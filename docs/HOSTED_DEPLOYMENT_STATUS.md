@@ -9,15 +9,16 @@ Date: 2026-06-17
 - Project ID: `prj_BWFVXVkasM6b3yybiuPHCJFk5fCV`
 - Public production alias: `https://cityatlas-one.vercel.app`
 - Custom Univenture alias: `https://city.univenturestudio.com`
-- Latest production deployment: `dpl_EH4ZGfu6TxX1Erg6dARaNuBGJv7y`
-- Latest production deployment URL: `https://cityatlas-rcpxa1sng-michael-yaps-projects-92932836.vercel.app`
+- Latest production deployment: `dpl_FjB8fUnP5ZhzueTvLfN2XWQ5sKRd`
+- Latest production deployment URL: `https://cityatlas-699zdvfn9-michael-yaps-projects-92932836.vercel.app`
 
 ## GitHub Release Path
 
 - Repository: `https://github.com/mikeyap87/cityatlas`
 - Remote-backed baseline now exists on `origin/main`.
 - The current release lane `codex/vancouver-release-lane` is pushed and tracks `origin/codex/vancouver-release-lane`.
-- The exact deployed Vancouver baseline currently matches both remote branches, so the next release lane work starts from a clean shared base instead of a missing-remote state.
+- The live production deploy on 2026-06-17 came from `codex/vancouver-release-lane` commit `36cda30`.
+- `origin/codex/vancouver-release-lane` is ahead of `origin/main`, so the release lane is the safest rollback base until a later merge updates `main`.
 
 ## Protection State
 
@@ -101,12 +102,20 @@ The next production follow-through on 2026-06-17 deployed the current Vancouver 
 
 The next live follow-through on 2026-06-17 kept the same approved public domain, used the verified `Univenture Studio (univenturestudio@gmail.com)` Search Console property, and confirmed three material changes in live truth: the Search Console overview still shows processing and `0` total web search clicks, the submitted sitemap refreshed successfully on the same day with `51` discovered pages, and the previously blocked Toronto pilot routes now pass the hosted smoke profile on the approved domain. The live starter-pack routing guide was also inspected and added to Google's priority crawl queue after URL inspection showed `Discovered - currently not indexed`.
 
+## 2026-06-17 Homepage UX And Visual Cleanup
+
+The latest production follow-through on 2026-06-17 deployed the homepage cleanup batch: a clickable Vancouver route map, working homepage search routing, simpler public copy, refreshed pricing presentation, and new city-specific card artwork including the corrected Kits Beach rope-flow visual. This release kept the same crawlable robots posture and the same hosted guard screens for `/admin` and `/private-preview/date-night`.
+
 ## 2026-06-15 Search Console Reverification
 
 The next live follow-through on 2026-06-15 updated the homepage Google verification token, deployed production build `dpl_2qdDJJDwypndVaW6W7rY4CxvoE87`, verified the `https://city.univenturestudio.com/` URL-prefix property in Search Console under the `Univenture Studio (univenturestudio@gmail.com)` Google account, confirmed the already-submitted sitemap state, and added two high-value guide URLs to Google's priority crawl queue.
 
 ## Verified
 
+- Production deploy `dpl_FjB8fUnP5ZhzueTvLfN2XWQ5sKRd` completed successfully and now serves the public aliases.
+- `curl -I https://city.univenturestudio.com/` returned `HTTP/2 200` after the 2026-06-17 homepage cleanup deploy with `last-modified: Wed, 17 Jun 2026 19:00:50 GMT`.
+- `curl -I https://cityatlas-one.vercel.app/` returned `HTTP/2 200` after the 2026-06-17 homepage cleanup deploy with the same `last-modified: Wed, 17 Jun 2026 19:00:50 GMT`.
+- Headless Chrome rendered `https://city.univenturestudio.com/`, confirmed the homepage hero heading, opened the clickable Kitsilano map stop, and used the homepage search to open `/vancouver/guides/two-hour-vancouver-visitor-loop-for-a-first-evening`.
 - Production deploy `dpl_EH4ZGfu6TxX1Erg6dARaNuBGJv7y` completed successfully and now serves the public aliases.
 - `curl -I https://city.univenturestudio.com/` returned `HTTP/2 200` after the 2026-06-17 deploy with `last-modified: Wed, 17 Jun 2026 06:46:43 GMT`.
 - `npm run seo:smoke:first -- --base-url https://city.univenturestudio.com` passed on 2026-06-17 after the standalone-repo direct deploy and re-verified the hosted first-time-visitor and wellness routes, protected noindex routes, `sitemap.xml`, and `llms.txt`.

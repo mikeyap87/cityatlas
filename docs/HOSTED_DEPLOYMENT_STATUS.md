@@ -1,6 +1,6 @@
 # Hosted Deployment Status
 
-Date: 2026-06-15
+Date: 2026-06-17
 
 ## Vercel
 
@@ -9,8 +9,8 @@ Date: 2026-06-15
 - Project ID: `prj_BWFVXVkasM6b3yybiuPHCJFk5fCV`
 - Public production alias: `https://cityatlas-one.vercel.app`
 - Custom Univenture alias: `https://city.univenturestudio.com`
-- Latest production deployment: `dpl_C9pg5MdqK6sFDSrFef8J4JoQd1vp`
-- Latest production deployment URL: `https://cityatlas-jcyimih0a-michael-yaps-projects-92932836.vercel.app`
+- Latest production deployment: `dpl_EH4ZGfu6TxX1Erg6dARaNuBGJv7y`
+- Latest production deployment URL: `https://cityatlas-rcpxa1sng-michael-yaps-projects-92932836.vercel.app`
 
 ## Protection State
 
@@ -86,12 +86,21 @@ The earlier production follow-through on 2026-06-15 added a Google Search Consol
 
 The next production follow-through on 2026-06-16 removed internal-style wording from the public homepage, city hub, missions, business, pricing, guide-library, trust, and crawl-context surfaces while keeping the same honest public boundaries about review-first business requests, sample-format pages, and protected noindex routes.
 
+## 2026-06-17 Standalone-Repo Direct Deploy
+
+The next production follow-through on 2026-06-17 deployed the current Vancouver business-coverage and public-copy batch directly from the newly isolated standalone CityAtlas repo after the local branch passed build, growth verification, smoke, and SEO proof. This release kept the same public crawl posture while preserving protected `/admin` and `/private-preview/date-night` routes behind hosted guard screens.
+
 ## 2026-06-15 Search Console Reverification
 
 The next live follow-through on 2026-06-15 updated the homepage Google verification token, deployed production build `dpl_2qdDJJDwypndVaW6W7rY4CxvoE87`, verified the `https://city.univenturestudio.com/` URL-prefix property in Search Console under the `Univenture Studio (univenturestudio@gmail.com)` Google account, confirmed the already-submitted sitemap state, and added two high-value guide URLs to Google's priority crawl queue.
 
 ## Verified
 
+- Production deploy `dpl_EH4ZGfu6TxX1Erg6dARaNuBGJv7y` completed successfully and now serves the public aliases.
+- `curl -I https://city.univenturestudio.com/` returned `HTTP/2 200` after the 2026-06-17 deploy with `last-modified: Wed, 17 Jun 2026 06:46:43 GMT`.
+- `npm run seo:smoke:first -- --base-url https://city.univenturestudio.com` passed on 2026-06-17 after the standalone-repo direct deploy and re-verified the hosted first-time-visitor and wellness routes, protected noindex routes, `sitemap.xml`, and `llms.txt`.
+- `npm run seo:smoke:second -- --base-url https://city.univenturestudio.com` passed on 2026-06-17 after the standalone-repo direct deploy and re-verified the hosted out-of-town guest and weekend-route routes, protected noindex routes, `sitemap.xml`, and `llms.txt`.
+- `npm run seo:smoke:starterpack -- --base-url https://city.univenturestudio.com` passed on 2026-06-17 after the standalone-repo direct deploy and re-verified the hosted Vancouver starter-pack routing guide, protected noindex routes, `sitemap.xml`, and `llms.txt`.
 - Production deploy `dpl_8SsQGqiWzpmJ613znBraq1AXEsxB` completed successfully and now serves the public aliases.
 - `npm run seo:smoke:first -- --base-url https://city.univenturestudio.com` passed on 2026-06-16 after the public-copy cleanup deploy and re-verified the hosted first-time-visitor and wellness routes, protected noindex routes, `sitemap.xml`, and `llms.txt`.
 - `npm run seo:smoke:second -- --base-url https://city.univenturestudio.com` passed on 2026-06-16 after the public-copy cleanup deploy and re-verified the hosted out-of-town guest and weekend-route routes, protected noindex routes, `sitemap.xml`, and `llms.txt`.

@@ -13,25 +13,28 @@ CityAtlas Vancouver public batch on:
 
 Release the current locally proven Vancouver batch that sharpens public business-coverage truth, keeps internal-style copy off the crawlable surface, and preserves the answer-first guide and source-backed authority library.
 
-This packet is about release mechanics only. It does not approve or perform a live action.
+This packet started as a release-mechanics-only approval packet. It now records the current release-path truth after the standalone-repo repair and the direct Vercel production deploy.
 
 ## Current Release Truth
 
 - CityAtlas is locally linked to the live Vercel project `cityatlas` through `.vercel/project.json`.
 - CityAtlas now has its own standalone local git repo at `/Users/michaelyap/Documents/Codex/Workspace/univenture/cityatlas`.
 - The current local release branch is `codex/vancouver-release-lane`.
+- The first clean standalone CityAtlas commit is `1cc4761`.
 - The approved public domain is already live and crawlable.
 - The current local batch has fresh proof artifacts dated 2026-06-17.
-- The currently served hosted shell responds with `HTTP/2 200` and `last-modified: Tue, 16 Jun 2026 06:28:51 GMT`, which means the live deployment is real but not proven to match the newest local batch.
+- The current production deployment is `dpl_EH4ZGfu6TxX1Erg6dARaNuBGJv7y` at `https://cityatlas-rcpxa1sng-michael-yaps-projects-92932836.vercel.app`.
+- The approved custom domain now responds with `HTTP/2 200` and `last-modified: Wed, 17 Jun 2026 06:46:43 GMT`, which confirms the current batch is live for review.
 
 ## Exact Blocker
 
-The Vancouver batch is not blocked by product readiness. It is now blocked by the remaining missing pieces of a clean push and deploy lane.
+The Vancouver batch is no longer blocked from live review. It is now blocked only from a clean remote-backed push and deploy lane.
 
 What is true right now:
 
 - `univenture/cityatlas` now resolves to its own standalone git repo.
 - The parent-workspace git collision is no longer the active blocker.
+- The current Vancouver batch has already been deployed directly through the linked Vercel project.
 - No remote is configured on the new CityAtlas repo yet.
 - No live base branch or commit has been identified from the real release source of truth yet.
 - The release-safety checker still cannot prove a normal branch-against-live release path until the remote and base are known.
@@ -55,11 +58,13 @@ CityAtlas now has a real standalone local release lane, but it still does not ha
 - `https://cityatlas-one.vercel.app/` returns `HTTP/2 200`.
 - Hosted `robots.txt` is public and still blocks `/admin`, `/private-preview/`, and `/for-businesses/submit`.
 - Hosted `sitemap.xml` is live and contains the current Vancouver crawlable guide and starter library.
+- Production deploy `dpl_EH4ZGfu6TxX1Erg6dARaNuBGJv7y` is live on the public aliases.
+- Hosted smoke passed on 2026-06-17 for the first source-backed packet, the second source-backed packet, and the starter-pack routing packet on `https://city.univenturestudio.com`.
 - Existing docs show CityAtlas already has a linked Vercel project, a public alias, and a public custom domain.
 
 ### Local Proof For The New Batch
 
-- `output/seo/local-proof-stack.json` passed on `2026-06-17T05:13:16.963Z`.
+- `output/seo/local-proof-stack.json` passed on `2026-06-17T06:44:13.189Z`.
 - Current local proof summary:
   - useful pieces: `41`
   - guides: `25`
@@ -68,20 +73,22 @@ CityAtlas now has a real standalone local release lane, but it still does not ha
   - checked routes: `38`
   - checked rendered routes: `51`
   - readiness average: `90`
-- `output/qa/local-product-smoke.json` passed on `2026-06-17T05:11:20.350Z`.
+- `output/qa/local-product-smoke.json` passed on `2026-06-17T06:44:08.430Z`.
 - Local smoke passed desktop and mobile checks across homepage, Vancouver starter navigation, Toronto pilot routes, planner, business submit, admin, and private preview.
+- `npm run growth:verify` passed on 2026-06-17 with Vancouver still at `143` total prospects, `124` partner candidates, `93` contact-ready rows, and `66` email-ready rows.
+- `npm run build` passed on 2026-06-17 before deploy.
 
 ### Repo And Tooling Truth
 
 - `git -C /Users/michaelyap/Documents/Codex/Workspace/univenture/cityatlas rev-parse --show-toplevel` now resolves to `/Users/michaelyap/Documents/Codex/Workspace/univenture/cityatlas`.
 - `git -C /Users/michaelyap/Documents/Codex/Workspace/univenture/cityatlas branch --show-current` now returns `codex/vancouver-release-lane`.
+- `git -C /Users/michaelyap/Documents/Codex/Workspace/univenture/cityatlas log -1 --oneline` now returns the standalone root commit `1cc4761 Initialize standalone CityAtlas release lane`.
 - `git -C /Users/michaelyap/Documents/Codex/Workspace/univenture/cityatlas remote -v` still returns no remote.
-- The staged payload is now isolated to the CityAtlas project instead of the mixed parent workspace.
+- The committed payload is now isolated to the CityAtlas project instead of the mixed parent workspace.
 - The release-safety checker exists for Univenture, but the shared standard points to a broader workspace path than the actual checker location for this repo family. The checker itself is usable, but only after the repo/base problem is fixed.
 
 ## Not Verified
 
-- The current local Vancouver batch is not verified live on the approved domain.
 - There is no pushable remote branch for CityAtlas.
 - There is no confirmed live base branch or commit for a safe release transplant.
 - There is no rollback snapshot tied to a clean repo history for this new local batch.
@@ -90,7 +97,7 @@ CityAtlas now has a real standalone local release lane, but it still does not ha
 
 ### Option 1: Dedicated CityAtlas Repo First
 
-Completed locally except for the remote and live-base step. CityAtlas now has its own standalone local git repo. The remaining move is to attach the intended GitHub remote, confirm the live base, rerun the release-safety check against that real base, then push and deploy from the dedicated repo.
+Completed locally except for the remote and live-base step. CityAtlas now has its own standalone local git repo, first clean commit, fresh local proof, and one live Vercel deploy. The remaining move is to attach the intended GitHub remote, confirm the live base, rerun the release-safety check against that real base, then move future releases onto the dedicated repo path.
 
 Why this is best:
 
@@ -105,7 +112,7 @@ Cost:
 
 ### Option 2: Standalone Local Repo Now, Remote Decision Next
 
-This local repair step is now in progress and effectively completed for repo isolation. CityAtlas has its own local repo and branch. The remaining work is the first clean commit plus the remote decision.
+This local repair step is complete. CityAtlas has its own local repo, branch, and first clean commit. The remaining work is the remote decision.
 
 Why this helps:
 
@@ -145,7 +152,7 @@ Why:
 
 Safest: Option 1.
 
-Fastest while still responsible: finish the first clean local commit on the new repo, then immediately continue into Option 1 once the remote is confirmed.
+Fastest while still responsible: keep the current live direct-deploy path available for review, then immediately continue into Option 1 once the remote is confirmed.
 
 Fastest live-only but weakest mechanically: Option 3.
 
@@ -153,20 +160,15 @@ Fastest live-only but weakest mechanically: Option 3.
 
 Please choose the release source of truth for CityAtlas:
 
-1. Approve creating or reconnecting a dedicated CityAtlas git repo and remote, then release from that repo.
-2. Approve making CityAtlas a standalone local repo first while you confirm the remote destination.
-3. Approve a one-off direct Vercel deploy from the linked folder even though it is not a clean commit, push, and deploy path.
+1. Approve creating or reconnecting a dedicated CityAtlas GitHub remote, then moving future releases onto that repo-based path.
+2. Approve keeping the current one-off direct Vercel deploy as the temporary live-review path while the remote is resolved.
 
 ## Recommended Approval Sentence
 
 If you want the cleanest path:
 
-`Approved: make CityAtlas its own real repo, connect the intended remote, build a clean release lane from that repo, rerun proof, and prepare the push/deploy packet.`
+`Approved: connect CityAtlas to its intended GitHub remote, rerun release-safety against the real base, and move future releases onto the clean repo-based path.`
 
-If you want the fastest acceptable setup step first:
+If you want to keep today's live review path while that gets resolved:
 
-`Approved: initialize CityAtlas as its own local repo now, make the first clean commit, and stop before any push or deploy until the remote is confirmed.`
-
-If you want the fastest live path instead:
-
-`Approved: use the existing linked Vercel project for a one-off direct deploy of the current CityAtlas batch, knowing this bypasses a clean repo-based release path.`
+`Approved: keep the current direct Vercel deploy as the temporary review path, and continue toward the clean GitHub remote path next.`

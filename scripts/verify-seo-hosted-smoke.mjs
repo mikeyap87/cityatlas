@@ -805,8 +805,22 @@ async function runRouteCheck(
     if (isLocalBase) {
       skippedChecks.push("guard-fragment-on-local-preview");
     } else {
+      const acceptedGuardFragments = [requiredGuardFragment];
+
+      if (path === "/admin") {
+        acceptedGuardFragments.push(
+          "Business reviews, partner notes, and operations data are handled in a protected workspace, so this page stays outside the public experience.",
+        );
+      }
+
+      if (path === "/private-preview/date-night") {
+        acceptedGuardFragments.push(
+          "It includes planning material that is shared selectively, so it stays outside the public CityAtlas experience.",
+        );
+      }
+
       check(
-        rendered.bodyText.includes(requiredGuardFragment),
+        acceptedGuardFragments.some((fragment) => rendered.bodyText.includes(fragment)),
         `${path} is missing the hosted guard notice on ${baseUrl}.`,
       );
     }

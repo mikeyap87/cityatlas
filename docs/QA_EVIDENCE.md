@@ -1,0 +1,483 @@
+# QA Evidence
+
+## Design Reference
+
+- Concept: `public/design/launch-product-concept.png`
+- Implemented screenshots captured locally with headless Chrome because the in-app Browser did not expose a direct local navigation/screenshot tool in this thread.
+
+## Screenshot Evidence
+
+- Desktop homepage: `/tmp/cityatlas_launch_home_desktop.png`
+- Mobile homepage after fixes: `/tmp/cityatlas_launch_home_mobile_v5.png`
+- Admin console after fixes: `/tmp/cityatlas_launch_admin_desktop_v2.png`
+- Business submit page: `/tmp/cityatlas_launch_submit_desktop.png`
+- Weekend Atlas homepage variant: `/tmp/cityatlas_next_home_variant_real.png`
+- Planner mobile after fixes: `/tmp/cityatlas_next_planner_mobile_v6.png`
+- Growth cockpit admin: `/tmp/cityatlas_next_admin_real.png`
+- City Missions desktop: `.lazyweb/design-research/cityatlas-missions-2026-06-14/references/current-state-missions.png`
+- City Missions mobile, true 390px viewport: `.lazyweb/design-research/cityatlas-missions-2026-06-14/references/current-state-missions-mobile-cdp.png`
+- Planner mobile, true 390px viewport: `.lazyweb/design-research/cityatlas-missions-2026-06-14/references/current-state-planner-mobile-cdp.png`
+- Admin growth radar full capture: `.lazyweb/design-research/cityatlas-missions-2026-06-14/references/current-state-admin-growth-radar-full.png`
+- Lazyweb design research report: `.lazyweb/design-research/cityatlas-missions-2026-06-14/report.html`
+- Admin proof sprint desktop: `public/visual_references/04_admin_proof_sprint_desktop.png`
+- Admin proof sprint mobile: `public/visual_references/05_admin_proof_sprint_mobile.png`
+- Admin mobile header after nav fix: `public/visual_references/06_admin_mobile_header.png`
+- Admin Founder CRM desktop: `public/visual_references/07_admin_founder_crm_desktop.png`
+- Admin Founder CRM mobile: `public/visual_references/08_admin_founder_crm_mobile.png`
+- Private Date Night preview desktop: `public/visual_references/09_private_preview_desktop.png`
+- Private Date Night preview mobile: `public/visual_references/10_private_preview_mobile.png`
+- Admin reply tracker desktop: `public/visual_references/11_admin_reply_tracker_desktop.png`
+- Admin AI Brain command engine desktop: `public/visual_references/12_admin_ai_brain_desktop.png`
+- Admin AI Brain command engine mobile: `public/visual_references/13_admin_ai_brain_mobile.png`
+- Univenture terms desktop: `public/visual_references/14_univenture_terms_desktop.png`
+- Univenture privacy mobile: `public/visual_references/15_univenture_privacy_mobile.png`
+- Out-of-town guest mobile after shared header fix: `/tmp/cityatlas_out_of_town_guest_mobile_v2.png`
+
+## Checks
+
+- Neighborhood starter completion batch: `npm run typecheck` passed after the Kitsilano neighborhood starter page, neighborhood-cluster direct-path links, and destination-surface promotion updates.
+- Neighborhood starter completion batch: `npm run build` passed after the Kitsilano neighborhood starter page, neighborhood-cluster direct-path links, and destination-surface promotion updates.
+- Neighborhood starter completion batch: `npm run seo:proof` passed on `2026-06-14T23:28:14.658Z` and re-confirmed `28` useful pieces, `19` guides, `9` source-backed wedge collections, `45` source-backed place anchors, and zero failures.
+- Neighborhood starter completion batch: `npm run readiness` passed on `2026-06-14T23:28:34.258Z` and kept `CityAtlas readiness average: 90%`.
+- Neighborhood starter completion batch: `curl -I http://127.0.0.1:5178/vancouver/guides/kitsilano-scenic-route-starter-guide-for-slower-vancouver-evenings` returned `HTTP/1.1 200 OK`.
+- Neighborhood starter completion batch: local `sitemap.xml` and `llms.txt` were updated to include the Kitsilano starter route, and the home, city, and guide-library surfaces now spotlight the Gastown, Mount Pleasant, and Kitsilano starter trio instead of leaving Kitsilano missing from the destination cluster.
+- Kitsilano scenic source-backed wedge batch: `npm run typecheck` passed after wiring the new source-backed collection into the Vancouver city page, guide-library router, homepage trust layer, and crawl files.
+- Kitsilano scenic source-backed wedge batch: `npm run build` passed after wiring the new source-backed collection into the Vancouver city page, guide-library router, homepage trust layer, and crawl files.
+- Kitsilano scenic source-backed wedge batch: `npm run seo:proof` passed on `2026-06-14T23:39:21.138Z` and confirmed `29` useful pieces, `19` guides, `10` source-backed wedge collections, `50` source-backed place anchors, and zero failures.
+- Kitsilano scenic source-backed wedge batch: `curl -I http://127.0.0.1:5178/vancouver/kitsilano-scenic-starters` returned `HTTP/1.1 200 OK`.
+- Kitsilano scenic source-backed wedge batch: `curl -I http://127.0.0.1:5178/vancouver/guides/kitsilano-scenic-route-starter-guide-for-slower-vancouver-evenings` returned `HTTP/1.1 200 OK`.
+- Kitsilano scenic source-backed wedge batch: local `sitemap.xml` and `llms.txt` were updated to include `/vancouver/kitsilano-scenic-starters`, and the public copy now reflects ten local source-backed wedges instead of the older nine-wedge count.
+- West-side daytime source-backed wedge batch: `npm run typecheck` passed after wiring the new west-side daytime collection into the seed data, route surfaces, guide mapping, and crawl files.
+- West-side daytime source-backed wedge batch: `npm run build` passed after wiring the new west-side daytime collection into the seed data, route surfaces, guide mapping, and crawl files.
+- West-side daytime source-backed wedge batch: `npm run seo:proof` passed on `2026-06-14T23:56:01.327Z` and confirmed `31` useful pieces, `20` guides, `11` source-backed wedge collections, `55` source-backed place anchors, and zero failures.
+- West-side daytime source-backed wedge batch: `curl -I http://127.0.0.1:5178/vancouver/west-side-daytime-starters` returned `HTTP/1.1 200 OK`.
+- West-side daytime source-backed wedge batch: `curl -I http://127.0.0.1:5178/vancouver/guides/where-should-you-start-a-west-side-vancouver-daytime-plan` returned `HTTP/1.1 200 OK`.
+- West-side daytime source-backed wedge batch: local `sitemap.xml` and `llms.txt` were updated to include the new west-side daytime source-backed route and matching guide, and the public source-backed surfaces now reflect eleven local wedges instead of the older ten-wedge count.
+- False Creek culture source-backed wedge batch: `npm run typecheck` passed after wiring the new False Creek culture collection into the seed data, route surfaces, guide mapping, and crawl files.
+- False Creek culture source-backed wedge batch: `npm run build` passed after wiring the new False Creek culture collection into the seed data, route surfaces, guide mapping, and crawl files.
+- False Creek culture source-backed wedge batch: `npm run seo:proof` passed on `2026-06-15T00:11:25.107Z` and confirmed `33` useful pieces, `21` guides, `12` source-backed wedge collections, `60` source-backed place anchors, and zero failures.
+- False Creek culture source-backed wedge batch: `npm run readiness` passed after the new wedge and kept `CityAtlas readiness average: 90%`.
+- False Creek culture source-backed wedge batch: `curl -I http://127.0.0.1:5178/vancouver/false-creek-culture-starters` returned `HTTP/1.1 200 OK`.
+- False Creek culture source-backed wedge batch: `curl -I http://127.0.0.1:5178/vancouver/guides/where-should-you-start-a-false-creek-vancouver-culture-afternoon` returned `HTTP/1.1 200 OK`.
+- False Creek culture source-backed wedge batch: local `sitemap.xml` and `llms.txt` were updated to include the new False Creek culture source-backed route and matching guide, and the public source-backed surfaces now reflect twelve local wedges instead of the older eleven-wedge count.
+- UBC discovery source-backed wedge batch: `npm run typecheck` passed after wiring the new UBC discovery collection into the seed data, route surfaces, guide mapping, and crawl files.
+- UBC discovery source-backed wedge batch: `npm run build` passed after wiring the new UBC discovery collection into the seed data, route surfaces, guide mapping, and crawl files, with only the existing non-blocking Vite large-chunk warning.
+- UBC discovery source-backed wedge batch: `npm run seo:proof` passed on `2026-06-15T00:31:08.133Z` and confirmed `35` useful pieces, `22` guides, `13` source-backed wedge collections, `65` source-backed place anchors, and zero failures.
+- UBC discovery source-backed wedge batch: `npm run readiness` passed on `2026-06-15T00:31:28.279Z` and kept `CityAtlas readiness average: 90%`.
+- UBC discovery source-backed wedge batch: `curl -I http://127.0.0.1:5178/vancouver/ubc-discovery-starters` returned `HTTP/1.1 200 OK`.
+- UBC discovery source-backed wedge batch: `curl -I http://127.0.0.1:5178/vancouver/guides/where-should-you-start-a-ubc-adjacent-vancouver-discovery-day` returned `HTTP/1.1 200 OK`.
+- UBC discovery source-backed wedge batch: local `sitemap.xml` and `llms.txt` were updated to include the new UBC discovery source-backed route and matching guide, and the public source-backed surfaces now reflect thirteen local wedges instead of the older twelve-wedge count.
+- Garden-day source-backed wedge batch: `npm run typecheck` passed after wiring the new garden-day collection into the seed data, route surfaces, guide mapping, and crawl files.
+- Garden-day source-backed wedge batch: `npm run build` passed after wiring the new garden-day collection into the seed data, route surfaces, guide mapping, and crawl files, with only the existing non-blocking Vite large-chunk warning.
+- Garden-day source-backed wedge batch: `npm run seo:proof` passed on `2026-06-15T00:56:04.996Z` and confirmed `37` useful pieces, `23` guides, `14` source-backed wedge collections, `70` source-backed place anchors, `14` mapped guide-to-collection links, and zero failures.
+- Garden-day source-backed wedge batch: `npm run readiness` passed on June 15, 2026 and kept `CityAtlas readiness average: 90%`.
+- Garden-day source-backed wedge batch: `curl -I http://127.0.0.1:4178/vancouver/garden-day-starters` returned `HTTP/1.1 200 OK`.
+- Garden-day source-backed wedge batch: `curl -I http://127.0.0.1:4178/vancouver/guides/where-should-you-start-a-vancouver-garden-and-conservatory-day` returned `HTTP/1.1 200 OK`.
+- Garden-day source-backed wedge batch: local `sitemap.xml` and `llms.txt` were updated to include the new garden-day source-backed route and matching guide, and the public source-backed surfaces now reflect fourteen local wedges instead of the older thirteen-wedge count.
+- SEO structure-proof batch: `npm run seo:structure:proof` passed on `2026-06-15T06:39:23.742Z` and verified key route metadata, robots directives, breadcrumb coverage, guide FAQ schema, source-backed CollectionPage and ItemList structure, and the guide-hub plus city-hub JSON-LD surfaces.
+- SEO structure-proof batch: `npm run typecheck` passed after extracting shared route metadata and JSON-LD logic into a reusable SEO helper.
+- SEO structure-proof batch: `npm run build` passed after the shared SEO helper and structure-proof script were added, with only the existing non-blocking Vite large-chunk warning.
+- Current-state proof snapshot refresh: `npm run seo:proof` passed on `2026-06-14T23:22:49.242Z` and re-confirmed `27` useful pieces, `18` guides, `9` source-backed wedge collections, `45` source-backed place anchors, and zero failures.
+- Current-state proof snapshot refresh: `npm run readiness` passed on `2026-06-14T23:22:49.192Z` and re-confirmed `CityAtlas readiness average: 90%`.
+- Current-state proof snapshot refresh: `curl -I http://127.0.0.1:5178/vancouver/first-time-visitor-starters` returned `HTTP/1.1 200 OK`.
+- Current-state proof snapshot refresh: `curl -I http://127.0.0.1:5178/vancouver/guides/vancouver-itinerary-starter-pack-which-cityatlas-page-should-you-open-first` returned `HTTP/1.1 200 OK`.
+- Current-state proof snapshot refresh: `curl -I http://127.0.0.1:5178/vancouver/guides/which-low-friction-vancouver-route-should-you-open-today` returned `HTTP/1.1 200 OK`.
+- Current-state proof snapshot refresh: `curl -I http://127.0.0.1:5178/vancouver/guides/cityatlas-guide-roundup-which-vancouver-route-should-you-open-by-situation` returned `HTTP/1.1 200 OK`.
+- Current-state proof snapshot refresh: `docs/seo-aeo-geo/CURRENT_LOCAL_PROOF_SNAPSHOT.md` was added as the preferred current local truth source so newer release packets can cite one clean machine snapshot instead of mixed historical batch notes.
+- Source-backed authority batch: `npm run typecheck` passed after the new public source-backed page, standards page, and trust-linking changes.
+- Source-backed authority batch: `npm run build` passed after the new public source-backed page, standards page, and trust-linking changes.
+- Source-backed authority batch: `npm run readiness` passed and kept `CityAtlas readiness average: 90%`.
+- Source-backed authority batch: `curl -I http://127.0.0.1:4178/vancouver/date-night-starters` returned `HTTP/1.1 200 OK`.
+- Source-backed authority batch: `curl -I http://127.0.0.1:4178/editorial-standards` returned `HTTP/1.1 200 OK`.
+- Source-backed authority batch: Safari Computer Use rendered local `/vancouver/date-night-starters` and showed the source-backed hero, five official-source cards, and correction-path links.
+- Source-backed authority batch: Safari Computer Use rendered local `/editorial-standards` and showed the public source policy, correction/removal process, and terms/privacy CTA.
+- Source-backed authority batch: `npx vercel deploy --prod --yes --scope michael-yaps-projects-92932836` first succeeded with production deployment `dpl_BHNwt9zub6NzLkRYbFkCkZjVN5Fm`, then the final guide-layer refinement shipped in production deployment `dpl_CpRjDLYUiuL8WQFK2zcJhzUDofsC`.
+- Source-backed authority batch: `curl -I https://city.univenturestudio.com/`, `/vancouver/date-night-starters`, `/editorial-standards`, and `/admin` returned `HTTP/2 200`.
+- Source-backed authority batch: `https://city.univenturestudio.com/llms.txt` now includes the source-backed date-night page and public standards/correction path.
+- Source-backed authority batch: `https://city.univenturestudio.com/sitemap.xml` now includes `/vancouver/date-night-starters` and `/editorial-standards`.
+- Source-backed authority batch: Safari Computer Use rendered hosted `/vancouver/date-night-starters` and showed the official-source cards plus correction-path links on the real public domain.
+- Source-backed authority batch: Safari Computer Use rendered hosted `/admin` and showed `Launch console is protected before hosted sharing.`
+- Guide-layer replacement follow-through: `npm run typecheck` passed after moving source-backed anchors directly into the public date-night guide and fixing the stale local-storage merge behavior for seed editorial content.
+- Guide-layer replacement follow-through: `npm run build` passed after moving source-backed anchors directly into the public date-night guide and fixing the stale local-storage merge behavior for seed editorial content.
+- Guide-layer replacement follow-through: Safari Computer Use rendered local `/vancouver/guides/how-to-plan-a-vancouver-date-night-without-crossing-the-city-twice?fresh=1` and showed the updated proof note plus the embedded source-backed starter section.
+- Guide-layer replacement follow-through: `curl -I https://city.univenturestudio.com/vancouver/guides/how-to-plan-a-vancouver-date-night-without-crossing-the-city-twice?fresh=2` returned `HTTP/2 200`.
+- Guide-layer replacement follow-through: Safari Computer Use rendered hosted `/vancouver/guides/how-to-plan-a-vancouver-date-night-without-crossing-the-city-twice?fresh=2` and showed the updated proof note, embedded source-backed starter section, and correction-path links.
+- Guide-layer replacement follow-through: Safari Computer Use rendered hosted `/admin?fresh=2` and still showed `Live payments, imports, outreach, and public claims remain disabled.`
+- Rainy-day authority batch: `npm run typecheck` passed after the shared source-backed collection helper, new rainy-day page, rainy-day guide replacement layer, and trust-link updates.
+- Rainy-day authority batch: `npm run build` passed after the shared source-backed collection helper, new rainy-day page, rainy-day guide replacement layer, and trust-link updates.
+- Rainy-day authority batch: `npm run readiness` passed and kept `CityAtlas readiness average: 90%`.
+- Rainy-day authority batch: `curl -I http://127.0.0.1:4178/vancouver/rainy-day-starters`, `/vancouver/guides/rainy-day-vancouver-plan-coffee-walk-and-reset`, `/vancouver/date-night-starters`, and `/editorial-standards` all returned `HTTP/1.1 200 OK`.
+- Rainy-day authority batch: headless Chrome rendered local `/vancouver/rainy-day-starters` and showed the rainy-day source-backed hero, five official-source cards, and correction-path links.
+- Rainy-day authority batch: headless Chrome rendered local `/vancouver/guides/rainy-day-vancouver-plan-coffee-walk-and-reset` and showed the embedded rainy-day source-backed section, updated proof note, and rainy-day rail link.
+- Rainy-day authority batch: `curl -sS http://127.0.0.1:4178/sitemap.xml` included `/vancouver/rainy-day-starters`.
+- Rainy-day authority batch: `curl -sS http://127.0.0.1:4178/llms.txt` included both source-backed pages plus the public standards/correction path.
+- Rainy-day authority batch: `npx vercel deploy --prod --yes --scope michael-yaps-projects-92932836` succeeded with production deployment `dpl_ASSTqvBGm6v1fyPZa7hDHaaUJB9d`.
+- Rainy-day authority batch: `curl -I https://city.univenturestudio.com/vancouver/rainy-day-starters`, `/vancouver/guides/rainy-day-vancouver-plan-coffee-walk-and-reset`, and `/admin` all returned `HTTP/2 200`.
+- Rainy-day authority batch: `https://city.univenturestudio.com/sitemap.xml` now includes `/vancouver/rainy-day-starters`.
+- Rainy-day authority batch: `https://city.univenturestudio.com/llms.txt` now lists both source-backed pages and the standards/correction path.
+- Rainy-day authority batch: headless Chrome rendered hosted `/vancouver/rainy-day-starters` and showed the rainy-day source-backed hero, five official-source cards, and correction-path links on the public domain.
+- Rainy-day authority batch: headless Chrome rendered hosted `/admin` and showed `Launch console is protected before hosted sharing.` plus `Live payments, imports, outreach, and public claims remain disabled.`
+- First-evening visitor authority batch: `npm run typecheck` passed after the new shared first-evening source-backed collection, upgraded visitor guide, trust-surface links, and crawl-file updates.
+- First-evening visitor authority batch: `npm run build` passed after the new shared first-evening source-backed collection, upgraded visitor guide, trust-surface links, and crawl-file updates.
+- First-evening visitor authority batch: `npm run readiness` passed and kept `CityAtlas readiness average: 90%`.
+- First-evening visitor authority batch: `curl -I http://127.0.0.1:4178/vancouver/first-evening-starters` and `curl -I http://127.0.0.1:4178/vancouver/guides/two-hour-vancouver-visitor-loop-for-a-first-evening` both returned `HTTP/1.1 200 OK`.
+- First-evening visitor authority batch: the in-app browser rendered local `/vancouver/first-evening-starters` and showed the first-evening source-backed hero, correction-path links, and official-source cards including Vancouver Art Gallery, Stanley Park, and Bloedel Conservatory.
+- First-evening visitor authority batch: the in-app browser rendered local `/vancouver/guides/two-hour-vancouver-visitor-loop-for-a-first-evening` and showed the embedded first-evening source-backed section, updated proof note, and first-evening rail link.
+- First-evening visitor authority batch: `npx vercel deploy --prod --yes --scope michael-yaps-projects-92932836` succeeded with production deployment `dpl_8t2Z6dZoRNDL8e8fGw4WDwrk6op3`.
+- First-evening visitor authority batch: `curl -I https://city.univenturestudio.com/vancouver/first-evening-starters`, `curl -I https://city.univenturestudio.com/vancouver/guides/two-hour-vancouver-visitor-loop-for-a-first-evening`, and `curl -I https://city.univenturestudio.com/admin` all returned `HTTP/2 200`.
+- First-evening visitor authority batch: `https://city.univenturestudio.com/sitemap.xml` now includes `/vancouver/first-evening-starters`.
+- First-evening visitor authority batch: `https://city.univenturestudio.com/llms.txt` now lists all three source-backed pages and the standards/correction path.
+- First-evening visitor authority batch: the in-app browser rendered hosted `/vancouver/first-evening-starters` and showed the first-evening source-backed hero, correction-path links, and official-source cards on the public domain.
+- First-evening visitor authority batch: the in-app browser rendered hosted `/vancouver/guides/two-hour-vancouver-visitor-loop-for-a-first-evening` and showed the embedded first-evening source-backed section, updated proof note, and first-evening rail link on the public domain.
+- Brand/post-send batch: `npm run proof:sprint` passed and regenerated post-send proof-sprint artifacts.
+- Brand/post-send batch: `npm run replies:analyze` passed and regenerated reply summary with `bounces: 0`.
+- Brand/post-send batch: `npm run typecheck` passed.
+- Brand/post-send batch: `npm run build` passed.
+- Brand/post-send batch: `npm run readiness` passed and generated `docs/READINESS_PROGRESS.md` with average progress at `89%`.
+- Brand/post-send route pass: `curl -I http://127.0.0.1:5178/` returned `HTTP/1.1 200 OK`.
+- Brand/post-send route pass: `curl -I http://127.0.0.1:5178/admin` returned `HTTP/1.1 200 OK`.
+- Brand/post-send visual QA note: headless Chrome screenshot rerun failed in sandbox with exit `134`, and the escalated rerun was rejected by the environment usage limit. No new screenshot evidence was captured in this batch.
+- `npm install` completed with `0 vulnerabilities`.
+- `npm run typecheck` passed.
+- `npm run build` passed.
+- `curl -I http://127.0.0.1:5178/` returned `HTTP/1.1 200 OK`.
+- `curl -I http://127.0.0.1:5178/planner` returned `HTTP/1.1 200 OK`.
+- `curl -I http://127.0.0.1:5178/admin` returned `HTTP/1.1 200 OK`.
+- `curl -I http://127.0.0.1:5178/vancouver/missions` returned `HTTP/1.1 200 OK`.
+- `curl -I http://127.0.0.1:5178/for-businesses/pricing` returned `HTTP/1.1 200 OK`.
+- `curl -I http://127.0.0.1:5178/private-preview/date-night` returned `HTTP/1.1 200 OK`.
+- `npm audit --json` returned 0 vulnerabilities after read-only registry access.
+- Proof sprint pass: `npm run typecheck` passed.
+- Proof sprint pass: `npm run build` passed.
+- Founder CRM pass: `npm run typecheck` passed.
+- Founder CRM pass: `npm run build` passed.
+- Private preview and reply tracker pass: `npm run typecheck` passed.
+- Private preview and reply tracker pass: `npm run build` passed.
+- AI Brain command engine pass: `npm run typecheck` passed.
+- AI Brain command engine pass: `npm run build` passed.
+- AI Brain command engine pass: `LC_ALL=C rg -n "[^[:ascii:]]" README.md CHANGELOG.md docs src supabase` returned no matches.
+- `curl -I http://127.0.0.1:5178/admin` returned `HTTP/1.1 200 OK`.
+- `curl -I http://127.0.0.1:5178/private-preview/date-night` returned `HTTP/1.1 200 OK`.
+- `curl -I http://127.0.0.1:5178/for-businesses/pricing` returned `HTTP/1.1 200 OK`.
+- `curl -I http://127.0.0.1:5178/vancouver/missions` returned `HTTP/1.1 200 OK`.
+- Univenture readiness pass: `npm install` completed with `0 vulnerabilities` in `/Users/michaelyap/Documents/Codex/Workspace/univenture/cityatlas`.
+- Univenture readiness pass: `npm run readiness` passed and generated `docs/READINESS_PROGRESS.md` with average progress at `75%`.
+- Univenture readiness pass: `npm run typecheck` passed.
+- Univenture readiness pass: `npm run build` passed.
+- Univenture readiness pass: `LC_ALL=C rg -n "[^[:ascii:]]" README.md CHANGELOG.md AGENTS.md docs src supabase stripe scripts public .env.example` returned no matches.
+- Univenture route checks returned `HTTP/1.1 200 OK` for `/`, `/admin`, `/terms`, `/privacy`, `/for-businesses/pricing`, `/for-businesses/submit`, `/private-preview/date-night`, and `/vancouver/missions`.
+- Univenture visual QA captured and reviewed the terms desktop page and privacy mobile page after CTA and footer wrapping fixes.
+- Univenture archive pass: `zip -T output/CityAtlas_Univenture_Launch_Lane.zip` returned `test of output/CityAtlas_Univenture_Launch_Lane.zip OK`.
+- Hosted deploy pass: Vercel project `cityatlas` deployed production alias `https://cityatlas-one.vercel.app`.
+- Hosted deploy pass: protected preview `https://cityatlas-7hc9sfcg3-michael-yaps-projects-92932836.vercel.app` returned `HTTP/2 401` without Vercel access.
+- Hosted route pass: `curl -I https://cityatlas-one.vercel.app/`, `/admin`, `/private-preview/date-night`, `/terms`, and `/robots.txt` returned `HTTP/2 200`.
+- Hosted route pass: `https://cityatlas-one.vercel.app/robots.txt` returned `Disallow: /`.
+- Hosted route pass: headless Chrome rendered `/admin` and showed `Launch console is protected before hosted sharing.`
+- Hosted route pass: headless Chrome rendered `/private-preview/date-night` and showed `Private Date Night preview is not exposed on hosted builds.`
+- Hosted domain pass: `city.univenturestudio.com` was added to Vercel and initially waited on Cloudflare DNS A record `city -> 76.76.21.21`.
+- Cloudflare DNS pass: created DNS record `8ff75b331e538b2f69ef1ee175a4a370`, `A city.univenturestudio.com -> 76.76.21.21`, `proxied=false`, `ttl=1`.
+- Cloudflare authoritative DNS pass: `dig @jillian.ns.cloudflare.com city.univenturestudio.com A +short` returned `76.76.21.21`.
+- Cloudflare authoritative DNS pass: `dig @pete.ns.cloudflare.com city.univenturestudio.com A +short` returned `76.76.21.21`.
+- Public recursive DNS pass: `dig @1.1.1.1 +short city.univenturestudio.com A` returned `76.76.21.21`.
+- Public recursive DNS pass: `dig @8.8.8.8 +short city.univenturestudio.com A` returned `76.76.21.21`.
+- Local resolver note: this machine's default resolver had not refreshed yet and plain `curl https://city.univenturestudio.com/` still returned `Could not resolve host` during immediate verification.
+- Vercel alias pass: `npx vercel alias set cityatlas-biybpmrnj-michael-yaps-projects-92932836.vercel.app city.univenturestudio.com --scope michael-yaps-projects-92932836` succeeded and issued certificate `cert_u3pbkyalMfT35DtAZryQRPMe`.
+- Vercel alias pass: `npx vercel alias ls --scope michael-yaps-projects-92932836` listed `city.univenturestudio.com` pointing to the production deployment source.
+- Custom-domain HTTPS pass: `curl -I --resolve city.univenturestudio.com:443:76.76.21.21 https://city.univenturestudio.com/` returned `HTTP/2 200`.
+- Custom-domain HTTPS pass: `curl -I --resolve city.univenturestudio.com:443:76.76.21.21 https://city.univenturestudio.com/admin` returned `HTTP/2 200`.
+- Custom-domain HTTPS pass: `curl -I --resolve city.univenturestudio.com:443:76.76.21.21 https://city.univenturestudio.com/private-preview/date-night` returned `HTTP/2 200`.
+- Custom-domain robots pass: `curl -sS --resolve city.univenturestudio.com:443:76.76.21.21 https://city.univenturestudio.com/robots.txt` returned `Disallow: /`.
+- Custom-domain route guard pass: headless Chrome rendered `/admin` and showed `Launch console is protected before hosted sharing.`
+- Custom-domain route guard pass: headless Chrome rendered `/private-preview/date-night` and showed `Private Date Night preview is not exposed on hosted builds.`
+- Proof sprint handoff pass: `npm run proof:sprint` generated `docs/proof-sprints/DATE_NIGHT_SEND_WINDOW_APPROVAL.md`, `output/proof-sprints/date-night-send-window-review.json`, and `output/proof-sprints/date-night-reply-log-template.csv`.
+- Readiness progress pass: `npm run readiness` passed and generated `docs/READINESS_PROGRESS.md` with average progress at `79%`.
+- Revenue proof loop pass: official-source contact-path research found 10 contact-ready prospects, 6 high-confidence contacts, and 0 low-confidence contacts.
+- Revenue proof loop pass: `npm run proof:sprint` generated `docs/proof-sprints/DATE_NIGHT_CONTACT_PATHS_RESEARCH.md`, `docs/revenue/DATE_NIGHT_REVENUE_PROOF_LOOP.md`, `output/proof-sprints/date-night-contact-paths.json`, and `output/revenue/date-night-revenue-proof-loop.json`.
+- Revenue proof loop pass: `npm run readiness` passed and generated `docs/READINESS_PROGRESS.md`; this later moved from `82%` to `85%` after the shadow-outreach pass.
+- Revenue proof loop verification: `npm run typecheck` passed after contact-path and Brain updates.
+- Revenue proof loop verification: `npm run build` passed after contact-path and Brain updates.
+- Revenue proof loop verification: ASCII scan returned no matches.
+- Revenue proof loop route pass: `/`, `/admin`, `/for-businesses/pricing`, `/private-preview/date-night`, `/terms`, and `/privacy` returned `HTTP/1.1 200 OK` on `127.0.0.1:5178`.
+- Revenue proof loop render pass: headless Chrome rendered `/admin` and showed contact-readiness QA, 10 contact-ready prospects, the Date Night first revenue proof experiment, and package-demand gating.
+- Shadow outreach pass: `npm run proof:sprint` generated `docs/proof-sprints/DATE_NIGHT_SHADOW_OUTREACH_RANKING.md` and `output/proof-sprints/date-night-shadow-outreach-ranking.json`.
+- Shadow outreach pass: generated ranking showed 5 primary manual-send candidates, 4 confirm-first candidates, 1 backup/no-send candidate, and 0 blocked manual lookups.
+- Reply learning pass: `npm run replies:analyze` generated `docs/proof-sprints/DATE_NIGHT_REPLY_SUMMARY.md` and `output/proof-sprints/date-night-reply-summary.json`.
+- Reply learning pass: current summary shows 0 rows, 0 replies, 0 package-demand signals, and `No signal`, so outreach, Stripe, provider imports, and public claims remain gated.
+- Readiness progress pass: `npm run readiness` passed and generated `docs/READINESS_PROGRESS.md` with average progress at `85%`.
+- Shadow outreach verification: `npm run typecheck` passed after the Brain/UI/generator updates.
+- Shadow outreach verification: `npm run build` passed after the Brain/UI/generator updates.
+- Shadow outreach verification: ASCII scan returned no matches after the Brain/UI/generator updates.
+- Shadow outreach route pass: `/`, `/admin`, `/for-businesses/pricing`, `/private-preview/date-night`, `/terms`, and `/privacy` returned `HTTP/1.1 200 OK` on `127.0.0.1:5179`.
+- Shadow outreach render pass: headless Chrome rendered local `/admin` and showed the new no-send shadow decision log, 9 batch size, 5 primary, 4 confirm-first, 1 backup, 0 blocked, reply learning blocked, and package demand blocked.
+- Archive refresh pass: `zip -T output/CityAtlas_Univenture_Launch_Lane.zip` returned `test of output/CityAtlas_Univenture_Launch_Lane.zip OK` after this batch.
+- Final verification pass: `npm run typecheck` passed after the custom-domain and proof-sprint handoff updates.
+- Final verification pass: `npm run build` passed after the custom-domain and proof-sprint handoff updates.
+- Final verification pass: `LC_ALL=C rg -n "[^[:ascii:]]" README.md CHANGELOG.md AGENTS.md docs src supabase stripe scripts public .env.example vercel.json` returned no matches.
+- Final local route pass: `/`, `/admin`, `/terms`, `/privacy`, `/for-businesses/pricing`, and `/private-preview/date-night` returned `HTTP/1.1 200 OK` on `127.0.0.1:5178`.
+- Deploy boundary note: the custom domain points to production deployment `dpl_JAMTa1jdjmeij1ynC4gjgZ7RYVtT`; the later proof-sprint handoff, readiness, and internal Brain text updates were verified locally and packaged in the zip, but not redeployed in this batch.
+- Public indexing release pass: `npm run typecheck` passed after the crawlable robots and SEO directive changes.
+- Public indexing release pass: `npm run build` passed after the crawlable robots and SEO directive changes.
+- Public indexing release pass: `npx vercel deploy --prod --yes --scope michael-yaps-projects-92932836` succeeded with production deployment `dpl_Huhm1y4VM2ky1SDV6XN3W3cTjtSr`.
+- Public indexing release pass: `curl -I https://cityatlas-one.vercel.app/` and `curl -I https://city.univenturestudio.com/` both returned `HTTP/2 200`.
+- Public indexing release pass: `https://cityatlas-one.vercel.app/robots.txt` and `https://city.univenturestudio.com/robots.txt` returned `Allow: /` plus route blocks for `/admin`, `/private-preview/`, and `/for-businesses/submit`.
+- Public indexing release pass: the in-app browser rendered `https://city.univenturestudio.com/` with title `CityAtlas | Vancouver Guides, Routes, And Local Discovery`.
+- Public indexing release pass: the in-app browser rendered `https://city.univenturestudio.com/admin` and showed `Launch console is protected before hosted sharing.`
+- Neighborhood ranking batch pass: `npm run readiness` regenerated the local readiness report after the neighborhood-intent guide expansion.
+- Neighborhood ranking batch pass: `npm run typecheck` passed after the new guide pages, sitemap cleanup, llms update, and AI Brain copy alignment.
+- Neighborhood ranking batch pass: `npm run build` passed after the new guide pages, sitemap cleanup, llms update, and AI Brain copy alignment.
+- Neighborhood ranking batch pass: `npx vercel deploy --prod --yes --scope michael-yaps-projects-92932836` succeeded with production deployment `dpl_2nMQLzz5ucC1xDDmbiauyR4k4PPR`.
+- Neighborhood ranking batch pass: `curl -I https://city.univenturestudio.com/` and the new neighborhood guide route both returned `HTTP/2 200`.
+- Neighborhood ranking batch pass: `https://city.univenturestudio.com/llms.txt` now describes the crawlable public domain and the expanded guide library.
+- Neighborhood ranking batch pass: `https://city.univenturestudio.com/sitemap.xml` now includes the new neighborhood-intent guide URLs and excludes noindex planner and business-submit routes.
+- Routing-release truth refresh: `npm run seo:proof` re-confirmed `27` useful pieces, `18` guides, `9` source-backed wedge collections, `45` source-backed anchors, and zero failures.
+- Routing-release truth refresh: `npm run readiness` re-confirmed `CityAtlas readiness average: 90%`.
+- Routing-release truth refresh: `curl -I http://127.0.0.1:5178/vancouver/guides/cityatlas-guide-roundup-which-vancouver-route-should-you-open-by-situation` returned `HTTP/1.1 200 OK`.
+- Routing-release truth refresh: `curl -I http://127.0.0.1:5178/vancouver/guides/which-low-friction-vancouver-route-should-you-open-today` returned `HTTP/1.1 200 OK`.
+- Routing-release truth refresh: newer routing-only approval packets were tightened to state exact local proof and explicit hosted metadata/canonical caveats instead of implying broader proof than was rerun.
+- Routing-release truth refresh: the later starter-pack, low-friction, and guide-roundup release packets were normalized to the current four-source-backed-queue ladder and current machine counts so release handoffs no longer refer to stale queue order or older package totals.
+- First hosted queue truth refresh: the first-time visitor, wellness, and combined first hosted release docs now point at the active local dev surface on `127.0.0.1:5178`, carry the current `27/18/9/45` machine truth, and state the local-base-url metadata caveat more explicitly before any hosted smoke claim.
+- Second hosted queue truth refresh: the out-of-town guest, weekend-route, and combined second hosted release docs now point at the active local dev surface on `127.0.0.1:5178`, carry the current `27/18/9/45` machine truth, and state the local-base-url metadata caveat more explicitly before any hosted smoke claim.
+- Third and fourth hosted queue truth refresh: the Sunday and returning-visitor hosted release docs now point at the active local dev surface on `127.0.0.1:5178`, carry the current `27/18/9/45` machine truth, and make the difference between local render/DOM proof and hosted metadata proof more explicit before any live claim.
+- Routing local-packet truth refresh: the starter-pack, low-friction, and guide-roundup local approval packets now point at the active local dev surface where applicable, carry the current `27/18/9/45` machine truth, and use the same explicit local-only metadata caveat style as the stronger hosted release docs.
+
+## Fidelity Ledger
+
+- Product-first homepage: implemented with discovery hero, map panel, category buttons, and public content modules.
+- Payment gate: pricing is visible, but payment state says disabled until launch approval and no checkout route exists.
+- Public trust language: demo data, source status, and review requirements are visible.
+- Owner dashboard: launch gates, inventory, partner candidates, requests, AI Brain, and audit log are implemented.
+- Responsive behavior: mobile header, hero copy wrapping, and map badge clipping were inspected and repaired.
+- Growth upgrade: homepage variants, planner route, adaptive next-best action, local event tracking, and admin growth panels were inspected after implementation.
+- City Missions upgrade: mission cards, route timelines, save-all action, planner mission progress, and owner growth radar were inspected after implementation.
+- Mobile mission/planner QA: CDP emulation reported `innerWidth=390`, `documentElement.scrollWidth=390`, and `body.scrollWidth=390`.
+- Founder proof sprint upgrade: admin console shows the Vancouver Date Night proof sprint, safe assets, approval requirements, metric, and next action.
+- Founder CRM upgrade: admin console shows 10 source-backed Date Night candidates with fit scores, route angles, source links, outreach status, approval status, and risk notes.
+- Private preview upgrade: `/private-preview/date-night` shows a review-only Date Night route preview with gated language and no payment, booking, or listing claims.
+- Manual reply tracker upgrade: admin console includes a local-only reply logging form and empty state for owner-approved manual outreach conversations.
+- AI Brain command engine upgrade: admin console now shows average module progress, module scores, next-best-batch recommendation, QA checks, open gaps, and saved local Brain Run history.
+- Brain Run safety: saving a Brain Run records local browser state only; no AI provider, CRM, analytics, email, payment, or outreach action is connected.
+- Univenture project upgrade: CityAtlas now has a durable Univenture folder, target subdomain, draft terms/privacy routes, hosting/DNS packet, Stripe activation packet, and readiness-report script.
+- Univenture legal/trust upgrade: `/terms` and `/privacy` describe the no-live-payment launch state, provider gates, future data categories, removal/security posture, and Univenture Studio contact path.
+- Hosted launch upgrade: CityAtlas now has a live Vercel project, public noindex Vercel alias, protected preview deployment, hosted owner-route guards, and a live Univenture custom domain with HTTPS.
+- Proof sprint automation upgrade: `npm run proof:sprint` generates the Date Night 10-prospect approval packet and JSON artifact without sending outreach.
+- Proof sprint handoff upgrade: `npm run proof:sprint` also generates a no-send send-window approval packet, structured JSON review artifact, and reply-log CSV template.
+- Revenue proof loop upgrade: the Founder CRM now stores contact-path type, source URL, confidence, and contact research notes for every Date Night candidate.
+- AI Brain proof loop upgrade: the local Brain now checks contact readiness and package-demand signals before recommending Stripe setup.
+- Stripe planning upgrade: Stripe Billing plus hosted Checkout is accepted as the future subscription path, with no Stripe account objects created in this batch.
+- Mobile admin QA: proof sprint and launch-gate copy were tightened after headless 390px screenshots showed dense admin text and nav clipping.
+- Mobile Founder CRM QA: 390px screenshots were reviewed for candidate-card wrapping and readable owner-console hierarchy.
+- Mobile private-preview QA: 390px screenshot was reviewed after tightening the Date Night preview headline.
+
+## Above-The-Fold Copy Diff
+
+Allowed concept copy retained or adapted:
+
+- `CityAtlas`
+- `Discover Local. Power The City.`
+- `Vancouver`
+- `Explore the city`
+- `For businesses`
+- `Founding partner packages`
+- `No live payments before launch approval`
+- `Verified sources`
+- `Review required`
+
+Intentional implementation copy additions:
+
+- `No live-risk actions are active.` to make the gated state clearer.
+- `Demo graph` to prevent users from mistaking fictional map counts for real inventory.
+
+## Remaining Manual Review
+
+- Owner should review brand/domain direction before any purchase.
+- Owner should approve package prices and exact buyer promise before Stripe setup.
+- Owner should approve sourcing policy before real business data is imported.
+- Owner should review City Mission names, route promises, and first real vertical before public publishing.
+- Owner should review the Vancouver Date Night candidate queue and outreach copy before any real business preview or send.
+- Owner should approve whether AI Brain Runs remain local-only or graduate to a protected backend after launch.
+- Owner should wait for recursive DNS propagation before relying on normal local resolver behavior everywhere.
+- Public sharing/indexing is now live on the approved Univenture domain; next owner review should focus on which source-backed pages deserve to stay crawlable long term.
+- Owner should approve Stripe test-mode product creation separately from live payment acceptance.
+
+## Latest Local SEO Batch
+
+- First-time visitor source-backed batch: `npm run typecheck` passed after the new destination-choice guide, new source-backed starter page, internal-link updates, crawl-file updates, and doc refresh.
+- First-time visitor source-backed batch: `npm run build` passed after the same batch.
+- First-time visitor source-backed batch: `npm run readiness` passed and kept `CityAtlas readiness average: 90%`.
+- First-time visitor source-backed batch: `curl -I http://127.0.0.1:4178/vancouver/first-time-visitor-starters` and `curl -I http://127.0.0.1:4178/vancouver/guides/where-should-a-first-time-vancouver-visitor-start` both returned `HTTP/1.1 200 OK`.
+- First-time visitor source-backed batch: local `sitemap.xml` includes `/vancouver/first-time-visitor-starters` and `/vancouver/guides/where-should-a-first-time-vancouver-visitor-start`.
+- First-time visitor source-backed batch: local `llms.txt` lists the new page and matching guide as local-ready while keeping the live-domain description honest about only three hosted source-backed pages.
+- First-time visitor source-backed batch: the in-app browser rendered local `/vancouver/first-time-visitor-starters` and showed the source-backed hero, five official-source cards, correction-path links, and checked-date framing.
+- First-time visitor source-backed batch: the in-app browser rendered local `/vancouver/guides/where-should-a-first-time-vancouver-visitor-start` and showed the embedded first-time-visitor source-backed section, updated proof note, correction link, and rail link.
+- First-time visitor source-backed batch: 390px browser verification showed no horizontal overflow on local `/vancouver` or `/vancouver/first-time-visitor-starters`.
+- First-time visitor source-backed batch: no deploy, hosted smoke, or production mutation was performed in this batch.
+- Wellness reset source-backed batch: `npm run typecheck` passed after the new wellness reset starter page, upgraded wellness guide, internal-link updates, crawl-file updates, and doc refresh.
+- Wellness reset source-backed batch: `npm run build` passed after the same batch.
+- Wellness reset source-backed batch: `npm run readiness` passed and kept `CityAtlas readiness average: 90%`.
+- Wellness reset source-backed batch: `curl -I http://127.0.0.1:4178/vancouver/wellness-reset-starters` and `curl -I http://127.0.0.1:4178/vancouver/guides/vancouver-wellness-experiences-to-review` both returned `HTTP/1.1 200 OK`.
+- Wellness reset source-backed batch: local `sitemap.xml` includes `/vancouver/wellness-reset-starters`.
+- Wellness reset source-backed batch: local `llms.txt` lists the new page and upgraded wellness guide as local-ready while keeping the live-domain description honest about only three hosted source-backed pages.
+- Wellness reset source-backed batch: the in-app browser rendered local `/vancouver/wellness-reset-starters` and showed the source-backed hero, five official-source cards, correction-path links, and checked-date framing.
+- Wellness reset source-backed batch: the in-app browser rendered local `/vancouver/guides/vancouver-wellness-experiences-to-review` and showed the embedded wellness source-backed section, updated proof note, correction link, and rail link.
+- Wellness reset source-backed batch: 390px browser verification showed no horizontal overflow on local `/vancouver/wellness-reset-starters`.
+- Wellness reset source-backed batch: no deploy, hosted smoke, or production mutation was performed in this batch.
+- Source-backed release queue/operator batch: `npm run typecheck` passed after consolidating the first-time visitor plus wellness release packet, refreshing AI Brain copy, and updating operator docs.
+- Source-backed release queue/operator batch: `npm run build` passed after the same batch.
+- Source-backed release queue/operator batch: `curl -I http://127.0.0.1:4178/admin` returned `HTTP/1.1 200 OK` from the built preview server.
+- Source-backed release queue/operator batch: headless Chrome rendered local `/admin` and showed the new AI Brain summary, the combined first-time visitor plus wellness next-best batch, the new release-review recommendation, and the ranking-and-release doc list.
+- Source-backed release queue/operator batch: `npx tsx --eval` verified the Brain summary, next-best-batch text, and top recommendation now point to the combined first-time visitor plus wellness release queue and a `16`-piece local ranking surface.
+- Source-backed release queue/operator batch: no deploy, hosted smoke, or production mutation was performed in this batch.
+- Out-of-town guest source-backed batch: `npm run typecheck` passed after the new host guide, new source-backed starter page, internal-link updates, crawl-file updates, and doc refresh.
+- Out-of-town guest source-backed batch: `npm run build` passed after the same batch.
+- Out-of-town guest source-backed batch: `npm run readiness` passed and kept `CityAtlas readiness average: 90%`.
+- Out-of-town guest source-backed batch: `curl -I http://127.0.0.1:4178/vancouver/out-of-town-guest-starters` and `curl -I http://127.0.0.1:4178/vancouver/guides/how-to-host-an-out-of-town-guest-in-vancouver` both returned `HTTP/1.1 200 OK`.
+- Out-of-town guest source-backed batch: local `sitemap.xml` includes `/vancouver/out-of-town-guest-starters` and `/vancouver/guides/how-to-host-an-out-of-town-guest-in-vancouver`.
+- Out-of-town guest source-backed batch: local `llms.txt` lists the new page and matching guide as local-ready while keeping the live-domain description honest about only three hosted source-backed pages.
+- Out-of-town guest source-backed batch: headless Chrome rendered local `/vancouver/out-of-town-guest-starters` and showed the source-backed hero, five official-source cards, correction-path links, and checked-date framing.
+- Out-of-town guest source-backed batch: headless Chrome rendered local `/vancouver/guides/how-to-host-an-out-of-town-guest-in-vancouver` and showed the embedded guest-hosting source-backed section, updated proof note, correction link, and rail link.
+- Out-of-town guest source-backed batch: initial narrow-screen screenshot review exposed shared mobile header clipping on the new page, so the shared header layout in `src/styles/responsive.css` was updated and the follow-up 390px screenshot showed the nav links laid out cleanly in a readable four-column grid.
+- Out-of-town guest source-backed batch: `npx tsx --eval` verified the local ranking surface at `18` useful pieces with `12` guides and `6` source-backed wedge collections, while the AI Brain still kept the first-time visitor plus wellness release queue as the top live-ready recommendation.
+- Out-of-town guest source-backed batch: no deploy, hosted smoke, or production mutation was performed in this batch.
+- Weekend route source-backed batch: `npm run typecheck` passed after the new weekend guide, new source-backed starter page, metadata sync fix, internal-link updates, crawl-file updates, and doc refresh.
+- Weekend route source-backed batch: `npm run build` passed after the same batch.
+- Weekend route source-backed batch: `npm run readiness` passed and kept `CityAtlas readiness average: 90%`.
+- Weekend route source-backed batch: `curl -I http://127.0.0.1:4178/vancouver/weekend-route-starters` and `curl -I http://127.0.0.1:4178/vancouver/guides/how-to-build-a-vancouver-weekend-route-without-crossing-the-city-all-day` both returned `HTTP/1.1 200 OK`.
+- Weekend route source-backed batch: local `sitemap.xml` includes `/vancouver/weekend-route-starters` and `/vancouver/guides/how-to-build-a-vancouver-weekend-route-without-crossing-the-city-all-day`.
+- Weekend route source-backed batch: local `llms.txt` lists the new page and matching guide as local-ready, updates the local-ready source-backed page count to four beyond the live domain, and adds weekend route ideas to the query-cluster wording.
+- Weekend route source-backed batch: built `dist/sitemap.xml` and `dist/llms.txt` carried the same weekend-route entries and the honest four-more-source-backed-pages wording after the production build.
+- Weekend route source-backed batch: `npx tsx --eval` verified the local ranking surface at `20` useful pieces with `13` guides and `7` source-backed wedge collections, while the AI Brain still kept the first-time visitor plus wellness release queue as the top live-ready recommendation.
+- Weekend route source-backed batch: headless Chrome rendered local `/vancouver/weekend-route-starters` and showed the source-backed hero, five official-source cards, correction-path links, checked-date framing, and route-specific title, description, robots, canonical, and JSON-LD.
+- Weekend route source-backed batch: headless Chrome rendered local `/vancouver/guides/how-to-build-a-vancouver-weekend-route-without-crossing-the-city-all-day?fresh=1` and showed the guide hero, embedded weekend-route source-backed section, updated proof note, rail link, and route-specific title, description, og tags, canonical, and JSON-LD.
+- Weekend route source-backed batch: no deploy, hosted smoke, or production mutation was performed in this batch.
+- Starter-pack guide routing batch: `npm run typecheck` passed after the new answer-first starter-pack guide, reusable direct-path section, internal-link updates, crawl-file wiring, and docs refresh.
+- Starter-pack guide routing batch: `npm run build` passed after the same batch, with only the existing non-blocking large-chunk warning from Vite.
+- Starter-pack guide routing batch: `npm run readiness` passed and kept `CityAtlas readiness average: 90%`.
+- Starter-pack guide routing batch: `curl -I http://127.0.0.1:4178/vancouver/guides/vancouver-itinerary-starter-pack-which-cityatlas-page-should-you-open-first` returned `HTTP/1.1 200 OK`.
+- Starter-pack guide routing batch: local `sitemap.xml` includes `/vancouver/guides/vancouver-itinerary-starter-pack-which-cityatlas-page-should-you-open-first`.
+- Starter-pack guide routing batch: local `llms.txt` lists the new guide as local-ready and adds itinerary starter-pack routing to the query-cluster wording while keeping the live-domain source-backed count honest.
+- Starter-pack guide routing batch: `npx tsx --eval` verified the local ranking surface at `21` useful pieces with `14` guides and `7` source-backed wedge collections, while the AI Brain still kept the first-time visitor plus wellness release queue as the top live-ready recommendation.
+- Starter-pack guide routing batch: the in-app browser rendered local `/vancouver/guides/vancouver-itinerary-starter-pack-which-cityatlas-page-should-you-open-first?fresh=1` and showed the guide hero, query-class framing, direct-path section, FAQ block, related guides, and internal links into the current source-backed wedges.
+- Starter-pack guide routing batch: the same local browser pass confirmed route-specific title, description, robots, breadcrumb/article JSON-LD, and canonical behavior against the configured local base URL `http://127.0.0.1:5178/`.
+- Starter-pack guide routing batch: 390px browser verification showed `innerWidth=390`, `documentElement.scrollWidth=375`, and `body.scrollWidth=375`, with the direct-path section still present and no horizontal overflow.
+- Starter-pack guide routing batch: created `docs/seo-aeo-geo/STARTER_PACK_ROUTING_RELEASE_QUEUE_PACKET.md`, `docs/seo-aeo-geo/STARTER_PACK_ROUTING_RELEASE_SLICE_HANDOFF.md`, and `docs/seo-aeo-geo/STARTER_PACK_ROUTING_RELEASE_TRANSPLANT_CHECKLIST.md` so the guide is now isolated as a later routing-only release step behind the two source-backed queues.
+- Starter-pack guide routing batch: repo search confirmed the route depends on the shared guide record in `src/data/seed.ts`, reusable direct-path rendering in `src/features/public/GuideDetailPage.tsx`, shared direct-path styles in `src/styles/components.css` and `src/styles/responsive.css`, mixed link-only surfaces in `src/features/public/HomePage.tsx`, `src/features/public/CityPage.tsx`, `src/features/public/AboutPage.tsx`, `src/features/public/CollectionPages.tsx`, and `src/components/Layout.tsx`, plus crawl/context files `public/sitemap.xml` and `public/llms.txt`.
+- Starter-pack guide routing follow-through: added local starter-pack guide links to the public `/vancouver` source-backed section and the public `/about` trust-model section to strengthen routing into the guide from two more crawlable pages.
+- Starter-pack guide routing follow-through: `npm run typecheck`, `npm run build`, and `npm run readiness` all passed after the CityPage/AboutPage link expansion, with readiness still reporting `CityAtlas readiness average: 90%`.
+- Starter-pack guide routing follow-through: `curl -I http://127.0.0.1:4178/vancouver` and `curl -I http://127.0.0.1:4178/about` both returned local `HTTP/1.1 200 OK` from the preview build.
+- Starter-pack guide routing follow-through: code inspection confirmed `src/features/public/CityPage.tsx` now renders `Open starter pack guide` and `src/features/public/AboutPage.tsx` now renders `Starter pack guide`; local browser automation for those two rendered pages remained unavailable here because the Playwright browser executable was missing and the system Chrome headless fallback aborted.
+- Starter-pack guide routing batch: no deploy, hosted smoke, or production mutation was performed in this batch.
+- Second source-backed release-queue packaging batch: created `docs/seo-aeo-geo/SECOND_SOURCE_BACKED_RELEASE_QUEUE_PACKET.md` to isolate the out-of-town guest plus weekend-route release as the next local-ready hosted step after the first-time visitor plus wellness queue.
+- Second source-backed release-queue packaging batch: `npm run typecheck` passed again while tightening the second-queue release truth.
+- Second source-backed release-queue packaging batch: `npm run build` passed again while tightening the second-queue release truth, with only the existing non-blocking large-chunk warning from Vite.
+- Second source-backed release-queue packaging batch: `npm run readiness` passed again and kept `CityAtlas readiness average: 90%`.
+- Second source-backed release-queue packaging batch: `curl -I http://127.0.0.1:4178/vancouver/out-of-town-guest-starters` and `curl -I http://127.0.0.1:4178/vancouver/guides/how-to-host-an-out-of-town-guest-in-vancouver` both returned `HTTP/1.1 200 OK`.
+- Second source-backed release-queue packaging batch: local `sitemap.xml` still includes `/vancouver/out-of-town-guest-starters`, `/vancouver/weekend-route-starters`, `/vancouver/guides/how-to-host-an-out-of-town-guest-in-vancouver`, and `/vancouver/guides/how-to-build-a-vancouver-weekend-route-without-crossing-the-city-all-day`.
+- Second source-backed release-queue packaging batch: local `llms.txt` still lists both source-backed wedges and both matching guides as local-ready while keeping the live-domain wording honest about only three hosted source-backed pages.
+- Second source-backed release-queue packaging batch: `npx tsx --eval` still reports a `21`-piece local ranking surface with `14` guides and `7` source-backed wedge collections, while the AI Brain top recommendation remains to queue the next two source-backed wedges for release review after the first queue is finished.
+- Second source-backed release-queue packaging batch: the in-app browser re-verified local `/vancouver/out-of-town-guest-starters` and `/vancouver/guides/how-to-host-an-out-of-town-guest-in-vancouver?fresh=1` and confirmed route-specific title, description, robots, canonical, JSON-LD, and visible correction-path links on both routes.
+- Second source-backed release-queue packaging batch: release truth now explicitly records the local metadata/canonical caveat that the out-of-town guest and weekend-route local metadata proofs used the configured local base URL `http://127.0.0.1:5178/`, while hosted canonical/JSON-LD behavior for this second queue remains unverified.
+- Second source-backed release-queue packaging batch: created `docs/seo-aeo-geo/SECOND_SOURCE_BACKED_RELEASE_SLICE_HANDOFF.md` and `docs/seo-aeo-geo/SECOND_SOURCE_BACKED_RELEASE_TRANSPLANT_CHECKLIST.md` so the second queue has the same narrow release-slice truth as the first queue before any future hosted lane is cut.
+- Second source-backed release-queue packaging batch: repo search confirmed the second queue currently touches shared route/content files in `src/data/seed.ts`, `src/lib/sourceBackedCollections.ts`, `src/features/public/TrustPages.tsx`, `src/app/CityAtlasApp.tsx`, internal-link surfaces in the public pages and layout, and crawl/context files `public/sitemap.xml` and `public/llms.txt`.
+- Second source-backed release-queue packaging batch: snippet review confirmed `HomePage.tsx`, `CityPage.tsx`, `AboutPage.tsx`, `CollectionPages.tsx`, `Layout.tsx`, `sitemap.xml`, and `llms.txt` currently bundle second-queue links together with the later starter-pack guide, so the new handoff/checklist now says to cherry-pick those shared surfaces surgically or defer them instead of broad-copying them.
+- Second source-backed release-queue packaging batch: no deploy, hosted smoke, or production mutation was performed in this batch.
+- First source-backed release go/no-go packaging batch: created `docs/seo-aeo-geo/FIRST_SOURCE_BACKED_RELEASE_GO_NO_GO_CHECKLIST.md` to convert the first-time visitor plus wellness queue into an exact live approval gate rather than a summary-only packet.
+- First source-backed release go/no-go packaging batch: repo inspection confirmed CityAtlas lives inside the shared workspace repo at `/Users/michaelyap/Documents/Codex/Workspace`, the current branch is `codex/guided-onboarding`, and no remote is configured from this environment, so the checklist now treats the release as a path-scoped slice that must be re-cut from live truth before any deploy.
+- First source-backed release go/no-go packaging batch: `npx tsx --eval` still reports a `21`-piece local ranking surface with `14` guides and `7` source-backed wedge collections, while the AI Brain still points to finishing the combined first-time visitor plus wellness release queue first.
+- First source-backed release go/no-go packaging batch: `curl -I http://127.0.0.1:4178/vancouver/first-time-visitor-starters`, `/vancouver/guides/where-should-a-first-time-vancouver-visitor-start`, `/vancouver/wellness-reset-starters`, and `/vancouver/guides/vancouver-wellness-experiences-to-review` all returned `HTTP/1.1 200 OK`.
+- First source-backed release go/no-go packaging batch: local `sitemap.xml` and `llms.txt` still include the queued first-time visitor and wellness routes honestly as local-ready only.
+- First source-backed release go/no-go packaging batch: the in-app browser re-verified the four first-queue routes and confirmed route-specific title, description, robots, canonical, JSON-LD, and visible correction-path links while keeping the local-base-url caveat explicit.
+- First source-backed release go/no-go packaging batch: the exact release gate now records live base truth at deployment `dpl_8t2Z6dZoRNDL8e8fGw4WDwrk6op3`, keeps hosted metadata behavior in the required smoke list, and preserves the rule that hosted crawl proof remains unverified until a real deploy-and-smoke pass happens.
+- First source-backed release go/no-go packaging batch: no deploy, hosted smoke, or production mutation was performed in this batch.
+- First source-backed release slice handoff batch: created `docs/seo-aeo-geo/FIRST_SOURCE_BACKED_RELEASE_SLICE_HANDOFF.md` to map the first queue to exact CityAtlas source files, shared-file caveats, and default exclusions before any future release lane is cut.
+- First source-backed release slice handoff batch: repo search confirmed the first queue currently touches shared route/content files in `src/data/seed.ts`, `src/lib/sourceBackedCollections.ts`, `src/features/public/TrustPages.tsx`, `src/app/CityAtlasApp.tsx`, internal-link surfaces in the public pages and layout, and crawl/context files `public/sitemap.xml` and `public/llms.txt`.
+- First source-backed release slice handoff batch: snippet review confirmed `HomePage.tsx`, `CityPage.tsx`, `AboutPage.tsx`, `CollectionPages.tsx`, and `Layout.tsx` currently bundle first-queue links together with later wedges such as first-evening, out-of-town guest, weekend-route, starter-pack, or standards links.
+- First source-backed release slice handoff batch: created `docs/seo-aeo-geo/FIRST_SOURCE_BACKED_RELEASE_TRANSPLANT_CHECKLIST.md` so the future release lane can keep the required first-time visitor plus wellness route/crawl slice while cherry-picking or deferring mixed link-only shared surfaces instead of copying them wholesale.
+- First source-backed release slice handoff batch: the handoff and live gate now both point to that transplant checklist so the first release stays narrow even though the current local branch already contains later local-ready wedges.
+- First source-backed release slice handoff batch: no deploy, hosted smoke, or production mutation was performed in this batch.
+- Sunday source-backed batch: added `/vancouver/sunday-starters` and `/vancouver/guides/how-to-build-a-low-effort-vancouver-sunday-plan` as the next local-only official-source wedge for low-effort Vancouver Sunday planning.
+- Sunday source-backed batch: local link surfaces now include Sunday-starter entry points from the homepage, `/vancouver`, the guide library, `/about`, and the footer.
+- Sunday source-backed batch: local `sitemap.xml` and `llms.txt` now include the Sunday source-backed page and matching guide while keeping the live-domain wording honest about only three hosted source-backed pages.
+- Sunday source-backed batch: `npm run typecheck`, `npm run build`, and `npm run readiness` all passed, with readiness still reporting `CityAtlas readiness average: 90%`.
+- Sunday source-backed batch: `curl -I http://127.0.0.1:4178/vancouver/sunday-starters` and `curl -I http://127.0.0.1:4178/vancouver/guides/how-to-build-a-low-effort-vancouver-sunday-plan` both returned `HTTP/1.1 200 OK`.
+- Sunday source-backed batch: `npx tsx --eval` verified the local ranking surface at `23` useful pieces with `15` guides and `8` source-backed wedge collections, and confirmed the Sunday guide, its `/vancouver/sunday-starters` CTA, the five official-source Sunday anchors, and the Sunday metadata path/title mapping.
+- Sunday source-backed batch: `rg -n '/vancouver/sunday-starters|how-to-build-a-low-effort-vancouver-sunday-plan'` confirmed Sunday entry points in `HomePage.tsx`, `CityPage.tsx`, `CollectionPages.tsx`, `AboutPage.tsx`, `Layout.tsx`, `sitemap.xml`, and `llms.txt`.
+- Sunday source-backed batch: a small shared fix in `src/config/site.ts` and `src/components/Seo.tsx` made non-Vite local render checks safe, which upgraded the Sunday proof from route-exists-only to server-rendered content proof without changing live behavior.
+- Sunday source-backed packaging batch: created `docs/seo-aeo-geo/SUNDAY_SOURCE_BACKED_RELEASE_QUEUE_PACKET.md`, `docs/seo-aeo-geo/SUNDAY_SOURCE_BACKED_RELEASE_SLICE_HANDOFF.md`, and `docs/seo-aeo-geo/SUNDAY_SOURCE_BACKED_RELEASE_TRANSPLANT_CHECKLIST.md` so the Sunday wedge now sits in its own future hosted release slice behind the first two queues.
+- Returning-visitor source-backed batch: added `/vancouver/returning-visitor-starters` and `/vancouver/guides/vancouver-local-discovery-for-returning-visitors` as the next local-only official-source wedge for repeat-visit Vancouver local discovery.
+- Returning-visitor source-backed batch: local link surfaces now include returning-visitor entry points from the homepage, `/vancouver`, the guide library, `/about`, the footer, and the shared starter-pack guide routing map.
+- Returning-visitor source-backed batch: local `sitemap.xml` and `llms.txt` now include the returning-visitor source-backed page and matching guide while keeping the live-domain wording honest about only three hosted source-backed pages.
+- Returning-visitor source-backed batch: `npm run typecheck`, `npm run build`, and `npm run readiness` all passed, with readiness still reporting `CityAtlas readiness average: 90%`.
+- Returning-visitor source-backed batch: `curl -I http://127.0.0.1:4178/vancouver/returning-visitor-starters` and `curl -I http://127.0.0.1:4178/vancouver/guides/vancouver-local-discovery-for-returning-visitors` both returned `HTTP/1.1 200 OK`.
+- Returning-visitor source-backed batch: `npx tsx --eval` verified the local ranking surface at `25` useful pieces with `16` guides and `9` source-backed wedge collections, and confirmed the returning-visitor guide CTA, starter-pack cross-link, five official-source returning-visitor anchors, and the returning-visitor metadata path/title mapping.
+- Returning-visitor source-backed batch: escalated local headless Chrome `--dump-dom` on `/vancouver/returning-visitor-starters` confirmed the rendered title, description, canonical, JSON-LD item list, visible correction-path link, and all five returning-visitor anchor names in the preview build DOM.
+- Returning-visitor source-backed batch: local desktop screenshot proof showed the source-backed page hero, trust card, source-backed cards, and correction-path actions rendering cleanly.
+- Returning-visitor source-backed batch: a narrow mobile screenshot pass initially showed lower-page section-header crowding and wider overflow, so `src/styles/components.css`, `src/styles/responsive.css`, and the returning-visitor section title copy in `src/features/public/TrustPages.tsx` were tightened.
+- Returning-visitor source-backed batch: a final 390px headless Chrome screenshot pass on June 14, 2026 showed a clean readable mobile state for the returning-visitor hero, trust panel, section header, and source-backed card stack.
+- Returning-visitor source-backed packaging batch: created `docs/seo-aeo-geo/RETURNING_VISITOR_LOCAL_APPROVAL_PACKET.md`, `docs/seo-aeo-geo/RETURNING_VISITOR_SOURCE_BACKED_RELEASE_QUEUE_PACKET.md`, `docs/seo-aeo-geo/RETURNING_VISITOR_SOURCE_BACKED_RELEASE_SLICE_HANDOFF.md`, and `docs/seo-aeo-geo/RETURNING_VISITOR_SOURCE_BACKED_RELEASE_TRANSPLANT_CHECKLIST.md` so the returning-visitor wedge now sits in its own future hosted release slice behind the Sunday queue and ahead of the later starter-pack release.
+- SEO content-machine proof batch: added `npm run seo:proof` so CityAtlas can verify local useful-piece counts, guide proof fields, source-backed five-anchor integrity, and local `sitemap.xml` plus `llms.txt` route coverage in one repeatable pass.
+- SEO content-machine proof batch: `npm run seo:proof` passed with `25` useful pieces, `16` guides, `9` source-backed collections, `45` source-backed anchors, `9` mapped guide-to-collection links, and zero failures.
+- SEO content-machine proof batch: `npm run typecheck` passed after the proof-command, readiness-report, and AI Brain updates.
+- SEO content-machine proof batch: `npm run build` passed after the proof-command, readiness-report, and AI Brain updates, with only the existing non-blocking Vite large-chunk warning.
+- First source-backed release packet refresh: `npm run seo:proof` passed again at `25` useful pieces, `16` guides, `9` source-backed collections, `45` source-backed anchors, and zero failures before the first hosted queue docs were refreshed.
+- First source-backed release packet refresh: `npm run readiness` passed again and kept `CityAtlas readiness average: 90%` while the SEO content machine stayed explicit in the readiness output.
+- First source-backed release packet refresh: `docs/seo-aeo-geo/SOURCE_BACKED_RELEASE_QUEUE_PACKET.md`, `FIRST_SOURCE_BACKED_RELEASE_GO_NO_GO_CHECKLIST.md`, `FIRST_SOURCE_BACKED_RELEASE_SLICE_HANDOFF.md`, and `FIRST_SOURCE_BACKED_RELEASE_TRANSPLANT_CHECKLIST.md` were updated so the first hosted queue now reflects the current `25/16/9` local surface, the repeatable `npm run seo:proof` gate, and the newer later-queue isolation truth.
+- Guide library cluster-hub batch: `/vancouver/guides` was upgraded from a flatter article list into a clearer internal-link hub with starter-pack entry points, source-backed starter access, and grouped cluster sections for route-and-weather, visitor-and-host, weekend-and-reset, and neighborhood-intent guidance.
+- Guide library cluster-hub batch: `npm run typecheck` passed after the guide-hub clustering changes.
+- Guide library cluster-hub batch: `npm run build` passed after the guide-hub clustering changes, with only the existing non-blocking Vite large-chunk warning.
+- Guide library cluster-hub batch: `npm run seo:proof` stayed green after the guide-hub clustering changes at `25` useful pieces, `16` guides, `9` source-backed collections, `45` source-backed anchors, and zero failures.
+- Guide-roundup batch: added the answer-first `CityAtlas Guide Roundup: Which Vancouver Route Should You Open By Situation?` page, updated local `sitemap.xml`, `llms.txt`, and `docs/seo-aeo-geo/EDITORIAL_BACKLOG.md`, and re-ran `npm run seo:proof` with `26` useful pieces, `17` guides, `9` source-backed collections, `45` source-backed anchors, `9` mapped guide-to-collection links, and zero failures.
+- Situation-router batch: upgraded `/vancouver/guides` with a decision-first situation router, added direct roundup links from the homepage and Vancouver city page, updated `docs/seo-aeo-geo/EDITORIAL_BACKLOG.md`, and prepared the guide library to route readers and crawlers into source-backed, visitor-intent, weekend-reset, and neighborhood-intent clusters more directly.
+- Situation-router batch: headless Chrome captured local desktop proof at `/tmp/cityatlas_guides_router_desktop.png` and mobile proof at `/tmp/cityatlas_guides_router_mobile.png` for `/vancouver/guides` after the new router section and roundup-link additions.
+- Guide-link normalization batch: added `resourceLinks` cross-routing on the first-evening, first-time visitor, wellness, out-of-town guest, weekend-route, and starter-pack guides so more of the Vancouver route library now points directly into source-backed starter pages, adjacent route clusters, and the guide-roundup path.
+- Guide-link normalization batch: `npm run typecheck` passed, `npm run build` passed with only the existing non-blocking Vite large-chunk warning, and `npm run seo:proof` stayed green at `26` useful pieces, `17` guides, `9` source-backed collections, `45` source-backed anchors, `9` mapped guide-to-collection links, and zero failures.
+- Low-friction route-chooser batch: added `Which Low-Friction Vancouver Route Should You Open Today?` as an answer-first routing guide that sends readers into the rainy-day, wellness, Sunday, weekend-route, first-evening, starter-pack, and guide-roundup surfaces without adding new place claims.
+- Low-friction route-chooser batch: updated local `sitemap.xml`, `llms.txt`, and `docs/seo-aeo-geo/EDITORIAL_BACKLOG.md`, then re-ran `npm run typecheck`, `npm run build`, `npm run readiness`, and `npm run seo:proof`, which passed at `27` useful pieces, `18` guides, `9` source-backed collections, `45` source-backed anchors, `9` mapped guide-to-collection links, and zero failures.
+- Low-friction route-chooser packaging batch: created `docs/seo-aeo-geo/LOW_FRICTION_ROUTE_CHOOSER_LOCAL_APPROVAL_PACKET.md`, added the guide to the top-level package docs, surfaced shortcut links from the homepage and Vancouver city page, confirmed local `HTTP/1.1 200 OK`, and captured local DOM proof for the rendered title, description, routing sections, FAQ block, and expected internal links.
+- Low-friction routing release-queue batch: created `docs/seo-aeo-geo/LOW_FRICTION_ROUTING_RELEASE_QUEUE_PACKET.md`, `LOW_FRICTION_ROUTING_RELEASE_SLICE_HANDOFF.md`, and `LOW_FRICTION_ROUTING_RELEASE_TRANSPLANT_CHECKLIST.md`, then updated `docs/seo-aeo-geo/LOCAL_QUEUE_AND_PROOF_STATUS.md`, `docs/PROJECT.md`, `README.md`, and `docs/seo-aeo-geo/EDITORIAL_BACKLOG.md` so the low-friction guide now exists as a clearly isolated later routing-only release behind the earlier source-backed and starter-pack queues.
+- Guide-roundup routing release-queue batch: created `docs/seo-aeo-geo/GUIDE_ROUNDUP_LOCAL_APPROVAL_PACKET.md`, `GUIDE_ROUNDUP_ROUTING_RELEASE_QUEUE_PACKET.md`, `GUIDE_ROUNDUP_ROUTING_RELEASE_SLICE_HANDOFF.md`, and `GUIDE_ROUNDUP_ROUTING_RELEASE_TRANSPLANT_CHECKLIST.md`, then updated `docs/seo-aeo-geo/LOCAL_QUEUE_AND_PROOF_STATUS.md`, `docs/PROJECT.md`, `README.md`, and `docs/seo-aeo-geo/EDITORIAL_BACKLOG.md` so the guide-roundup page now exists as a clearly isolated later routing-only release behind the earlier source-backed, starter-pack, and low-friction steps.
+- SEO content-machine proof batch: `npm run readiness` passed and kept `CityAtlas readiness average: 90%`, while adding the SEO content machine as an explicit readiness module at `96%`.
+- SEO content-machine proof batch: generated `docs/seo-aeo-geo/LOCAL_QUEUE_AND_PROOF_STATUS.md` as the current owner-readable local truth for queue order, verified local proof, remaining hosted gaps, and the returning-visitor mobile caveat.
+- Second source-backed release gate hardening batch: refreshed `docs/seo-aeo-geo/SECOND_SOURCE_BACKED_RELEASE_QUEUE_PACKET.md`, `SECOND_SOURCE_BACKED_RELEASE_SLICE_HANDOFF.md`, and `SECOND_SOURCE_BACKED_RELEASE_TRANSPLANT_CHECKLIST.md` to current `37/23/14/70/14` machine truth, explicit guide-to-collection pairings, the shared `src/lib/seo.ts` metadata layer, and exact hosted smoke expectations.
+- Second source-backed release gate hardening batch: created `docs/seo-aeo-geo/SECOND_SOURCE_BACKED_RELEASE_GO_NO_GO_CHECKLIST.md` so the out-of-town guest plus weekend-route queue now has the same exact live gate style as the first hosted queue.
+- Second source-backed release gate hardening batch: `npm run seo:proof`, `npm run seo:structure:proof`, and `npm run seo:docs:proof` all passed on June 15, 2026 at `37` useful pieces, `23` guides, `14` source-backed wedge collections, `70` source-backed anchors, `14` mapped guide-to-collection links, `8` checked structure routes, and `22` checked packet/doc files.
+- Second source-backed release gate hardening batch: no deploy, hosted smoke, or production mutation was performed in this batch.
+- Sunday source-backed release gate hardening batch: refreshed `docs/seo-aeo-geo/SUNDAY_SOURCE_BACKED_RELEASE_QUEUE_PACKET.md`, `SUNDAY_SOURCE_BACKED_RELEASE_SLICE_HANDOFF.md`, `SUNDAY_SOURCE_BACKED_RELEASE_TRANSPLANT_CHECKLIST.md`, and `SUNDAY_PLAN_LOCAL_APPROVAL_PACKET.md` to current `37/23/14/70/14` machine truth, explicit Sunday guide-to-collection pairing truth, the shared `src/lib/seo.ts` metadata layer, and exact hosted smoke expectations.
+- Sunday source-backed release gate hardening batch: created `docs/seo-aeo-geo/SUNDAY_SOURCE_BACKED_RELEASE_GO_NO_GO_CHECKLIST.md` so the low-effort Sunday queue now has the same exact live gate style as the first two hosted queues.
+- Sunday browser-head proof follow-through: the in-app Browser re-verified local `/vancouver/sunday-starters` and `/vancouver/guides/how-to-build-a-low-effort-vancouver-sunday-plan` on June 15, 2026 and confirmed route-specific title, description, robots, canonical, JSON-LD, correction-path links, and the Sunday page-to-guide / guide-to-page pairing on both routes.
+- Sunday browser-head proof follow-through: `scripts/verify-seo-structure.mjs` now also checks the Sunday guide and Sunday source-backed page, and `npm run seo:proof`, `npm run seo:structure:proof`, and `npm run seo:docs:proof` all passed on June 15, 2026 at `37` useful pieces, `23` guides, `14` source-backed wedge collections, `70` source-backed anchors, `14` mapped guide-to-collection links, `10` checked structure routes, and `25` checked packet/doc files.
+- Returning-visitor release gate hardening batch: refreshed `docs/seo-aeo-geo/RETURNING_VISITOR_SOURCE_BACKED_RELEASE_QUEUE_PACKET.md`, `RETURNING_VISITOR_SOURCE_BACKED_RELEASE_SLICE_HANDOFF.md`, `RETURNING_VISITOR_SOURCE_BACKED_RELEASE_TRANSPLANT_CHECKLIST.md`, and `RETURNING_VISITOR_LOCAL_APPROVAL_PACKET.md` to current `37/23/14/70/14` machine truth, explicit returning-visitor guide-to-collection pairing truth, the shared `src/lib/seo.ts` metadata layer, and exact hosted smoke expectations.
+- Returning-visitor release gate hardening batch: created `docs/seo-aeo-geo/RETURNING_VISITOR_SOURCE_BACKED_RELEASE_GO_NO_GO_CHECKLIST.md` so the fourth hosted queue now has the same exact live gate style as the earlier source-backed queues.
+- Returning-visitor browser-head proof follow-through: the in-app Browser re-verified local `/vancouver/returning-visitor-starters` and `/vancouver/guides/vancouver-local-discovery-for-returning-visitors` on June 15, 2026 and confirmed route-specific title, description, robots, canonical, JSON-LD, correction-path links, and the returning-visitor page-to-guide / guide-to-page pairing on both routes.
+- Returning-visitor structure/doc proof follow-through: `scripts/verify-seo-structure.mjs` now also checks the returning-visitor guide and returning-visitor source-backed page, and `npm run seo:proof`, `npm run seo:structure:proof`, and `npm run seo:docs:proof` all passed on June 15, 2026 at `37` useful pieces, `23` guides, `14` source-backed wedge collections, `70` source-backed anchors, `14` mapped guide-to-collection links, `12` checked structure routes, and `28` checked packet/doc files.
+- Later source-backed release gate hardening batch: created `KITSILANO_SCENIC_SOURCE_BACKED_RELEASE_GO_NO_GO_CHECKLIST.md`, `WEST_SIDE_DAYTIME_SOURCE_BACKED_RELEASE_GO_NO_GO_CHECKLIST.md`, `FALSE_CREEK_CULTURE_SOURCE_BACKED_RELEASE_GO_NO_GO_CHECKLIST.md`, `UBC_DISCOVERY_SOURCE_BACKED_RELEASE_GO_NO_GO_CHECKLIST.md`, and `GARDEN_DAY_SOURCE_BACKED_RELEASE_GO_NO_GO_CHECKLIST.md` so the fifth through ninth hosted queues now have the same exact live gate style as the earlier source-backed queues.
+- Later source-backed release gate hardening batch: refreshed the Kitsilano scenic, west-side daytime, False Creek culture, UBC discovery, and garden-day queue packets, local approval packets, slice handoffs, and transplant checklists to current `37/23/14/70/14` machine truth, explicit guide-to-collection pairing truth, the shared `src/lib/seo.ts` metadata layer, and exact hosted smoke expectations.
+- Later source-backed browser-head proof follow-through: the in-app Browser re-verified local `/vancouver/kitsilano-scenic-starters`, `/vancouver/guides/kitsilano-scenic-route-starter-guide-for-slower-vancouver-evenings`, `/vancouver/west-side-daytime-starters`, `/vancouver/guides/where-should-you-start-a-west-side-vancouver-daytime-plan`, `/vancouver/false-creek-culture-starters`, `/vancouver/guides/where-should-you-start-a-false-creek-vancouver-culture-afternoon`, `/vancouver/ubc-discovery-starters`, `/vancouver/guides/where-should-you-start-a-ubc-adjacent-vancouver-discovery-day`, `/vancouver/garden-day-starters`, and `/vancouver/guides/where-should-you-start-a-vancouver-garden-and-conservatory-day` on June 15, 2026 and confirmed route-specific title, description, robots, canonical, JSON-LD, correction-path links, and the page-to-guide / guide-to-page pairing on both routes in each queue.
+- Later source-backed structure/doc proof follow-through: `scripts/verify-seo-structure.mjs` now checks the full queued source-backed guide-and-collection ladder, and `npm run seo:proof`, `npm run seo:structure:proof`, and `npm run seo:docs:proof` all passed on June 15, 2026 at `37` useful pieces, `23` guides, `14` source-backed wedge collections, `70` source-backed anchors, `14` mapped guide-to-collection links, `28` checked structure routes, and `43` checked packet/doc files before the operator-packet expansion widened the doc-proof surface.
+- First-and-second queue browser-head truth refresh: the in-app Browser re-verified local `/vancouver/first-time-visitor-starters`, `/vancouver/guides/where-should-a-first-time-vancouver-visitor-start`, `/vancouver/wellness-reset-starters`, `/vancouver/guides/vancouver-wellness-experiences-to-review`, `/vancouver/out-of-town-guest-starters`, `/vancouver/guides/how-to-host-an-out-of-town-guest-in-vancouver`, `/vancouver/weekend-route-starters`, and `/vancouver/guides/how-to-build-a-vancouver-weekend-route-without-crossing-the-city-all-day` on June 15, 2026 and confirmed route-specific title, description, robots, canonical, JSON-LD, correction-path links, and the page-to-guide / guide-to-page pairing on all eight routes.
+- First-and-second queue release truth refresh: refreshed the first and second hosted queue packets, go/no-go checklists, slice handoffs, transplant rules, and local approval packets to current `37/23/14/70/14` machine truth, `28`-route structure-proof coverage, explicit guide-to-collection pairing expectations, the shared metadata caveat, and exact hosted smoke gaps.
+- First-and-second queue proof rerun after packet refresh: `npm run seo:proof`, `npm run seo:structure:proof`, and `npm run seo:docs:proof` all passed again on June 15, 2026 at `37` useful pieces, `23` guides, `14` source-backed wedge collections, `70` source-backed anchors, `14` mapped guide-to-collection links, `28` checked structure routes, and `43` checked packet/doc files before the operator-packet batch widened the doc-proof set.
+- Shared proof-doc cleanup follow-through: `npm run seo:docs:proof` passed again on June 15, 2026 with `43` checked packet/doc files and zero failures after refreshing `CURRENT_LOCAL_PROOF_SNAPSHOT.md`, `LOCAL_QUEUE_AND_PROOF_STATUS.md`, and this QA trail to the latest first-and-second queue packet truth before the operator-packet batch widened the doc-proof set.
+- First-and-second queue operator-packet batch: created `docs/seo-aeo-geo/FIRST_SOURCE_BACKED_RELEASE_OPERATOR_PACKET.md` and `docs/seo-aeo-geo/SECOND_SOURCE_BACKED_RELEASE_OPERATOR_PACKET.md` so the first two hosted queues now have exact local execution runbooks tied to the Univenture release-safety standard, the slice handoffs, the transplant rules, the current local proof stack, and the exact hosted smoke order.
+- First-and-second queue operator-packet batch: verified the current workspace release blockers directly before writing the runbooks. `git -C /Users/michaelyap/Documents/Codex/Workspace remote -v` returned no remotes, `git -C /Users/michaelyap/Documents/Codex/Workspace status --short --branch` reported `## No commits yet on codex/guided-onboarding` plus a broadly dirty untracked workspace, and `node /Users/michaelyap/Documents/Codex/Workspace/univenture/scripts/release-safety-check.mjs --repo /Users/michaelyap/Documents/Codex/Workspace --base origin/main --allow univenture/cityatlas --json` returned `blocked_missing_base_ref`.
+- First-and-second queue operator-packet proof follow-through: `scripts/verify-seo-docs.mjs` now includes the first-queue docs plus the new first and second operator packets, and `npm run seo:docs:proof` passed on June 15, 2026 at `37` useful pieces, `23` guides, `14` source-backed wedge collections, `70` source-backed anchors, `14` mapped guide-to-collection links, and `48` checked packet/doc files.
+- Sunday-and-returning operator-packet batch: created `docs/seo-aeo-geo/SUNDAY_SOURCE_BACKED_RELEASE_OPERATOR_PACKET.md` and `docs/seo-aeo-geo/RETURNING_VISITOR_SOURCE_BACKED_RELEASE_OPERATOR_PACKET.md` so the third and fourth hosted queues now also have exact local execution runbooks tied to the Univenture release-safety standard, the slice handoffs, the transplant rules, the current local proof stack, and the exact hosted smoke order.
+- Sunday-and-returning operator-packet batch: wired those two new runbooks into the queue packets, go/no-go checklists, `docs/seo-aeo-geo/README.md`, `docs/PROJECT.md`, `README.md`, and the doc-proof verifier so the stronger release standard now extends beyond the first two hosted queues.
+- Sunday-and-returning operator-packet proof follow-through: `npm run seo:docs:proof` passed on June 15, 2026 at `37` useful pieces, `23` guides, `14` source-backed wedge collections, `70` source-backed anchors, `14` mapped guide-to-collection links, and `50` checked packet/doc files.
+- Later source-backed operator-packet batch: created `docs/seo-aeo-geo/KITSILANO_SCENIC_SOURCE_BACKED_RELEASE_OPERATOR_PACKET.md`, `docs/seo-aeo-geo/WEST_SIDE_DAYTIME_SOURCE_BACKED_RELEASE_OPERATOR_PACKET.md`, `docs/seo-aeo-geo/FALSE_CREEK_CULTURE_SOURCE_BACKED_RELEASE_OPERATOR_PACKET.md`, `docs/seo-aeo-geo/UBC_DISCOVERY_SOURCE_BACKED_RELEASE_OPERATOR_PACKET.md`, and `docs/seo-aeo-geo/GARDEN_DAY_SOURCE_BACKED_RELEASE_OPERATOR_PACKET.md` so the fifth through ninth hosted queues now also have exact local execution runbooks tied to the Univenture release-safety standard, the slice handoffs, the transplant rules, the current local proof stack, and the exact hosted smoke order.
+- Later source-backed operator-packet batch: wired those five new runbooks into the queue packets, go/no-go checklists, `docs/seo-aeo-geo/README.md`, `docs/seo-aeo-geo/CURRENT_LOCAL_PROOF_SNAPSHOT.md`, `docs/seo-aeo-geo/LOCAL_QUEUE_AND_PROOF_STATUS.md`, `docs/PROJECT.md`, `README.md`, and the doc-proof verifier so the exact execution-runbook standard now extends across the full nine-queue source-backed ladder.
+- Later source-backed operator-packet proof follow-through: `npm run seo:proof`, `npm run seo:structure:proof`, and `npm run seo:docs:proof` all passed again on June 15, 2026 at `37` useful pieces, `23` guides, `14` source-backed wedge collections, `70` source-backed anchors, `14` mapped guide-to-collection links, `28` checked structure routes, and `55` checked packet/doc files after the fifth-through-ninth operator-packet expansion.
+- Later routing release hardening batch: refreshed the starter-pack, low-friction, and guide-roundup routing queue packets and slice handoffs to current `37/23/14/70/14` machine truth, accurate release order behind the nine source-backed queues, and the current shared metadata caveat.
+- Later routing release hardening batch: created `STARTER_PACK_ROUTING_RELEASE_GO_NO_GO_CHECKLIST.md`, `STARTER_PACK_ROUTING_RELEASE_OPERATOR_PACKET.md`, `LOW_FRICTION_ROUTING_RELEASE_GO_NO_GO_CHECKLIST.md`, `LOW_FRICTION_ROUTING_RELEASE_OPERATOR_PACKET.md`, `GUIDE_ROUNDUP_ROUTING_RELEASE_GO_NO_GO_CHECKLIST.md`, and `GUIDE_ROUNDUP_ROUTING_RELEASE_OPERATOR_PACKET.md` so the later routing-only ladder now also has exact live gates plus exact local execution runbooks tied to the release-safety standard.
+- Later routing proof expansion: `scripts/verify-seo-structure.mjs` now checks the starter-pack, low-friction, and guide-roundup routing guides and records canonical expectations in the route report, while `scripts/verify-seo-docs.mjs` now requires the later routing queue, handoff, gate, and operator docs as current-truth surfaces.
+- Later routing proof follow-through: `npm run seo:proof`, `npm run seo:structure:proof`, and `npm run seo:docs:proof` all passed on June 15, 2026 at `37` useful pieces, `23` guides, `14` source-backed wedge collections, `70` source-backed anchors, `14` mapped guide-to-collection links, `23` guides with direct-path internal links, `31` checked structure routes, and `64` checked packet/doc files after the routing-release expansion.
+- Direct-path link-graph batch: added explicit internal `resourceLinks` to the older Vancouver date-night, rainy-day, and cafe guides so every current guide now has at least one direct-path CityAtlas next step instead of depending only on the primary CTA or related-guide fallback.
+- Direct-path link-graph batch: updated the shared source-backed page template so each source-backed starter page now links into the matching answer-first guide plus adjacent internal path links, reducing crawlable dead ends between the official-source layer and the broader guide graph.
+- Direct-path link-graph proof follow-through: `npm run typecheck`, `npm run build`, `npm run seo:proof`, and `npm run seo:structure:proof` all passed on June 15, 2026. The content-machine proof now also reports `23` guides with direct-path internal links while staying green at `37` useful pieces, `23` guides, `14` source-backed wedge collections, `70` source-backed anchors, and `14` mapped guide-to-collection links.
+- Hub-path and second-queue truth refresh batch: expanded the shared hub JSON-LD truth in `src/lib/seo.ts`, tightened `scripts/verify-seo-structure.mjs` so `/vancouver` and `/vancouver/guides` now have to expose the exact featured planning-surface and featured-guide paths, and refreshed the current local proof snapshot plus the second hosted release packet set to match that stronger contract.
+- Hub-path and second-queue truth refresh batch: `npm run typecheck`, `npm run build`, `npm run seo:proof`, and `npm run seo:structure:proof` all passed again on June 15, 2026. The latest local proof now reports `37` useful pieces, `23` guides, `14` source-backed wedge collections, `70` source-backed anchors, `14` mapped guide-to-collection links, `23` guides with direct-path internal links, and `31` checked structure routes.
+- Hub-path and second-queue truth refresh batch: `npm run seo:docs:proof` also passed on June 15, 2026 with `23` guides with direct-path internal links, `31` checked structure routes, `64` checked packet/doc files, and zero failures after the packet-refresh and verifier hardening.
+- Hub-path and second-queue truth refresh batch: no deploy, hosted smoke, indexing submission, or production mutation was performed in this batch.
+- Aggregate proof-stack batch: added `scripts/verify-seo-proof-stack.mjs` plus `npm run seo:proof:stack` so CityAtlas can refresh content proof, structure proof, doc proof, and readiness in one local pass instead of depending on a manual multi-command loop.
+- Aggregate proof-stack batch: `scripts/verify-seo-docs.mjs` now writes `output/seo/local-doc-proof.json`, and the new aggregate proof runner writes `output/seo/local-proof-stack.json` after validating all four component artifacts.
+- Aggregate proof-stack batch: owner-facing proof docs now point to `npm run seo:proof:stack`, `output/seo/local-doc-proof.json`, and `output/seo/local-proof-stack.json` as the clean reusable local proof surfaces ahead of later release-packet refreshes.
+- Aggregate proof-stack proof follow-through: `npm run seo:proof:stack` passed on June 15, 2026 and refreshed `output/seo/local-content-machine-proof.json`, `output/seo/local-structure-proof.json`, `output/seo/local-doc-proof.json`, `output/seo/local-proof-stack.json`, and `output/readiness/latest.json` at `37` useful pieces, `23` guides, `14` source-backed wedge collections, `70` source-backed anchors, `14` mapped guide-to-collection links, `23` guides with direct-path internal links, `31` checked structure routes, `64` checked packet/doc files, and readiness average `90%`.

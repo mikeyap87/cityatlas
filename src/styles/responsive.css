@@ -1,0 +1,532 @@
+@media (max-width: 1080px) {
+  .site-header {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .site-nav {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    overflow-x: auto;
+  }
+
+  .hero-grid,
+  .city-hero,
+  .guide-hero,
+  .guide-layout,
+  .guide-machine-row,
+  .pricing-hero,
+  .form-hero,
+  .private-preview-hero,
+  .admin-hero,
+  .business-detail-hero,
+  .dashboard-preview,
+  .form-layout,
+  .legal-grid,
+  .admin-grid,
+  .admin-grid.bottom {
+    grid-template-columns: 1fr;
+  }
+
+  .partner-panel {
+    grid-column: auto;
+  }
+
+  .hero-media,
+  .hero-map-panel {
+    min-height: 460px;
+  }
+
+  .metrics-strip,
+  .pricing-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .trust-section {
+    grid-template-columns: 1fr;
+  }
+
+  .guide-query-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  :root {
+    --container: min(1180px, calc(100vw - 28px));
+  }
+
+  .site-header {
+    gap: 12px;
+    min-height: auto;
+    overflow: visible;
+    padding: 12px 14px;
+  }
+
+  .site-header > *,
+  .safe-mode-notice > *,
+  .admin-hero > *,
+  .admin-panel > * {
+    min-width: 0;
+  }
+
+  .header-actions {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+  }
+
+  .site-nav {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: visible;
+    width: 100%;
+  }
+
+  .brand-mark small,
+  .header-search {
+    display: none;
+  }
+
+  .site-nav {
+    gap: 8px 9px;
+    padding-bottom: 2px;
+  }
+
+  .nav-link {
+    align-items: center;
+    display: flex;
+    font-size: 0.72rem;
+    justify-content: center;
+    min-height: 38px;
+    text-align: center;
+    white-space: normal;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 10.5vw, 2.85rem);
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  h2 {
+    font-size: clamp(1.45rem, 8vw, 2rem);
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .hero-grid {
+    margin-top: 14px;
+  }
+
+  .hero-media {
+    min-height: 520px;
+  }
+
+  .hero-copy {
+    bottom: 26px;
+    left: 22px;
+    max-width: min(310px, calc(100vw - 72px));
+    right: auto;
+  }
+
+  .hero-copy p {
+    font-size: 1rem;
+  }
+
+  .hero-actions,
+  .inline-form,
+  .cta-band,
+  .adaptive-band,
+  .section-header,
+  .site-footer {
+    align-items: stretch;
+  }
+
+  .hero-actions,
+  .inline-form,
+  .section-header,
+  .site-footer {
+    flex-direction: column;
+  }
+
+  .section-header h2 {
+    font-size: clamp(1.04rem, 5.8vw, 1.4rem);
+    line-height: 1.12;
+    max-width: 100%;
+    word-break: break-word;
+  }
+
+  .section-header > div {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .section-header {
+    gap: 14px;
+  }
+
+  .section-action,
+  .source-panel,
+  .tag-cloud,
+  .tag-cloud span,
+  .hero-actions > * {
+    min-width: 0;
+  }
+
+  .button {
+    width: 100%;
+  }
+
+  .source-panel h2 {
+    font-size: clamp(1.22rem, 6vw, 1.48rem);
+    line-height: 1.12;
+  }
+
+  .tag-cloud {
+    gap: 8px;
+  }
+
+  .tag-cloud span,
+  .status-pill {
+    font-size: 0.76rem;
+    line-height: 1.15;
+    padding: 8px 10px;
+    white-space: normal;
+  }
+
+  .hero-map-panel {
+    min-height: auto;
+  }
+
+  .map-toolbar,
+  .card-topline,
+  .dashboard-card-header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .map-toolbar {
+    justify-content: flex-start;
+  }
+
+  .map-toolbar .status-pill {
+    white-space: normal;
+  }
+
+  .hero-copy p {
+    max-width: min(300px, calc(100vw - 84px));
+    overflow-wrap: anywhere;
+  }
+
+  .atlas-map {
+    height: 260px;
+  }
+
+  .hero-tabs,
+  .mini-pricing-row,
+  .metrics-strip,
+  .planner-stats,
+  .adaptive-band,
+  .card-grid.three,
+  .card-grid.two,
+  .split-section,
+  .pricing-grid,
+  .form-grid,
+  .business-meta-grid,
+  .inventory-grid,
+  .cta-band,
+  .checklist-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-block,
+  .split-section,
+  .dashboard-preview,
+  .trust-section,
+  .admin-grid.bottom,
+  .cta-band {
+    margin-top: 54px;
+  }
+
+  .city-hero,
+  .pricing-hero,
+  .form-hero,
+  .private-preview-hero,
+  .admin-hero {
+    padding-top: 28px;
+  }
+
+  .city-hero h1,
+  .pricing-hero h1,
+  .form-hero h1,
+  .private-preview-hero h1,
+  .admin-hero h1,
+  .private-preview-hero p,
+  .admin-hero p,
+  .admin-panel p,
+  .gate-row p,
+  .gate-row small,
+  .growth-play-row p,
+  .proof-sprint-row p,
+  .proof-sprint-heading small,
+  .proof-sprint-meta span,
+  .proof-sprint-next span,
+  .safe-mode-notice p,
+  .city-hero p,
+  .share-draft p,
+  .empty-state p {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .city-hero h1,
+  .pricing-hero h1,
+  .form-hero h1,
+  .private-preview-hero h1 {
+    font-size: clamp(2rem, 9.2vw, 2.35rem);
+    line-height: 1.04;
+    max-width: calc(100vw - 56px);
+  }
+
+  .city-hero p,
+  .private-preview-hero p,
+  .admin-hero p,
+  .section-header p,
+  .source-panel p,
+  .cta-band h2,
+  .cta-band p,
+  .share-draft p,
+  .empty-state p,
+  .newsletter-card p,
+  .trust-card p {
+    max-width: min(292px, calc(100vw - 96px));
+    width: fit-content;
+  }
+
+  .city-hero > *,
+  .guide-hero > *,
+  .guide-layout > *,
+  .private-preview-hero > *,
+  .admin-hero > *,
+  .split-section > *,
+  .section-block > *,
+  .form-layout > *,
+  .dashboard-preview > *,
+  .admin-grid > *,
+  .trust-section > *,
+  .protected-route-notice > * {
+    min-width: 0;
+  }
+
+  .cta-band h2 {
+    font-size: 1.65rem;
+    line-height: 1.08;
+    max-width: min(292px, calc(100vw - 76px));
+    overflow-wrap: anywhere;
+  }
+
+  .cta-band p,
+  .footer-links {
+    max-width: min(292px, calc(100vw - 76px));
+    overflow-wrap: anywhere;
+  }
+
+  .share-draft,
+  .empty-state,
+  .source-panel,
+  .safe-mode-notice,
+  .admin-panel,
+  .gate-row,
+  .proof-sprint-row,
+  .protected-route-notice li {
+    overflow: hidden;
+  }
+
+  .admin-hero p,
+  .admin-panel p,
+  .gate-row p,
+  .gate-row small,
+  .growth-play-row p,
+  .proof-sprint-row p,
+  .proof-sprint-heading small,
+  .proof-sprint-meta span,
+  .proof-sprint-next span,
+  .proof-candidate-row p,
+  .proof-candidate-heading small,
+  .proof-candidate-meta span,
+  .shadow-plan-row p,
+  .shadow-plan-row small,
+  .reply-log-row p,
+  .reply-log-row small,
+  .brain-module-row small,
+  .brain-next-batch p,
+  .brain-check-row small,
+  .brain-recommendation-row p,
+  .brain-recommendation-row small,
+  .brain-gap-list span,
+  .brain-run-row small,
+  .preview-candidate-card p,
+  .preview-candidate-card small,
+  .preview-route-card p,
+  .preview-script-list p,
+  .protected-route-notice p,
+  .protected-route-notice li,
+  .safe-mode-notice p,
+  .source-panel p,
+  .tag-cloud span {
+    overflow-wrap: break-word;
+    word-break: normal;
+  }
+
+  .gate-row p,
+  .gate-row small,
+  .growth-play-row small,
+  .growth-play-row p,
+  .proof-sprint-heading small,
+  .proof-sprint-row p,
+  .proof-sprint-meta span,
+  .proof-sprint-next span,
+  .proof-candidate-row p,
+  .proof-candidate-heading small,
+  .proof-candidate-meta span,
+  .proof-candidate-main > small,
+  .shadow-plan-row p,
+  .shadow-plan-row small,
+  .reply-log-row p,
+  .reply-log-row small,
+  .brain-module-row small,
+  .brain-next-batch p,
+  .brain-check-row small,
+  .brain-recommendation-row p,
+  .brain-recommendation-row small,
+  .brain-gap-list span,
+  .brain-run-row small,
+  .preview-candidate-card p,
+  .preview-candidate-card small,
+  .preview-route-card p,
+  .preview-script-list p,
+  .plain-list.compact li,
+  .experiment-row small {
+    max-width: min(270px, calc(100vw - 104px));
+  }
+
+  .city-search-panel {
+    grid-template-columns: auto 1fr;
+  }
+
+  .city-search-panel select {
+    grid-column: 1 / -1;
+  }
+
+  .business-detail-hero > img {
+    min-height: 330px;
+  }
+
+  .business-detail-panel,
+  .guide-answer-card,
+  .guide-sidebar-card,
+  .guide-intro,
+  .guide-section,
+  .rail-card,
+  .faq-card,
+  .pricing-card,
+  .submission-form,
+  .review-sidebar,
+  .admin-panel,
+  .source-panel,
+  .dashboard-card,
+  .dashboard-preview,
+  .cta-band {
+    padding: 18px;
+  }
+
+  .gate-row,
+  .ai-job-list div,
+  .brain-stage-row,
+  .brain-module-row,
+  .brain-check-row,
+  .brain-recommendation-row,
+  .brain-run-row,
+  .growth-play-row,
+  .proof-sprint-meta,
+  .proof-sprint-columns,
+  .proof-candidate-summary,
+  .city-rollout-row,
+  .city-rollout-metrics,
+  .business-prospect-row,
+  .business-prospect-meta,
+  .proof-candidate-row,
+  .shadow-plan-row,
+  .proof-candidate-meta,
+  .reply-tracker-form,
+  .preview-route-grid,
+  .preview-candidate-card,
+  .preview-script-list li,
+  .mission-route-header,
+  .route-timeline li {
+    grid-template-columns: 1fr;
+  }
+
+  .proof-sprint-heading,
+  .proof-candidate-heading,
+  .preview-card-heading {
+    display: grid;
+  }
+
+  .prospect-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .prospect-toolbar label {
+    max-width: none;
+  }
+
+  .proof-candidate-score,
+  .preview-candidate-score {
+    min-width: 0;
+    text-align: left;
+  }
+
+  .gate-actions {
+    align-items: start;
+    justify-items: start;
+  }
+
+  .site-footer {
+    display: flex;
+  }
+
+  .guide-sidebar-card {
+    position: static;
+    top: auto;
+  }
+
+  .mission-actions,
+  .share-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .mission-card {
+    max-width: calc(100vw - 28px);
+    width: 100%;
+  }
+
+  .mission-card p,
+  .mission-step-preview,
+  .mission-progress,
+  .mission-meta,
+  .mission-actions {
+    max-width: calc(100vw - 76px);
+    width: 100%;
+  }
+
+  .mission-route-score {
+    min-width: 0;
+    text-align: left;
+  }
+}

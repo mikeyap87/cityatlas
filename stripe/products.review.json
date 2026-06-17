@@ -1,0 +1,32 @@
+{
+  "mode": "review_only",
+  "currency": "usd",
+  "products": [
+    {
+      "lookupKey": "cityatlas_community_listing_monthly",
+      "name": "CityAtlas Community Listing",
+      "description": "Basic business review queue and source metadata. Free launch-candidate tier.",
+      "amount": 0,
+      "interval": "month",
+      "paymentBehavior": "manual_free_tier_no_checkout"
+    },
+    {
+      "lookupKey": "cityatlas_city_partner_monthly",
+      "name": "CityAtlas City Partner",
+      "description": "Enhanced CityAtlas profile, founding partner placement review, offer or event module, and monthly visibility snapshot.",
+      "amount": 4900,
+      "interval": "month",
+      "paymentBehavior": "subscription_checkout_after_approval"
+    },
+    {
+      "lookupKey": "cityatlas_signature_partner_monthly",
+      "name": "CityAtlas Signature Partner",
+      "description": "Premium local feature package with creator visit brief, sponsored guide proposal, and AI visibility report draft.",
+      "amount": 14900,
+      "interval": "month",
+      "paymentBehavior": "subscription_checkout_after_approval"
+    }
+  ],
+  "activationGate": "Do not create Stripe products, prices, checkout sessions, payment links, invoices, coupons, or subscriptions until owner approval.",
+  "recommendedFirstStep": "Create test-mode products and prices only after package promise, refund policy, support process, and first proof-sprint demand are approved."
+}

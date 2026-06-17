@@ -43,16 +43,35 @@ export function SecondaryCityGuidesPage({
       <section className="city-hero">
         <div>
           <p className="section-label">City preview</p>
-          <h1>{cityName} guide preview and official source route pages</h1>
+          <h1>{cityName} starter pages and guide preview</h1>
           <p>
-            {`This CityAtlas city preview stays narrow by design. Use these pages when you want one clear ${cityName} starting area, official source links, and a clear way to report an issue instead of a generic listicle.`}
+            {`This CityAtlas city guide stays intentionally narrow. Use these pages when you want one clear ${cityName} starting area, official links, and a clear way to report an issue instead of a generic listicle.`}
           </p>
+          <div className="hero-actions">
+            <AppLink className="button primary" to={`/${citySlug}/guides`}>
+              Open {cityName} guides
+            </AppLink>
+            <AppLink className="button secondary" to="/vancouver/guides">
+              Open Vancouver guides
+            </AppLink>
+          </div>
         </div>
-        <div className="source-panel">
-          <StatusPill tone="blue">Narrow city preview</StatusPill>
-          <p>
-            {`${cityName} is the first reusable non-Vancouver CityAtlas preview. The public surface stays intentionally small until the city has stronger route depth and stronger official source support.`}
-          </p>
+        <div className="public-intro-card">
+          <div className="public-intro-card-header">
+            <div>
+              <strong>Start with the clearest page</strong>
+              <p>{`${cityName} stays intentionally small for now, so each page should answer one route question well.`}</p>
+            </div>
+            <StatusPill tone="blue">Narrow city guide</StatusPill>
+          </div>
+          <div className="public-intro-card-grid">
+            {collections.map(({ id, meta, itemCount }) => (
+              <AppLink className="public-intro-link" key={id} to={meta.path}>
+                <strong>{meta.shortLabel}</strong>
+                <span>{itemCount} real places with official links.</span>
+              </AppLink>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -90,7 +109,7 @@ export function SecondaryCityGuidesPage({
         <div>
           <h2>Need the deeper Vancouver guide library too?</h2>
           <p>
-            CityAtlas still has its deepest public route library in Vancouver. Use the Toronto preview for direct first-visit and compact-weekend route questions, then open the Vancouver guides when you need broader neighborhood and weekend coverage.
+            CityAtlas still has its deepest public route library in Vancouver. Use the Toronto guide for direct first-visit and compact-weekend questions, then open Vancouver when you need broader neighborhood and weekend coverage.
           </p>
         </div>
         <AppLink className="button primary" to="/vancouver/guides">

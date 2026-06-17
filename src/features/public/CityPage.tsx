@@ -337,9 +337,9 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
 
       <section className="section-block">
         <SectionHeader
-          title={`${businesses.length} current business page examples`}
-          copy="These example cards show how fuller reviewed Vancouver business pages can look once facts, media, and participation details are stronger."
-          action={<StatusPill tone="amber">Example pages</StatusPill>}
+          title={`${businesses.length} current business page formats`}
+          copy="These cards show how CityAtlas can present a reviewed business page once facts, media, and participation details are confirmed."
+          action={<StatusPill tone="amber">Page formats</StatusPill>}
         />
         <div className="card-grid three">
           {businesses.map((business) => (
@@ -368,7 +368,7 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
 
       <section className="split-section">
         <div>
-          <SectionHeader title="Event examples" copy="These example cards show how CityAtlas can package event coverage. Confirm live details with hosts or official sources." />
+          <SectionHeader title="Sample event pages" copy="These cards show how CityAtlas can present event coverage. Confirm live details with hosts or official sources." />
           <div className="stacked-list">
             {data.events.map((event) => (
               <EventCard event={event} key={event.id} />
@@ -377,8 +377,8 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
         </div>
         <div>
           <SectionHeader
-            title="Perk examples"
-            copy="These example cards show how CityAtlas can package partner perks once the business confirms the details and redemption rules."
+            title="Sample partner offers"
+            copy="These cards show how CityAtlas can package a partner offer once the business confirms the details and redemption rules."
           />
           <div className="stacked-list">
             {data.offers.map((offer) => (
@@ -393,7 +393,7 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
       </section>
 
       <section className="section-block">
-        <SectionHeader title="Guides" copy="Editorial pages connect city questions to neighborhood fit, route logic, and clearer next steps." />
+        <SectionHeader title="Guides" copy="Guide pages connect city questions to neighborhood fit, planning logic, and clearer next steps." />
         <div className="card-grid two">
           {cityGuides.map((guide) => (
             <GuideCard guide={guide} key={guide.id} />

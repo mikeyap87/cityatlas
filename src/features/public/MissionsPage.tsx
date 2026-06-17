@@ -87,22 +87,31 @@ export function MissionsPage({ data, onSaveMission }: MissionsPageProps) {
       <section className="city-hero mission-hero">
         <div>
           <p className="section-label">Saved plans</p>
-          <h1>What is a CityAtlas saved plan? A reusable Vancouver route you can actually keep.</h1>
+          <h1>Save a Vancouver route you can reuse</h1>
           <p>
-            Use saved plans when the Vancouver question is already clear and the next step is
-            saving, sharing, or tightening one route instead of reopening the whole city. Saved
-            plans turn answer-first guides, starting-point pages, and route ideas into a concrete
-            plan with one clear next move.
+            Use saved plans when the question is already clear and the next step is saving,
+            sharing, or tightening one route instead of reopening the whole city.
           </p>
+          <div className="hero-actions">
+            <AppLink
+              className="button primary"
+              to="/vancouver/guides/cityatlas-guide-roundup-which-vancouver-route-should-you-open-by-situation"
+            >
+              Choose a route first <ArrowRightIcon />
+            </AppLink>
+            <AppLink className="button secondary" to="/planner">
+              Open planner
+            </AppLink>
+          </div>
         </div>
-        <div className="source-panel">
+        <div className="public-intro-card">
           <MapIcon />
-          <h2>Why people use this</h2>
-          <p>
-            A saved plan is easier to reuse than a directory. It gives locals and visitors one
-            compact Vancouver plan, gives businesses a future sponsor shape, and gives CityAtlas a
-            clearer planning unit than generic browse-only discovery.
-          </p>
+          <h2>What you can do here</h2>
+          <ul className="public-note-list">
+            <li><CheckIcon /> Keep one compact plan instead of reopening five different pages.</li>
+            <li><CheckIcon /> Turn a guide or starter page into something easier to share later.</li>
+            <li><CheckIcon /> See how CityAtlas routes can become repeatable local plans.</li>
+          </ul>
         </div>
       </section>
 

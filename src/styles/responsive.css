@@ -34,7 +34,7 @@
 
   .hero-media,
   .hero-map-panel {
-    min-height: 460px;
+    min-height: 420px;
   }
 
   .metrics-strip,
@@ -47,6 +47,10 @@
   }
 
   .guide-query-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-explainer-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -135,18 +139,24 @@
   }
 
   .hero-media {
-    min-height: 520px;
+    min-height: 470px;
   }
 
   .hero-copy {
-    bottom: 26px;
-    left: 22px;
-    max-width: min(310px, calc(100vw - 72px));
-    right: auto;
+    bottom: 20px;
+    left: 18px;
+    max-width: none;
+    right: 18px;
   }
 
   .hero-copy p {
-    font-size: 1rem;
+    font-size: 0.96rem;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(1.95rem, 8.1vw, 2.7rem);
+    line-height: 0.94;
+    max-width: 9ch;
   }
 
   .hero-actions,
@@ -230,12 +240,12 @@
   }
 
   .hero-copy p {
-    max-width: min(300px, calc(100vw - 84px));
+    max-width: 18rem;
     overflow-wrap: anywhere;
   }
 
   .atlas-map {
-    height: 260px;
+    height: 230px;
   }
 
   .map-stop {
@@ -472,6 +482,14 @@
 
   .city-search-header {
     flex-direction: column;
+  }
+
+  .public-intro-card-header {
+    flex-direction: column;
+  }
+
+  .public-intro-card-grid {
+    grid-template-columns: 1fr;
   }
 
   .city-search-quick-grid {

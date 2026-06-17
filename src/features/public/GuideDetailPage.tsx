@@ -4,7 +4,6 @@ import { BusinessCard, EventCard, GuideCard } from "../../components/Cards";
 import { ArrowRightIcon, MapIcon, ShieldIcon, SparkIcon } from "../../components/Icons";
 import { SectionHeader, StatusPill } from "../../components/UI";
 import {
-  getGuideCityName,
   getGuideHubPath,
 } from "../../lib/cityPaths";
 import {
@@ -226,7 +225,6 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
     ? sourceBackedCollectionMeta[sourceBackedCollection]
     : null;
   const gateMeta = guideGateMeta[guide.gateDecision];
-  const cityName = getGuideCityName(guide);
   const resolvedGuideHubPath = getGuideHubPath(guide);
 
   return (
@@ -380,8 +378,8 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
             <MapIcon />
             <strong>Why this guide fits</strong>
             <p>
-              This page is part of the CityAtlas {cityName}-intent guide set built to make
-              neighborhood fit, route shape, and next-step planning easier to follow.
+              This page helps with one planning job: pick a route, choose the right area, or move
+              to the next CityAtlas page with less guesswork.
             </p>
           </article>
           <article className="rail-card">
@@ -415,7 +413,7 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
           <SectionHeader
             label="Related places"
             title="Places this guide can connect to"
-            copy="These links help readers move from planning guidance into the broader CityAtlas discovery surface."
+            copy="These links help readers move from planning guidance into the broader CityAtlas place library."
           />
           <div className="card-grid two">
             {relatedBusinesses.map((business) => (
@@ -430,7 +428,7 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
           <SectionHeader
             label="Related guides"
             title="Keep the planning path moving"
-            copy="These guide-to-guide links strengthen the city-intent guide set and help readers move from one planning question into the next useful page."
+            copy="These links help readers move from one planning question into the next useful page."
           />
           <div className="card-grid three">
             {relatedGuides.map((relatedGuide) => (

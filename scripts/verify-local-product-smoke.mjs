@@ -148,9 +148,9 @@ async function runDesktopFlow(browser) {
     await page.goto(`${baseUrl}/toronto/guides`, { waitUntil: "networkidle" });
     await page.getByRole("heading", {
       level: 1,
-      name: /Toronto guide preview and official source route pages/i,
+      name: /Toronto starter pages and guide preview/i,
     }).waitFor();
-    await page.getByRole("link", { name: /First-time visitor starting points/i }).click();
+    await page.getByRole("link", { name: /First-time visitor starting points/i }).first().click();
     await page.waitForURL(`${baseUrl}/toronto/first-time-visitor-starters`);
     await page.getByRole("link", { name: /Read the Toronto destination guide/i }).click();
     await page.waitForURL(`${baseUrl}/toronto/guides/where-should-a-first-time-toronto-visitor-start`);

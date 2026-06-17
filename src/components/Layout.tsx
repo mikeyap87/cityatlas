@@ -76,7 +76,7 @@ export function PublicLayout({ children, path }: LayoutProps) {
         <div className="footer-links">
           <AppLink to="/about">About CityAtlas</AppLink>
           <AppLink to="/vancouver/guides">Guide library</AppLink>
-          <AppLink to="/toronto/guides">Toronto preview</AppLink>
+          <AppLink to="/toronto/guides">Toronto guides</AppLink>
           <AppLink to="/vancouver/guides/vancouver-itinerary-starter-pack-which-cityatlas-page-should-you-open-first">
             Where to start guide
           </AppLink>

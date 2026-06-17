@@ -14,17 +14,17 @@ export interface VariantCopy {
 export const variantCopy: Record<GrowthVariant, VariantCopy> = {
   control: {
     variant: "control",
-    heroTitle: "Plan a better Vancouver day without opening 12 tabs",
+    heroTitle: "Find your Vancouver plan faster",
     heroCopy:
-      "Start with the right part of Vancouver, then open the guide or route that fits today.",
-    primaryCta: "Start exploring",
-    partnerHeadline: "Help your business show up in the right Vancouver moments",
+      "Choose a mood, neighborhood, or occasion, then open one good guide.",
+    primaryCta: "Open Vancouver",
+    partnerHeadline: "Help your business show up in the right Vancouver decisions",
     partnerCopy:
-      "Request a review if you want guide placement, a stronger page, or a clearer local story. Checkout stays off until the fit is clear.",
+      "Request a review if you want better guide placement, a stronger page, or a clearer local story. Checkout stays off until the fit is clear.",
   },
   "founding-partner": {
     variant: "founding-partner",
-    heroTitle: "Help your business show up when Vancouver people are deciding where to go",
+    heroTitle: "Show up when Vancouver people are deciding where to go",
     heroCopy:
       "CityAtlas helps the right business show up when people are choosing a neighborhood, guide, or city plan.",
     primaryCta: "See business packages",
@@ -34,9 +34,9 @@ export const variantCopy: Record<GrowthVariant, VariantCopy> = {
   },
   "weekend-atlas": {
     variant: "weekend-atlas",
-    heroTitle: "Plan a better Vancouver weekend without tab overload",
+    heroTitle: "Find a better Vancouver weekend plan faster",
     heroCopy:
-      "Use route ideas, practical guides, and one clear planner instead of bouncing between maps, blogs, and screenshots.",
+      "Open one route, save it, and keep the weekend compact instead of juggling maps, blogs, and screenshots.",
     primaryCta: "Build an itinerary",
     partnerHeadline: "Reach locals while they are planning the weekend",
     partnerCopy:

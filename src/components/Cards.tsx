@@ -13,14 +13,10 @@ function getCitySlug(value: string) {
 export function BusinessCard({ business }: { business: Business }) {
   return (
     <article className="content-card business-card">
-      <img
-        src={getBusinessVisual(business)}
-        alt={`${business.name} preview artwork`}
-        loading="lazy"
-      />
+      <img src={getBusinessVisual(business)} alt={`${business.name} scene`} loading="lazy" />
       <div className="card-body">
         <div className="card-topline">
-          <StatusPill tone="blue">Sample business page</StatusPill>
+          <StatusPill tone="blue">Business page format</StatusPill>
           <span>{business.priceTier}</span>
         </div>
         <h3>{business.name}</h3>
@@ -41,7 +37,7 @@ export function BusinessCard({ business }: { business: Business }) {
 export function EventCard({ event }: { event: EventItem }) {
   return (
     <article className="content-card compact-card">
-      <img src={getEventVisual(event)} alt={`${event.title} preview artwork`} loading="lazy" />
+      <img src={getEventVisual(event)} alt={`${event.title} scene`} loading="lazy" />
       <div className="card-body">
         <div className="card-icon-line">
           <CalendarIcon />
@@ -69,7 +65,7 @@ export function OfferCard({
   return (
     <article className="content-card offer-card">
       <div className="offer-card-inner">
-        <StatusPill tone="amber">Sample offer</StatusPill>
+        <StatusPill tone="amber">Offer format</StatusPill>
         <h3>{offer.title}</h3>
         <p>{offer.description}</p>
         <div className="card-meta">
@@ -85,7 +81,7 @@ export function OfferCard({
 export function GuideCard({ guide }: { guide: Guide }) {
   return (
     <article className="content-card guide-card">
-      <img src={getGuideVisual(guide)} alt={`${guide.title} preview artwork`} loading="lazy" />
+      <img src={getGuideVisual(guide)} alt={`${guide.title} scene`} loading="lazy" />
       <div className="card-body">
         <div className="card-icon-line">
           <MapIcon />

@@ -116,6 +116,40 @@ const trustedStartingPointLinks = [
   { path: "/vancouver/wellness-reset-starters", label: "Wellness reset" },
 ] as const;
 
+const homePlanningLanes = [
+  {
+    title: "Date night",
+    description: "Choose a smoother neighborhood or route before the night turns into too many tabs.",
+  },
+  {
+    title: "Rainy day",
+    description: "Open calmer indoor ideas fast when the weather changes the plan.",
+  },
+  {
+    title: "First visit",
+    description: "Start with the part of Vancouver that gives the right first impression.",
+  },
+  {
+    title: "Weekend route",
+    description: "Keep the day compact instead of bouncing across the city for one plan.",
+  },
+  {
+    title: "Work-friendly cafes",
+    description: "Find a better coffee-and-laptop fit without guessing from generic list posts.",
+  },
+  {
+    title: "Wellness reset",
+    description: "Choose a lower-friction recovery or slower-day plan without the hype layer.",
+  },
+] as const;
+
+const whyCityAtlasFeelsEasier = [
+  "It starts with the real decision: where to begin, not which place looks loudest.",
+  "Search, route chips, and area links all lead into the same guide library.",
+  "Official-link pages stay separate from broader guide pages so trust is easier to read.",
+  "Saved plans turn a good city idea into something you can come back to later.",
+] as const;
+
 export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePageProps) {
   const [email, setEmail] = useState("");
   const [referralCode, setReferralCode] = useState("");
@@ -355,11 +389,11 @@ export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePag
         <div className="hero-side-column">
           <div className="hero-map-panel">
             <div className="map-toolbar">
-              <strong>Vancouver route map</strong>
-              <StatusPill tone="blue">Start by area</StatusPill>
+              <strong>Choose a Vancouver area</strong>
+              <StatusPill tone="blue">Clickable</StatusPill>
             </div>
             <p className="hero-panel-copy">
-              Pick a part of the city and CityAtlas will take you to the best page to start with.
+              Click a neighborhood lane and CityAtlas will open the guide or starting page that fits.
             </p>
             <div className="atlas-map" aria-label="Clickable Vancouver route map">
               <svg className="atlas-map-art" viewBox="0 0 520 320" aria-hidden="true">
@@ -423,12 +457,10 @@ export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePag
             </div>
             <div className="hero-search-stack">
               <div className="hero-search-intro">
-                <strong>Search by mood, area, or occasion</strong>
+                <strong>Search by mood, place, or occasion</strong>
                 <StatusPill tone="green">Live search</StatusPill>
               </div>
-              <p className="hero-search-copy">
-                Type one real need and CityAtlas will open the closest match.
-              </p>
+              <p className="hero-search-copy">Type one need and open the closest match.</p>
               <form
                 className="hero-search-form"
                 onSubmit={(event) => {
@@ -556,27 +588,29 @@ export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePag
         <div className="source-panel">
           <SectionHeader
             label="What is CityAtlas?"
-            title="A Vancouver-first guide for choosing what to do next"
-            copy="CityAtlas helps you pick a good next move fast, then turns it into a route, saved plan, or simple next click."
+            title="A Vancouver-first guide for making the next city choice easier"
+            copy="CityAtlas is built for the moment when you know the kind of day you want, but not the best place or route to start with."
           />
-          <div className="tag-cloud">
-            <span>Date night planning</span>
-            <span>Rainy-day Vancouver ideas</span>
-            <span>Weekend route ideas</span>
-            <span>Easy route chooser</span>
-            <span>Wellness reset routes</span>
-            <span>Work-friendly cafe decisions</span>
-            <span>First-evening visitor plans</span>
-            <span>First-time visitor starting areas</span>
-            <span>Returning-visitor local discovery</span>
+          <div className="home-explainer-grid">
+            {homePlanningLanes.map((lane) => (
+              <article className="home-explainer-card" key={lane.title}>
+                <strong>{lane.title}</strong>
+                <p>{lane.description}</p>
+              </article>
+            ))}
           </div>
         </div>
         <div className="source-panel">
           <SectionHeader
             label="Why it feels easier"
-            title="Built to help you choose, not browse forever"
-            copy="The best CityAtlas page gives you one clear starting point, one useful next step, and a smaller set of good options."
+            title="Built to help you choose, not scroll forever"
+            copy="The strongest CityAtlas pages narrow the first decision quickly, then move you into the right guide, route, or saved plan."
           />
+          <ul className="home-why-list">
+            {whyCityAtlasFeelsEasier.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
           <div className="hero-actions">
             <AppLink className="button secondary" to="/about">
               About CityAtlas
@@ -586,18 +620,6 @@ export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePag
               to="/vancouver/guides/vancouver-itinerary-starter-pack-which-cityatlas-page-should-you-open-first"
             >
               Where to start
-            </AppLink>
-            <AppLink
-              className="button secondary"
-              to="/vancouver/guides/cityatlas-guide-roundup-which-vancouver-route-should-you-open-by-situation"
-            >
-              Browse by situation
-            </AppLink>
-            <AppLink
-              className="button secondary"
-              to="/vancouver/guides/which-low-friction-vancouver-route-should-you-open-today"
-            >
-              Easy plan guide
             </AppLink>
             <AppLink className="button secondary" to="/vancouver/guides">
               Guide library
@@ -710,9 +732,9 @@ export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePag
 
       <section className="section-block">
         <SectionHeader
-          label="Business page examples"
-          title="Preview how fuller reviewed business pages can look"
-          copy="These sample cards show what a stronger business page can look like after review. The public site still starts with guides and route pages first."
+          label="Business pages"
+          title="See how a reviewed business page can look"
+          copy="These cards show how a CityAtlas business page can look once the facts, media, and participation details are confirmed."
           action={<AppLink className="text-link" to="/vancouver">View all discovery <ArrowRightIcon /></AppLink>}
         />
         <div className="card-grid three">
@@ -745,8 +767,8 @@ export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePag
         <div>
           <SectionHeader
             label="Events and offers"
-            title="Flexible modules for local campaigns"
-            copy="CityAtlas can support events, perks, and partner moments without pretending every campaign is already live."
+            title="Event pages and local offers"
+            copy="CityAtlas can support events, offers, and partner moments without pretending every listing is already live."
           />
           <div className="stacked-list">
             {data.events.map((event) => (
@@ -756,9 +778,9 @@ export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePag
         </div>
         <div>
           <SectionHeader
-            label="Partner examples"
-            title="How partner perks can appear"
-            copy="These sample cards show how partner perks can appear once the business confirms the details."
+            label="Partner offers"
+            title="How a partner offer can appear"
+            copy="These cards show how a partner offer can appear once the business confirms the details."
           />
           <div className="stacked-list">
             {data.offers.map((offer) => (

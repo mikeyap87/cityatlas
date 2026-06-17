@@ -28,10 +28,10 @@ export function BusinessPage({ business, data }: BusinessPageProps) {
   return (
     <>
       <section className="business-detail-hero">
-        <img src={getBusinessVisual(business)} alt={`${business.name} preview artwork`} />
+        <img src={getBusinessVisual(business)} alt={`Illustration for ${business.name}`} />
         <div className="business-detail-panel">
           <div className="card-topline">
-            <StatusPill tone="blue">Example business page</StatusPill>
+            <StatusPill tone="blue">Business page format</StatusPill>
             <StatusPill tone="amber">Review-first details</StatusPill>
           </div>
           <h1>{business.name}</h1>
@@ -56,9 +56,9 @@ export function BusinessPage({ business, data }: BusinessPageProps) {
       <section className="split-section">
         <div>
           <SectionHeader
-            label="Example page"
-            title="What a fuller CityAtlas business page can include"
-            copy="This example shows how a fuller CityAtlas business page can look while key facts, media, and participation details are still being confirmed."
+            label="Page format"
+            title="What a reviewed CityAtlas business page can include"
+            copy="This page shows the structure CityAtlas can use while facts, media, and participation details are still being confirmed."
           />
           <ul className="checklist-grid">
             {checklist.map((item) => (
@@ -68,9 +68,9 @@ export function BusinessPage({ business, data }: BusinessPageProps) {
         </div>
         <div className="source-panel">
           <ShieldIcon />
-          <h2>Source state</h2>
+          <h2>What is confirmed first</h2>
           <p>
-            This example page uses placeholder business details while CityAtlas confirms current
+            This page uses provisional business details while CityAtlas confirms current
             hours, pricing, availability, and contact details with the business or its official
             site.
           </p>
@@ -108,14 +108,14 @@ export function BusinessPage({ business, data }: BusinessPageProps) {
         <div>
           <SectionHeader
             title="Offers"
-            copy="Perk examples appear here once the business confirms the details, timing, and redemption rules."
+            copy="Offers can appear here once the business confirms the details, timing, and redemption rules."
           />
           <div className="stacked-list">
             {offers.length > 0 ? (
               offers.map((offer) => <OfferCard offer={offer} business={business} key={offer.id} />)
             ) : (
               <div className="empty-state">
-                <strong>No sample offer attached</strong>
+                <strong>No offer attached yet</strong>
                 <p>This page can still be reviewed for feature or guide placement.</p>
               </div>
             )}

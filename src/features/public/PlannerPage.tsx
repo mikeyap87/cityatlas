@@ -3,7 +3,7 @@ import type { CityAtlasData, CityMission, SavedItem } from "../../types";
 import { siteConfig } from "../../config/site";
 import { MissionCard } from "../../components/Cards";
 import { AppLink } from "../../components/Link";
-import { ArrowRightIcon, CalendarIcon, MapIcon, SparkIcon, StoreIcon } from "../../components/Icons";
+import { ArrowRightIcon, CalendarIcon, CheckIcon, MapIcon, SparkIcon, StoreIcon } from "../../components/Icons";
 import { EmptyState, SectionHeader, StatusPill } from "../../components/UI";
 
 interface PlannerPageProps {
@@ -81,14 +81,26 @@ export function PlannerPage({ data, onToggleSave, onSaveMission, onTrack }: Plan
             Save places, events, and guides into a simple Vancouver plan. For now, your saved plan
             stays in this browser while sharing tools roll out in stages.
           </p>
+          <div className="hero-actions">
+            <AppLink className="button primary" to="/vancouver/missions">
+              Open saved plans
+            </AppLink>
+            <AppLink
+              className="button secondary"
+              to="/vancouver/guides/cityatlas-guide-roundup-which-vancouver-route-should-you-open-by-situation"
+            >
+              Pick a route first
+            </AppLink>
+          </div>
         </div>
-        <div className="source-panel">
+        <div className="public-intro-card planner-hero-card">
           <SparkIcon />
-          <h2>How this helps</h2>
-          <p>
-            Saved picks can become easy-to-reuse city plans and future share links. For now, your
-            plan stays in this browser.
-          </p>
+          <h2>Use it in three quick steps</h2>
+          <ul className="public-note-list">
+            <li><CheckIcon /> Save a few places, events, or guides.</li>
+            <li><CheckIcon /> Turn that short list into one route or saved plan.</li>
+            <li><CheckIcon /> Prepare the share draft when the plan feels right.</li>
+          </ul>
         </div>
       </section>
 

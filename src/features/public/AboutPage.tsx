@@ -19,7 +19,7 @@ export function AboutPage() {
               Read Vancouver guides <ArrowRightIcon />
             </AppLink>
             <AppLink className="button secondary" to="/toronto/guides">
-              Toronto preview
+              Toronto guides
             </AppLink>
             <AppLink className="button secondary" to="/vancouver/missions">
               See saved plans

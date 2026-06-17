@@ -37,13 +37,13 @@ export function VancouverBusinessCoverageSection({
         label="Vancouver business coverage"
         title={
           isHome
-            ? "A bigger Vancouver business map already sits behind the public guides"
-            : "The Vancouver business map is already bigger than the current public business pages"
+            ? "Vancouver coverage already reaches far beyond the first public pages"
+            : "The live guides are only one layer of the current Vancouver coverage"
         }
         copy={
           isHome
-            ? `CityAtlas now tracks ${snapshot.totalBusinesses} Vancouver businesses across hospitality, culture, guest-hosting, events, wellness, and neighborhood-led planning. The public site still starts with guides, but the city coverage underneath is already much broader.`
-            : `CityAtlas now tracks ${snapshot.totalBusinesses} Vancouver businesses behind the live guides and starting-point pages. The public site still leads with the best route to open first, but the business coverage underneath is already strong enough to support a fuller launch.`
+            ? `CityAtlas now tracks ${snapshot.totalBusinesses} Vancouver businesses across hospitality, culture, guest stays, events, wellness, and neighborhood planning. The public site still starts with guides, but the city coverage underneath is already much broader.`
+            : `CityAtlas now tracks ${snapshot.totalBusinesses} Vancouver businesses behind the live guides and starting-point pages. The public site still leads with the best route to open first, while the wider city map keeps that advice more grounded.`
         }
         action={<StatusPill tone="green">{snapshot.totalBusinesses} businesses tracked</StatusPill>}
       />
@@ -75,8 +75,8 @@ export function VancouverBusinessCoverageSection({
         <div className="source-panel">
           <SectionHeader
             label="What this means"
-            title="Start with the right page first, then the right place"
-            copy="The strongest public CityAtlas pages still help people choose the right guide or route first. This wider business map makes those pages feel more grounded without pretending every business already has a public profile."
+            title="Start with the right route, then the right place"
+            copy="The first public job is still helping someone choose the right guide or route. Wider business coverage makes those pages feel more grounded without pretending every business already has a full public profile."
           />
           <div className="tag-cloud">
             {snapshot.topCategories.map((category) => (

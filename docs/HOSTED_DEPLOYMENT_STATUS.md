@@ -12,6 +12,13 @@ Date: 2026-06-17
 - Latest production deployment: `dpl_EH4ZGfu6TxX1Erg6dARaNuBGJv7y`
 - Latest production deployment URL: `https://cityatlas-rcpxa1sng-michael-yaps-projects-92932836.vercel.app`
 
+## GitHub Release Path
+
+- Repository: `https://github.com/mikeyap87/cityatlas`
+- Remote-backed baseline now exists on `origin/main`.
+- The current release lane `codex/vancouver-release-lane` is pushed and tracks `origin/codex/vancouver-release-lane`.
+- The exact deployed Vancouver baseline currently matches both remote branches, so the next release lane work starts from a clean shared base instead of a missing-remote state.
+
 ## Protection State
 
 - Vercel SSO protection is enabled for production deployment URLs and all previews.

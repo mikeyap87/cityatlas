@@ -13,6 +13,13 @@
 - Moved CityAtlas into the Univenture workspace and added protected-preview, Stripe, and readiness packets.
 - Added hosted route guards, Vercel project/deploy, live Univenture custom domain, Stripe planner decision, generated proof-sprint packet, and no-send proof-sprint approval handoff.
 
+## 2026-06-17 - GitHub release path repair
+
+- Created the dedicated GitHub repo `mikeyap87/cityatlas`.
+- Added `origin` to the standalone CityAtlas repo and pushed both `main` and `codex/vancouver-release-lane`.
+- Confirmed the clean remote-backed baseline now exists, with the current Vancouver release branch matching `origin/main`.
+- Updated hosted deployment and release-path docs so the repo no longer claims the remote/base path is missing.
+
 ## 2026-06-14 - Shadow outreach and reply-learning pass
 
 - Added Brain shadow-mode outreach ranking for Date Night prospects with primary, confirm-first, backup, and blocked roles.

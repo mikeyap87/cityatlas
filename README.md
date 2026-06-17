@@ -16,6 +16,10 @@ Fallback Vercel alias:
 
 `https://cityatlas-one.vercel.app`
 
+GitHub repo:
+
+`https://github.com/mikeyap87/cityatlas`
+
 ## What Is Included
 
 - Public homepage with product-first discovery UI.

@@ -93,6 +93,8 @@ The public product helps locals find places, events, offers, and guides. The bus
 - Supabase schema draft for future backend
 - Vercel-ready SPA rewrite config
 - Live Vercel project: `cityatlas`
+- GitHub repo: `mikeyap87/cityatlas`
+- Current clean release branch: `codex/vancouver-release-lane`
 
 ## Important Constraints
 

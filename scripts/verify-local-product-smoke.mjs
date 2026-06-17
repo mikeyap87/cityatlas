@@ -108,10 +108,32 @@ async function runDesktopFlow(browser) {
     };
   });
 
+  await runStep(steps, "desktop home map and search", async () => {
+    await page.goto(`${baseUrl}/`, { waitUntil: "networkidle" });
+    await page.locator(".map-stop-kits").click();
+    await page.waitForURL(`${baseUrl}/vancouver/kitsilano-scenic-starters`);
+    const mapBodyText = await page.locator("body").innerText();
+    ensure(/kitsilano/i.test(mapBodyText), "Homepage route map did not open the Kitsilano page.");
+
+    await page.goto(`${baseUrl}/`, { waitUntil: "networkidle" });
+    await page.getByLabel("Search CityAtlas").fill("first evening");
+    const firstResult = page.locator(".hero-search-result").first();
+    await firstResult.waitFor();
+    const href = await firstResult.getAttribute("href");
+    ensure(Boolean(href && href.startsWith("/")), "Homepage search did not surface a clickable route.");
+    await firstResult.click();
+    await page.waitForURL(`${baseUrl}${href}`);
+
+    return {
+      route: href,
+      screenshot: await saveScreenshot(page, "desktop-home-search.png"),
+    };
+  });
+
   await runStep(steps, "desktop city starter navigation", async () => {
     await page.goto(`${baseUrl}/vancouver`, { waitUntil: "networkidle" });
     await page.getByRole("heading", { level: 1, name: /Explore Vancouver/i }).waitFor();
-    await page.getByRole("link", { name: /Open Kitsilano scenic starters/i }).click();
+    await page.getByRole("link", { name: /Open Kitsilano/i }).click();
     await page.waitForURL(`${baseUrl}/vancouver/kitsilano-scenic-starters`);
     const bodyText = await page.locator("body").innerText();
     ensure(/kitsilano/i.test(bodyText), "Kitsilano starters route did not render recognizable Kitsilano text.");
@@ -126,9 +148,9 @@ async function runDesktopFlow(browser) {
     await page.goto(`${baseUrl}/toronto/guides`, { waitUntil: "networkidle" });
     await page.getByRole("heading", {
       level: 1,
-      name: /Toronto starter guides and source-backed route pages/i,
+      name: /Toronto guide preview and official source route pages/i,
     }).waitFor();
-    await page.getByRole("link", { name: /Toronto first-time visitor starters/i }).click();
+    await page.getByRole("link", { name: /First-time visitor starting points/i }).click();
     await page.waitForURL(`${baseUrl}/toronto/first-time-visitor-starters`);
     await page.getByRole("link", { name: /Read the Toronto destination guide/i }).click();
     await page.waitForURL(`${baseUrl}/toronto/guides/where-should-a-first-time-toronto-visitor-start`);
@@ -143,7 +165,7 @@ async function runDesktopFlow(browser) {
 
   await runStep(steps, "desktop Toronto weekend navigation", async () => {
     await page.goto(`${baseUrl}/toronto/guides`, { waitUntil: "networkidle" });
-    await page.getByRole("link", { name: /Toronto weekend route starters/i }).click();
+    await page.getByRole("link", { name: /Toronto weekend starting points/i }).click();
     await page.waitForURL(`${baseUrl}/toronto/weekend-route-starters`);
     await page.getByRole("link", { name: /Read the Toronto weekend guide/i }).click();
     await page.waitForURL(`${baseUrl}/toronto/guides/how-to-build-a-toronto-weekend-route-without-crossing-the-city-all-day`);
@@ -342,7 +364,7 @@ async function runMobileFlow(browser) {
     await page.goto(`${baseUrl}/toronto/first-time-visitor-starters`, { waitUntil: "networkidle" });
     await page.getByRole("heading", {
       level: 1,
-      name: /Toronto first-time visitor starters with official source notes/i,
+      name: /Toronto first-time visitor starting points/i,
     }).waitFor();
 
     return {
@@ -355,7 +377,7 @@ async function runMobileFlow(browser) {
     await page.goto(`${baseUrl}/toronto/weekend-route-starters`, { waitUntil: "networkidle" });
     await page.getByRole("heading", {
       level: 1,
-      name: /Toronto weekend route starters with official source notes/i,
+      name: /Toronto weekend route starting points/i,
     }).waitFor();
 
     return {

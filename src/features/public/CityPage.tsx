@@ -93,12 +93,11 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
       <section className="city-hero">
         <div>
           <p className="section-label">{siteConfig.city}</p>
-          <h1>Explore Vancouver with routes, guides, and local planning logic</h1>
+          <h1>Explore Vancouver with guides, routes, and better starting points</h1>
           <p>
-            Search places, events, offers, and guides. CityAtlas is designed to help people choose
-            a better next move, not just browse a pile of city listings. Today the clearest public
-            coverage lives in the source-backed guides and starter pages, while the wider Vancouver
-            business map is being surfaced through route-first coverage.
+            Search places, events, offers, and guides. CityAtlas is built to help people choose a
+            better next move, not just browse a pile of city listings. Today the clearest public
+            coverage lives in the official source starting-point pages and the city guides.
           </p>
         </div>
         <div className="city-search-panel">
@@ -124,9 +123,9 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
       {neighborhoodGuides.length > 0 ? (
         <section className="section-block">
           <SectionHeader
-            label="Neighborhood starters"
+            label="Neighborhood starting points"
             title="Choose the right area before you browse place pages"
-            copy="CityAtlas is strongest when it helps someone choose the right part of Vancouver first, then decide what kind of route belongs there. The current starter trio covers Gastown, Mount Pleasant, and Kitsilano."
+            copy="CityAtlas works best when it helps someone choose the right part of Vancouver first, then decide what kind of plan belongs there. The current trio covers Gastown, Mount Pleasant, and Kitsilano."
             action={<StatusPill tone="blue">Neighborhood guides</StatusPill>}
           />
           <div className="card-grid two">
@@ -156,9 +155,9 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
         <section className="split-section">
           <div className="source-panel">
             <SectionHeader
-              label="Official-source starters"
-              title="Source-backed starters for real Vancouver anchors"
-              copy="If you want CityAtlas pages that name real Vancouver anchors today, start with the official-source starter pages before fuller public business pages."
+              label="Official source pages"
+              title="Official source pages for real Vancouver places"
+              copy="If you want CityAtlas pages that name real Vancouver anchors today, start with the official source pages before fuller public business pages."
               action={
                 <StatusPill tone="green">
                   {sourceBackedDateNightStarters.length +
@@ -175,7 +174,7 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
                     sourceBackedWeekendRouteStarters.length +
                     sourceBackedSundayStarters.length +
                     sourceBackedWellnessResetStarters.length}{" "}
-                  source-backed entries
+                  real places with official links
                 </StatusPill>
               }
             />
@@ -183,69 +182,69 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
           <div className="source-panel">
             <p>
               This public layer is intentionally narrow. It links straight to official venue
-              sources, explains route fit, and points people toward the correction path instead of
-              pretending the whole Vancouver directory is already verified.
+              sources, explains who each route fits, and points people toward the correction process
+              instead of pretending the whole Vancouver directory is already verified.
             </p>
             <div className="hero-actions">
               <AppLink className="button primary" to="/vancouver/date-night-starters">
-                Open date-night starters
+                Open date night
               </AppLink>
               <AppLink className="button secondary" to="/vancouver/rainy-day-starters">
-                Open rainy-day starters
+                Open rainy day
               </AppLink>
               <AppLink className="button secondary" to="/vancouver/first-evening-starters">
-                Open first-evening starters
+                Open first evening
               </AppLink>
               <AppLink className="button secondary" to="/vancouver/first-time-visitor-starters">
-                Open first-time visitor starters
+                Open first visit
               </AppLink>
               <AppLink className="button secondary" to="/vancouver/garden-day-starters">
-                Open garden day starters
+                Open garden day
               </AppLink>
               <AppLink className="button secondary" to="/vancouver/kitsilano-scenic-starters">
-                Open Kitsilano scenic starters
+                Open Kitsilano
               </AppLink>
               <AppLink className="button secondary" to="/vancouver/west-side-daytime-starters">
-                Open west-side daytime starters
+                Open west-side day
               </AppLink>
               <AppLink className="button secondary" to="/vancouver/false-creek-culture-starters">
-                Open False Creek culture starters
+                Open False Creek
               </AppLink>
               <AppLink className="button secondary" to="/vancouver/ubc-discovery-starters">
-                Open UBC discovery starters
+                Open UBC day
               </AppLink>
               <AppLink className="button secondary" to="/vancouver/returning-visitor-starters">
-                Open returning-visitor starters
+                Open returning visit
               </AppLink>
               <AppLink className="button secondary" to="/vancouver/out-of-town-guest-starters">
-                Open out-of-town guest starters
+                Open hosting guests
               </AppLink>
               <AppLink className="button secondary" to="/vancouver/weekend-route-starters">
-                Open weekend route starters
+                Open weekend route
               </AppLink>
               <AppLink className="button secondary" to="/vancouver/sunday-starters">
-                Open Sunday starters
+                Open Sunday plan
               </AppLink>
               <AppLink className="button secondary" to="/vancouver/wellness-reset-starters">
-                Open wellness reset starters
+                Open wellness reset
               </AppLink>
               <AppLink
                 className="button secondary"
                 to="/vancouver/guides/vancouver-itinerary-starter-pack-which-cityatlas-page-should-you-open-first"
               >
-                Open starter pack guide
+                Open where-to-start guide
               </AppLink>
               <AppLink
                 className="button secondary"
                 to="/vancouver/guides/cityatlas-guide-roundup-which-vancouver-route-should-you-open-by-situation"
               >
-                Open guide roundup
+                Open browse-by-situation guide
               </AppLink>
               <AppLink
                 className="button secondary"
                 to="/vancouver/guides/which-low-friction-vancouver-route-should-you-open-today"
               >
-                Open low-friction guide
+                Open easy-plan guide
               </AppLink>
               <AppLink className="button secondary" to="/editorial-standards">
                 Review standards
@@ -272,7 +271,7 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
 
       <section className="section-block">
         <SectionHeader
-          title="City missions"
+          title="Saved plans"
           copy="Short saveable routes help CityAtlas move from browsing into a clearer next step."
           action={<StatusPill tone="blue">{data.cityMissions.length} routes</StatusPill>}
         />

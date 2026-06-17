@@ -43,15 +43,15 @@ export function SecondaryCityGuidesPage({
       <section className="city-hero">
         <div>
           <p className="section-label">City preview</p>
-          <h1>{cityName} starter guides and source-backed route pages</h1>
+          <h1>{cityName} guide preview and official source route pages</h1>
           <p>
-            {`This CityAtlas city preview stays narrow by design. Use these pages when you want one clear ${cityName} starting area, official-source anchor coverage, and a correction path instead of a generic listicle.`}
+            {`This CityAtlas city preview stays narrow by design. Use these pages when you want one clear ${cityName} starting area, official source links, and a clear way to report an issue instead of a generic listicle.`}
           </p>
         </div>
         <div className="source-panel">
           <StatusPill tone="blue">Narrow city preview</StatusPill>
           <p>
-            {`${cityName} is the first reusable non-Vancouver CityAtlas preview. The public surface stays intentionally small until the city has stronger route depth and more official-source support.`}
+            {`${cityName} is the first reusable non-Vancouver CityAtlas preview. The public surface stays intentionally small until the city has stronger route depth and stronger official source support.`}
           </p>
         </div>
       </section>
@@ -62,12 +62,12 @@ export function SecondaryCityGuidesPage({
             <AppLink className="query-card query-card-link" key={id} to={meta.path}>
               <strong>{meta.shortLabel}</strong>
               <p>{meta.pageDescription}</p>
-              <small>{itemCount} official-source anchors</small>
+              <small>{itemCount} real places with official links</small>
             </AppLink>
           ))}
           <AppLink className="query-card query-card-link" to="/editorial-standards">
             <strong>Editorial standards</strong>
-            <p>Review the public source rules, correction path, and claim boundaries before using a narrower CityAtlas city preview page as planning input.</p>
+            <p>Review the public source rules, correction process, and claim limits before using a narrower CityAtlas city preview page as planning input.</p>
           </AppLink>
         </div>
       </section>
@@ -86,7 +86,7 @@ export function SecondaryCityGuidesPage({
       </section>
 
       <section className="cta-band">
-        <StatusPill tone="green">Source-backed expansion</StatusPill>
+        <StatusPill tone="green">Official-source expansion</StatusPill>
         <div>
           <h2>Need the deeper Vancouver guide library too?</h2>
           <p>

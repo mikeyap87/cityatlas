@@ -37,27 +37,27 @@ export function VancouverBusinessCoverageSection({
         label="Vancouver business coverage"
         title={
           isHome
-            ? "The public guide layer already sits on top of a wider Vancouver business map"
-            : "Vancouver business coverage is already wider than the current public business pages"
+            ? "A bigger Vancouver business map already sits behind the public guides"
+            : "The Vancouver business map is already bigger than the current public business pages"
         }
         copy={
           isHome
-            ? `CityAtlas now tracks ${snapshot.totalBusinesses} Vancouver businesses across hospitality, culture, guest-hosting, event, wellness, and neighborhood-discovery lanes. Public publishing stays route-first, but the business base behind it is already much wider than the current listing surface.`
-            : `CityAtlas now tracks ${snapshot.totalBusinesses} Vancouver businesses behind the live route library. The public experience still leads with answer-first guides and source-backed starters, but the business coverage underneath is already broad enough to support a fuller Vancouver launch story.`
+            ? `CityAtlas now tracks ${snapshot.totalBusinesses} Vancouver businesses across hospitality, culture, guest-hosting, events, wellness, and neighborhood-led planning. The public site still starts with guides, but the city coverage underneath is already much broader.`
+            : `CityAtlas now tracks ${snapshot.totalBusinesses} Vancouver businesses behind the live guides and starting-point pages. The public site still leads with the best route to open first, but the business coverage underneath is already strong enough to support a fuller launch.`
         }
         action={<StatusPill tone="green">{snapshot.totalBusinesses} businesses tracked</StatusPill>}
       />
 
       <div className="metrics-strip">
         <MetricCard
-          label="Official-source anchors"
+          label="Official source places"
           value={`${snapshot.sourceBackedAnchors}`}
-          detail="Real Vancouver anchors already named on public starter pages"
+          detail="Real Vancouver places already named on starting-point pages"
         />
         <MetricCard
-          label="Live route clusters"
+          label="Starter groups"
           value={`${snapshot.sourceBackedCollections}`}
-          detail="Source-backed starter groups already supporting public discovery"
+          detail="Official source groups already supporting discovery"
         />
         <MetricCard
           label="Guide pages"
@@ -67,7 +67,7 @@ export function VancouverBusinessCoverageSection({
         <MetricCard
           label="Categories covered"
           value={`${snapshot.categoryCount}`}
-          detail="Business categories already mapped into the Vancouver coverage base"
+          detail="Business categories already mapped across Vancouver"
         />
       </div>
 
@@ -75,8 +75,8 @@ export function VancouverBusinessCoverageSection({
         <div className="source-panel">
           <SectionHeader
             label="What this means"
-            title="Guide-first now, fuller business publishing after review"
-            copy="The strongest public CityAtlas pages are still the route and guide pages. This coverage layer makes those pages feel more grounded without pretending every business already has a verified public profile."
+            title="Start with the right page first, then the right place"
+            copy="The strongest public CityAtlas pages still help people choose the right guide or route first. This wider business map makes those pages feel more grounded without pretending every business already has a public profile."
           />
           <div className="tag-cloud">
             {snapshot.topCategories.map((category) => (
@@ -89,8 +89,8 @@ export function VancouverBusinessCoverageSection({
         <div className="source-panel">
           <SectionHeader
             label="Best public next moves"
-            title="Open the route that matches the situation first"
-            copy="Use the live route pages below when the real decision is where to start in Vancouver, not which single venue should carry the whole plan."
+            title="Open the route that matches the moment first"
+            copy="Use the live route pages below when the real decision is where to start in Vancouver, not which single venue should carry the whole day."
           />
           <div className="tag-cloud">
             {snapshot.topNeighborhoods.length > 0 ? (
@@ -123,7 +123,7 @@ export function VancouverBusinessCoverageSection({
       <div className="guide-query-grid">
         {snapshot.lanes.map((lane) => (
           <AppLink className="query-card query-card-link" to={lane.path} key={lane.id}>
-            <span className="query-card-kicker">{lane.count} businesses tracked</span>
+            <span className="query-card-kicker">{lane.count} businesses already mapped</span>
             <strong>{lane.title}</strong>
             <p>{lane.description}</p>
             <p>

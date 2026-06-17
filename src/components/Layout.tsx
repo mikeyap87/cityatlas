@@ -42,10 +42,10 @@ export function PublicLayout({ children, path }: LayoutProps) {
             to="/vancouver/date-night-starters"
             className={navClass(path, "/vancouver/date-night-starters")}
           >
-            Starters
+            Best places
           </AppLink>
           <AppLink to="/vancouver/missions" className={navClass(path, "/vancouver/missions")}>
-            Missions
+            Saved plans
           </AppLink>
           <AppLink to="/planner" className={navClass(path, "/planner")}>
             Planner
@@ -56,10 +56,10 @@ export function PublicLayout({ children, path }: LayoutProps) {
         </nav>
 
         <div className="header-actions">
-          <div className="header-search" aria-label="Search">
+          <AppLink className="header-search" aria-label="Search Vancouver plans" to="/vancouver">
             <SearchIcon />
             <span>Search Vancouver plans</span>
-          </div>
+          </AppLink>
         </div>
       </header>
 
@@ -69,8 +69,8 @@ export function PublicLayout({ children, path }: LayoutProps) {
         <div>
           <strong>{siteConfig.name}</strong>
           <p>
-            Vancouver-first guides, route starters, and local discovery pages built around clearer
-            planning help, official public sources where needed, and visible correction paths.
+            Vancouver plans, neighborhood guides, and local picks that help you decide what to do
+            next faster.
           </p>
         </div>
         <div className="footer-links">
@@ -78,29 +78,29 @@ export function PublicLayout({ children, path }: LayoutProps) {
           <AppLink to="/vancouver/guides">Guide library</AppLink>
           <AppLink to="/toronto/guides">Toronto preview</AppLink>
           <AppLink to="/vancouver/guides/vancouver-itinerary-starter-pack-which-cityatlas-page-should-you-open-first">
-            Starter pack guide
+            Where to start guide
           </AppLink>
-          <AppLink to="/vancouver/date-night-starters">Date night starters</AppLink>
-          <AppLink to="/vancouver/rainy-day-starters">Rainy-day starters</AppLink>
-          <AppLink to="/vancouver/first-evening-starters">First-evening starters</AppLink>
+          <AppLink to="/vancouver/date-night-starters">Date night</AppLink>
+          <AppLink to="/vancouver/rainy-day-starters">Rainy day</AppLink>
+          <AppLink to="/vancouver/first-evening-starters">First evening</AppLink>
           <AppLink to="/vancouver/first-time-visitor-starters">
-            First-time visitor starters
+            First visit
           </AppLink>
           <AppLink to="/vancouver/returning-visitor-starters">
-            Returning-visitor starters
+            Returning visit
           </AppLink>
           <AppLink to="/vancouver/out-of-town-guest-starters">
-            Out-of-town guest starters
+            Hosting guests
           </AppLink>
-          <AppLink to="/vancouver/weekend-route-starters">Weekend route starters</AppLink>
-          <AppLink to="/vancouver/sunday-starters">Sunday starters</AppLink>
-          <AppLink to="/vancouver/wellness-reset-starters">Wellness reset starters</AppLink>
-          <AppLink to="/toronto/first-time-visitor-starters">Toronto visitor starters</AppLink>
-          <AppLink to="/toronto/weekend-route-starters">Toronto weekend starters</AppLink>
+          <AppLink to="/vancouver/weekend-route-starters">Weekend route</AppLink>
+          <AppLink to="/vancouver/sunday-starters">Sunday plan</AppLink>
+          <AppLink to="/vancouver/wellness-reset-starters">Wellness reset</AppLink>
+          <AppLink to="/toronto/first-time-visitor-starters">Toronto first visit</AppLink>
+          <AppLink to="/toronto/weekend-route-starters">Toronto weekend</AppLink>
           <AppLink to="/vancouver">Vancouver discovery</AppLink>
           <AppLink to="/for-businesses/submit">Submit a business</AppLink>
-          <AppLink to="/for-businesses/pricing">Partner packages</AppLink>
-          <AppLink to="/vancouver/missions">City missions</AppLink>
+          <AppLink to="/for-businesses/pricing">Business packages</AppLink>
+          <AppLink to="/vancouver/missions">Saved plans</AppLink>
           <AppLink to="/planner">Planner</AppLink>
           <AppLink to="/editorial-standards">Editorial standards</AppLink>
           <AppLink to="/terms">Terms</AppLink>

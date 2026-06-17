@@ -86,22 +86,22 @@ export function MissionsPage({ data, onSaveMission }: MissionsPageProps) {
     <>
       <section className="city-hero mission-hero">
         <div>
-          <p className="section-label">City missions</p>
-          <h1>What is a CityAtlas mission? A saveable Vancouver route you can actually reuse.</h1>
+          <p className="section-label">Saved plans</p>
+          <h1>What is a CityAtlas saved plan? A reusable Vancouver route you can actually keep.</h1>
           <p>
-            Use missions when the Vancouver question is already clear and the next step is saving,
-            sharing, or tightening one route instead of reopening the whole city. Missions turn
-            answer-first guides, starter pages, and route ideas into a concrete plan with one clear
-            next move.
+            Use saved plans when the Vancouver question is already clear and the next step is
+            saving, sharing, or tightening one route instead of reopening the whole city. Saved
+            plans turn answer-first guides, starting-point pages, and route ideas into a concrete
+            plan with one clear next move.
           </p>
         </div>
         <div className="source-panel">
           <MapIcon />
-          <h2>Why this spreads</h2>
+          <h2>Why people use this</h2>
           <p>
-            A mission is easier to reuse than a directory. It gives locals and visitors one compact
-            Vancouver plan, gives businesses a future sponsor shape, and gives CityAtlas a clearer
-            route-planner unit than generic browse-only discovery.
+            A saved plan is easier to reuse than a directory. It gives locals and visitors one
+            compact Vancouver plan, gives businesses a future sponsor shape, and gives CityAtlas a
+            clearer planning unit than generic browse-only discovery.
           </p>
         </div>
       </section>
@@ -109,8 +109,8 @@ export function MissionsPage({ data, onSaveMission }: MissionsPageProps) {
       <section className="section-block">
         <SectionHeader
           label="Best first move"
-          title="Open the right route input before you save a mission"
-          copy="Missions work best after the pace, visitor situation, or route shape is already clearer. These pages help someone choose the right CityAtlas path first."
+          title="Choose a route first, then save the plan"
+          copy="Saved plans work best after the pace, visitor situation, or route shape is already clearer. These pages help someone choose the right CityAtlas path first."
           action={<StatusPill tone="blue">Choose your route first</StatusPill>}
         />
         <div className="guide-query-grid">
@@ -118,21 +118,21 @@ export function MissionsPage({ data, onSaveMission }: MissionsPageProps) {
             className="query-card query-card-link"
             to="/vancouver/guides/vancouver-itinerary-starter-pack-which-cityatlas-page-should-you-open-first"
           >
-            <strong>Starter-pack guide</strong>
+            <strong>Where to start guide</strong>
             <p>Open this when the first problem is still which CityAtlas page should shape the day at all.</p>
           </AppLink>
           <AppLink
             className="query-card query-card-link"
             to="/vancouver/guides/cityatlas-guide-roundup-which-vancouver-route-should-you-open-by-situation"
           >
-            <strong>Guide roundup</strong>
+            <strong>Browse by situation</strong>
             <p>Use this when weather, visitor type, or neighborhood fit should decide the mission shape first.</p>
           </AppLink>
           <AppLink
             className="query-card query-card-link"
             to="/vancouver/guides/which-low-friction-vancouver-route-should-you-open-today"
           >
-            <strong>Low-friction route chooser</strong>
+            <strong>Easy plan chooser</strong>
             <p>Choose this when the mission needs to stay easier, calmer, or more compact before anything gets saved.</p>
           </AppLink>
           <AppLink className="query-card query-card-link" to="/planner">
@@ -144,9 +144,9 @@ export function MissionsPage({ data, onSaveMission }: MissionsPageProps) {
 
       <section className="section-block">
         <SectionHeader
-          label="Mission library"
+          label="Saved plan library"
           title="Three reusable Vancouver routes"
-          copy="These routes show how CityAtlas turns guides and starter pages into saved Vancouver plans while broader city coverage keeps growing carefully."
+          copy="These routes show how CityAtlas turns guides and starting-point pages into saved Vancouver plans while broader city coverage keeps growing carefully."
           action={<StatusPill tone="amber">Current route set</StatusPill>}
         />
         <div className="card-grid three">
@@ -164,7 +164,7 @@ export function MissionsPage({ data, onSaveMission }: MissionsPageProps) {
       <section className="mission-routes section-block">
         <SectionHeader
           title="How a route helps"
-          copy="Each mission shows what a local user would do and where a business could fit naturally later."
+          copy="Each saved plan shows what a local user would do and where a business could fit naturally later."
         />
         <div className="mission-route-grid">
           {data.cityMissions.map((mission) => (
@@ -180,7 +180,7 @@ export function MissionsPage({ data, onSaveMission }: MissionsPageProps) {
 
       <section className="split-section">
         <div className="source-panel conversion-panel">
-          <h2>Who should use missions first?</h2>
+          <h2>Who should use saved plans first?</h2>
           <ul className="conversion-list">
             <li><CheckIcon /> Locals who want one reusable Vancouver route instead of reopening every guide.</li>
             <li><CheckIcon /> Visitors or hosts who already know the route type and need a cleaner saved plan.</li>
@@ -188,11 +188,11 @@ export function MissionsPage({ data, onSaveMission }: MissionsPageProps) {
           </ul>
         </div>
         <div className="source-panel conversion-panel">
-          <h2>What missions are not</h2>
+          <h2>What saved plans are not</h2>
           <ul className="conversion-list">
             <li><ShieldIcon /> Not a claim that every place, offer, or event shown here is already part of a verified public directory.</li>
             <li><ShieldIcon /> Not a promise that one route fits every mood, budget, or weather shift.</li>
-            <li><ShieldIcon /> Not a replacement for the editorial standards, starter pages, or answer-first guide layer.</li>
+            <li><ShieldIcon /> Not a replacement for the editorial standards, starting-point pages, or answer-first guide layer.</li>
           </ul>
         </div>
       </section>
@@ -202,7 +202,7 @@ export function MissionsPage({ data, onSaveMission }: MissionsPageProps) {
         <div>
           <h2>A route layer first, broader listings later</h2>
           <p>
-            Missions show how CityAtlas can turn planning into reusable itineraries. As verified
+            Saved plans show how CityAtlas can turn planning into reusable itineraries. As verified
             business coverage expands, routes can become more specific.
           </p>
         </div>

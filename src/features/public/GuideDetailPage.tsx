@@ -171,6 +171,18 @@ const guideSourceBackedSectionCopy = {
   },
 } as const;
 
+function simplifyGuideSupportCopy(value: string) {
+  return value
+    .replace(/source-backed starter page/gi, "page with official links")
+    .replace(/source-backed page/gi, "page with official links")
+    .replace(/official-source/gi, "official")
+    .replace(/correction path/gi, "report-an-issue path")
+    .replace(/broader guide library/gi, "broader guide collection")
+    .replace(/guide cluster/gi, "guide set")
+    .replace(/visible claim boundaries/gi, "clear claim limits")
+    .replace(/route shape/gi, "plan shape");
+}
+
 export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPageProps) {
   if (!guide) {
     return (
@@ -244,7 +256,7 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
             </div>
           </div>
           <div className="guide-sidebar-section">
-            <strong>Query class</strong>
+            <strong>Best use case</strong>
             <p>{guide.queryClass}</p>
           </div>
           <div className="guide-sidebar-section">
@@ -297,9 +309,9 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
           {sourceBackedGuidePlaces.length > 0 && sourceBackedGuideSection ? (
             <section className="guide-section">
               <SectionHeader
-                label="Source-backed starters"
-                title={sourceBackedGuideSection.title}
-                copy={sourceBackedGuideSection.copy}
+                label="Official-source starting points"
+                title={simplifyGuideSupportCopy(sourceBackedGuideSection.title)}
+                copy={simplifyGuideSupportCopy(sourceBackedGuideSection.copy)}
               />
               <div className="card-grid two">
                 {sourceBackedGuidePlaces.map((reference) => (
@@ -326,10 +338,10 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
                         rel="noreferrer"
                         target="_blank"
                       >
-                        Official source
+                        Official site
                       </a>
                       <AppLink className="button secondary" to={reference.correctionPath}>
-                        Correction path
+                        Report an issue
                       </AppLink>
                     </div>
                     <small>
@@ -361,14 +373,14 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
         <aside className="guide-rail">
           <article className="rail-card">
             <ShieldIcon />
-            <strong>Trust-first publishing rule</strong>
+            <strong>Before you rely on this page</strong>
             <p>{gateMeta.trustCopy}</p>
           </article>
           <article className="rail-card">
             <MapIcon />
-            <strong>Cluster fit</strong>
+            <strong>Why this guide fits</strong>
             <p>
-              This page is part of the CityAtlas {cityName}-intent guide cluster built to make
+              This page is part of the CityAtlas {cityName}-intent guide set built to make
               neighborhood fit, route shape, and next-step planning easier to follow.
             </p>
           </article>
@@ -377,7 +389,7 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
             <strong>Next pages to open</strong>
             <div className="rail-links">
               <AppLink to={resolvedGuideHubPath}>All guides</AppLink>
-              <AppLink to="/vancouver/missions">City missions</AppLink>
+              <AppLink to="/vancouver/missions">Saved plans</AppLink>
               <AppLink to="/planner">Planner</AppLink>
               <AppLink to="/for-businesses/pricing">For businesses</AppLink>
             </div>
@@ -385,8 +397,8 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
           {sourceBackedGuideMeta && sourceBackedGuideSection ? (
             <article className="rail-card">
               <ShieldIcon />
-              <strong>{sourceBackedGuideSection.railTitle}</strong>
-              <p>{sourceBackedGuideSection.railCopy}</p>
+              <strong>{simplifyGuideSupportCopy(sourceBackedGuideSection.railTitle)}</strong>
+              <p>{simplifyGuideSupportCopy(sourceBackedGuideSection.railCopy)}</p>
               <div className="rail-links">
                 <AppLink to={sourceBackedGuideMeta.path}>
                   {sourceBackedGuideMeta.shortLabel}
@@ -418,7 +430,7 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
           <SectionHeader
             label="Related guides"
             title="Keep the planning path moving"
-            copy="These guide-to-guide links strengthen the city-intent cluster and help readers move from one planning question into the next useful page."
+            copy="These guide-to-guide links strengthen the city-intent guide set and help readers move from one planning question into the next useful page."
           />
           <div className="card-grid three">
             {relatedGuides.map((relatedGuide) => (

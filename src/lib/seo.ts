@@ -112,7 +112,7 @@ export function getRouteMeta(
     return {
       title: "Vancouver Business Visibility Packages | CityAtlas",
       description:
-        "CityAtlas packages for Vancouver businesses that want guide placement, mission sponsorship angles, and trust-first local visibility. Billing opens after review and scope confirmation.",
+        "CityAtlas packages for Vancouver businesses that want guide placement, shareable plan sponsorship options, and clearer local visibility. Billing opens after review and scope confirmation.",
       type: "website",
     };
   }
@@ -128,7 +128,7 @@ export function getRouteMeta(
     return {
       title: "Editorial Standards And Corrections | CityAtlas",
       description:
-        "How CityAtlas checks official sources, limits public claims, and handles correction or removal requests for source-backed Vancouver pages.",
+        "How CityAtlas checks official sources, limits public claims, and handles correction or removal requests for public Vancouver pages with official links.",
       type: "website",
     };
   }
@@ -198,9 +198,9 @@ export function getRouteMeta(
   }
   if (path === "/vancouver/missions") {
     return {
-      title: "Vancouver City Missions And Route Planner | CityAtlas",
+      title: "Vancouver Saved Plans And Route Planner | CityAtlas",
       description:
-        "Saveable Vancouver mission routes that turn CityAtlas guides, source-backed starters, and planner actions into reusable city plans.",
+        "Saveable Vancouver plans that turn CityAtlas guides, real-place pages with official links, and planner actions into reusable city routes.",
       type: "website",
     };
   }
@@ -216,7 +216,7 @@ export function getRouteMeta(
     return {
       title: "Vancouver Guides | CityAtlas",
       description:
-        "Answer-first Vancouver guides and neighborhood starter pages for date nights, rainy-day plans, weekend routes, wellness resets, visitor choices, garden days, guest-hosting plans, and destination discovery.",
+        "Answer-first Vancouver guides and neighborhood starting-point pages for date nights, rainy days, weekend plans, wellness resets, visitor choices, garden days, guest hosting, and destination discovery.",
       type: "website",
     };
   }
@@ -224,7 +224,7 @@ export function getRouteMeta(
     return {
       title: `${guideHubMeta.cityName} Guides | CityAtlas`,
       description:
-        `Answer-first ${guideHubMeta.cityName} starter guides and official-source route pages for visitors who need one clear place to begin instead of a generic city roundup.`,
+        `Answer-first ${guideHubMeta.cityName} guides and pages with official links for visitors who need one clear place to begin instead of a generic city roundup.`,
       type: "website",
     };
   }
@@ -248,7 +248,7 @@ export function getRouteMeta(
     return {
       title: "Explore Vancouver | CityAtlas",
       description:
-        "Browse Vancouver through answer-first guides, neighborhood starters, source-backed route layers, missions, and trust-first local planning surfaces.",
+        "Browse Vancouver through answer-first guides, neighborhood starting points, real-place pages with official links, saved plans, and trust-first local planning.",
       type: "website",
     };
   }
@@ -411,7 +411,7 @@ const pricingFaqEntries = [
   {
     question: "What does CityAtlas mean by local visibility?",
     answer:
-      "CityAtlas means clearer guide placement, stronger route fit, source-backed starter context, mission sponsorship angles, and better city-facing presentation, not traffic guarantees or automatic publication.",
+      "CityAtlas means clearer guide placement, stronger plan fit, real-place context with official links, shareable plan sponsorship options, and better city-facing presentation, not traffic guarantees or automatic publication.",
   },
 ];
 
@@ -440,7 +440,7 @@ export function buildJsonLd(
       url: baseUrl,
       slogan: siteConfig.tagline,
       description:
-        "A Vancouver-first guide, route planner, and local discovery platform with public route logic and careful source-backed expansion.",
+        "A Vancouver-first guide, route planner, and local discovery platform with public planning logic and carefully reviewed place pages.",
     },
     {
       "@type": "WebSite",
@@ -465,9 +465,9 @@ export function buildJsonLd(
     {
       "@type": "ItemList",
       "@id": `${baseUrl}/vancouver/missions#city-missions`,
-      name: "CityAtlas Vancouver city missions",
+      name: "CityAtlas Vancouver saved plans",
       description:
-        "Saveable route loops that turn CityAtlas guides and starter pages into reusable Vancouver plans.",
+        "Saveable route loops that turn CityAtlas guides and starting-point pages into reusable Vancouver plans.",
       numberOfItems: data.cityMissions.length,
     },
   ];
@@ -509,7 +509,7 @@ export function buildJsonLd(
         "@id": `${baseUrl}/vancouver#featured-surfaces`,
         name: "Featured CityAtlas Vancouver planning surfaces",
         description:
-          "The strongest public CityAtlas planning surfaces for Vancouver route, visitor, weather, and source-backed discovery intent.",
+          "The strongest public CityAtlas planning surfaces for Vancouver route, visitor, weather, and place discovery with official links.",
         numberOfItems: cityHubItems.length,
         itemListElement: cityHubItems,
       },
@@ -559,7 +559,7 @@ export function buildJsonLd(
         "@id": `${baseUrl}/vancouver/guides#featured-guides`,
         name: "Featured Vancouver guide clusters and answer-first routes",
         description:
-          "The strongest answer-first CityAtlas guide routes for visitor choice, weekend planning, neighborhood discovery, and source-backed handoff.",
+          "The strongest answer-first CityAtlas guide routes for visitor choice, weekend planning, neighborhood discovery, and handoff to pages with official links.",
         numberOfItems: guideHubItems.length,
         itemListElement: guideHubItems,
       },
@@ -603,7 +603,7 @@ export function buildJsonLd(
         "@id": `${baseUrl}${path}#list`,
         name: `${guideHubMeta.cityName} guide pilot`,
         description:
-          `The current CityAtlas ${guideHubMeta.cityName} pilot guide set for first-visit routing and official-source starter handoff.`,
+          `The current CityAtlas ${guideHubMeta.cityName} pilot guide set for first-visit planning and pages with official links.`,
         numberOfItems: guideHubItems.length,
         itemListElement: guideHubItems,
       },
@@ -632,7 +632,7 @@ export function buildJsonLd(
           {
             "@type": "ListItem",
             position: 3,
-            name: "Vancouver City Missions",
+            name: "Vancouver Saved Plans",
             item: `${baseUrl}/vancouver/missions`,
           },
         ],
@@ -641,7 +641,7 @@ export function buildJsonLd(
         "@type": "CollectionPage",
         "@id": `${baseUrl}/vancouver/missions#collection-page`,
         url: `${baseUrl}/vancouver/missions`,
-        name: "Vancouver City Missions And Route Planner",
+        name: "Vancouver Saved Plans And Route Planner",
         description: meta.description,
         about: {
           "@type": "Place",
@@ -651,9 +651,9 @@ export function buildJsonLd(
       {
         "@type": "ItemList",
         "@id": `${baseUrl}/vancouver/missions#list`,
-        name: "CityAtlas Vancouver city missions",
+        name: "CityAtlas Vancouver saved plans",
         description:
-          "Saveable Vancouver route plans that turn guide logic, starter pages, and planner actions into reusable CityAtlas missions.",
+          "Saveable Vancouver route plans that turn guide logic, starting-point pages, and planner actions into reusable CityAtlas plans.",
         numberOfItems: missionItems.length,
         itemListElement: missionItems,
       },
@@ -696,7 +696,7 @@ export function buildJsonLd(
         "@id": `${baseUrl}/for-businesses/pricing#packages`,
         name: "CityAtlas partner package options",
         description:
-          "CityAtlas package options for Vancouver businesses that want guide placement, mission sponsorship angles, and trust-first city visibility.",
+          "CityAtlas package options for Vancouver businesses that want guide placement, shareable plan sponsorship options, and trust-first city visibility.",
         numberOfItems: data.packages.length,
         itemListElement: data.packages.map((plan, index) => ({
           "@type": "ListItem",

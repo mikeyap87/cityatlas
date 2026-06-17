@@ -1,0 +1,32 @@
+<svg width="1600" height="1000" viewBox="0 0 1600 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1600" height="1000" fill="#B8D9E8"/>
+  <rect width="1600" height="1000" fill="url(#cultureSky)"/>
+  <path d="M0 516C183 486 303 524 454 496C622 464 737 368 906 372C1078 376 1195 478 1366 498C1456 508 1533 504 1600 490V1000H0V516Z" fill="#6B99B5"/>
+  <path d="M0 628C165 599 294 646 443 617C602 586 735 517 900 518C1035 519 1166 572 1321 594C1432 610 1523 607 1600 592V1000H0V628Z" fill="#547D98"/>
+  <path d="M0 744H1600V1000H0V744Z" fill="url(#cultureWater)"/>
+  <path d="M96 682H434V824H96V682Z" fill="#E6D5BC"/>
+  <rect x="142" y="640" width="250" height="58" rx="18" fill="#D8C3A5"/>
+  <path d="M523 616H856V824H523V616Z" fill="#F6EFE4"/>
+  <path d="M548 602L688 502L831 602" stroke="#E9DFC8" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="593" y="667" width="56" height="157" fill="#D5CAB4"/>
+  <rect x="664" y="667" width="56" height="157" fill="#D5CAB4"/>
+  <rect x="735" y="667" width="56" height="157" fill="#D5CAB4"/>
+  <path d="M923 678H1378V824H923V678Z" fill="#F6F1E9"/>
+  <path d="M923 678L1085 540L1238 618L1378 678" fill="#D5E3EB"/>
+  <path d="M923 678L1085 540L1238 618L1378 678" stroke="#E5F0F5" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M1029 710C1058 690 1103 685 1140 699C1179 714 1210 742 1240 788" stroke="#547D98" stroke-width="12" stroke-linecap="round"/>
+  <path d="M1080 760C1112 772 1143 786 1175 806" stroke="#547D98" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="1229" cy="190" r="72" fill="#FFE6A5"/>
+  <path d="M244 264L390 170L497 238L652 146L825 258L975 180L1128 280L1284 208L1392 294" stroke="#F8FAFF" stroke-opacity="0.82" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  <defs>
+    <linearGradient id="cultureSky" x1="800" y1="0" x2="800" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D9EFF6"/>
+      <stop offset="0.52" stop-color="#89B7CC"/>
+      <stop offset="1" stop-color="#4C7288"/>
+    </linearGradient>
+    <linearGradient id="cultureWater" x1="800" y1="744" x2="800" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#47728F"/>
+      <stop offset="1" stop-color="#234557"/>
+    </linearGradient>
+  </defs>
+</svg>

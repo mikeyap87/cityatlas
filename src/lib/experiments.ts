@@ -14,33 +14,33 @@ export interface VariantCopy {
 export const variantCopy: Record<GrowthVariant, VariantCopy> = {
   control: {
     variant: "control",
-    heroTitle: "A Vancouver-first city guide for better local plans",
+    heroTitle: "Plan a better Vancouver day without opening 12 tabs",
     heroCopy:
-      "CityAtlas helps locals and visitors choose what to do next with answer-first guides, saveable routes, and trust-first local discovery.",
-    primaryCta: "Explore the city",
-    partnerHeadline: "Business visibility packages",
+      "Search by mood, neighborhood, weather, or visitor type. CityAtlas helps you find the best page to start with, then turn it into a simple plan.",
+    primaryCta: "Start exploring",
+    partnerHeadline: "Help your business show up in the right Vancouver moments",
     partnerCopy:
-      "Request review for guide placement, feature pages, offers, and local visibility snapshots. Billing opens after fit, scope, and terms are confirmed.",
+      "Request a review if you want guide placement, a stronger page, or a cleaner city-facing story. Billing stays off until the fit is clear.",
   },
   "founding-partner": {
     variant: "founding-partner",
-    heroTitle: "Help your business show up in better Vancouver discovery",
+    heroTitle: "Help your business show up when Vancouver people are deciding where to go",
     heroCopy:
-      "CityAtlas is building a curated Vancouver discovery layer around route logic, useful guides, and partner-ready local stories.",
+      "CityAtlas brings together useful guides, neighborhood picks, and city pages so the right businesses are easier to discover at the right moment.",
     primaryCta: "See business packages",
-    partnerHeadline: "Become a CityAtlas business partner",
+    partnerHeadline: "Get reviewed for a stronger CityAtlas presence",
     partnerCopy:
-      "Get reviewed for a premium page, guide placement, offer module, and visibility snapshot before paid packages open.",
+      "Start with a review for page quality, guide placement, and offer fit before paid packages open.",
   },
   "weekend-atlas": {
     variant: "weekend-atlas",
     heroTitle: "Plan a better Vancouver weekend without tab overload",
     heroCopy:
-      "Use saveable routes, practical guides, and one clear planner loop instead of bouncing across maps, blogs, and screenshots.",
+      "Use route ideas, practical guides, and one clear planner loop instead of bouncing between maps, blogs, and screenshots.",
     primaryCta: "Build an itinerary",
-    partnerHeadline: "Reach locals planning where to go next",
+    partnerHeadline: "Reach locals while they are planning the weekend",
     partnerCopy:
-      "Businesses can request review for guide placement, event modules, offers, and creator-ready local stories.",
+      "Businesses can request review for guide placement, events, offers, and a cleaner local story.",
   },
 };
 
@@ -65,7 +65,7 @@ export function getNextBestAction(data: CityAtlasData) {
     return {
       label: "Finish your business review request",
       path: "/for-businesses/submit",
-      copy: "You already started a business request. The next step is saving the details clearly, not outreach.",
+      copy: "You already started a request. The next step is saving the business details clearly.",
     };
   }
   if (intent === "local_planner") {
@@ -85,6 +85,6 @@ export function getNextBestAction(data: CityAtlasData) {
   return {
     label: "Explore Vancouver",
     path: "/vancouver",
-    copy: "Start with places, events, offers, and guides before you save or share a plan.",
+    copy: "Start with the city page, then narrow down to the guide or route that fits today.",
   };
 }

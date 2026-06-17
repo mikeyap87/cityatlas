@@ -4,6 +4,7 @@ import { AppLink } from "../../components/Link";
 import { ArrowRightIcon, MapIcon, ShieldIcon, StoreIcon } from "../../components/Icons";
 import { ChecklistItem, SectionHeader, StatusPill } from "../../components/UI";
 import { OfferCard } from "../../components/Cards";
+import { getBusinessVisual } from "../../lib/visuals";
 
 interface BusinessPageProps {
   business?: Business;
@@ -27,7 +28,7 @@ export function BusinessPage({ business, data }: BusinessPageProps) {
   return (
     <>
       <section className="business-detail-hero">
-        <img src={business.heroImage} alt="" />
+        <img src={getBusinessVisual(business)} alt={`${business.name} preview artwork`} />
         <div className="business-detail-panel">
           <div className="card-topline">
             <StatusPill tone="blue">Example business page</StatusPill>

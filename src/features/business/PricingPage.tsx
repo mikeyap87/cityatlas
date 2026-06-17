@@ -20,12 +20,11 @@ export function PricingPage({ data }: PricingPageProps) {
       <section className="pricing-hero">
         <div>
           <p className="section-label">For businesses</p>
-          <h1>Choose the CityAtlas package that fits your Vancouver visibility problem</h1>
+          <h1>Choose the CityAtlas package that fits how you want to show up in Vancouver</h1>
           <p>
-            Use this page when a Vancouver business wants clearer guide placement, source-backed
-            city visibility, mission sponsorship angles, or a cleaner local growth story.
-            CityAtlas starts with a review step, then opens billing only after fit, scope, and
-            terms are clear.
+            Use this page when a Vancouver business wants better guide placement, a stronger page,
+            clearer local visibility, or cleaner event and offer placement. CityAtlas starts with
+            a review, then opens billing only after fit, scope, and terms are clear.
           </p>
           <div className="hero-actions">
             <AppLink className="button primary" to="/for-businesses/submit">
@@ -42,8 +41,33 @@ export function PricingPage({ data }: PricingPageProps) {
 
       <section className="section-block">
         <SectionHeader
+          label="How it works"
+          title="Start with a simple review before any billing"
+          copy="This keeps the packages clear and avoids selling the wrong thing too early."
+        />
+        <div className="guide-query-grid">
+          <article className="query-card">
+            <span className="query-card-kicker">Step 1</span>
+            <strong>Tell CityAtlas what needs better visibility</strong>
+            <p>Share whether the goal is guide placement, a stronger page, an offer, or a cleaner city-facing story.</p>
+          </article>
+          <article className="query-card">
+            <span className="query-card-kicker">Step 2</span>
+            <strong>Get a fit and scope review</strong>
+            <p>CityAtlas checks the facts, the page fit, and what kind of package makes sense before anything goes live.</p>
+          </article>
+          <article className="query-card">
+            <span className="query-card-kicker">Step 3</span>
+            <strong>Open billing only if the plan is clear</strong>
+            <p>Billing stays off until both sides are clear on the package, the terms, and what is actually being delivered first.</p>
+          </article>
+        </div>
+      </section>
+
+      <section className="section-block">
+        <SectionHeader
           title="See the package structure before checkout opens"
-          copy="These packages show the service structure. Checkout, payment links, and subscriptions open only after review, scope confirmation, and clear terms."
+          copy="These packages show the service structure. Checkout and payment links open only after review, scope confirmation, and clear terms."
           action={<StatusPill tone="amber">Review first</StatusPill>}
         />
         <div className="pricing-grid">
@@ -82,25 +106,25 @@ export function PricingPage({ data }: PricingPageProps) {
         <SectionHeader
           label="Best first ask"
           title="Choose the right visibility request before you ask for a package"
-          copy="CityAtlas is strongest when a business names the real local-visibility problem first: guide placement, route sponsorship, trust review, or a stronger business profile."
+          copy="CityAtlas works best when a business names the real problem first: guide placement, event or offer support, trust review, or a stronger page."
           action={<StatusPill tone="blue">Trust-first business routing</StatusPill>}
         />
         <div className="guide-query-grid">
           <AppLink className="query-card query-card-link" to="/vancouver/guides">
             <strong>Need guide placement and neighborhood fit?</strong>
-            <p>Open the guide library when the real problem is showing up in the right Vancouver route or destination cluster.</p>
+            <p>Open the guide library when the real problem is showing up in the right Vancouver route or neighborhood choice.</p>
           </AppLink>
           <AppLink className="query-card query-card-link" to="/vancouver/missions">
             <strong>Need a sponsor-ready route or shareable city plan?</strong>
-            <p>Use missions when the business needs a sponsor-ready route, creator visit shape, or a shareable city plan.</p>
+            <p>Use saved plans when the business needs a shareable city plan or a route that could later support sponsorship.</p>
           </AppLink>
           <AppLink className="query-card query-card-link" to="/editorial-standards">
             <strong>Need the trust rules first?</strong>
-            <p>Review this before asking for live publication, because CityAtlas keeps source, claim, and correction boundaries visible.</p>
+            <p>Review this before asking for live publication, because CityAtlas keeps source, claim, and correction rules visible.</p>
           </AppLink>
           <AppLink className="query-card query-card-link" to="/for-businesses/submit">
             <strong>Ready for review?</strong>
-            <p>Go straight to review request when the business already knows it wants a CityAtlas page, package, or clearer local growth plan.</p>
+            <p>Go straight to the review request when the business already knows it wants a CityAtlas page, package, or better local visibility.</p>
           </AppLink>
         </div>
       </section>
@@ -109,15 +133,15 @@ export function PricingPage({ data }: PricingPageProps) {
         <div className="source-panel conversion-panel">
           <h2>What a CityAtlas partner gets in the first 7 days</h2>
           <ul className="conversion-list">
-            <li><CheckIcon /> Premium page outline with source and review status.</li>
-            <li><CheckIcon /> Category or neighborhood guide placement review.</li>
-            <li><CheckIcon /> Offer or event module prepared for confirmation.</li>
-            <li><CheckIcon /> AI visibility snapshot for the business.</li>
-            <li><CheckIcon /> Creator visit brief when the business is a strong fit.</li>
+            <li><CheckIcon /> A clear page outline with review status.</li>
+            <li><CheckIcon /> Guide and neighborhood placement review.</li>
+            <li><CheckIcon /> Event or offer module prepared for confirmation.</li>
+            <li><CheckIcon /> A visibility snapshot for the business.</li>
+            <li><CheckIcon /> A short next-step plan if the fit is strong.</li>
           </ul>
         </div>
         <div className="source-panel conversion-panel">
-          <h2>Objections we handle before billing</h2>
+          <h2>What stays off until approval</h2>
           <ul className="conversion-list">
             <li><LockIcon /> No traffic promises until analytics prove demand.</li>
             <li><LockIcon /> No live payment until terms and refund policy are approved.</li>
@@ -154,9 +178,9 @@ export function PricingPage({ data }: PricingPageProps) {
           <article className="source-panel conversion-panel">
             <h2>What does CityAtlas mean by local visibility?</h2>
             <p>
-              It means clearer guide placement, better route fit, source-backed starter context,
-              mission sponsorship angles, and stronger city-facing presentation. It does not mean
-              traffic guarantees, fake rankings, or automatic publication.
+              It means clearer guide placement, better route fit, stronger city-facing presentation,
+              and a simpler way for people to find the right business at the right moment. It does
+              not mean traffic guarantees, fake rankings, or automatic publication.
             </p>
           </article>
         </div>
@@ -168,7 +192,7 @@ export function PricingPage({ data }: PricingPageProps) {
           <h2>Best first monetization path</h2>
           <p>
             Use this page for early partner conversations first. Open checkout only after clear
-            business demand is proven.
+            demand is proven.
           </p>
         </div>
         <AppLink className="button primary" to="/for-businesses/submit">
@@ -181,8 +205,8 @@ export function PricingPage({ data }: PricingPageProps) {
           <ShieldIcon />
           <h2>What happens after request</h2>
           <p>
-            Requests stay private to this form and can be reviewed for fit, facts, and next
-            steps before anything is published.
+            Requests stay private to this form and can be reviewed for fit, facts, and next steps
+            before anything is published.
           </p>
         </div>
         <div className="source-panel">

@@ -1,6 +1,7 @@
 import type { Business, CityMission, EventItem, Guide, Offer, SavedItem } from "../types";
 import { getGuidePath } from "../lib/cityPaths";
 import { formatDate } from "../lib/format";
+import { getBusinessVisual, getEventVisual, getGuideVisual } from "../lib/visuals";
 import { ArrowRightIcon, CalendarIcon, MapIcon, ShieldIcon, SparkIcon, StoreIcon } from "./Icons";
 import { AppLink } from "./Link";
 import { StatusPill } from "./UI";
@@ -12,10 +13,14 @@ function getCitySlug(value: string) {
 export function BusinessCard({ business }: { business: Business }) {
   return (
     <article className="content-card business-card">
-      <img src={business.heroImage} alt="" loading="lazy" />
+      <img
+        src={getBusinessVisual(business)}
+        alt={`${business.name} preview artwork`}
+        loading="lazy"
+      />
       <div className="card-body">
         <div className="card-topline">
-          <StatusPill tone="blue">Business page example</StatusPill>
+          <StatusPill tone="blue">Sample business page</StatusPill>
           <span>{business.priceTier}</span>
         </div>
         <h3>{business.name}</h3>
@@ -36,7 +41,7 @@ export function BusinessCard({ business }: { business: Business }) {
 export function EventCard({ event }: { event: EventItem }) {
   return (
     <article className="content-card compact-card">
-      <img src={event.image} alt="" loading="lazy" />
+      <img src={getEventVisual(event)} alt={`${event.title} preview artwork`} loading="lazy" />
       <div className="card-body">
         <div className="card-icon-line">
           <CalendarIcon />
@@ -64,7 +69,7 @@ export function OfferCard({
   return (
     <article className="content-card offer-card">
       <div className="offer-card-inner">
-        <StatusPill tone="amber">Offer example</StatusPill>
+        <StatusPill tone="amber">Sample offer</StatusPill>
         <h3>{offer.title}</h3>
         <p>{offer.description}</p>
         <div className="card-meta">
@@ -80,7 +85,7 @@ export function OfferCard({
 export function GuideCard({ guide }: { guide: Guide }) {
   return (
     <article className="content-card guide-card">
-      <img src={guide.image} alt="" loading="lazy" />
+      <img src={getGuideVisual(guide)} alt={`${guide.title} preview artwork`} loading="lazy" />
       <div className="card-body">
         <div className="card-icon-line">
           <MapIcon />
@@ -146,11 +151,11 @@ export function MissionCard({
       <div className="mission-actions">
         {onSaveMission ? (
           <button className="button primary" type="button" onClick={() => onSaveMission(mission)}>
-            Save route
+            Save plan
           </button>
         ) : null}
         <AppLink className="text-link" to="/vancouver/missions">
-          View missions <ArrowRightIcon />
+          View saved plans <ArrowRightIcon />
         </AppLink>
       </div>
     </article>
@@ -161,11 +166,10 @@ export function TrustCard() {
   return (
     <article className="trust-card">
       <ShieldIcon />
-      <strong>Trust-first public publishing</strong>
+      <strong>Clear public publishing rules</strong>
       <p>
-        CityAtlas separates source-backed starter pages, route guides, business-submitted updates,
-        and the broader discovery layer so public pages stay clear about what is verified and what
-        is still expanding carefully.
+        CityAtlas keeps official source pages, guide pages, and business requests clearly
+        separated so readers can tell what is confirmed now and what still needs review.
       </p>
     </article>
   );

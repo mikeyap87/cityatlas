@@ -22,10 +22,10 @@ export function AboutPage() {
               Toronto preview
             </AppLink>
             <AppLink className="button secondary" to="/vancouver/missions">
-              See city missions
+              See saved plans
             </AppLink>
             <AppLink className="button secondary" to="/vancouver/first-time-visitor-starters">
-              Visitor starters
+              Visitor starting points
             </AppLink>
           </div>
         </div>
@@ -80,7 +80,7 @@ export function AboutPage() {
           <h2>How CityAtlas works</h2>
           <ul className="plain-list compact">
             <li>Answer-first guides help people solve one specific Vancouver planning question.</li>
-            <li>City missions turn those ideas into saveable local routes.</li>
+            <li>Saved plans turn those ideas into reusable local routes.</li>
             <li>Business pages show how a place can be presented once facts are supported.</li>
             <li>Business review pages create the first monetization path after trust is earned.</li>
           </ul>
@@ -89,52 +89,52 @@ export function AboutPage() {
           <ShieldIcon />
           <h2>Trust model</h2>
           <p>
-            CityAtlas separates source-backed public pages, planning guides, early business pages,
+            CityAtlas separates real-place pages with official links, planning guides, early business pages,
             and business-submitted updates. That keeps the site useful without pretending every
-            local page is already part of a live verified city database.
+            local page is already part of a live, fully verified city database.
           </p>
           <div className="hero-actions">
             <AppLink className="button secondary" to="/vancouver/date-night-starters">
-              Date-night starters
+              Date night
             </AppLink>
             <AppLink className="button secondary" to="/vancouver/rainy-day-starters">
-              Rainy-day starters
+              Rainy day
             </AppLink>
             <AppLink className="button secondary" to="/vancouver/wellness-reset-starters">
-              Wellness reset starters
+              Wellness reset
             </AppLink>
             <AppLink className="button secondary" to="/vancouver/first-evening-starters">
-              First-evening starters
+              First evening
             </AppLink>
             <AppLink className="button secondary" to="/vancouver/first-time-visitor-starters">
-              First-time visitor starters
+              First visit
             </AppLink>
             <AppLink className="button secondary" to="/vancouver/returning-visitor-starters">
-              Returning-visitor starters
+              Returning visit
             </AppLink>
             <AppLink className="button secondary" to="/vancouver/out-of-town-guest-starters">
-              Out-of-town guest starters
+              Hosting guests
             </AppLink>
             <AppLink className="button secondary" to="/vancouver/weekend-route-starters">
-              Weekend route starters
+              Weekend route
             </AppLink>
             <AppLink className="button secondary" to="/vancouver/sunday-starters">
-              Sunday starters
+              Sunday plan
             </AppLink>
             <AppLink className="button secondary" to="/toronto/first-time-visitor-starters">
-              Toronto visitor starters
+              Toronto first visit
             </AppLink>
             <AppLink className="button secondary" to="/toronto/weekend-route-starters">
-              Toronto weekend starters
+              Toronto weekend
             </AppLink>
             <AppLink
               className="button secondary"
               to="/vancouver/guides/vancouver-itinerary-starter-pack-which-cityatlas-page-should-you-open-first"
             >
-              Starter pack guide
+              Where to start guide
             </AppLink>
             <AppLink className="button secondary" to="/editorial-standards">
-              Correction path
+              Report an issue
             </AppLink>
           </div>
         </div>

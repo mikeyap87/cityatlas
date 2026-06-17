@@ -1,6 +1,6 @@
 export const siteConfig = {
   name: "CityAtlas",
-  tagline: "Vancouver Guides, Routes, And Local Discovery",
+  tagline: "Vancouver Plans, Guides, And Local Picks",
   city: "Vancouver",
   citySlug: "vancouver",
   localUrl: "http://127.0.0.1:5178/",

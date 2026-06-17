@@ -123,10 +123,10 @@ export function GuidesPage({ data }: { data: CityAtlasData }) {
     {
       title: "Need real places with official public sources?",
       copy:
-        "Open the starter layer first when named Vancouver anchors matter more than broad route logic.",
-      primaryLabel: "Source-backed starters",
+        "Open the official source page first when named Vancouver places matter more than broad route logic.",
+      primaryLabel: "Official source pages",
       primaryPath: "/vancouver/date-night-starters",
-      secondaryLabel: "Guide roundup",
+      secondaryLabel: "Browse by situation",
       secondaryPath:
         "/vancouver/guides/cityatlas-guide-roundup-which-vancouver-route-should-you-open-by-situation",
       meta: "Best for trust-first real-place routing",
@@ -137,17 +137,17 @@ export function GuidesPage({ data }: { data: CityAtlasData }) {
         "Use the visitor-intent cluster when the strongest answer changes with who the city plan is for.",
       primaryLabel: "Visitor and host guides",
       primaryPath: "#visitor-guide-cluster",
-      secondaryLabel: "First-time visitor starters",
+      secondaryLabel: "First-time visitor starting points",
       secondaryPath: "/vancouver/first-time-visitor-starters",
       meta: "First evening, first trip, repeat trip, or hosting",
     },
     {
       title: "Need one calmer weekend or reset route?",
       copy:
-        "Open the lower-friction cluster when the real problem is energy, pace, and keeping the day compact.",
+        "Open the easier weekend group when the real problem is energy, pace, and keeping the day compact.",
       primaryLabel: "Weekend and reset guides",
       primaryPath: "#weekend-guide-cluster",
-      secondaryLabel: "Weekend route starters",
+      secondaryLabel: "Weekend route starting points",
       secondaryPath: "/vancouver/weekend-route-starters",
       meta: "Weekend, Sunday, and wellness-first planning",
     },
@@ -170,15 +170,15 @@ export function GuidesPage({ data }: { data: CityAtlasData }) {
         <SectionHeader
           label="Guides"
           title="Editorial guide system for city moments, neighborhood fit, and route intent"
-          copy="These pages are designed to answer real Vancouver planning questions fast, then connect people into discovery pages, missions, and partner paths."
+          copy="These pages are designed to answer real Vancouver planning questions fast, then connect people into discovery pages, saved plans, and partner paths."
           action={<StatusPill tone="blue">Route logic first</StatusPill>}
         />
         <div className="split-section">
           <div className="source-panel">
             <SectionHeader
               label="Start here"
-              title="Open the right guide cluster before the city gets overbuilt"
-              copy="CityAtlas works best when someone starts with the right planning question first: weather, visitor type, neighborhood choice, weekend shape, or a source-backed real-place layer."
+              title="Open the right guide group before the city gets overbuilt"
+              copy="CityAtlas works best when someone starts with the right planning question first: weather, visitor type, neighborhood choice, weekend shape, or a careful real-place layer."
             />
             <div className="guide-query-grid">
               {starterPackGuide ? (
@@ -186,7 +186,7 @@ export function GuidesPage({ data }: { data: CityAtlasData }) {
                   className="query-card query-card-link"
                   to={`/vancouver/guides/${starterPackGuide.slug}`}
                 >
-                  <strong>Starter-pack guide</strong>
+                  <strong>Where to start guide</strong>
                   <p>Choose the right CityAtlas page first when the main problem is where to begin.</p>
                 </AppLink>
               ) : null}
@@ -200,43 +200,43 @@ export function GuidesPage({ data }: { data: CityAtlasData }) {
               </a>
               <a className="query-card query-card-link" href="#neighborhood-guide-cluster">
                 <strong>Neighborhood choice</strong>
-                <p>Use these pages when the first decision is which part of Vancouver fits the plan, then move into the Gastown, Mount Pleasant, and Kitsilano starter trio.</p>
+                <p>Use these pages when the first decision is which part of Vancouver fits the plan, then move into the Gastown, Mount Pleasant, and Kitsilano starting-point trio.</p>
               </a>
               <AppLink className="query-card query-card-link" to="/vancouver/date-night-starters">
-                <strong>Source-backed starters</strong>
-                <p>Jump straight to official-source route anchors when real-place clarity matters first.</p>
+                <strong>Official source starting points</strong>
+                <p>Jump straight to official source places when real-place clarity matters first.</p>
               </AppLink>
               <AppLink className="query-card query-card-link" to="/vancouver/garden-day-starters">
-                <strong>Garden day starters</strong>
+                <strong>Garden day starting points</strong>
                 <p>Use this when the route should choose between conservatory calm, hilltop gardens, and fuller botanical pacing before the day sprawls.</p>
               </AppLink>
               <AppLink className="query-card query-card-link" to="/vancouver/kitsilano-scenic-starters">
-                <strong>Kitsilano scenic starters</strong>
-                <p>Use this narrower west-side source-backed layer when the plan needs scenic anchors instead of a full-city route.</p>
+                <strong>Kitsilano scenic starting points</strong>
+                <p>Use this narrower west-side official source page when the plan needs scenic places instead of a full-city route.</p>
               </AppLink>
               <AppLink className="query-card query-card-link" to="/vancouver/west-side-daytime-starters">
-                <strong>West-side daytime starters</strong>
+                <strong>West-side daytime starting points</strong>
                 <p>Use this when the route should start with beaches, gardens, or UBC culture before the day gets overbuilt.</p>
               </AppLink>
               <AppLink className="query-card query-card-link" to="/vancouver/false-creek-culture-starters">
-                <strong>False Creek culture starters</strong>
+                <strong>False Creek culture starting points</strong>
                 <p>Use this when the route should stay compact around markets, museums, Vanier Park, and one culture-afternoon shape.</p>
               </AppLink>
               <AppLink className="query-card query-card-link" to="/vancouver/ubc-discovery-starters">
-                <strong>UBC discovery starters</strong>
+                <strong>UBC discovery starting points</strong>
                 <p>Use this when the route should stay campus-side around museums, gardens, and one contained west-side discovery day.</p>
               </AppLink>
               <AppLink className="query-card query-card-link" to="/vancouver/missions">
-                <strong>Saveable missions</strong>
+                <strong>Saved plans</strong>
                 <p>Move here once the route type is clear and the next step is saving or reusing the plan.</p>
               </AppLink>
             </div>
           </div>
           <div className="source-panel">
             <SectionHeader
-              label="Cluster health"
+              label="Guide coverage"
               title="The guide system now covers the strongest Vancouver planning moments"
-              copy="These clusters give readers a clearer map of CityAtlas than one flat article library would."
+              copy="These guide groups give readers a clearer map of CityAtlas than one flat article library would."
             />
             <div className="guide-query-grid">
               <article className="query-card">
@@ -245,15 +245,15 @@ export function GuidesPage({ data }: { data: CityAtlasData }) {
               </article>
               <article className="query-card">
                 <strong>{visitorGuides.length} visitor and host guides</strong>
-                <p>Visitor-intent pages now connect first arrival, second-look plans, guest hosting, and the starter-pack path.</p>
+                <p>Visitor-intent pages now connect first arrival, second-look plans, guest hosting, and the where-to-start path.</p>
               </article>
               <article className="query-card">
                 <strong>{weekendAndResetGuides.length} weekend and reset guides</strong>
-                <p>Weekend-route, Sunday, and wellness pages keep calmer, lower-friction route questions in one crawlable area.</p>
+                <p>Weekend-route, Sunday, and wellness pages keep calmer, easier route questions in one crawlable area.</p>
               </article>
               <article className="query-card">
                 <strong>{neighborhoodGuides.length} neighborhood guides</strong>
-                <p>These pages now include a full neighborhood starter trio plus chooser pages so CityAtlas can explain place fit before named-venue browsing.</p>
+                <p>These pages now include a full neighborhood starting-point trio plus chooser pages so CityAtlas can explain place fit before named-venue browsing.</p>
               </article>
             </div>
           </div>
@@ -292,7 +292,7 @@ export function GuidesPage({ data }: { data: CityAtlasData }) {
             <p>Low-pressure city introductions that help a host pick one easy Vancouver anchor instead of an all-day marathon.</p>
           </article>
           <article className="query-card">
-            <strong>Itinerary starter pack</strong>
+            <strong>Where to start</strong>
             <p>Use this when the first problem is choosing the right CityAtlas page before the day gets overbuilt.</p>
           </article>
           <article className="query-card">
@@ -310,7 +310,7 @@ export function GuidesPage({ data }: { data: CityAtlasData }) {
         <SectionHeader
           label="Situation router"
           title="Choose the strongest next CityAtlas page by planning moment"
-          copy="This turns the guide library into a clearer route map for real readers: start with the situation, then open the guide or starter layer that already fits it."
+          copy="This turns the guide library into a clearer route map for real readers: start with the situation, then open the guide or official source layer that already fits it."
           action={<StatusPill tone="blue">Decision-first route links</StatusPill>}
         />
         <div className="guide-query-grid">
@@ -362,8 +362,8 @@ export function GuidesPage({ data }: { data: CityAtlasData }) {
             <p>Start with the Toronto guide hub when the plan needs one cleaner first-visit or weekend-route decision instead of a generic city roundup.</p>
           </AppLink>
           <AppLink className="query-card query-card-link" to="/toronto/first-time-visitor-starters">
-            <strong>Toronto starter page</strong>
-            <p>Open the official-source Toronto starter page for a narrower first-visit layer with visible claim limits and correction paths.</p>
+            <strong>Toronto starting points</strong>
+            <p>Open the official source Toronto page for a narrower first-visit layer with visible claim limits and correction paths.</p>
           </AppLink>
           <AppLink
             className="query-card query-card-link"
@@ -373,8 +373,8 @@ export function GuidesPage({ data }: { data: CityAtlasData }) {
             <p>Read the Toronto destination guide when the key decision is Distillery, St. Lawrence, Harbourfront, AGO, or ROM first.</p>
           </AppLink>
           <AppLink className="query-card query-card-link" to="/toronto/weekend-route-starters">
-            <strong>Toronto weekend starter page</strong>
-            <p>Open the official-source Toronto weekend page when the key decision is one flexible weekend anchor instead of a scattered cross-city plan.</p>
+            <strong>Toronto weekend starting points</strong>
+            <p>Open the official source Toronto weekend page when the key decision is one flexible weekend anchor instead of a scattered cross-city plan.</p>
           </AppLink>
         </div>
       </section>
@@ -430,9 +430,9 @@ export function GuidesPage({ data }: { data: CityAtlasData }) {
       {neighborhoodGuides.length > 0 ? (
         <section className="section-block" id="neighborhood-guide-cluster">
           <SectionHeader
-            label="Destination starters"
+            label="Destination starting points"
             title="Neighborhood-intent pages for clearer Vancouver choices"
-            copy="These guides answer which part of Vancouver fits the plan before the reader gets dragged into venue-by-venue browsing, now with dedicated starter pages for Gastown, Mount Pleasant, and Kitsilano."
+            copy="These guides answer which part of Vancouver fits the plan before the reader gets dragged into venue-by-venue browsing, now with dedicated starting-point pages for Gastown, Mount Pleasant, and Kitsilano."
             action={<StatusPill tone="green">{neighborhoodGuides.length} guides</StatusPill>}
           />
           <div className="card-grid three">
@@ -463,9 +463,9 @@ export function GuidesPage({ data }: { data: CityAtlasData }) {
         <section className="split-section">
           <div className="source-panel">
             <SectionHeader
-              label="Source-backed now"
+              label="Official source pages"
               title="Need pages that name real Vancouver places more carefully?"
-              copy="CityAtlas now has narrow Vancouver date-night, rainy-day, Sunday, weekend-route, wellness-reset, guest-hosting, first-evening, first-time-visitor, returning-visitor, Kitsilano-scenic, False Creek culture, and UBC discovery pages built from official public sources, visible claim boundaries, and a public correction path."
+              copy="CityAtlas now has narrow Vancouver date-night, rainy-day, Sunday, weekend-route, wellness-reset, guest-hosting, first-evening, first-time-visitor, returning-visitor, Kitsilano-scenic, False Creek culture, and UBC discovery pages built from official public sources, clear claim limits, and a public correction path."
             />
           </div>
           <div className="source-panel">
@@ -475,59 +475,59 @@ export function GuidesPage({ data }: { data: CityAtlasData }) {
             </p>
             <div className="hero-actions">
               <AppLink className="button primary" to="/vancouver/date-night-starters">
-                Open source-backed starters <ArrowRightIcon />
+                Open official source pages <ArrowRightIcon />
               </AppLink>
               <AppLink className="button secondary" to="/vancouver/rainy-day-starters">
-                Rainy-day starters
+                Rainy day
               </AppLink>
               <AppLink className="button secondary" to="/vancouver/first-evening-starters">
-                First-evening starters
+                First evening
               </AppLink>
               <AppLink className="button secondary" to="/vancouver/first-time-visitor-starters">
-                First-time visitor starters
+                First visit
               </AppLink>
               <AppLink className="button secondary" to="/vancouver/garden-day-starters">
-                Garden day starters
+                Garden day
               </AppLink>
               <AppLink className="button secondary" to="/vancouver/kitsilano-scenic-starters">
-                Kitsilano scenic starters
+                Kitsilano
               </AppLink>
               <AppLink className="button secondary" to="/vancouver/west-side-daytime-starters">
-                West-side daytime starters
+                West-side day
               </AppLink>
               <AppLink className="button secondary" to="/vancouver/false-creek-culture-starters">
-                False Creek culture starters
+                False Creek
               </AppLink>
               <AppLink className="button secondary" to="/vancouver/ubc-discovery-starters">
-                UBC discovery starters
+                UBC day
               </AppLink>
               <AppLink className="button secondary" to="/vancouver/returning-visitor-starters">
-                Returning-visitor starters
+                Returning visit
               </AppLink>
               <AppLink className="button secondary" to="/vancouver/out-of-town-guest-starters">
-                Out-of-town guest starters
+                Hosting guests
               </AppLink>
               <AppLink className="button secondary" to="/vancouver/weekend-route-starters">
-                Weekend route starters
+                Weekend route
               </AppLink>
               <AppLink className="button secondary" to="/vancouver/sunday-starters">
-                Sunday starters
+                Sunday plan
               </AppLink>
               <AppLink className="button secondary" to="/vancouver/wellness-reset-starters">
-                Wellness reset starters
+                Wellness reset
               </AppLink>
               <AppLink
                 className="button secondary"
                 to="/vancouver/guides/vancouver-itinerary-starter-pack-which-cityatlas-page-should-you-open-first"
               >
-                Starter pack guide
+                Where to start guide
               </AppLink>
               {routeRoundupGuide ? (
                 <AppLink
                   className="button secondary"
                   to={`/vancouver/guides/${routeRoundupGuide.slug}`}
                 >
-                  Guide roundup
+                  Browse by situation
                 </AppLink>
               ) : null}
               <AppLink className="button secondary" to="/editorial-standards">
@@ -560,7 +560,7 @@ export function GuidesPage({ data }: { data: CityAtlasData }) {
           </p>
         </div>
         <AppLink className="button primary" to="/vancouver/missions">
-          Open missions <ArrowRightIcon />
+          Open saved plans <ArrowRightIcon />
         </AppLink>
       </section>
     </>

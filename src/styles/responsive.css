@@ -10,6 +10,7 @@
   }
 
   .hero-grid,
+  .hero-business-strip,
   .city-hero,
   .guide-hero,
   .guide-layout,
@@ -223,10 +224,31 @@
   }
 
   .atlas-map {
-    height: 260px;
+    height: 320px;
   }
 
-  .hero-tabs,
+  .map-stop {
+    min-width: 112px;
+    padding: 9px 10px 9px 14px;
+  }
+
+  .map-stop strong {
+    font-size: 0.76rem;
+  }
+
+  .map-stop small {
+    font-size: 0.68rem;
+  }
+
+  .hero-search-form {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-search-submit {
+    width: 100%;
+  }
+
+  .hero-map-list,
   .mini-pricing-row,
   .metrics-strip,
   .planner-stats,
@@ -245,11 +267,22 @@
 
   .section-block,
   .split-section,
+  .hero-business-strip,
   .dashboard-preview,
   .trust-section,
   .admin-grid.bottom,
   .cta-band {
     margin-top: 54px;
+  }
+
+  .hero-quick-picks {
+    flex-direction: column;
+  }
+
+  .hero-quick-pick,
+  .hero-filter-button,
+  .hero-search-suggestion {
+    width: 100%;
   }
 
   .city-hero,

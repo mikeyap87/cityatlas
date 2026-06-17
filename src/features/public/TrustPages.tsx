@@ -53,14 +53,14 @@ function SourceBackedReferenceCard({
           rel="noreferrer"
           target="_blank"
         >
-          Open official source
+          Open official site
         </a>
         <AppLink className="button secondary" to={reference.correctionPath}>
-          Correction path
+          Report an issue
         </AppLink>
       </div>
       <small>
-        Source owner: {reference.sourceOwner}. Checked {reference.sourceCheckedAt}.
+        Source: {reference.sourceOwner}. Checked {reference.sourceCheckedAt}.
       </small>
       <ul className="plain-list compact">
         {reference.claimBoundaries.map((boundary) => (
@@ -124,6 +124,37 @@ function getCollectionNextLinks(
   }
 
   return nextLinks;
+}
+
+function simplifyCollectionCopy(value: string) {
+  return value
+    .replace(/Source-backed ([A-Za-z0-9\- ]+) coverage/gi, "$1 page")
+    .replace(/source-backed starter page/gi, "page with official links")
+    .replace(/source-backed page/gi, "page with official links")
+    .replace(/source-backed entry/gi, "place here")
+    .replace(/official-source/gi, "official")
+    .replace(/official source notes/gi, "official source links")
+    .replace(/starter pages/gi, "starting-point pages")
+    .replace(/starter page/gi, "starting-point page")
+    .replace(/\bstarters\b/gi, "starting points")
+    .replace(/source-owner, source-date, and correction rules/gi, "source dates, official links, and correction rules")
+    .replace(/carefully sourced/gi, "real")
+    .replace(/anchor(s)?/gi, "place$1")
+    .replace(/claim limits visible/gi, "keeps the page honest about what it knows")
+    .replace(/visible claim boundaries/gi, "clear claim limits")
+    .replace(/visible source discipline/gi, "clear source rules")
+    .replace(/source discipline/gi, "source rules")
+    .replace(/route role/gi, "why it belongs in this kind of plan")
+    .replace(/route fit/gi, "plan fit")
+    .replace(/route logic/gi, "planning logic")
+    .replace(/low-friction/gi, "easy")
+    .replace(/destination-choice/gi, "destination choice")
+    .replace(/This coverage is intentionally narrow\./gi, "This page stays intentionally focused.")
+    .replace(/Every official-link entry routes to a public correction or removal path\./gi, "Every place here includes a public way to report a mistake or ask for a change.")
+    .replace(/correction or removal path/gi, "way to report a mistake or ask for a change")
+    .replace(/broader itinerary and real-business publication is still being expanded carefully\./gi, "The wider business directory is still being built carefully.")
+    .replace(/broader real-business and itinerary publication is still being expanded carefully\./gi, "The wider business directory is still being built carefully.")
+    .replace(/broader real-business publication is still being expanded carefully\./gi, "The wider business directory is still being built carefully.");
 }
 
 const sourceBackedPageContent: Record<
@@ -540,9 +571,9 @@ export function SourceBackedCollectionPage({
     <>
       <section className="city-hero">
         <div>
-          <p className="section-label">{content.heroLabel}</p>
-          <h1>{content.heroTitle}</h1>
-          <p>{content.heroCopy}</p>
+          <p className="section-label">{simplifyCollectionCopy(content.heroLabel)}</p>
+          <h1>{simplifyCollectionCopy(content.heroTitle)}</h1>
+          <p>{simplifyCollectionCopy(content.heroCopy)}</p>
           <div className="hero-actions">
             <AppLink className="button primary" to={content.primaryCtaPath}>
               {content.primaryCtaLabel} <ArrowRightIcon />
@@ -557,18 +588,18 @@ export function SourceBackedCollectionPage({
           <h2>How to read this page</h2>
           <ul className="plain-list compact">
             {content.helpBullets.map((bullet) => (
-              <li key={bullet}>{bullet}</li>
+              <li key={bullet}>{simplifyCollectionCopy(bullet)}</li>
             ))}
           </ul>
-          <StatusPill tone="blue">{starters.length} source-backed real-world entries</StatusPill>
+          <StatusPill tone="blue">{starters.length} real places with official links</StatusPill>
         </div>
       </section>
 
       <section className="section-block">
         <SectionHeader
-          label="Official-source starters"
-          title={content.sectionTitle}
-          copy={content.sectionCopy}
+          label="Official source picks"
+          title={simplifyCollectionCopy(content.sectionTitle)}
+          copy={simplifyCollectionCopy(content.sectionCopy)}
         />
         <div className="card-grid two">
           {starters.map((reference) => (
@@ -580,15 +611,15 @@ export function SourceBackedCollectionPage({
       {nextLinks.length > 0 ? (
         <section className="section-block">
           <SectionHeader
-            label="Next CityAtlas paths"
-            title="Move from official-source anchors into the right route page"
-            copy="These route links keep the source-backed layer connected to the broader CityAtlas guide library so readers can move from named places into route logic instead of hitting a dead end."
+            label="Next pages"
+            title="Move from real places into the right guide"
+            copy="These route links help readers move from a short list of real places into fuller route guidance instead of hitting a dead end."
           />
           <div className="guide-query-grid">
             {nextLinks.map((link) => (
               <AppLink className="query-card query-card-link" key={link.path} to={link.path}>
                 <strong>{link.title}</strong>
-                <p>{link.description}</p>
+                <p>{simplifyCollectionCopy(link.description)}</p>
               </AppLink>
             ))}
           </div>
@@ -598,16 +629,16 @@ export function SourceBackedCollectionPage({
       <section className="split-section">
         <div className="source-panel">
           <MapIcon />
-          <h2>{content.whyTitle}</h2>
-          <p>{content.whyCopy}</p>
+          <h2>{simplifyCollectionCopy(content.whyTitle)}</h2>
+          <p>{simplifyCollectionCopy(content.whyCopy)}</p>
         </div>
         <div className="source-panel">
           <SparkIcon />
           <h2>Best next move</h2>
           <p>
-            Start with this page when named places need official-source context, then open the
-            matching guide or guide library when you need more route logic than one starter page
-            can provide.
+            Start with this page when named places need official source context, then open the
+            matching guide or guide library when you want a fuller route than one short list can
+            provide.
           </p>
         </div>
       </section>
@@ -703,7 +734,7 @@ export function EditorialStandardsPage() {
       <SectionHeader
         label="Editorial standards"
         title="How CityAtlas handles sources, claims, corrections, and removals"
-        copy="This page explains how public CityAtlas pages are reviewed before they name real businesses, events, or route anchors. It also provides the public correction and removal path for source-backed pages."
+        copy="This page explains how public CityAtlas pages are reviewed before they name real businesses, events, or route anchors. It also provides the public correction and removal path for official-source pages."
         action={<StatusPill tone="blue">Public trust page</StatusPill>}
       />
 
@@ -713,7 +744,7 @@ export function EditorialStandardsPage() {
           <h2>What can be public now</h2>
           <p>
             CityAtlas can publish answer-first route logic, neighborhood guidance, and narrow
-            source-backed pages that link directly to official public sources and keep claim limits
+            official-source pages that link directly to official public sources and keep claim limits
             visible.
           </p>
         </article>

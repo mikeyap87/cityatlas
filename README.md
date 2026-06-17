@@ -42,7 +42,7 @@ Fallback Vercel alias:
 - Public Vancouver itinerary starter-pack guide for choosing the right CityAtlas page first, now hosted and smoke-verified on the approved domain.
 - Public Vancouver guide-roundup page for choosing the strongest CityAtlas route by situation, now hosted and smoke-verified on the approved domain.
 - Public source-backed Vancouver wellness reset starter page plus upgraded wellness guide with official-source framing and correction path.
-- Local-ready Toronto first-time visitor starter page plus matching destination-choice guide, plus a Toronto weekend-route starter page plus matching compact-weekend guide, as the first non-Vancouver preview cluster, now threaded into the public internal-link architecture while still pending hosted proof on the approved domain.
+- Public Toronto first-time visitor starter page plus matching destination-choice guide, plus a Toronto weekend-route starter page plus matching compact-weekend guide, now live on the approved domain as the first non-Vancouver CityAtlas preview cluster and threaded into the public internal-link architecture.
 - Local-ready Kitsilano scenic route starter guide, completing the Gastown, Mount Pleasant, and Kitsilano destination-page trio for neighborhood-intent Vancouver queries.
 - Business pricing/package page with payment acceptance disabled.
 - Business submission flow that stores requests locally only.
@@ -114,7 +114,7 @@ Fallback Vercel alias:
 - The live public package now includes `/vancouver/guides/vancouver-itinerary-starter-pack-which-cityatlas-page-should-you-open-first`, which routes people into the existing guide and source-backed library and is now hosted and smoke-verified on the approved domain.
 - The live public package now includes `/vancouver/guides/cityatlas-guide-roundup-which-vancouver-route-should-you-open-by-situation`, which routes readers to the strongest existing CityAtlas route family and is now hosted and smoke-verified on the approved domain.
 - The live public package now includes `/vancouver/wellness-reset-starters` and the upgraded `/vancouver/guides/vancouver-wellness-experiences-to-review`, both running on the approved domain with the same source-backed pattern.
-- The Toronto pilot routes `/toronto/guides`, `/toronto/first-time-visitor-starters`, `/toronto/weekend-route-starters`, `/toronto/guides/where-should-a-first-time-toronto-visitor-start`, and `/toronto/guides/how-to-build-a-toronto-weekend-route-without-crossing-the-city-all-day` remain local-only truth for now. Hosted smoke on June 16, 2026 showed the approved domain still falling back to the Vancouver shell for `/toronto/*`, with Toronto still missing from hosted `sitemap.xml` and hosted `llms.txt`.
+- The Toronto pilot routes `/toronto/guides`, `/toronto/first-time-visitor-starters`, `/toronto/weekend-route-starters`, `/toronto/guides/where-should-a-first-time-toronto-visitor-start`, and `/toronto/guides/how-to-build-a-toronto-weekend-route-without-crossing-the-city-all-day` now render real Toronto content on the approved domain. A June 17, 2026 Search Console refresh also shows the live sitemap re-read successfully with `51` discovered pages, and the live starter-pack guide was added to Google's priority crawl queue after URL inspection showed it as `Discovered - currently not indexed`.
 - Public indexing is live on the approved Univenture domain, but real-business publication remains gated until source policy and verified content are approved.
 
 ## Setup

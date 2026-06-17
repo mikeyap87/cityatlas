@@ -37,7 +37,7 @@ The public product helps locals find places, events, offers, and guides. The bus
 - Public Vancouver itinerary starter-pack guide for routing people into the right CityAtlas page first, now hosted and smoke-verified on the approved domain.
 - Public Vancouver guide-roundup page for routing people into the strongest CityAtlas route family by situation, now hosted and smoke-verified on the approved domain.
 - Public source-backed Vancouver wellness reset starters page and upgraded wellness guide with official-source framing and correction path.
-- Local-ready Toronto first-time visitor starter page and matching destination-choice guide, plus a Toronto weekend-route starter page and matching compact-weekend guide, as the first non-Vancouver preview cluster, now also threaded into the public homepage, guide-library, about-page, and footer internal-link architecture while still pending hosted proof on the approved domain.
+- Public Toronto first-time visitor starter page and matching destination-choice guide, plus a Toronto weekend-route starter page and matching compact-weekend guide, as the first non-Vancouver preview cluster, now also threaded into the public homepage, guide-library, about-page, and footer internal-link architecture and verified live on the approved domain.
 - Business pricing page with payment acceptance disabled.
 - Business submission flow with local-only storage.
 - Draft terms and privacy pages.

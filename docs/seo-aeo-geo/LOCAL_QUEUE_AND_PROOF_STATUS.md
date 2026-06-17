@@ -57,17 +57,20 @@ The following hosted smoke commands all passed in browser-render mode on June 16
 
 Those passes verified live 200 responses, expected titles, robots, canonical URLs, JSON-LD, page-pair fragments, protected-route guards, hosted `sitemap.xml`, and hosted `llms.txt` for all nine Vancouver source-backed wedge pairs plus the Vancouver routing-guide trio.
 
-Additional live read-only checks on June 16, 2026 confirmed:
+Additional live read-only and provider-side checks on June 17, 2026 confirmed:
 
 - the Google Search Console URL-prefix property for `https://city.univenturestudio.com/` is accessible in the signed-in Google account
-- the Search Console overview currently shows `Processing data, please check again in a day or so` for Performance and Indexing
+- the Search Console overview still shows `0 total web search clicks` and `Processing data, please check again in a day or so` for Performance and Indexing
 - live `robots.txt` allows public crawling while still blocking `/admin`, `/private-preview/`, and `/for-businesses/submit`
-- live `sitemap.xml` and live `llms.txt` still expose the Vancouver-first library only and do not yet include the Toronto pilot routes
+- live `sitemap.xml` and live `llms.txt` now include the Toronto pilot routes on the approved domain
+- Search Console accepted a fresh resubmission of `https://city.univenturestudio.com/sitemap.xml` and now shows `Success` with `51` discovered pages and `0` discovered videos
+- Search Console URL Inspection showed the live starter-pack guide as `Discovered - currently not indexed`, then accepted `Request indexing` and added it to Google's priority crawl queue
+- `npm run seo:smoke:toronto -- --base-url https://city.univenturestudio.com` now passes, so the Toronto first-time visitor and weekend-route pair are no longer blocked on hosted rendering or crawl-file coverage
 
 ## Active Queue Order Now
 
-1. Next non-Vancouver proof-city candidate
-   Use the Toronto starter and guide surfaces plus the shared city-rollout packets
+1. First live secondary-city follow-through
+   Use the now-live Toronto starter and guide surfaces plus the shared city-rollout packets
    Scope: Toronto first-time visitor plus weekend-route wedge pair
    Packet set: `TORONTO_PILOT_LOCAL_APPROVAL_PACKET.md`, `TORONTO_PILOT_HOSTED_RELEASE_QUEUE_PACKET.md`, `TORONTO_PILOT_HOSTED_RELEASE_SLICE_HANDOFF.md`, `TORONTO_PILOT_HOSTED_RELEASE_TRANSPLANT_CHECKLIST.md`, `TORONTO_PILOT_HOSTED_RELEASE_GO_NO_GO_CHECKLIST.md`, `TORONTO_PILOT_HOSTED_RELEASE_OPERATOR_PACKET.md`
 
@@ -90,17 +93,16 @@ The following queue packets are now historical hosted-proof records for already-
 
 ## What Is Still Unverified
 
-- hosted smoke for the Toronto first-time visitor plus weekend-route wedge pair
-- hosted `sitemap.xml` and hosted `llms.txt` coverage for the Toronto starter and guide pair
-- current Search Console indexing movement across the now-verified Vancouver wedge expansion, because the property is still processing data
+- current Search Console indexing movement across the now-verified Vancouver wedge expansion and the newly live Toronto pilot, because the property is still processing data
+- the current Google indexing state of the Toronto pilot URLs themselves
 - live ranking movement
 - any live inbox, provider send, CRM sync, or paid EXA discovery behavior
 
 ## Best Next Move
 
 - stop planning around the Vancouver routing trio as future release queue because hosted proof now shows they are already live
-- treat the failed Toronto hosted smoke pass as the exact next release blocker for the first-time visitor plus weekend-route pair
-- keep Vancouver business and no-send outreach prep widening locally while Toronto becomes the next hosted target
+- treat Toronto as the first live secondary-city proof layer instead of a blocked hosted target
+- use Search Console URL inspection and indexing requests on the Toronto pilot URLs next, then keep Vancouver business and no-send outreach prep widening locally while the next release adds stronger source-backed destination and entity depth
 
 <!-- CURRENT_SHARED_MACHINE_TRUTH:START -->
 ## Current Shared Machine Truth

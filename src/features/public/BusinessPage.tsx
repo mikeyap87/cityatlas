@@ -28,11 +28,11 @@ export function BusinessPage({ business, data }: BusinessPageProps) {
   return (
     <>
       <section className="business-detail-hero">
-        <img src={getBusinessVisual(business)} alt={`Illustration for ${business.name}`} />
+        <img src={getBusinessVisual(business)} alt={`Photo or scene for ${business.name}`} />
         <div className="business-detail-panel">
           <div className="card-topline">
-            <StatusPill tone="blue">Business page format</StatusPill>
-            <StatusPill tone="amber">Review-first details</StatusPill>
+            <StatusPill tone="blue">Example business page</StatusPill>
+            <StatusPill tone="amber">Checked before publishing</StatusPill>
           </div>
           <h1>{business.name}</h1>
           <p>{business.fullDescription}</p>
@@ -47,7 +47,7 @@ export function BusinessPage({ business, data }: BusinessPageProps) {
               Visit website
             </a>
             <AppLink className="button secondary" to="/for-businesses/submit">
-              Request review
+              Start business request
             </AppLink>
           </div>
         </div>
@@ -56,9 +56,9 @@ export function BusinessPage({ business, data }: BusinessPageProps) {
       <section className="split-section">
         <div>
           <SectionHeader
-            label="Page format"
-            title="What a reviewed CityAtlas business page can include"
-            copy="This page shows the structure CityAtlas can use while facts, media, and participation details are still being confirmed."
+            label="How this page works"
+            title="What a CityAtlas business page can include"
+            copy="This example shows the shape of a CityAtlas business page while facts, photos, and participation details are still being checked."
           />
           <ul className="checklist-grid">
             {checklist.map((item) => (
@@ -68,11 +68,10 @@ export function BusinessPage({ business, data }: BusinessPageProps) {
         </div>
         <div className="source-panel">
           <ShieldIcon />
-          <h2>What is confirmed first</h2>
+          <h2>What gets checked first</h2>
           <p>
-            This page uses provisional business details while CityAtlas confirms current
-            hours, pricing, availability, and contact details with the business or its official
-            site.
+            CityAtlas checks hours, prices, availability, and contact details against the
+            official site before treating a page like a live business listing.
           </p>
           <div className="source-rows">
             {business.sourceIds.map((sourceId) => {
@@ -116,7 +115,7 @@ export function BusinessPage({ business, data }: BusinessPageProps) {
             ) : (
               <div className="empty-state">
                 <strong>No offer attached yet</strong>
-                <p>This page can still be reviewed for feature or guide placement.</p>
+                <p>This page can still be considered for feature or guide placement.</p>
               </div>
             )}
           </div>
@@ -126,14 +125,14 @@ export function BusinessPage({ business, data }: BusinessPageProps) {
       <section className="cta-band">
         <MapIcon />
         <div>
-          <h2>Request a business review</h2>
+          <h2>Start a business request</h2>
           <p>
-            Share details, then CityAtlas can review source support, page fit, and feature
+            Share details, then CityAtlas can check source support, page fit, and feature
             possibilities before anything is published.
           </p>
         </div>
         <AppLink className="button primary" to="/for-businesses/submit">
-          Start review <ArrowRightIcon />
+          Start business request <ArrowRightIcon />
         </AppLink>
       </section>
     </>

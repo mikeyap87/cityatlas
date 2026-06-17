@@ -20,7 +20,7 @@ export const variantCopy: Record<GrowthVariant, VariantCopy> = {
     primaryCta: "Open Vancouver",
     partnerHeadline: "Help your business show up in the right Vancouver decisions",
     partnerCopy:
-      "Request a review if you want better guide placement, a stronger page, or a clearer local story. Checkout stays off until the fit is clear.",
+      "Start with a quick check if you want better guide placement, a stronger page, or a clearer local story. Checkout stays closed until the scope is clear.",
   },
   "founding-partner": {
     variant: "founding-partner",
@@ -28,9 +28,9 @@ export const variantCopy: Record<GrowthVariant, VariantCopy> = {
     heroCopy:
       "CityAtlas helps the right business show up when people are choosing a neighborhood, guide, or city plan.",
     primaryCta: "See business packages",
-    partnerHeadline: "Get reviewed for a stronger CityAtlas presence",
+    partnerHeadline: "Build a stronger CityAtlas presence",
     partnerCopy:
-      "Start with a review for page quality, guide placement, and offer fit before checkout opens.",
+      "Start with a quick check for page quality, guide placement, and offer fit before checkout opens.",
   },
   "weekend-atlas": {
     variant: "weekend-atlas",
@@ -40,7 +40,7 @@ export const variantCopy: Record<GrowthVariant, VariantCopy> = {
     primaryCta: "Build an itinerary",
     partnerHeadline: "Reach locals while they are planning the weekend",
     partnerCopy:
-      "Businesses can request review for guide placement, events, offers, and a clearer local story.",
+      "Businesses can start a quick check for guide placement, events, offers, and a clearer local story.",
   },
 };
 
@@ -63,7 +63,7 @@ export function getNextBestAction(data: CityAtlasData) {
   const intent = getVisitorIntent(data);
   if (intent === "business_high_intent") {
     return {
-      label: "Finish your business review request",
+      label: "Finish your business request",
       path: "/for-businesses/submit",
       copy: "You already started a request. The next step is saving the business details clearly.",
     };

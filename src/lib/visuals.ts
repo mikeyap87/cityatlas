@@ -21,6 +21,10 @@ function matchesAny(text: string, terms: string[]) {
   return terms.some((term) => text.includes(term));
 }
 
+function isSceneAsset(path: string | undefined) {
+  return Boolean(path) && !path?.includes("/visual_references/");
+}
+
 export function getGuideVisual(guide: Guide) {
   const text = normalize([guide.title, guide.category, guide.cluster, guide.neighborhood, guide.summary]);
 
@@ -48,6 +52,10 @@ export function getGuideVisual(guide: Guide) {
 }
 
 export function getBusinessVisual(business: Business) {
+  if (isSceneAsset(business.heroImage)) {
+    return business.heroImage;
+  }
+
   const text = normalize([
     business.name,
     business.category,
@@ -76,6 +84,10 @@ export function getBusinessVisual(business: Business) {
 }
 
 export function getEventVisual(event: EventItem) {
+  if (isSceneAsset(event.image)) {
+    return event.image;
+  }
+
   const text = normalize([event.title, event.category, event.neighborhood, event.description]);
 
   if (matchesAny(text, ["rope", "flow", "kits", "beach", "wellness"])) {

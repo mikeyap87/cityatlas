@@ -11,9 +11,9 @@ export function EventsPage({ data }: { data: CityAtlasData }) {
     <section className="section-block page-top">
       <SectionHeader
         label="Events"
-        title="Vancouver event page formats"
-        copy="These cards show how CityAtlas can present events once timing, venue details, and source support are confirmed."
-        action={<StatusPill tone="amber">Event formats</StatusPill>}
+        title="Vancouver event examples"
+        copy="These examples show how CityAtlas can present local events once timing, venue details, and public source links are confirmed."
+        action={<StatusPill tone="amber">Event examples</StatusPill>}
       />
       <div className="card-grid two">
         {data.events.map((event) => (
@@ -29,9 +29,9 @@ export function OffersPage({ data }: { data: CityAtlasData }) {
     <section className="section-block page-top">
       <SectionHeader
         label="Offers"
-        title="Vancouver offer formats"
-        copy="These cards show how CityAtlas can package partner offers once the business confirms the details and redemption rules."
-        action={<StatusPill tone="amber">Offer formats</StatusPill>}
+        title="Vancouver offer examples"
+        copy="These examples show how CityAtlas can package local offers once the business confirms the details and redemption rules."
+        action={<StatusPill tone="amber">Offer examples</StatusPill>}
       />
       <div className="card-grid two">
         {data.offers.map((offer) => (
@@ -327,8 +327,8 @@ export function GuidesPage({ data }: { data: CityAtlasData }) {
 
       <section className="section-block">
         <SectionHeader
-          label="Other city preview"
-          title="Toronto is the first smaller CityAtlas city guide"
+          label="Next city"
+          title="Toronto is the first smaller CityAtlas guide set"
           copy="Use Toronto when the strongest next move is one first-visit starting-area question or one compact weekend-route question, not the full Vancouver guide library."
           action={<StatusPill tone="blue">Toronto guide hub</StatusPill>}
         />
@@ -532,7 +532,7 @@ export function GuidesPage({ data }: { data: CityAtlasData }) {
           <h2>Turn guide traffic into saved plans and stronger local discovery</h2>
           <p>
             Every guide should point readers toward a route, a planner action, a neighborhood
-            decision, or a business review path instead of ending as a dead article.
+            decision, or a business request path instead of ending as a dead article.
           </p>
         </div>
         <AppLink className="button primary" to="/vancouver/missions">

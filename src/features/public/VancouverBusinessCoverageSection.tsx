@@ -42,10 +42,10 @@ export function VancouverBusinessCoverageSection({
         }
         copy={
           isHome
-            ? `CityAtlas now tracks ${snapshot.totalBusinesses} Vancouver businesses across hospitality, culture, guest stays, events, wellness, and neighborhood planning. The public site still starts with guides, but the city coverage underneath is already much broader.`
-            : `CityAtlas now tracks ${snapshot.totalBusinesses} Vancouver businesses behind the live guides and starting-point pages. The public site still leads with the best route to open first, while the wider city map keeps that advice more grounded.`
+            ? `CityAtlas already maps ${snapshot.totalBusinesses} Vancouver businesses across hospitality, culture, guest stays, events, wellness, and neighborhood planning. The public site still starts with guides, but the city layer underneath is already much broader.`
+            : `CityAtlas already maps ${snapshot.totalBusinesses} Vancouver businesses behind the live guides and starting-point pages. The public site still leads with the best route to open first, while the wider city map keeps that advice more grounded.`
         }
-        action={<StatusPill tone="green">{snapshot.totalBusinesses} businesses tracked</StatusPill>}
+        action={<StatusPill tone="green">{snapshot.totalBusinesses} businesses in the map</StatusPill>}
       />
 
       <div className="metrics-strip">
@@ -114,7 +114,7 @@ export function VancouverBusinessCoverageSection({
               Choose a route
             </AppLink>
             <AppLink className="button secondary" to="/for-businesses/submit">
-              Request a business review
+              Start a business request
             </AppLink>
           </div>
         </div>
@@ -123,11 +123,11 @@ export function VancouverBusinessCoverageSection({
       <div className="guide-query-grid">
         {snapshot.lanes.map((lane) => (
           <AppLink className="query-card query-card-link" to={lane.path} key={lane.id}>
-            <span className="query-card-kicker">{lane.count} businesses already mapped</span>
+            <span className="query-card-kicker">{lane.count} businesses in this lane</span>
             <strong>{lane.title}</strong>
             <p>{lane.description}</p>
             <p>
-              Strongest current mix: {formatTagList(lane.topCategories, "Route-led Vancouver planning")}
+              Best-covered mix: {formatTagList(lane.topCategories, "Route-led Vancouver planning")}
               {lane.topNeighborhoods.length > 0
                 ? `. Named areas include ${formatTagList(lane.topNeighborhoods, "multiple Vancouver areas")}.`
                 : "."}

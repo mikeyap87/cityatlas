@@ -82,7 +82,7 @@ export function AboutPage() {
             <li>Answer-first guides help people solve one specific Vancouver planning question.</li>
             <li>Saved plans turn those ideas into reusable local routes.</li>
             <li>Business pages show how a place can be presented once facts are supported.</li>
-            <li>Business review pages create the first monetization path after trust is earned.</li>
+            <li>Business requests create the first monetization path after trust is earned.</li>
           </ul>
         </div>
         <div className="source-panel">

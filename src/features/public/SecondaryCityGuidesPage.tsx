@@ -42,10 +42,10 @@ export function SecondaryCityGuidesPage({
     <>
       <section className="city-hero">
         <div>
-          <p className="section-label">City preview</p>
-          <h1>{cityName} starter pages and guide preview</h1>
+          <p className="section-label">Next city</p>
+          <h1>{cityName} starter pages and guides</h1>
           <p>
-            {`This CityAtlas city guide stays intentionally narrow. Use these pages when you want one clear ${cityName} starting area, official links, and a clear way to report an issue instead of a generic listicle.`}
+            {`CityAtlas starts smaller here. Use these pages when you want one clear ${cityName} starting area, official links, and a simple way to report outdated information instead of a generic listicle.`}
           </p>
           <div className="hero-actions">
             <AppLink className="button primary" to={`/${citySlug}/guides`}>
@@ -62,7 +62,7 @@ export function SecondaryCityGuidesPage({
               <strong>Start with the clearest page</strong>
               <p>{`${cityName} stays intentionally small for now, so each page should answer one route question well.`}</p>
             </div>
-            <StatusPill tone="blue">Narrow city guide</StatusPill>
+            <StatusPill tone="blue">Starter library</StatusPill>
           </div>
           <div className="public-intro-card-grid">
             {collections.map(({ id, meta, itemCount }) => (
@@ -86,7 +86,7 @@ export function SecondaryCityGuidesPage({
           ))}
           <AppLink className="query-card query-card-link" to="/editorial-standards">
             <strong>Editorial standards</strong>
-            <p>Review the public source rules, correction process, and claim limits before using a narrower CityAtlas city preview page as planning input.</p>
+            <p>Review the source rules, correction process, and claim limits before using a smaller CityAtlas city page as planning input.</p>
           </AppLink>
         </div>
       </section>
@@ -95,7 +95,7 @@ export function SecondaryCityGuidesPage({
         <SectionHeader
           label="Answer-first guides"
           title={`${cityName} route guidance that stays narrow and usable`}
-          copy={`These pages focus on destination choice and route fit first so the ${cityName} preview can stay useful without pretending CityAtlas already has full city authority.`}
+          copy={`These pages focus on destination choice and route fit first so the ${cityName} library can stay useful without pretending CityAtlas already covers the whole city.`}
         />
         <div className="card-grid two">
           {guides.map((guide) => (

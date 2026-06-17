@@ -17,7 +17,7 @@ export const seedData: CityAtlasData = {
   sources: [
     {
       id: "src-demo",
-      label: "Sample profile source",
+      label: "Example page details",
       type: "demo_seed",
       verified: false,
       notes:
@@ -55,15 +55,15 @@ export const seedData: CityAtlasData = {
         "/visual_references/02_public_pages_and_admin_composite.png",
       ],
       shortDescription:
-        "A sample candlelit restaurant profile that shows how CityAtlas can present a premium local page.",
+        "A candlelit waterfront dinner example with a slower Gastown pace.",
       fullDescription:
-        "Harbour Table is a sample CityAtlas listing that shows how a business page can combine editorial context, practical details, offers, guide placement, and source notes without overstating real-world facts.",
+        "Harbour Table is an example CityAtlas restaurant page for date nights, hosted dinners, and premium local plans. It shows how editorial context, practical details, and offers can sit together once the facts are checked.",
       highlights: [
-        "Feature page ready",
-        "Date-night guide fit",
-        "Review-ready partner fit",
+        "Waterfront dining room",
+        "Good fit for slower date nights",
+        "Can pair with nearby evening stops",
       ],
-      bestFor: ["Date nights", "Hosted tastings", "Premium guide placement"],
+      bestFor: ["Date nights", "Hosted dinners", "Gastown evenings"],
       priceTier: "$$$",
       rating: 4.8,
       reviewCount: 128,
@@ -101,11 +101,15 @@ export const seedData: CityAtlasData = {
         "/assets/vancouver-market-hero.png",
       ],
       shortDescription:
-        "A sample cafe profile for neighborhood discovery and save flows.",
+        "A calmer Mount Pleasant cafe example for laptop time and low-key meetups.",
       fullDescription:
-        "Rainline Coffee shows the everyday CityAtlas discovery experience: browse by neighborhood, save a spot, inspect source status, and see how a business page could fit into broader city planning.",
-      highlights: ["Cafe guide fit", "Newsletter-friendly", "Offer module fit"],
-      bestFor: ["Laptop work", "Coffee dates", "Neighborhood guides"],
+        "Rainline Coffee is an example neighborhood cafe page focused on work sessions, casual meetups, and route-friendly coffee stops.",
+      highlights: [
+        "Good for laptop sessions",
+        "Easy stop between neighborhood plans",
+        "Can pair with local offer slots",
+      ],
+      bestFor: ["Laptop work", "Coffee dates", "Mount Pleasant breaks"],
       priceTier: "$$",
       rating: 4.6,
       reviewCount: 216,
@@ -143,11 +147,15 @@ export const seedData: CityAtlasData = {
         "/assets/vancouver-market-hero.png",
       ],
       shortDescription:
-        "A sample wellness studio profile for higher-intent service coverage.",
+        "A calmer recovery studio example for post-work resets and wellness routes.",
       fullDescription:
-        "North Shore Recovery is a sample higher-value local service page that shows how CityAtlas can handle review notes and wellness caution without making live claims.",
-      highlights: ["High-intent category", "AI report fit", "Creator visit fit"],
-      bestFor: ["Recovery days", "First-visit offers", "Wellness guides"],
+        "North Shore Recovery is an example wellness page that shows how CityAtlas can present services carefully, with route context and simple trust notes.",
+      highlights: [
+        "Best for calmer reset days",
+        "Works well in wellness routes",
+        "Designed for clear service notes",
+      ],
+      bestFor: ["Recovery days", "Post-work resets", "Wellness routes"],
       priceTier: "$$$",
       rating: 4.7,
       reviewCount: 74,
@@ -182,11 +190,15 @@ export const seedData: CityAtlasData = {
       heroImage: "/assets/vancouver-market-hero.png",
       gallery: ["/assets/vancouver-market-hero.png"],
       shortDescription:
-        "A sample activity listing for routes, outdoor guides, and event bundles.",
+        "A Kitsilano activity example built around scenic rides and outdoor weekend plans.",
       fullDescription:
-        "Seaside Cycle House shows how CityAtlas can support activity operators with route content, seasonal offers, and local guide placement.",
-      highlights: ["Outdoor guide fit", "Event bundle fit", "Seasonal offers"],
-      bestFor: ["Weekend routes", "Visitor itineraries", "Creator visits"],
+        "Seaside Cycle House is an example activity page for scenic rides, visitor routes, and outdoor weekend plans.",
+      highlights: [
+        "Scenic ride starting point",
+        "Easy add-on for visitor plans",
+        "Seasonal route fit",
+      ],
+      bestFor: ["Weekend routes", "Visitor itineraries", "Kitsilano afternoons"],
       priceTier: "$$",
       rating: 4.5,
       reviewCount: 62,
@@ -220,7 +232,7 @@ export const seedData: CityAtlasData = {
       capacity: 160,
       image: "/assets/vancouver-market-hero.png",
       description:
-        "A sample community event page showing how CityAtlas can package event discovery and save states.",
+        "A neighbourhood night-market example with local food, light wandering, and easy add-to-plan value.",
       safetyNotes:
         "Confirm vendor details and live event information with the host or official source before relying on this page.",
       rsvps: 47,
@@ -232,14 +244,14 @@ export const seedData: CityAtlasData = {
       slug: "kits-beach-rope-flow-session",
       category: "Wellness",
       neighborhood: "Kitsilano",
-      venue: "Kits Beach demo location",
+      venue: "Kits Beach shoreline lawn",
       date: "2026-06-28",
       time: "9:00 AM",
       priceLabel: "By donation",
       capacity: 24,
-      image: "/visual_references/02_public_pages_and_admin_composite.png",
+      image: "/assets/kits-rope-flow-reference.png",
       description:
-        "A sample movement event page showing how CityAtlas can present safety notes, capacity, and route fit.",
+        "A sunrise rope-flow session example for beach movement, fresh air, and low-friction weekend energy.",
       safetyNotes:
         "Physical events need verified host, waiver, capacity, and safety review before public promotion.",
       rsvps: 14,
@@ -250,11 +262,11 @@ export const seedData: CityAtlasData = {
       ...demoAudit,
       id: "offer-dessert",
       businessId: "biz-harbour-table",
-      title: "Preview dessert feature",
+      title: "Late dessert add-on",
       description:
-        "Sample offer module showing how a partner perk could appear once it is confirmed.",
+        "An example of how a local dining offer could appear once the business confirms the details.",
       redemptionInstructions:
-        "Preview only. Real offers must be business-confirmed before publishing.",
+        "Offer details still need business confirmation before this goes live.",
       endDate: "2026-07-15",
       claimCount: 18,
       maxClaims: 80,
@@ -264,11 +276,11 @@ export const seedData: CityAtlasData = {
       ...demoAudit,
       id: "offer-recovery",
       businessId: "biz-north-shore-recovery",
-      title: "Preview first-visit recovery credit",
+      title: "First-visit recovery add-on",
       description:
-        "Sample wellness offer used to show claim boundaries and review warnings.",
+        "An example wellness offer written with careful claim limits and simple guest-friendly language.",
       redemptionInstructions:
-        "Preview only. Health and wellness claims require extra review.",
+        "Offer details still need business confirmation before this goes live.",
       endDate: "2026-07-30",
       claimCount: 9,
       maxClaims: 40,
@@ -1031,7 +1043,7 @@ export const seedData: CityAtlasData = {
           title: "Toronto guide hub",
           path: "/toronto/guides",
           description:
-            "Open this when the strongest next move is staying inside the narrower Toronto preview instead of jumping back to the broader Vancouver guide library.",
+            "Open this when the strongest next move is staying inside the smaller Toronto guide set instead of jumping back to the broader Vancouver guide library.",
         },
         {
           title: "Vancouver guide library",
@@ -1161,7 +1173,7 @@ export const seedData: CityAtlasData = {
           title: "Toronto guide hub",
           path: "/toronto/guides",
           description:
-            "Use this when the strongest next move is staying inside the narrower Toronto preview instead of jumping back to the broader Vancouver library.",
+            "Use this when the strongest next move is staying inside the smaller Toronto guide set instead of jumping back to the broader Vancouver library.",
         },
         {
           title: "Editorial standards",
@@ -5752,46 +5764,46 @@ export const seedData: CityAtlasData = {
       priceLabel: "$0 / month",
       paymentState: "disabled_until_launch_approval",
       description:
-        "Basic profile and review queue access for launch candidates.",
+        "A simple starting point for businesses that want a CityAtlas page request on file.",
       bestFor: "Businesses that want to be considered for future coverage.",
       highlighted: false,
       features: [
-        "Basic listing request",
-        "Business review queue",
-        "Source and trust metadata",
-        "No live payment acceptance",
+        "Basic business request",
+        "Initial fit check",
+        "Source and trust notes",
+        "No billing until checkout opens",
       ],
     },
     {
       id: "city_partner",
       name: "City Partner",
-      priceLabel: "$49 / month planned",
+      priceLabel: "$49 / month on launch",
       paymentState: "disabled_until_launch_approval",
       description:
-        "Featured page, guide consideration, offer module, and launch reporting.",
+        "A fuller local-visibility package with a stronger page, guide consideration, and one offer or event slot.",
       bestFor: "Restaurants, cafes, wellness studios, and experience operators.",
       highlighted: true,
       features: [
-        "Enhanced profile",
-        "Founding partner placement review",
-        "Offer or event module",
+        "Enhanced business page",
+        "Guide placement check",
+        "Offer or event slot",
         "Monthly visibility snapshot",
       ],
     },
     {
       id: "signature_partner",
       name: "Signature Partner",
-      priceLabel: "$149 / month planned",
+      priceLabel: "$149 / month on launch",
       paymentState: "disabled_until_launch_approval",
       description:
-        "Premium local feature package with creator brief and campaign planning.",
+        "A higher-touch local package for deeper page work, sponsored ideas, and campaign planning.",
       bestFor: "Businesses ready for a hands-on content and local growth push.",
       highlighted: false,
       features: [
         "Premium feature page",
-        "Creator visit brief",
+        "Creative visit planning",
         "Sponsored guide proposal",
-        "AI visibility report draft",
+        "Visibility report",
       ],
     },
   ],

@@ -183,6 +183,7 @@
   }
 
   .section-header > div {
+    flex: 0 0 auto;
     min-width: 0;
     width: 100%;
   }
@@ -571,7 +572,12 @@
   }
 
   .site-footer {
-    display: flex;
+    grid-template-columns: 1fr;
+  }
+
+  .footer-groups,
+  .footer-links {
+    grid-template-columns: 1fr;
   }
 
   .guide-sidebar-card {

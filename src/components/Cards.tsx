@@ -16,7 +16,7 @@ export function BusinessCard({ business }: { business: Business }) {
       <img src={getBusinessVisual(business)} alt={`${business.name} scene`} loading="lazy" />
       <div className="card-body">
         <div className="card-topline">
-          <StatusPill tone="blue">Business page format</StatusPill>
+          <StatusPill tone="blue">Example business page</StatusPill>
           <span>{business.priceTier}</span>
         </div>
         <h3>{business.name}</h3>
@@ -65,7 +65,7 @@ export function OfferCard({
   return (
     <article className="content-card offer-card">
       <div className="offer-card-inner">
-        <StatusPill tone="amber">Offer format</StatusPill>
+        <StatusPill tone="amber">Offer example</StatusPill>
         <h3>{offer.title}</h3>
         <p>{offer.description}</p>
         <div className="card-meta">
@@ -164,8 +164,8 @@ export function TrustCard() {
       <ShieldIcon />
       <strong>Clear public publishing rules</strong>
       <p>
-        CityAtlas keeps official source pages, guide pages, and business requests clearly
-        separated so readers can tell what is confirmed now and what still needs review.
+        CityAtlas keeps pages with official links, planning guides, and business requests clearly
+        separated so readers can tell what is confirmed now and what still needs checking.
       </p>
     </article>
   );

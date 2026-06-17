@@ -51,11 +51,11 @@ export function SubmitBusinessPage({ data, onSubmitBusiness }: SubmitBusinessPag
     <>
       <section className="form-hero">
         <div>
-          <p className="section-label">Business review</p>
-          <h1>Start a CityAtlas business request</h1>
+          <p className="section-label">For businesses</p>
+          <h1>Tell CityAtlas about your business</h1>
           <p>
-            Early access note: this request is saved in this browser while CityAtlas finishes live
-            business intake. Nothing is billed, published, or contacted from this form.
+            For now, this request stays on this device. Nothing is billed, published, or sent from
+            this form.
           </p>
         </div>
         <SafeModeNotice />
@@ -81,9 +81,9 @@ export function SubmitBusinessPage({ data, onSubmitBusiness }: SubmitBusinessPag
           }}
         >
           <SectionHeader
-            title="Review request"
-            copy="Add the details you want CityAtlas to review first."
-            action={<StatusPill tone="amber">Review required</StatusPill>}
+            title="Tell us what needs to improve"
+            copy="Add the business details and the kind of CityAtlas help you want first."
+            action={<StatusPill tone="amber">Private request</StatusPill>}
           />
 
           <div className="form-grid">
@@ -156,17 +156,17 @@ export function SubmitBusinessPage({ data, onSubmitBusiness }: SubmitBusinessPag
           </label>
 
           <label>
-            Notes for review
+            What you want help with
             <textarea
               value={form.message}
               onChange={(event) => setForm({ ...form, message: event.target.value })}
               rows={5}
-              placeholder="Tell us what should be reviewed, verified, or prepared."
+              placeholder="Tell us what you want CityAtlas to improve, highlight, or help with."
             />
           </label>
 
           <button className="button primary" type="submit">
-            Save review request
+            Save business request
             <ArrowRightIcon />
           </button>
         </form>
@@ -176,7 +176,7 @@ export function SubmitBusinessPage({ data, onSubmitBusiness }: SubmitBusinessPag
             <LockIcon />
             <h2>Handled carefully</h2>
             <p>
-              Nothing goes live from this form. CityAtlas uses it to review fit, facts, and next
+              Nothing goes live from this form. CityAtlas uses it to check fit, facts, and next
               steps before any profile, perk, or package is confirmed.
             </p>
           </div>

@@ -1060,7 +1060,11 @@
 .pricing-hero h1,
 .form-hero h1,
 .admin-hero h1 {
+  font-family: var(--font-sans);
   font-size: clamp(2.35rem, 4.2vw, 3.9rem);
+  font-weight: 850;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
   max-width: 11.5ch;
 }
 
@@ -1202,7 +1206,11 @@
 }
 
 .business-detail-panel h1 {
+  font-family: var(--font-sans);
   font-size: clamp(2.2rem, 4vw, 4rem);
+  font-weight: 850;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
   margin-top: 18px;
 }
 
@@ -2837,28 +2845,51 @@
 
 .site-footer {
   border-top: 1px solid var(--line);
-  display: flex;
+  display: grid;
   gap: 24px;
-  justify-content: space-between;
+  grid-template-columns: minmax(220px, 0.75fr) minmax(0, 1.25fr);
   margin-top: 86px;
   padding: 34px 0;
+}
+
+.footer-brand {
+  max-width: 280px;
 }
 
 .site-footer p {
   font-size: 0.9rem;
   margin-top: 6px;
-  max-width: 580px;
+  max-width: 28rem;
+}
+
+.footer-groups {
+  display: grid;
+  gap: 18px 20px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.footer-group {
+  display: grid;
+  gap: 10px;
+}
+
+.footer-group > strong {
+  font-size: 0.84rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .footer-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
+  display: grid;
+  gap: 10px 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .footer-links a {
   color: var(--blue);
+  font-size: 0.94rem;
   font-weight: 800;
+  line-height: 1.35;
   text-decoration: none;
 }
 
@@ -2922,7 +2953,11 @@
 }
 
 .guide-hero h1 {
+  font-family: var(--font-sans);
   font-size: clamp(2.2rem, 4.35vw, 4rem);
+  font-weight: 850;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
   max-width: 12ch;
 }
 

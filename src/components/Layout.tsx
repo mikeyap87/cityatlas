@@ -3,6 +3,55 @@ import { siteConfig } from "../config/site";
 import { AppLink } from "./Link";
 import { CityAtlasMarkIcon, SearchIcon } from "./Icons";
 
+const footerGroups = [
+  {
+    title: "Start here",
+    links: [
+      { to: "/vancouver/guides", label: "Guide library" },
+      {
+        to: "/vancouver/guides/vancouver-itinerary-starter-pack-which-cityatlas-page-should-you-open-first",
+        label: "Where to start guide",
+      },
+      { to: "/vancouver", label: "Vancouver discovery" },
+      { to: "/vancouver/missions", label: "Saved plans" },
+      { to: "/planner", label: "Planner" },
+    ],
+  },
+  {
+    title: "Vancouver",
+    links: [
+      { to: "/vancouver/date-night-starters", label: "Date night" },
+      { to: "/vancouver/rainy-day-starters", label: "Rainy day" },
+      { to: "/vancouver/first-evening-starters", label: "First evening" },
+      { to: "/vancouver/first-time-visitor-starters", label: "First visit" },
+      { to: "/vancouver/returning-visitor-starters", label: "Returning visit" },
+      { to: "/vancouver/out-of-town-guest-starters", label: "Hosting guests" },
+      { to: "/vancouver/weekend-route-starters", label: "Weekend route" },
+      { to: "/vancouver/sunday-starters", label: "Sunday plan" },
+      { to: "/vancouver/wellness-reset-starters", label: "Wellness reset" },
+    ],
+  },
+  {
+    title: "More cities",
+    links: [
+      { to: "/toronto/guides", label: "Toronto guides" },
+      { to: "/toronto/first-time-visitor-starters", label: "Toronto first visit" },
+      { to: "/toronto/weekend-route-starters", label: "Toronto weekend" },
+    ],
+  },
+  {
+    title: "Business and trust",
+    links: [
+      { to: "/about", label: "About CityAtlas" },
+      { to: "/for-businesses/submit", label: "Submit a business" },
+      { to: "/for-businesses/pricing", label: "Business packages" },
+      { to: "/editorial-standards", label: "Editorial standards" },
+      { to: "/terms", label: "Terms" },
+      { to: "/privacy", label: "Privacy" },
+    ],
+  },
+] as const;
+
 interface LayoutProps {
   children: ReactNode;
   path: string;
@@ -66,45 +115,26 @@ export function PublicLayout({ children, path }: LayoutProps) {
       <main>{children}</main>
 
       <footer className="site-footer">
-        <div>
+        <div className="footer-brand">
           <strong>{siteConfig.name}</strong>
           <p>
             Vancouver plans, neighborhood guides, and local picks that help you decide what to do
             next faster.
           </p>
         </div>
-        <div className="footer-links">
-          <AppLink to="/about">About CityAtlas</AppLink>
-          <AppLink to="/vancouver/guides">Guide library</AppLink>
-          <AppLink to="/toronto/guides">Toronto guides</AppLink>
-          <AppLink to="/vancouver/guides/vancouver-itinerary-starter-pack-which-cityatlas-page-should-you-open-first">
-            Where to start guide
-          </AppLink>
-          <AppLink to="/vancouver/date-night-starters">Date night</AppLink>
-          <AppLink to="/vancouver/rainy-day-starters">Rainy day</AppLink>
-          <AppLink to="/vancouver/first-evening-starters">First evening</AppLink>
-          <AppLink to="/vancouver/first-time-visitor-starters">
-            First visit
-          </AppLink>
-          <AppLink to="/vancouver/returning-visitor-starters">
-            Returning visit
-          </AppLink>
-          <AppLink to="/vancouver/out-of-town-guest-starters">
-            Hosting guests
-          </AppLink>
-          <AppLink to="/vancouver/weekend-route-starters">Weekend route</AppLink>
-          <AppLink to="/vancouver/sunday-starters">Sunday plan</AppLink>
-          <AppLink to="/vancouver/wellness-reset-starters">Wellness reset</AppLink>
-          <AppLink to="/toronto/first-time-visitor-starters">Toronto first visit</AppLink>
-          <AppLink to="/toronto/weekend-route-starters">Toronto weekend</AppLink>
-          <AppLink to="/vancouver">Vancouver discovery</AppLink>
-          <AppLink to="/for-businesses/submit">Submit a business</AppLink>
-          <AppLink to="/for-businesses/pricing">Business packages</AppLink>
-          <AppLink to="/vancouver/missions">Saved plans</AppLink>
-          <AppLink to="/planner">Planner</AppLink>
-          <AppLink to="/editorial-standards">Editorial standards</AppLink>
-          <AppLink to="/terms">Terms</AppLink>
-          <AppLink to="/privacy">Privacy</AppLink>
+        <div className="footer-groups">
+          {footerGroups.map((group) => (
+            <div className="footer-group" key={group.title}>
+              <strong>{group.title}</strong>
+              <div className="footer-links">
+                {group.links.map((link) => (
+                  <AppLink key={link.to} to={link.to}>
+                    {link.label}
+                  </AppLink>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       </footer>
     </div>

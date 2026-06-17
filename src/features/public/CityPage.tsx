@@ -165,7 +165,7 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
               <strong>Filter Vancouver places</strong>
               <p>Search or narrow the place list below, or jump straight into a proven starter page.</p>
             </div>
-            <StatusPill tone="blue">{routeStarterCount} live route starters</StatusPill>
+            <StatusPill tone="blue">{routeStarterCount} starter pages live now</StatusPill>
           </div>
           <div className="city-search-panel">
             <SearchIcon />
@@ -337,9 +337,9 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
 
       <section className="section-block">
         <SectionHeader
-          title={`${businesses.length} current business page formats`}
-          copy="These cards show how CityAtlas can present a reviewed business page once facts, media, and participation details are confirmed."
-          action={<StatusPill tone="amber">Page formats</StatusPill>}
+          title={`${businesses.length} example business pages`}
+          copy="These examples show how CityAtlas can present a business once facts, photos, and participation details are checked."
+          action={<StatusPill tone="amber">Examples</StatusPill>}
         />
         <div className="card-grid three">
           {businesses.map((business) => (

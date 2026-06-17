@@ -525,7 +525,7 @@ export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePag
           <p>{copy.partnerCopy}</p>
           <div className="hero-actions">
             <AppLink className="button primary" to="/for-businesses/submit">
-              Request review
+              Start business request
               <ArrowRightIcon />
             </AppLink>
             <AppLink className="button secondary" to="/for-businesses/pricing">
@@ -540,7 +540,7 @@ export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePag
               <article className={plan.highlighted ? "mini-plan highlighted" : "mini-plan"} key={plan.id}>
                 <strong>{plan.name}</strong>
                 <span>{plan.priceLabel}</span>
-                <small>Request review first</small>
+                <small>Starts with a quick check</small>
               </article>
             ))}
           </div>
@@ -556,15 +556,15 @@ export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePag
 
       <section className="section-block">
         <SectionHeader
-          label="Next city preview"
-          title="Toronto now has a narrow first-visit preview inside CityAtlas"
-          copy="The Toronto preview stays intentionally small: one guide hub, two official source pages, and two simple guides for a first visit or one compact weekend."
-          action={<StatusPill tone="blue">Toronto preview</StatusPill>}
+          label="Next city"
+          title="Toronto now has its first CityAtlas starter library"
+          copy="Toronto starts smaller for now: one guide hub, two pages with official links, and two simple guides for a first visit or a compact weekend."
+          action={<StatusPill tone="blue">Toronto starter library</StatusPill>}
         />
         <div className="guide-query-grid">
           <AppLink className="query-card query-card-link" to="/toronto/guides">
-            <strong>Toronto guide hub</strong>
-            <p>Open the Toronto preview when the real question is where a first-time visitor should begin or how to keep a weekend compact, not how to cover the whole city.</p>
+            <strong>Toronto guide library</strong>
+            <p>Open Toronto when the real question is where a first-time visitor should begin or how to keep a weekend compact, not how to cover the whole city.</p>
           </AppLink>
           <AppLink className="query-card query-card-link" to="/toronto/first-time-visitor-starters">
             <strong>Toronto first-visit starting points</strong>
@@ -631,7 +631,7 @@ export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePag
       <section className="adaptive-band">
         <SparkIcon />
         <div>
-          <strong>Next best action: {nextBestAction.label}</strong>
+          <strong>Try this next: {nextBestAction.label}</strong>
           <p>{nextBestAction.copy}</p>
         </div>
         <AppLink className="button secondary" to={nextBestAction.path}>
@@ -733,8 +733,8 @@ export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePag
       <section className="section-block">
         <SectionHeader
           label="Business pages"
-          title="See how a reviewed business page can look"
-          copy="These cards show how a CityAtlas business page can look once the facts, media, and participation details are confirmed."
+          title="See how a CityAtlas business page can look"
+          copy="These examples show how CityAtlas can present a business once facts, photos, and participation details are checked."
           action={<AppLink className="text-link" to="/vancouver">View all discovery <ArrowRightIcon /></AppLink>}
         />
         <div className="card-grid three">
@@ -779,8 +779,8 @@ export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePag
         <div>
           <SectionHeader
             label="Partner offers"
-            title="How a partner offer can appear"
-            copy="These cards show how a partner offer can appear once the business confirms the details."
+            title="How a local offer can appear"
+            copy="These examples show how a local offer can appear after the business confirms the details."
           />
           <div className="stacked-list">
             {data.offers.map((offer) => (
@@ -830,7 +830,8 @@ export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePag
         >
           <strong>Get CityAtlas updates</strong>
           <p>
-            Save your email in this browser and keep the referral code handy for future invites.
+            For now, this signup stays on this device and gives you a referral code to keep for
+            future invites.
           </p>
           <div className="inline-form">
             <input

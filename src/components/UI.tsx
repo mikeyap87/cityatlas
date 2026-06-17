@@ -64,10 +64,10 @@ export function SafeModeNotice() {
     <aside className="safe-mode-notice">
       <LockIcon />
       <div>
-        <strong>Every business request starts with a quick review.</strong>
+        <strong>Every business request starts with a quick check.</strong>
         <p>
-          CityAtlas checks the fit, details, and next step before a package, perk, or profile goes
-          live.
+          CityAtlas looks at the business, the facts, and the best next step before any page,
+          offer, or package goes live.
         </p>
       </div>
     </aside>

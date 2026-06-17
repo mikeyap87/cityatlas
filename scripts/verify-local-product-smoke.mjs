@@ -148,7 +148,7 @@ async function runDesktopFlow(browser) {
     await page.goto(`${baseUrl}/toronto/guides`, { waitUntil: "networkidle" });
     await page.getByRole("heading", {
       level: 1,
-      name: /Toronto starter pages and guide preview/i,
+      name: /Toronto starter pages and guides/i,
     }).waitFor();
     await page.getByRole("link", { name: /First-time visitor starting points/i }).first().click();
     await page.waitForURL(`${baseUrl}/toronto/first-time-visitor-starters`);
@@ -206,7 +206,7 @@ async function runDesktopFlow(browser) {
     await page.goto(`${baseUrl}/for-businesses/submit?package=signature_partner`, {
       waitUntil: "networkidle",
     });
-    await page.getByRole("heading", { level: 1, name: /Start a CityAtlas business request/i }).waitFor();
+    await page.getByRole("heading", { level: 1, name: /Tell CityAtlas about your business/i }).waitFor();
     const packageInterest = await page.getByLabel("Package interest").inputValue();
     ensure(
       packageInterest === "signature_partner",
@@ -219,8 +219,8 @@ async function runDesktopFlow(browser) {
     await page.getByLabel("Website").fill("https://smoke-bistro.example");
     await page.getByLabel("Contact name").fill("Jordan");
     await page.getByLabel("Email").fill("hello@smoke-bistro.example");
-    await page.getByLabel("Notes for review").fill("Smoke test request for local review flow.");
-    await page.getByRole("button", { name: /Save review request/i }).click();
+    await page.getByLabel("What you want help with").fill("Smoke test request for local review flow.");
+    await page.getByRole("button", { name: /Save business request/i }).click();
     await page.locator(".submission-row").filter({ hasText: businessName }).waitFor();
 
     return {
@@ -403,8 +403,8 @@ async function runMobileFlow(browser) {
 
   await runStep(steps, "mobile business request render", async () => {
     await page.goto(`${baseUrl}/for-businesses/submit`, { waitUntil: "networkidle" });
-    await page.getByRole("heading", { level: 1, name: /Start a CityAtlas business request/i }).waitFor();
-    await page.getByRole("button", { name: /Save review request/i }).waitFor();
+    await page.getByRole("heading", { level: 1, name: /Tell CityAtlas about your business/i }).waitFor();
+    await page.getByRole("button", { name: /Save business request/i }).waitFor();
 
     return {
       route: "/for-businesses/submit",

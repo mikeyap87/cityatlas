@@ -71,6 +71,54 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
     data,
     "vancouver_wellness_reset_starters",
   );
+  const routeStarterCount = [
+    sourceBackedDateNightStarters,
+    sourceBackedRainyDayStarters,
+    sourceBackedFirstEveningStarters,
+    sourceBackedFirstTimeVisitorStarters,
+    sourceBackedGardenDayStarters,
+    sourceBackedKitsilanoScenicStarters,
+    sourceBackedWestSideDaytimeStarters,
+    sourceBackedFalseCreekCultureStarters,
+    sourceBackedUbcDiscoveryStarters,
+    sourceBackedReturningVisitorStarters,
+    sourceBackedOutOfTownGuestStarters,
+    sourceBackedWeekendRouteStarters,
+    sourceBackedSundayStarters,
+    sourceBackedWellnessResetStarters,
+  ].filter((collection) => collection.length > 0).length;
+  const cityHeroQuickStarts = [
+    {
+      label: "First visit",
+      detail: "Downtown, scenic, or west-side first stop",
+      to: "/vancouver/first-time-visitor-starters",
+    },
+    {
+      label: "Weekend route",
+      detail: "One low-friction path without crossing the city",
+      to: "/vancouver/weekend-route-starters",
+    },
+    {
+      label: "Rainy day",
+      detail: "Indoor-friendly Vancouver starters",
+      to: "/vancouver/rainy-day-starters",
+    },
+    {
+      label: "Kitsilano",
+      detail: "Slower waterfront and west-side flow",
+      to: "/vancouver/kitsilano-scenic-starters",
+    },
+    {
+      label: "Hosting guests",
+      detail: "Easy crowd-pleasing path for visitors",
+      to: "/vancouver/out-of-town-guest-starters",
+    },
+    {
+      label: "Wellness reset",
+      detail: "Lower-key recovery and reset plans",
+      to: "/vancouver/wellness-reset-starters",
+    },
+  ];
 
   const businesses = useMemo(() => {
     return data.businesses.filter((business) => {
@@ -90,34 +138,65 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
 
   return (
     <>
-      <section className="city-hero">
+      <section className="city-hero city-hero-explore">
         <div>
           <p className="section-label">{siteConfig.city}</p>
-          <h1>Explore Vancouver with guides, routes, and better starting points</h1>
+          <h1>Explore Vancouver with better guides and starting points</h1>
           <p>
-            Search places, events, offers, and guides. CityAtlas is built to help people choose a
-            better next move, not just browse a pile of city listings. Today the clearest public
-            coverage lives in the official source starting-point pages and the city guides.
+            Start here when you know the kind of day you want, but not the exact stop yet.
+            CityAtlas helps you choose a good next move instead of scrolling through a pile of
+            listings.
           </p>
+          <div className="hero-actions">
+            <AppLink className="button primary" to="/vancouver/guides">
+              Open guide library
+            </AppLink>
+            <AppLink
+              className="button secondary"
+              to="/vancouver/guides/vancouver-itinerary-starter-pack-which-cityatlas-page-should-you-open-first"
+            >
+              Where should I start?
+            </AppLink>
+          </div>
         </div>
-        <div className="city-search-panel">
-          <SearchIcon />
-          <input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search cafes, wellness, date night..."
-            aria-label="Search CityAtlas"
-          />
-          <select
-            value={category}
-            onChange={(event) => setCategory(event.target.value)}
-            aria-label="Filter category"
-          >
-            {categories.map((item) => (
-              <option key={item}>{item}</option>
+        <aside className="city-search-card">
+          <div className="city-search-header">
+            <div>
+              <strong>Filter Vancouver places</strong>
+              <p>Search or narrow the place list below, or jump straight into a proven starter page.</p>
+            </div>
+            <StatusPill tone="blue">{routeStarterCount} live route starters</StatusPill>
+          </div>
+          <div className="city-search-panel">
+            <SearchIcon />
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search cafes, wellness, date night..."
+              aria-label="Search CityAtlas"
+            />
+            <select
+              value={category}
+              onChange={(event) => setCategory(event.target.value)}
+              aria-label="Filter category"
+            >
+              {categories.map((item) => (
+                <option key={item}>{item}</option>
+              ))}
+            </select>
+          </div>
+          <p className="city-search-note">
+            These filters update the place cards lower on this page. Use the quick links if you already know the kind of plan you want.
+          </p>
+          <div className="city-search-quick-grid">
+            {cityHeroQuickStarts.map((item) => (
+              <AppLink className="city-search-quick-link" key={item.to} to={item.to}>
+                <strong>{item.label}</strong>
+                <span>{item.detail}</span>
+              </AppLink>
             ))}
-          </select>
-        </div>
+          </div>
+        </aside>
       </section>
 
       {neighborhoodGuides.length > 0 ? (

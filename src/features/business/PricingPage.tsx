@@ -20,11 +20,10 @@ export function PricingPage({ data }: PricingPageProps) {
       <section className="pricing-hero">
         <div>
           <p className="section-label">For businesses</p>
-          <h1>Choose the CityAtlas package that fits how you want to show up in Vancouver</h1>
+          <h1>Choose the right CityAtlas package for your business</h1>
           <p>
-            Use this page when a Vancouver business wants better guide placement, a stronger page,
-            clearer local visibility, or cleaner event and offer placement. CityAtlas starts with
-            a review, then opens billing only after fit, scope, and terms are clear.
+            Start with a quick review. CityAtlas checks the fit first, then opens checkout only
+            when the scope, terms, and next step are clear.
           </p>
           <div className="hero-actions">
             <AppLink className="button primary" to="/for-businesses/submit">
@@ -43,23 +42,23 @@ export function PricingPage({ data }: PricingPageProps) {
         <SectionHeader
           label="How it works"
           title="Start with a simple review before any billing"
-          copy="This keeps the packages clear and avoids selling the wrong thing too early."
+          copy="This keeps the first step simple and avoids selling the wrong package too early."
         />
         <div className="guide-query-grid">
           <article className="query-card">
             <span className="query-card-kicker">Step 1</span>
-            <strong>Tell CityAtlas what needs better visibility</strong>
-            <p>Share whether the goal is guide placement, a stronger page, an offer, or a cleaner city-facing story.</p>
+            <strong>Say what needs to improve</strong>
+            <p>Share whether you need better guide placement, a stronger page, or clearer local visibility.</p>
           </article>
           <article className="query-card">
             <span className="query-card-kicker">Step 2</span>
             <strong>Get a fit and scope review</strong>
-            <p>CityAtlas checks the facts, the page fit, and what kind of package makes sense before anything goes live.</p>
+            <p>CityAtlas checks the facts, the page fit, and which package makes sense before anything goes live.</p>
           </article>
           <article className="query-card">
             <span className="query-card-kicker">Step 3</span>
-            <strong>Open billing only if the plan is clear</strong>
-            <p>Billing stays off until both sides are clear on the package, the terms, and what is actually being delivered first.</p>
+            <strong>Open checkout only if the plan is clear</strong>
+            <p>Checkout stays off until both sides are clear on the package, the terms, and what gets delivered first.</p>
           </article>
         </div>
       </section>
@@ -67,7 +66,7 @@ export function PricingPage({ data }: PricingPageProps) {
       <section className="section-block">
         <SectionHeader
           title="See the package structure before checkout opens"
-          copy="These packages show the service structure. Checkout and payment links open only after review, scope confirmation, and clear terms."
+          copy="These packages show the shape of the offer. Checkout opens only after review, scope confirmation, and clear terms."
           action={<StatusPill tone="amber">Review first</StatusPill>}
         />
         <div className="pricing-grid">

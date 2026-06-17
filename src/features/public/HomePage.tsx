@@ -11,12 +11,9 @@ import { buildPublicBusinessCoverageSnapshot } from "../../lib/publicBusinessCov
 import { AppLink } from "../../components/Link";
 import {
   ArrowRightIcon,
-  CalendarIcon,
-  MapIcon,
   SearchIcon,
   ShieldIcon,
   SparkIcon,
-  StoreIcon,
 } from "../../components/Icons";
 import {
   BusinessCard,
@@ -43,11 +40,11 @@ interface HomePageProps {
   onSaveMission: (mission: CityMission) => void;
 }
 
-type HomeSearchFilter = "all" | "guide" | "business" | "event" | "offer";
+type HomeSearchKind = "guide" | "business" | "event" | "offer";
 
 interface HomeSearchResult {
   id: string;
-  kind: HomeSearchFilter;
+  kind: HomeSearchKind;
   label: string;
   detail: string;
   path: string;
@@ -95,6 +92,13 @@ const heroSearchSuggestions = [
   { label: "Weekend route", value: "weekend route" },
 ] as const;
 
+const homeResultKindLabels: Record<HomeSearchKind, string> = {
+  guide: "Guide",
+  business: "Place",
+  event: "Event",
+  offer: "Offer",
+};
+
 const trustedStartingPointLinks = [
   { path: "/vancouver/date-night-starters", label: "Date night" },
   { path: "/vancouver/rainy-day-starters", label: "Rainy day" },
@@ -116,7 +120,6 @@ export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePag
   const [email, setEmail] = useState("");
   const [referralCode, setReferralCode] = useState("");
   const [heroQuery, setHeroQuery] = useState("");
-  const [heroFilter, setHeroFilter] = useState<HomeSearchFilter>("all");
   const activeVariant = getActiveVariant();
   const copy = variantCopy[activeVariant];
   const nextBestAction = getNextBestAction(data);
@@ -292,7 +295,6 @@ export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePag
 
     const queryTerms = query.split(/\s+/).filter(Boolean);
     return homeSearchResults
-      .filter((result) => heroFilter === "all" || result.kind === heroFilter)
       .map((result) => {
         const haystack = result.haystack;
         const exactMatch = haystack.includes(query) ? 5 : 0;
@@ -308,8 +310,8 @@ export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePag
       })
       .filter((result) => result.score > 0)
       .sort((left, right) => right.score - left.score || left.label.localeCompare(right.label))
-      .slice(0, 4);
-  }, [heroFilter, heroQuery, homeSearchResults]);
+      .slice(0, 3);
+  }, [heroQuery, homeSearchResults]);
 
   useEffect(() => {
     onTrack("experiment_exposed", { experiment: "homepage_positioning", variant: activeVariant });
@@ -419,122 +421,67 @@ export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePag
                 </AppLink>
               ))}
             </div>
-          </div>
-
-          <div className="hero-search-panel">
-            <div className="map-toolbar">
-              <strong>Search by what you actually need</strong>
-              <StatusPill tone="green">Live search</StatusPill>
-            </div>
-            <form
-              className="hero-search-form"
-              onSubmit={(event) => {
-                event.preventDefault();
-
-                const firstResult = filteredHomeResults[0];
-                if (firstResult) {
-                  navigate(firstResult.path);
-                  return;
-                }
-
-                if (heroFilter === "guide") {
-                  navigate(`/${siteConfig.citySlug}/guides`);
-                  return;
-                }
-
-                if (heroFilter === "business") {
-                  navigate(`/${siteConfig.citySlug}`);
-                  return;
-                }
-
-                if (heroFilter === "event") {
-                  navigate(`/${siteConfig.citySlug}/events`);
-                  return;
-                }
-
-                if (heroFilter === "offer") {
-                  navigate(`/${siteConfig.citySlug}/offers`);
-                  return;
-                }
-
-                navigate(`/${siteConfig.citySlug}`);
-              }}
-            >
-              <SearchIcon />
-              <input
-                aria-label="Search CityAtlas"
-                onChange={(event) => setHeroQuery(event.target.value)}
-                placeholder="Try rainy day, Kits Beach, coffee, or first evening"
-                type="search"
-                value={heroQuery}
-              />
-              <button className="button primary hero-search-submit" type="submit">
-                Open match
-              </button>
-            </form>
-            <div className="hero-filter-row" aria-label="Search filters">
-              <button
-                className={heroFilter === "all" ? "hero-filter-button active" : "hero-filter-button"}
-                onClick={() => setHeroFilter("all")}
-                type="button"
-              >
-                <SearchIcon /> Everything
-              </button>
-              <button
-                className={heroFilter === "guide" ? "hero-filter-button active" : "hero-filter-button"}
-                onClick={() => setHeroFilter("guide")}
-                type="button"
-              >
-                <MapIcon /> Guides
-              </button>
-              <button
-                className={heroFilter === "business" ? "hero-filter-button active" : "hero-filter-button"}
-                onClick={() => setHeroFilter("business")}
-                type="button"
-              >
-                <StoreIcon /> Places
-              </button>
-              <button
-                className={heroFilter === "event" ? "hero-filter-button active" : "hero-filter-button"}
-                onClick={() => setHeroFilter("event")}
-                type="button"
-              >
-                <CalendarIcon /> Events
-              </button>
-              <button
-                className={heroFilter === "offer" ? "hero-filter-button active" : "hero-filter-button"}
-                onClick={() => setHeroFilter("offer")}
-                type="button"
-              >
-                <SparkIcon /> Offers
-              </button>
-            </div>
-            {filteredHomeResults.length > 0 ? (
-              <div className="hero-search-results">
-                {filteredHomeResults.map((result) => (
-                  <AppLink className="hero-search-result" key={result.id} to={result.path}>
-                    <strong>{result.label}</strong>
-                    <span>{result.detail}</span>
-                  </AppLink>
-                ))}
+            <div className="hero-search-stack">
+              <div className="hero-search-intro">
+                <strong>Search by mood, area, or occasion</strong>
+                <StatusPill tone="green">Live search</StatusPill>
               </div>
-            ) : (
-              <div className="hero-search-empty">
-                <p>Popular starting points</p>
-                <div className="hero-search-suggestions">
-                  {heroSearchSuggestions.map((suggestion) => (
-                    <button
-                      className="hero-search-suggestion"
-                      key={suggestion.value}
-                      onClick={() => setHeroQuery(suggestion.value)}
-                      type="button"
-                    >
-                      {suggestion.label}
-                    </button>
+              <p className="hero-search-copy">
+                Type one real need and CityAtlas will open the closest match.
+              </p>
+              <form
+                className="hero-search-form"
+                onSubmit={(event) => {
+                  event.preventDefault();
+
+                  const firstResult = filteredHomeResults[0];
+                  if (firstResult) {
+                    navigate(firstResult.path);
+                    return;
+                  }
+
+                  navigate(heroQuery.trim() ? `/${siteConfig.citySlug}/guides` : `/${siteConfig.citySlug}`);
+                }}
+              >
+                <SearchIcon />
+                <input
+                  aria-label="Search CityAtlas"
+                  onChange={(event) => setHeroQuery(event.target.value)}
+                  placeholder="Try rainy day, Kits Beach, coffee, or first evening"
+                  type="search"
+                  value={heroQuery}
+                />
+                <button className="button primary hero-search-submit" type="submit">
+                  Open match
+                </button>
+              </form>
+              {filteredHomeResults.length > 0 ? (
+                <div className="hero-search-results">
+                  {filteredHomeResults.map((result) => (
+                    <AppLink className="hero-search-result" key={result.id} to={result.path}>
+                      <strong>{result.label}</strong>
+                      <span>{`${homeResultKindLabels[result.kind]} | ${result.detail}`}</span>
+                    </AppLink>
                   ))}
                 </div>
-              </div>
-            )}
+              ) : (
+                <div className="hero-search-empty">
+                  <p>Popular starting points</p>
+                  <div className="hero-search-suggestions">
+                    {heroSearchSuggestions.map((suggestion) => (
+                      <button
+                        className="hero-search-suggestion"
+                        key={suggestion.value}
+                        onClick={() => setHeroQuery(suggestion.value)}
+                        type="button"
+                      >
+                        {suggestion.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </section>
@@ -610,7 +557,7 @@ export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePag
           <SectionHeader
             label="What is CityAtlas?"
             title="A Vancouver-first guide for choosing what to do next"
-            copy="CityAtlas answers common city questions quickly, then turns the answer into a route, saved plan, or better next click."
+            copy="CityAtlas helps you pick a good next move fast, then turns it into a route, saved plan, or simple next click."
           />
           <div className="tag-cloud">
             <span>Date night planning</span>
@@ -627,7 +574,7 @@ export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePag
         <div className="source-panel">
           <SectionHeader
             label="Why it feels easier"
-            title="Built to help you choose, not just browse forever"
+            title="Built to help you choose, not browse forever"
             copy="The best CityAtlas page gives you one clear starting point, one useful next step, and a smaller set of good options."
           />
           <div className="hero-actions">

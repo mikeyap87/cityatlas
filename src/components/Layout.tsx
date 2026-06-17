@@ -42,7 +42,7 @@ export function PublicLayout({ children, path }: LayoutProps) {
             to="/vancouver/date-night-starters"
             className={navClass(path, "/vancouver/date-night-starters")}
           >
-            Best places
+            Start here
           </AppLink>
           <AppLink to="/vancouver/missions" className={navClass(path, "/vancouver/missions")}>
             Saved plans

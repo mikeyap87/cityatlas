@@ -16,31 +16,31 @@ export const variantCopy: Record<GrowthVariant, VariantCopy> = {
     variant: "control",
     heroTitle: "Plan a better Vancouver day without opening 12 tabs",
     heroCopy:
-      "Search by mood, neighborhood, weather, or visitor type. CityAtlas helps you find the best page to start with, then turn it into a simple plan.",
+      "Start with the right part of Vancouver, then open the guide or route that fits today.",
     primaryCta: "Start exploring",
     partnerHeadline: "Help your business show up in the right Vancouver moments",
     partnerCopy:
-      "Request a review if you want guide placement, a stronger page, or a cleaner city-facing story. Billing stays off until the fit is clear.",
+      "Request a review if you want guide placement, a stronger page, or a clearer local story. Checkout stays off until the fit is clear.",
   },
   "founding-partner": {
     variant: "founding-partner",
     heroTitle: "Help your business show up when Vancouver people are deciding where to go",
     heroCopy:
-      "CityAtlas brings together useful guides, neighborhood picks, and city pages so the right businesses are easier to discover at the right moment.",
+      "CityAtlas helps the right business show up when people are choosing a neighborhood, guide, or city plan.",
     primaryCta: "See business packages",
     partnerHeadline: "Get reviewed for a stronger CityAtlas presence",
     partnerCopy:
-      "Start with a review for page quality, guide placement, and offer fit before paid packages open.",
+      "Start with a review for page quality, guide placement, and offer fit before checkout opens.",
   },
   "weekend-atlas": {
     variant: "weekend-atlas",
     heroTitle: "Plan a better Vancouver weekend without tab overload",
     heroCopy:
-      "Use route ideas, practical guides, and one clear planner loop instead of bouncing between maps, blogs, and screenshots.",
+      "Use route ideas, practical guides, and one clear planner instead of bouncing between maps, blogs, and screenshots.",
     primaryCta: "Build an itinerary",
     partnerHeadline: "Reach locals while they are planning the weekend",
     partnerCopy:
-      "Businesses can request review for guide placement, events, offers, and a cleaner local story.",
+      "Businesses can request review for guide placement, events, offers, and a clearer local story.",
   },
 };
 

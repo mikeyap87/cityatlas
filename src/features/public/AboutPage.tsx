@@ -8,7 +8,7 @@ export function AboutPage() {
       <section className="city-hero">
         <div>
           <p className="section-label">About CityAtlas</p>
-          <h1>CityAtlas is a Vancouver-first city guide and local discovery system</h1>
+          <h1>CityAtlas is a Vancouver-first guide for better local plans</h1>
           <p>
             CityAtlas helps locals and visitors figure out what to do next with answer-first
             guides, saveable routes, and trust-first business pages. It also helps neighborhood

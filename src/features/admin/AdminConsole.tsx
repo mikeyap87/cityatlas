@@ -70,12 +70,19 @@ import {
 
 interface AdminConsoleProps {
   data: CityAtlasData;
-  onImportBusinessProspects: (prospects: BusinessProspect[], sourceLabel?: string) => number;
+  onImportBusinessProspects: (
+    prospects: BusinessProspect[],
+    sourceLabel?: string,
+  ) => number | Promise<number>;
   onSetBusinessProspectSupervisedAllowlist: (prospectId: string, allowlisted: boolean) => void;
   onMarkBusinessProspectSupervisedDryRunPrepared: (prospectId: string) => void;
   onStageBusinessProspectSupervisedLiveReview: (prospectId: string) => void;
-  onSaveBusinessInboundMirror: (entries: BusinessInboundMirrorEntry[]) => number;
-  onReplayBusinessReplyBridgeEntry: (entryId: string) => BusinessReplyLog | undefined;
+  onSaveBusinessInboundMirror: (
+    entries: BusinessInboundMirrorEntry[],
+  ) => number | Promise<number>;
+  onReplayBusinessReplyBridgeEntry: (
+    entryId: string,
+  ) => BusinessReplyLog | undefined | Promise<BusinessReplyLog | undefined>;
   onLogManualReply: (input: {
     candidateId: string;
     channel: ManualReplyLog["channel"];
@@ -83,7 +90,7 @@ interface AdminConsoleProps {
     messageVersion: string;
     summary: string;
     nextStep: string;
-  }) => ManualReplyLog | undefined;
+  }) => ManualReplyLog | undefined | Promise<ManualReplyLog | undefined>;
   onSaveBrainRun: (input: {
     stage: string;
     summary: string;
@@ -91,9 +98,9 @@ interface AdminConsoleProps {
     topGate: string;
     openGaps: number;
     averageProgress: number;
-  }) => BrainRun;
+  }) => BrainRun | Promise<BrainRun>;
   onMarkGateReady: (gateId: string) => void;
-  onResetDemo: () => void;
+  onResetDemo: () => void | Promise<void>;
 }
 
 function getProspectPriority(prospect: BusinessProspect) {
@@ -966,11 +973,16 @@ export function AdminConsole({
             className="reply-tracker-form"
             onSubmit={(event) => {
               event.preventDefault();
-              const rows = createImportedBusinessProspects(importPreview.importableRows);
-              const importedCount = onImportBusinessProspects(rows, "manual_or_exa_preview");
-              if (importedCount > 0) {
-                setProspectImportText("");
-              }
+              void (async () => {
+                const rows = createImportedBusinessProspects(importPreview.importableRows);
+                const importedCount = await onImportBusinessProspects(
+                  rows,
+                  "manual_or_exa_preview",
+                );
+                if (importedCount > 0) {
+                  setProspectImportText("");
+                }
+              })();
             }}
           >
             <label className="wide">
@@ -1302,14 +1314,16 @@ export function AdminConsole({
             className="reply-tracker-form"
             onSubmit={(event) => {
               event.preventDefault();
-              const entries = buildBusinessProtectedInboundMirrorEntries(
-                businessInboundPreview.rows,
-                data.businessInboundMirror,
-              );
-              const savedCount = onSaveBusinessInboundMirror(entries);
-              if (savedCount > 0) {
-                setBusinessInboundText("");
-              }
+              void (async () => {
+                const entries = buildBusinessProtectedInboundMirrorEntries(
+                  businessInboundPreview.rows,
+                  data.businessInboundMirror,
+                );
+                const savedCount = await onSaveBusinessInboundMirror(entries);
+                if (savedCount > 0) {
+                  setBusinessInboundText("");
+                }
+              })();
             }}
           >
             <label className="wide">
@@ -1410,7 +1424,9 @@ export function AdminConsole({
                   <button
                     className="button tiny"
                     type="button"
-                    onClick={() => onReplayBusinessReplyBridgeEntry(row.entry.id)}
+                    onClick={() => {
+                      void onReplayBusinessReplyBridgeEntry(row.entry.id);
+                    }}
                   >
                     Replay to local reply memory
                   </button>
@@ -1850,16 +1866,18 @@ export function AdminConsole({
             onSubmit={(event) => {
               event.preventDefault();
               if (!replyForm.candidateId || !replyForm.summary.trim()) return;
-              onLogManualReply({
-                ...replyForm,
-                summary: replyForm.summary.trim(),
-                nextStep: replyForm.nextStep.trim() || "Review next action manually.",
-              });
-              setReplyForm((current) => ({
-                ...current,
-                summary: "",
-                nextStep: "",
-              }));
+              void (async () => {
+                await onLogManualReply({
+                  ...replyForm,
+                  summary: replyForm.summary.trim(),
+                  nextStep: replyForm.nextStep.trim() || "Review next action manually.",
+                });
+                setReplyForm((current) => ({
+                  ...current,
+                  summary: "",
+                  nextStep: "",
+                }));
+              })();
             }}
           >
             <label>
@@ -1985,16 +2003,16 @@ export function AdminConsole({
               <button
                 className="button tiny"
                 type="button"
-                onClick={() =>
-                  onSaveBrainRun({
+                onClick={() => {
+                  void onSaveBrainRun({
                     stage: brain.stage,
                     summary: brain.summary,
                     topRecommendation: brain.recommendations[0]?.title ?? "Review manually",
                     topGate: brain.recommendations[0]?.gate ?? "No gate",
                     openGaps: brain.gaps.length,
                     averageProgress: brain.averageProgress,
-                  })
-                }
+                  });
+                }}
               >
                 Save run
               </button>
@@ -2165,7 +2183,13 @@ export function AdminConsole({
             the original seed package.
           </p>
           <div className="hero-actions">
-            <button className="button secondary" type="button" onClick={onResetDemo}>
+            <button
+              className="button secondary"
+              type="button"
+              onClick={() => {
+                void onResetDemo();
+              }}
+            >
               Reset local demo
             </button>
             <AppLink className="button secondary" to="/private-preview/date-night">

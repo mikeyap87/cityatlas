@@ -35,14 +35,36 @@ function noteWarning(scope, message) {
   warnings.push(`${scope}: ${message}`);
 }
 
+async function closeSafely(target, scope) {
+  if (!target) {
+    return;
+  }
+
+  try {
+    await Promise.race([
+      target.close(),
+      wait(5_000).then(() => {
+        throw new Error("close timed out");
+      }),
+    ]);
+  } catch (error) {
+    noteWarning(scope, error instanceof Error ? error.message : String(error));
+  }
+}
+
 function attachRuntimeCapture(page, bucket) {
   page.on("pageerror", (error) => {
     bucket.pageErrors.push(error.message);
   });
   page.on("requestfailed", (request) => {
     const url = request.url();
-    if (url.startsWith(baseUrl)) {
-      bucket.requestFailures.push(`${url} :: ${request.failure()?.errorText ?? "request failed"}`);
+    const errorText = request.failure()?.errorText ?? "request failed";
+    const abortedImageRequest =
+      errorText === "net::ERR_ABORTED" && request.resourceType() === "image";
+
+    // Navigating between pages can cancel in-flight same-origin images without affecting users.
+    if (url.startsWith(baseUrl) && !abortedImageRequest) {
+      bucket.requestFailures.push(`${url} :: ${errorText}`);
     }
   });
   page.on("console", (message) => {
@@ -55,6 +77,24 @@ function attachRuntimeCapture(page, bucket) {
 async function saveScreenshot(page, fileName) {
   mkdirSync(screenshotDir, { recursive: true });
   const path = join(screenshotDir, fileName);
+  await page.evaluate(async () => {
+    const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    const maxScrollTop = Math.max(
+      document.documentElement.scrollHeight,
+      document.body.scrollHeight,
+    ) - window.innerHeight;
+    const step = Math.max(Math.round(window.innerHeight * 0.82), 320);
+
+    for (let scrollTop = 0; scrollTop < maxScrollTop; scrollTop += step) {
+      window.scrollTo(0, Math.min(scrollTop, maxScrollTop));
+      await pause(80);
+    }
+
+    window.scrollTo(0, maxScrollTop);
+    await pause(120);
+    window.scrollTo(0, 0);
+    await pause(120);
+  });
   await page.screenshot({ path, fullPage: true });
   return `output/qa/local-product-smoke/${fileName}`;
 }
@@ -90,30 +130,39 @@ async function runDesktopFlow(browser) {
   const steps = [];
   attachRuntimeCapture(page, runtime);
 
-  await runStep(steps, "desktop home newsletter save", async () => {
+  await runStep(steps, "desktop home contact funnel", async () => {
     await page.goto(`${baseUrl}/`, { waitUntil: "networkidle" });
     const heroHeading = (await page.locator("h1").first().innerText()).trim();
     ensure(/vancouver/i.test(heroHeading), `Homepage hero heading should mention Vancouver, got "${heroHeading}".`);
-
-    await page.getByLabel("Email address").fill("smoke-cityatlas@example.com");
-    await page.getByRole("button", { name: "Save", exact: true }).click();
-    await page.locator(".referral-box code").waitFor();
-    const referralCode = (await page.locator(".referral-box code").textContent())?.trim();
-    ensure(Boolean(referralCode), "Homepage newsletter save did not reveal a referral code.");
+    const screenshot = await saveScreenshot(page, "desktop-home.png");
+    const requestLink = page.getByRole("link", { name: /Start business request/i }).first();
+    const emailLink = page.getByRole("link", { name: /Email CityAtlas/i }).first();
+    const requestHref = await requestLink.getAttribute("href");
+    const emailHref = await emailLink.getAttribute("href");
+    ensure(
+      Boolean(requestHref && requestHref.includes("/for-businesses/submit")),
+      `Homepage business request link should open the request form. Got "${requestHref}".`,
+    );
+    ensure(
+      Boolean(emailHref && emailHref.startsWith("mailto:")),
+      `Homepage email link should open a mailto draft. Got "${emailHref}".`,
+    );
+    await requestLink.click();
+    await page.waitForURL(`${baseUrl}/for-businesses/submit`);
 
     return {
-      route: "/",
-      referralCode,
-      screenshot: await saveScreenshot(page, "desktop-home.png"),
+      route: "/for-businesses/submit",
+      emailHref,
+      screenshot,
     };
   });
 
-  await runStep(steps, "desktop home map and search", async () => {
+  await runStep(steps, "desktop home area picker and search", async () => {
     await page.goto(`${baseUrl}/`, { waitUntil: "networkidle" });
-    await page.locator(".map-stop-kits").click();
+    await page.getByRole("link", { name: /Kitsilano/i }).first().click();
     await page.waitForURL(`${baseUrl}/vancouver/kitsilano-scenic-starters`);
     const mapBodyText = await page.locator("body").innerText();
-    ensure(/kitsilano/i.test(mapBodyText), "Homepage route map did not open the Kitsilano page.");
+    ensure(/kitsilano/i.test(mapBodyText), "Homepage starting-point links did not open the Kitsilano page.");
 
     await page.goto(`${baseUrl}/`, { waitUntil: "networkidle" });
     await page.getByLabel("Search CityAtlas").fill("first evening");
@@ -132,8 +181,8 @@ async function runDesktopFlow(browser) {
 
   await runStep(steps, "desktop city starter navigation", async () => {
     await page.goto(`${baseUrl}/vancouver`, { waitUntil: "networkidle" });
-    await page.getByRole("heading", { level: 1, name: /Explore Vancouver/i }).waitFor();
-    await page.getByRole("link", { name: /Open Kitsilano/i }).click();
+    await page.getByRole("heading", { level: 1, name: /Find the right Vancouver start first/i }).waitFor();
+    await page.getByRole("link", { name: /Kitsilano/i }).first().click();
     await page.waitForURL(`${baseUrl}/vancouver/kitsilano-scenic-starters`);
     const bodyText = await page.locator("body").innerText();
     ensure(/kitsilano/i.test(bodyText), "Kitsilano starters route did not render recognizable Kitsilano text.");
@@ -144,12 +193,121 @@ async function runDesktopFlow(browser) {
     };
   });
 
-  await runStep(steps, "desktop Toronto pilot navigation", async () => {
-    await page.goto(`${baseUrl}/toronto/guides`, { waitUntil: "networkidle" });
+  await runStep(steps, "desktop city page render", async () => {
+    await page.goto(`${baseUrl}/vancouver`, { waitUntil: "networkidle" });
+    await page.getByRole("heading", { level: 1, name: /Find the right Vancouver start first/i }).waitFor();
+    const quickStartCount = await page.locator(".city-search-quick-link").count();
+    ensure(quickStartCount >= 4, `Expected at least 4 city quick-start cards, found ${quickStartCount}.`);
+    const businessImages = page.locator(".business-card img");
+    const businessImageCount = await businessImages.count();
+    ensure(businessImageCount >= 5, `Expected at least 5 source-backed business cards, found ${businessImageCount}.`);
+
+    for (let index = 0; index < Math.min(5, businessImageCount); index += 1) {
+      const image = businessImages.nth(index);
+      await image.scrollIntoViewIfNeeded();
+      await page.waitForFunction(({ selector, imageIndex }) => {
+        const images = Array.from(document.querySelectorAll(selector));
+        const target = images[imageIndex];
+        return target instanceof HTMLImageElement && target.currentSrc.length > 0 && target.naturalWidth > 0;
+      }, { selector: ".business-card img", imageIndex: index });
+    }
+
+    const businessImageSources = await businessImages.evaluateAll((images) =>
+      images.slice(0, 5).map((image) => (image instanceof HTMLImageElement ? image.currentSrc : "")),
+    );
+    ensure(
+      businessImageSources.every((src) => src.includes("/assets/businesses/")),
+      `Expected source-backed business cards to use venue-image assets. Got ${JSON.stringify(businessImageSources)}.`,
+    );
+
+    return {
+      route: "/vancouver",
+      screenshot: await saveScreenshot(page, "desktop-city.png"),
+    };
+  });
+
+  await runStep(steps, "desktop guide library render", async () => {
+    await page.goto(`${baseUrl}/vancouver/guides`, { waitUntil: "networkidle" });
+    await page.getByRole("heading", { level: 1, name: /Vancouver guides for easier local plans/i }).waitFor();
+    const bodyText = await page.locator("body").innerText();
+    ensure(
+      /Visitors and hosts|first arrivals, repeat visits, and guest plans/i.test(bodyText),
+      "Guide library did not render the visitor-and-host section.",
+    );
+
+    return {
+      route: "/vancouver/guides",
+      screenshot: await saveScreenshot(page, "desktop-guide-library.png"),
+    };
+  });
+
+  await runStep(steps, "desktop about render", async () => {
+    await page.goto(`${baseUrl}/about`, { waitUntil: "networkidle" });
     await page.getByRole("heading", {
       level: 1,
-      name: /Toronto starter pages and guides/i,
+      name: /CityAtlas helps people choose the right Vancouver start/i,
     }).waitFor();
+    const bodyText = await page.locator("body").innerText();
+    ensure(/Toronto preview/i.test(bodyText), "About page did not render the next-city preview card.");
+
+    return {
+      route: "/about",
+      screenshot: await saveScreenshot(page, "desktop-about.png"),
+    };
+  });
+
+  await runStep(steps, "desktop guide detail render", async () => {
+    await page.goto(`${baseUrl}/vancouver/guides/where-should-a-first-time-vancouver-visitor-start`, {
+      waitUntil: "networkidle",
+    });
+    await page.getByRole("heading", {
+      level: 1,
+      name: /Where Should A First-Time Vancouver Visitor Start/i,
+    }).waitFor();
+    const bodyText = await page.locator("body").innerText();
+    ensure(
+      /Open official places|Need the broader plan next/i.test(bodyText),
+      "Guide detail did not render the follow-through guidance section.",
+    );
+
+    return {
+      route: "/vancouver/guides/where-should-a-first-time-vancouver-visitor-start",
+      screenshot: await saveScreenshot(page, "desktop-guide-detail.png"),
+    };
+  });
+
+  await runStep(steps, "desktop business detail render", async () => {
+    await page.goto(`${baseUrl}/vancouver/businesses/published-on-main`, { waitUntil: "networkidle" });
+    await page.getByRole("heading", { level: 1, name: /Published on Main/i }).waitFor();
+    const bodyText = await page.locator("body").innerText();
+    ensure(
+      /What CityAtlas checks before a page is listed/i.test(bodyText),
+      "Business detail page did not render the source-backed guidance.",
+    );
+
+    return {
+      route: "/vancouver/businesses/published-on-main",
+      screenshot: await saveScreenshot(page, "desktop-business-detail.png"),
+    };
+  });
+
+  await runStep(steps, "desktop events render", async () => {
+    await page.goto(`${baseUrl}/vancouver/events`, { waitUntil: "networkidle" });
+    await page.getByRole("heading", { level: 1, name: /Vancouver event ideas that can shape the day/i }).waitFor();
+    const eventCards = await page.locator(".compact-card").count();
+    ensure(eventCards >= 1, `Expected at least 1 event card, found ${eventCards}.`);
+
+    return {
+      route: "/vancouver/events",
+      screenshot: await saveScreenshot(page, "desktop-events.png"),
+    };
+  });
+
+  await runStep(steps, "desktop Toronto pilot navigation", async () => {
+    await page.goto(`${baseUrl}/toronto/guides`, { waitUntil: "networkidle" });
+    await page.locator("h1").waitFor();
+    const guideHubText = await page.locator("body").innerText();
+    ensure(/Toronto starting pages and guides/i.test(guideHubText), "Toronto guide hub did not render the Toronto starter heading.");
     await page.getByRole("link", { name: /First-time visitor starting points/i }).first().click();
     await page.waitForURL(`${baseUrl}/toronto/first-time-visitor-starters`);
     await page.getByRole("link", { name: /Read the Toronto destination guide/i }).click();
@@ -169,8 +327,15 @@ async function runDesktopFlow(browser) {
     await page.waitForURL(`${baseUrl}/toronto/weekend-route-starters`);
     await page.getByRole("link", { name: /Read the Toronto weekend guide/i }).click();
     await page.waitForURL(`${baseUrl}/toronto/guides/how-to-build-a-toronto-weekend-route-without-crossing-the-city-all-day`);
+    await page.getByRole("heading", {
+      level: 1,
+      name: /How To Build A Toronto Weekend Plan Without Crossing The City All Day/i,
+    }).waitFor();
     const bodyText = await page.locator("body").innerText();
-    ensure(/Toronto weekend route/i.test(bodyText), "Toronto weekend guide did not render recognizable weekend-route copy.");
+    ensure(
+      /Toronto weekend planning guide|choose the kind of Toronto weekend first|weekend visitors/i.test(bodyText),
+      "Toronto weekend guide did not render recognizable Toronto weekend guidance.",
+    );
 
     return {
       route: "/toronto/guides/how-to-build-a-toronto-weekend-route-without-crossing-the-city-all-day",
@@ -180,7 +345,7 @@ async function runDesktopFlow(browser) {
 
   await runStep(steps, "desktop planner save and share", async () => {
     await page.goto(`${baseUrl}/planner`, { waitUntil: "networkidle" });
-    await page.getByRole("heading", { level: 1, name: /Build a Vancouver itinerary/i }).waitFor();
+    await page.getByRole("heading", { level: 1, name: /Save a Vancouver plan/i }).waitFor();
     const firstChip = page.locator(".planner-chip").first();
     const chipLabel = (await firstChip.locator("span").innerText()).trim();
     ensure(Boolean(chipLabel), "Planner did not expose a saveable chip label.");
@@ -201,12 +366,54 @@ async function runDesktopFlow(browser) {
     };
   });
 
-  await runStep(steps, "desktop business request save", async () => {
+  await runStep(steps, "desktop business pricing render", async () => {
+    await page.goto(`${baseUrl}/for-businesses/pricing`, { waitUntil: "networkidle" });
+    await page.getByRole("heading", { level: 1, name: /featured more clearly/i }).waitFor();
+    const packageCards = await page.locator(".pricing-card").count();
+    ensure(packageCards >= 3, `Expected at least 3 pricing cards, found ${packageCards}.`);
+    const firstChooseHref = await page.locator(".pricing-card .button.secondary").first().getAttribute("href");
+    ensure(
+      Boolean(firstChooseHref && firstChooseHref.includes("/for-businesses/submit?package=")),
+      `Pricing cards should link to a prefilled business request. Got "${firstChooseHref}".`,
+    );
+
+    return {
+      route: "/for-businesses/pricing",
+      packageCards,
+      screenshot: await saveScreenshot(page, "desktop-business-pricing.png"),
+    };
+  });
+
+  await runStep(steps, "desktop terms render", async () => {
+    await page.goto(`${baseUrl}/terms`, { waitUntil: "networkidle" });
+    await page.getByRole("heading", { level: 1, name: /CityAtlas terms for the public site/i }).waitFor();
+    const bodyText = await page.locator("body").innerText();
+    ensure(/What the public site includes today/i.test(bodyText), "Terms page did not render the public-site summary cards.");
+
+    return {
+      route: "/terms",
+      screenshot: await saveScreenshot(page, "desktop-terms.png"),
+    };
+  });
+
+  await runStep(steps, "desktop privacy render", async () => {
+    await page.goto(`${baseUrl}/privacy`, { waitUntil: "networkidle" });
+    await page.getByRole("heading", { level: 1, name: /How CityAtlas handles data today/i }).waitFor();
+    const bodyText = await page.locator("body").innerText();
+    ensure(/What stays on this device/i.test(bodyText), "Privacy page did not render the device-storage summary cards.");
+
+    return {
+      route: "/privacy",
+      screenshot: await saveScreenshot(page, "desktop-privacy.png"),
+    };
+  });
+
+  await runStep(steps, "desktop business request draft save", async () => {
     const businessName = "Smoke Test Bistro";
     await page.goto(`${baseUrl}/for-businesses/submit?package=signature_partner`, {
       waitUntil: "networkidle",
     });
-    await page.getByRole("heading", { level: 1, name: /Tell CityAtlas about your business/i }).waitFor();
+    await page.getByRole("heading", { level: 1, name: /Tell CityAtlas what should improve first/i }).waitFor();
     const packageInterest = await page.getByLabel("Package interest").inputValue();
     ensure(
       packageInterest === "signature_partner",
@@ -219,8 +426,9 @@ async function runDesktopFlow(browser) {
     await page.getByLabel("Website").fill("https://smoke-bistro.example");
     await page.getByLabel("Contact name").fill("Jordan");
     await page.getByLabel("Email").fill("hello@smoke-bistro.example");
-    await page.getByLabel("What you want help with").fill("Smoke test request for local review flow.");
-    await page.getByRole("button", { name: /Save business request/i }).click();
+    await page.getByLabel("What you want help with").fill("Smoke test request for local visibility help.");
+    await page.getByRole("button", { name: /Save draft for later/i }).click();
+    await page.getByText(/Your draft is saved in this browser/i).waitFor();
     await page.locator(".submission-row").filter({ hasText: businessName }).waitFor();
 
     return {
@@ -325,7 +533,7 @@ async function runDesktopFlow(browser) {
     };
   });
 
-  await context.close();
+  await closeSafely(context, "desktop context close");
   return {
     viewport: "desktop",
     steps,
@@ -360,6 +568,16 @@ async function runMobileFlow(browser) {
     };
   });
 
+  await runStep(steps, "mobile city page render", async () => {
+    await page.goto(`${baseUrl}/vancouver`, { waitUntil: "networkidle" });
+    await page.getByRole("heading", { level: 1, name: /Find the right Vancouver start first/i }).waitFor();
+
+    return {
+      route: "/vancouver",
+      screenshot: await saveScreenshot(page, "mobile-city.png"),
+    };
+  });
+
   await runStep(steps, "mobile Toronto pilot render", async () => {
     await page.goto(`${baseUrl}/toronto/first-time-visitor-starters`, { waitUntil: "networkidle" });
     await page.getByRole("heading", {
@@ -377,7 +595,7 @@ async function runMobileFlow(browser) {
     await page.goto(`${baseUrl}/toronto/weekend-route-starters`, { waitUntil: "networkidle" });
     await page.getByRole("heading", {
       level: 1,
-      name: /Toronto weekend route starting points/i,
+      name: /Toronto weekend.*starting points/i,
     }).waitFor();
 
     return {
@@ -386,9 +604,60 @@ async function runMobileFlow(browser) {
     };
   });
 
+  await runStep(steps, "mobile guide library render", async () => {
+    await page.goto(`${baseUrl}/vancouver/guides`, { waitUntil: "networkidle" });
+    await page.getByRole("heading", {
+      level: 1,
+      name: /Vancouver guides for easier local plans/i,
+    }).waitFor();
+
+    return {
+      route: "/vancouver/guides",
+      screenshot: await saveScreenshot(page, "mobile-guide-library.png"),
+    };
+  });
+
+  await runStep(steps, "mobile about render", async () => {
+    await page.goto(`${baseUrl}/about`, { waitUntil: "networkidle" });
+    await page.getByRole("heading", {
+      level: 1,
+      name: /CityAtlas helps people choose the right Vancouver start/i,
+    }).waitFor();
+
+    return {
+      route: "/about",
+      screenshot: await saveScreenshot(page, "mobile-about.png"),
+    };
+  });
+
+  await runStep(steps, "mobile guide detail render", async () => {
+    await page.goto(`${baseUrl}/vancouver/guides/where-should-a-first-time-vancouver-visitor-start`, {
+      waitUntil: "networkidle",
+    });
+    await page.getByRole("heading", {
+      level: 1,
+      name: /Where Should A First-Time Vancouver Visitor Start/i,
+    }).waitFor();
+
+    return {
+      route: "/vancouver/guides/where-should-a-first-time-vancouver-visitor-start",
+      screenshot: await saveScreenshot(page, "mobile-guide-detail.png"),
+    };
+  });
+
+  await runStep(steps, "mobile business detail render", async () => {
+    await page.goto(`${baseUrl}/vancouver/businesses/published-on-main`, { waitUntil: "networkidle" });
+    await page.getByRole("heading", { level: 1, name: /Published on Main/i }).waitFor();
+
+    return {
+      route: "/vancouver/businesses/published-on-main",
+      screenshot: await saveScreenshot(page, "mobile-business-detail.png"),
+    };
+  });
+
   await runStep(steps, "mobile planner render and save", async () => {
     await page.goto(`${baseUrl}/planner`, { waitUntil: "networkidle" });
-    await page.getByRole("heading", { level: 1, name: /Build a Vancouver itinerary/i }).waitFor();
+    await page.getByRole("heading", { level: 1, name: /Save a Vancouver plan/i }).waitFor();
     const firstChip = page.locator(".planner-chip").first();
     const chipLabel = (await firstChip.locator("span").innerText()).trim();
     await firstChip.click();
@@ -403,12 +672,45 @@ async function runMobileFlow(browser) {
 
   await runStep(steps, "mobile business request render", async () => {
     await page.goto(`${baseUrl}/for-businesses/submit`, { waitUntil: "networkidle" });
-    await page.getByRole("heading", { level: 1, name: /Tell CityAtlas about your business/i }).waitFor();
-    await page.getByRole("button", { name: /Save business request/i }).waitFor();
+    await page.getByRole("heading", { level: 1, name: /Tell CityAtlas what should improve first/i }).waitFor();
+    await page.getByRole("button", { name: /Open email draft/i }).waitFor();
 
     return {
       route: "/for-businesses/submit",
       screenshot: await saveScreenshot(page, "mobile-business-submit.png"),
+    };
+  });
+
+  await runStep(steps, "mobile business pricing render", async () => {
+    await page.goto(`${baseUrl}/for-businesses/pricing`, { waitUntil: "networkidle" });
+    await page.getByRole("heading", { level: 1, name: /featured more clearly/i }).waitFor();
+    const packageCards = await page.locator(".pricing-card").count();
+    ensure(packageCards >= 3, `Expected at least 3 pricing cards on mobile, found ${packageCards}.`);
+
+    return {
+      route: "/for-businesses/pricing",
+      packageCards,
+      screenshot: await saveScreenshot(page, "mobile-business-pricing.png"),
+    };
+  });
+
+  await runStep(steps, "mobile offers render", async () => {
+    await page.goto(`${baseUrl}/vancouver/offers`, { waitUntil: "networkidle" });
+    await page.getByRole("heading", { level: 1, name: /Vancouver offers worth checking before a detour/i }).waitFor();
+
+    return {
+      route: "/vancouver/offers",
+      screenshot: await saveScreenshot(page, "mobile-offers.png"),
+    };
+  });
+
+  await runStep(steps, "mobile terms render", async () => {
+    await page.goto(`${baseUrl}/terms`, { waitUntil: "networkidle" });
+    await page.getByRole("heading", { level: 1, name: /CityAtlas terms for the public site/i }).waitFor();
+
+    return {
+      route: "/terms",
+      screenshot: await saveScreenshot(page, "mobile-terms.png"),
     };
   });
 
@@ -436,7 +738,7 @@ async function runMobileFlow(browser) {
     };
   });
 
-  await context.close();
+  await closeSafely(context, "mobile context close");
   return {
     viewport: "mobile",
     steps,
@@ -474,7 +776,7 @@ async function main() {
     }
     browser = await chromium.launch({
       headless: true,
-      channel: process.env.CITYATLAS_PLAYWRIGHT_CHANNEL || "chrome",
+      channel: process.env.CITYATLAS_PLAYWRIGHT_CHANNEL || undefined,
     });
 
     const desktop = await runDesktopFlow(browser);
@@ -508,7 +810,7 @@ async function main() {
     }
   } finally {
     if (browser) {
-      await browser.close();
+      await closeSafely(browser, "browser close");
     }
     server?.child.kill("SIGTERM");
   }

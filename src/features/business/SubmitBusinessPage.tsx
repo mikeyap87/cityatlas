@@ -1,8 +1,9 @@
 import { useState } from "react";
+import { siteConfig } from "../../config/site";
 import type { BusinessSubmission, CityAtlasData, PackageId } from "../../types";
 import { AppLink } from "../../components/Link";
-import { ArrowRightIcon, LockIcon, StoreIcon } from "../../components/Icons";
-import { EmptyState, SafeModeNotice, SectionHeader, StatusPill } from "../../components/UI";
+import { ArrowRightIcon, CheckIcon, LockIcon, StoreIcon } from "../../components/Icons";
+import { EmptyState, HeroMediaCard, SectionHeader, StatusPill } from "../../components/UI";
 
 interface SubmitBusinessPageProps {
   data: CityAtlasData;
@@ -20,6 +21,49 @@ interface SubmitBusinessPageProps {
 
 const packageIds: PackageId[] = ["community", "city_partner", "signature_partner"];
 
+const requestChecklist = [
+  "Your business name, category, and neighborhood.",
+  "A website, Instagram, or other public contact path if you have one.",
+  "The one thing you want CityAtlas to improve first.",
+];
+
+const requestNextSteps = [
+  "CityAtlas gets the basics in one email-friendly format.",
+  "The next recommendation stays focused: page, guide, offer, or package.",
+  "A copy can stay saved in this browser if you want to come back later.",
+];
+
+type SubmitMode = "email" | "draft";
+
+function buildBusinessRequestEmailDraft(input: {
+  businessName: string;
+  category: string;
+  neighborhood: string;
+  contactName: string;
+  email: string;
+  website: string;
+  message: string;
+  packageInterest?: PackageId;
+}) {
+  const subject = `CityAtlas business request: ${input.businessName}`;
+  const lines = [
+    `Business name: ${input.businessName}`,
+    input.category ? `Category: ${input.category}` : null,
+    `Neighborhood: ${input.neighborhood}`,
+    input.contactName ? `Contact name: ${input.contactName}` : null,
+    `Email: ${input.email}`,
+    input.website ? `Website or Instagram: ${input.website}` : null,
+    input.packageInterest ? `Package interest: ${input.packageInterest}` : null,
+    "",
+    "What we want help with:",
+    input.message,
+  ].filter(Boolean);
+
+  return `mailto:${siteConfig.contactEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(
+    lines.join("\n"),
+  )}`;
+}
+
 export function SubmitBusinessPage({ data, onSubmitBusiness }: SubmitBusinessPageProps) {
   const params = new URLSearchParams(window.location.search);
   const initialPackage = packageIds.includes(params.get("package") as PackageId)
@@ -36,6 +80,7 @@ export function SubmitBusinessPage({ data, onSubmitBusiness }: SubmitBusinessPag
     packageInterest: initialPackage,
   });
   const [saved, setSaved] = useState<BusinessSubmission | null>(null);
+  const [lastSubmitMode, setLastSubmitMode] = useState<SubmitMode | null>(null);
   const recentSubmissions = [saved, ...data.submissions]
     .filter((item): item is BusinessSubmission => Boolean(item))
     .reduce<BusinessSubmission[]>((list, item) => {
@@ -47,18 +92,103 @@ export function SubmitBusinessPage({ data, onSubmitBusiness }: SubmitBusinessPag
     }, [])
     .slice(0, 5);
 
+  function resetForm() {
+    setForm({
+      businessName: "",
+      category: "",
+      neighborhood: "",
+      contactName: "",
+      email: "",
+      website: "",
+      message: "",
+      packageInterest: initialPackage,
+    });
+  }
+
+  function saveRequest(mode: SubmitMode) {
+    const nextForm = { ...form };
+    const submission = onSubmitBusiness(nextForm);
+    setSaved(submission);
+    setLastSubmitMode(mode);
+    resetForm();
+
+    if (mode === "email") {
+      window.location.href = buildBusinessRequestEmailDraft(nextForm);
+    }
+  }
+
   return (
     <>
-      <section className="form-hero">
+      <section className="form-hero form-hero-compact">
         <div>
           <p className="section-label">For businesses</p>
-          <h1>Tell CityAtlas about your business</h1>
+          <h1>Tell CityAtlas what should improve first</h1>
           <p>
-            For now, this request stays on this device. Nothing is billed, published, or sent from
-            this form.
+            Share the basics and the one result you want first. CityAtlas can open an email draft
+            with the request and keep a saved copy here if you want to come back later.
           </p>
+          <div className="hero-actions">
+            <AppLink className="button primary" to="/for-businesses/pricing">
+              See packages
+            </AppLink>
+            <AppLink className="button secondary" to="/editorial-standards">
+              See trust rules
+            </AppLink>
+          </div>
+          <div className="tag-cloud pricing-tag-cloud">
+            <span>Email draft opens</span>
+            <span>Save a copy here</span>
+            <span>Stronger page</span>
+            <span>Guide or offer help</span>
+          </div>
+          <article className="source-panel business-hero-note-card business-hero-note-card-safe pricing-hero-summary-card">
+            <strong>Most requests only need one neighborhood, one contact path, and one clear business goal.</strong>
+            <p>
+              That is usually enough for CityAtlas to point you toward the next useful page, guide,
+              offer, or package without overcomplicating the first step.
+            </p>
+          </article>
         </div>
-        <SafeModeNotice />
+        <div className="pricing-hero-side">
+          <HeroMediaCard
+            image={siteConfig.media.city}
+            alt="Vancouver waterfront skyline and seawall"
+            eyebrow="Start simple"
+            title="Lead with one real business need"
+            copy="A clear neighborhood, business need, and contact path is enough for CityAtlas to point the request in the right direction."
+          />
+        </div>
+      </section>
+
+      <section className="section-block">
+        <div className="card-grid three">
+          <article className="source-panel business-hero-note-card">
+            <strong>What to share</strong>
+            <ul className="plain-list compact pricing-step-list">
+              {requestChecklist.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </article>
+          <article className="source-panel business-hero-note-card business-hero-note-card-safe">
+            <strong>Why this request works</strong>
+            <p>
+              One clear neighborhood, category, and business need is usually enough for CityAtlas
+              to point you to the right next step.
+            </p>
+          </article>
+          <article className="source-panel business-hero-note-card">
+            <div className="card-topline">
+              <strong>Email draft + saved copy</strong>
+              <StatusPill tone="amber">Simple first contact</StatusPill>
+            </div>
+            <p>
+              The primary button opens an email draft to {siteConfig.contactEmail}. CityAtlas also
+              keeps a copy in this browser so the request does not disappear if you want to refine
+              it later.
+            </p>
+          </article>
+        </div>
       </section>
 
       <section className="form-layout">
@@ -66,25 +196,29 @@ export function SubmitBusinessPage({ data, onSubmitBusiness }: SubmitBusinessPag
           className="submission-form"
           onSubmit={(event) => {
             event.preventDefault();
-            const submission = onSubmitBusiness(form);
-            setSaved(submission);
-            setForm({
-              businessName: "",
-              category: "",
-              neighborhood: "",
-              contactName: "",
-              email: "",
-              website: "",
-              message: "",
-              packageInterest: initialPackage,
-            });
+            saveRequest("email");
           }}
         >
           <SectionHeader
-            title="Tell us what needs to improve"
-            copy="Add the business details and the kind of CityAtlas help you want first."
-            action={<StatusPill tone="amber">Private request</StatusPill>}
+            title="Tell CityAtlas what needs to improve"
+            copy="A clear request makes the next recommendation faster and more useful."
+            action={<StatusPill tone="amber">Opens an email draft</StatusPill>}
           />
+
+          {lastSubmitMode ? (
+            <article className="source-panel form-feedback-card business-hero-note-card business-hero-note-card-safe">
+              <strong>
+                {lastSubmitMode === "email"
+                  ? "Your email draft should be ready."
+                  : "Your draft is saved in this browser."}
+              </strong>
+              <p>
+                {lastSubmitMode === "email"
+                  ? `Your request was also saved in this browser. If your email app did not open, you can save a draft here and email ${siteConfig.contactEmail} directly.`
+                  : "You can keep refining this request here, or use the email-draft button when you are ready to send it."}
+              </p>
+            </article>
+          ) : null}
 
           <div className="form-grid">
             <label>
@@ -101,7 +235,6 @@ export function SubmitBusinessPage({ data, onSubmitBusiness }: SubmitBusinessPag
                 value={form.category}
                 onChange={(event) => setForm({ ...form, category: event.target.value })}
                 placeholder="Restaurant, cafe, wellness..."
-                required
               />
             </label>
             <label>
@@ -113,11 +246,11 @@ export function SubmitBusinessPage({ data, onSubmitBusiness }: SubmitBusinessPag
               />
             </label>
             <label>
-              Website
+              Website or Instagram
               <input
                 value={form.website}
                 onChange={(event) => setForm({ ...form, website: event.target.value })}
-                placeholder="https://example.com"
+                placeholder="https://yourbusiness.com or https://instagram.com/..."
               />
             </label>
             <label>
@@ -125,7 +258,6 @@ export function SubmitBusinessPage({ data, onSubmitBusiness }: SubmitBusinessPag
               <input
                 value={form.contactName}
                 onChange={(event) => setForm({ ...form, contactName: event.target.value })}
-                required
               />
             </label>
             <label>
@@ -161,30 +293,54 @@ export function SubmitBusinessPage({ data, onSubmitBusiness }: SubmitBusinessPag
               value={form.message}
               onChange={(event) => setForm({ ...form, message: event.target.value })}
               rows={5}
-              placeholder="Tell us what you want CityAtlas to improve, highlight, or help with."
+              placeholder="Example: We want a stronger Kitsilano page, better placement in date-night or visitor guides, and one clear offer worth showing."
+              required
             />
           </label>
 
-          <button className="button primary" type="submit">
-            Save business request
-            <ArrowRightIcon />
-          </button>
+          <div className="submission-action-row">
+            <button className="button primary" type="submit">
+              Open email draft
+              <ArrowRightIcon />
+            </button>
+            <button
+              className="button secondary"
+              onClick={(event) => {
+                if (!event.currentTarget.form?.reportValidity()) {
+                  return;
+                }
+                saveRequest("draft");
+              }}
+              type="button"
+            >
+              Save draft for later
+            </button>
+          </div>
+          <p className="submission-action-note">
+            The primary button opens an email draft to {siteConfig.contactEmail}. The secondary
+            button keeps the request saved in this browser only.
+          </p>
         </form>
 
         <aside className="review-sidebar">
-          <div className="source-panel">
+          <article className="business-guidance-card business-guidance-card-sidebar">
             <LockIcon />
-            <h2>Handled carefully</h2>
-            <p>
-              Nothing goes live from this form. CityAtlas uses it to check fit, facts, and next
-              steps before any profile, perk, or package is confirmed.
-            </p>
-          </div>
+            <span className="query-card-kicker">What happens next</span>
+            <strong>CityAtlas turns this into one clear next step</strong>
+            <ul className="conversion-list business-guidance-list">
+              {requestNextSteps.map((step) => (
+                <li key={step}>
+                  <CheckIcon />
+                  <span>{step}</span>
+                </li>
+              ))}
+            </ul>
+          </article>
           <div className="source-panel">
             <StoreIcon />
-            <h2>Recent requests</h2>
+            <h2>Saved drafts on this device</h2>
             {recentSubmissions.length === 0 ? (
-              <EmptyState title="No requests yet" copy="Save the form to add your business request here." />
+              <EmptyState title="No drafts yet" copy="Save a draft here if you want to come back before sending the email." />
             ) : (
               <div className="submission-list">
                 {recentSubmissions.map((item) =>
@@ -198,9 +354,13 @@ export function SubmitBusinessPage({ data, onSubmitBusiness }: SubmitBusinessPag
               </div>
             )}
           </div>
-          <AppLink className="text-link" to="/for-businesses/pricing">
-            Back to packages <ArrowRightIcon />
-          </AppLink>
+          <div className="source-panel">
+            <strong>Need the package details first?</strong>
+            <p>Compare the three package paths if you want to understand the likely scope before you submit.</p>
+            <AppLink className="text-link" to="/for-businesses/pricing">
+              See package options <ArrowRightIcon />
+            </AppLink>
+          </div>
         </aside>
       </section>
     </>

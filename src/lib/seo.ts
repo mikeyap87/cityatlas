@@ -1,4 +1,4 @@
-import type { CityAtlasData, Guide } from "../types";
+import type { Business, CityAtlasData, Guide } from "../types";
 import { siteConfig } from "../config/site.ts";
 import {
   getGuideCityName,
@@ -17,11 +17,18 @@ import {
   getSourceBackedPlaces,
   sourceBackedCollectionMeta,
 } from "./sourceBackedCollections.ts";
+import { simplifyGuideDisplayText } from "./publicCopy.ts";
+import {
+  getBusinessVisual,
+  getGuideHeroVisual,
+  getSourceBackedCollectionVisual,
+} from "./visuals.ts";
 
 export interface RouteMeta {
   title: string;
   description: string;
   type: "website" | "article";
+  imagePath?: string;
 }
 
 export interface RouteMetaOptions {
@@ -37,7 +44,7 @@ export function resolveBaseUrl(options?: {
   if (options?.publicBaseUrl) {
     return options.publicBaseUrl;
   }
-  if (options?.runtimeOrigin && options.hostname && !["localhost", "127.0.0.1", "::1"].includes(options.hostname)) {
+  if (options?.runtimeOrigin) {
     return options.runtimeOrigin;
   }
   return siteConfig.localUrl;
@@ -68,6 +75,14 @@ export function findGuideForPath(path: string, data: CityAtlasData) {
   );
 }
 
+export function findBusinessForPath(path: string, data: CityAtlasData) {
+  const prefix = `/${siteConfig.citySlug}/businesses/`;
+  if (!path.startsWith(prefix)) return undefined;
+  const slug = path.slice(prefix.length).trim();
+  if (!slug) return undefined;
+  return data.businesses.find((business) => business.slug === slug);
+}
+
 function getGuideHubMeta(path: string, data: CityAtlasData) {
   const parsed = parseGuideHubPath(path);
   if (!parsed || parsed.citySlug === siteConfig.citySlug) {
@@ -93,20 +108,37 @@ function getGuideHubMeta(path: string, data: CityAtlasData) {
   };
 }
 
+function buildBusinessMeta(business: Business): RouteMeta {
+  return {
+    title: `${business.name} Listing Example | CityAtlas`,
+    description:
+      `Example CityAtlas business listing for ${business.name}, a ${business.category.toLowerCase()} in ${business.neighborhood}, showing how details, guide context, and offers can appear once facts are confirmed.`,
+    type: "website",
+    imagePath: getBusinessVisual(business),
+  };
+}
+
 export function getRouteMeta(
   path: string,
   data: CityAtlasData,
   options: RouteMetaOptions = {},
 ): RouteMeta {
   const guide = findGuideForPath(path, data);
+  const business = findBusinessForPath(path, data);
   const sourceBackedCollection = getSourceBackedCollectionForPath(path);
   const guideHubMeta = getGuideHubMeta(path, data);
   if (guide) {
+    const guideTitle = simplifyGuideDisplayText(guide.title);
+    const guideSummary = simplifyGuideDisplayText(guide.summary);
     return {
-      title: `${guide.title} | CityAtlas`,
-      description: guide.summary,
+      title: `${guideTitle} | CityAtlas`,
+      description: guideSummary,
       type: "article",
+      imagePath: getGuideHeroVisual(guide),
     };
+  }
+  if (business) {
+    return buildBusinessMeta(business);
   }
   if (path === "/for-businesses/pricing") {
     return {
@@ -114,29 +146,31 @@ export function getRouteMeta(
       description:
         "CityAtlas packages for Vancouver businesses that want guide placement, shareable plan sponsorship options, and clearer local visibility. Billing opens after review and scope confirmation.",
       type: "website",
+      imagePath: siteConfig.media.city,
     };
   }
   if (path === "/about") {
     return {
       title: "About CityAtlas | Vancouver Local Discovery",
       description:
-        "Learn what CityAtlas is: a Vancouver-first city guide, route planner, and trust-first local discovery system for locals, visitors, and neighborhood businesses.",
+        "Learn what CityAtlas is: a Vancouver-first city guide, planner, and trust-first local discovery system for locals, visitors, and neighborhood businesses.",
       type: "website",
+      imagePath: siteConfig.media.city,
     };
   }
   if (path === "/editorial-standards") {
     return {
       title: "Editorial Standards And Corrections | CityAtlas",
       description:
-        "How CityAtlas checks official sources, limits public claims, and handles correction or removal requests for public Vancouver pages with official links.",
+        "How CityAtlas checks official sources, limits public claims, and handles correction or removal requests for public Vancouver pages with official site links.",
       type: "website",
     };
   }
   if (path === "/for-businesses/submit") {
     return {
-      title: "Submit A Business For Review | CityAtlas",
+      title: "Start A Business Request | CityAtlas",
       description:
-        "Submit a Vancouver business for review. Requests from this form are stored on the current device only.",
+        "Share a Vancouver business and the kind of help you want first. Requests from this form stay on the current device for now.",
       type: "website",
     };
   }
@@ -160,7 +194,7 @@ export function getRouteMeta(
     return {
       title: "Terms | CityAtlas",
       description:
-        "Current CityAtlas terms for the public site, business review requests, and future service packages.",
+        "Current CityAtlas terms for the public site, business requests, and future service packages.",
       type: "website",
     };
   }
@@ -175,16 +209,16 @@ export function getRouteMeta(
   if (path === "/private-preview/date-night") {
     if (options.privatePreviewVisible) {
       return {
-        title: "Vancouver Date Night Route Preview | CityAtlas",
+        title: "Vancouver Date Night Preview | CityAtlas",
         description:
-          "Local-only CityAtlas private preview for the Vancouver Date Night founder review route and proof-sprint conversation flow.",
+          "Local-only CityAtlas private preview for the Vancouver Date Night review page and conversation flow.",
         type: "website",
       };
     }
     return {
-      title: "Protected Date Night Route | CityAtlas",
+      title: "Protected Date Night Preview | CityAtlas",
       description:
-        "Protected Vancouver date-night route for private CityAtlas review.",
+        "Protected Vancouver date-night preview for private CityAtlas review.",
       type: "website",
     };
   }
@@ -198,9 +232,9 @@ export function getRouteMeta(
   }
   if (path === "/vancouver/missions") {
     return {
-      title: "Vancouver Saved Plans And Route Planner | CityAtlas",
+      title: "Vancouver Saved Plans | CityAtlas",
       description:
-        "Saveable Vancouver plans that turn CityAtlas guides, real-place pages with official links, and planner actions into reusable city routes.",
+        "Saveable Vancouver plans that turn CityAtlas guides, local places, and planner actions into reusable city plans.",
       type: "website",
     };
   }
@@ -210,37 +244,40 @@ export function getRouteMeta(
       title: meta.pageTitle,
       description: meta.pageDescription,
       type: "website",
+      imagePath: getSourceBackedCollectionVisual(sourceBackedCollection),
     };
   }
   if (path === "/vancouver/guides") {
     return {
       title: "Vancouver Guides | CityAtlas",
       description:
-        "Answer-first Vancouver guides and neighborhood starting-point pages for date nights, rainy days, weekend plans, wellness resets, visitor choices, garden days, guest hosting, and destination discovery.",
+        "Clear Vancouver guides and neighborhood starting pages for date nights, rainy days, weekend plans, wellness resets, first visits, garden days, and guest hosting.",
       type: "website",
+      imagePath: siteConfig.media.city,
     };
   }
   if (guideHubMeta) {
     return {
       title: `${guideHubMeta.cityName} Guides | CityAtlas`,
       description:
-        `Answer-first ${guideHubMeta.cityName} guides and pages with official links for visitors who need one clear place to begin instead of a generic city roundup.`,
+        `Clear ${guideHubMeta.cityName} guides and local places for people who need one clear place to begin instead of a generic city roundup.`,
       type: "website",
+      imagePath: siteConfig.media.city,
     };
   }
   if (path === "/vancouver/events") {
     return {
-      title: "Vancouver Events | CityAtlas",
+      title: "Vancouver Event Examples | CityAtlas",
       description:
-        "Vancouver event page formats inside CityAtlas with clear host and source checks.",
+        "Sample Vancouver event pages inside CityAtlas with clear host details and source checks.",
       type: "website",
     };
   }
   if (path === "/vancouver/offers") {
     return {
-      title: "Vancouver Offers | CityAtlas",
+      title: "Vancouver Offer Examples | CityAtlas",
       description:
-        "Vancouver partner perk formats inside CityAtlas with clear redemption boundaries.",
+        "Sample Vancouver local offers inside CityAtlas with clear redemption boundaries.",
       type: "website",
     };
   }
@@ -248,15 +285,17 @@ export function getRouteMeta(
     return {
       title: "Explore Vancouver | CityAtlas",
       description:
-        "Browse Vancouver through answer-first guides, neighborhood starting points, real-place pages with official links, saved plans, and trust-first local planning.",
+        "Browse Vancouver through clear guides, neighborhood starting pages, local places, saved plans, and practical local planning help.",
       type: "website",
+      imagePath: siteConfig.media.city,
     };
   }
   return {
-    title: "CityAtlas | Vancouver Guides, Routes, And Local Discovery",
+    title: "CityAtlas | Vancouver Guides, Plans, And Local Discovery",
     description:
-      "CityAtlas is a Vancouver-first guide, route planner, and local discovery platform with answer-first city pages, neighborhood guides, and business visibility paths.",
+      "CityAtlas is a Vancouver-first guide, planner, and local discovery platform with clear city pages, neighborhood guides, and business visibility paths.",
     type: "website",
+    imagePath: siteConfig.media.hero,
   };
 }
 
@@ -264,11 +303,13 @@ function buildGuideJsonLd(baseUrl: string, guide: Guide) {
   const cityName = getGuideCityName(guide);
   const regionName = getGuideRegionName(guide);
   const guidePath = getGuidePath(guide);
+  const guideTitle = simplifyGuideDisplayText(guide.title);
+  const guideSummary = simplifyGuideDisplayText(guide.summary);
   return {
     "@type": "BlogPosting",
     "@id": `${baseUrl}${guidePath}#article`,
-    headline: guide.title,
-    description: guide.summary,
+    headline: guideTitle,
+    description: guideSummary,
     image: `${baseUrl}${guide.image}`,
     dateModified: guide.updatedAt,
     datePublished: guide.publishedAt ?? guide.createdAt,
@@ -401,17 +442,17 @@ const pricingFaqEntries = [
   {
     question: "What happens before a business is ever charged?",
     answer:
-      "CityAtlas starts with a review request and opens billing only after terms, refund policy, and clear business demand are in place.",
+      "CityAtlas starts with a business request and opens billing only after terms, refund policy, and clear business demand are in place.",
   },
   {
-    question: "When should a business request review now?",
+    question: "When should a business start a request?",
     answer:
-      "A business should request review when it already knows it needs better guide placement, neighborhood visibility, offer packaging, or a clearer city-facing story and wants a careful review-first first step.",
+      "A business should start a request when it already knows it needs better guide placement, neighborhood visibility, offer packaging, or a clearer city-facing story and wants a careful first step.",
   },
   {
     question: "What does CityAtlas mean by local visibility?",
     answer:
-      "CityAtlas means clearer guide placement, stronger plan fit, real-place context with official links, shareable plan sponsorship options, and better city-facing presentation, not traffic guarantees or automatic publication.",
+      "CityAtlas means clearer guide placement, a better match for the right page, real-place context with official site links, shareable plan sponsorship options, and better city-facing presentation, not traffic guarantees or automatic publication.",
   },
 ];
 
@@ -440,7 +481,7 @@ export function buildJsonLd(
       url: baseUrl,
       slogan: siteConfig.tagline,
       description:
-        "A Vancouver-first guide, route planner, and local discovery platform with public planning logic and carefully reviewed place pages.",
+        "A Vancouver-first guide, planner, and local discovery platform with clear planning help and carefully reviewed local places.",
     },
     {
       "@type": "WebSite",
@@ -459,7 +500,7 @@ export function buildJsonLd(
       "@id": `${baseUrl}/vancouver#planning-library`,
       name: "CityAtlas Vancouver planning library",
       description:
-        "Guide, route, and discovery pages that help readers plan Vancouver more clearly.",
+        "Guide and discovery pages that help readers plan Vancouver more clearly.",
       numberOfItems: vancouverGuideCount + data.cityMissions.length,
     },
     {
@@ -467,7 +508,7 @@ export function buildJsonLd(
       "@id": `${baseUrl}/vancouver/missions#city-missions`,
       name: "CityAtlas Vancouver saved plans",
       description:
-        "Saveable route loops that turn CityAtlas guides and starting-point pages into reusable Vancouver plans.",
+        "Saveable plans that turn CityAtlas guides and starting pages into reusable Vancouver plans.",
       numberOfItems: data.cityMissions.length,
     },
   ];
@@ -509,7 +550,7 @@ export function buildJsonLd(
         "@id": `${baseUrl}/vancouver#featured-surfaces`,
         name: "Featured CityAtlas Vancouver planning surfaces",
         description:
-          "The strongest public CityAtlas planning surfaces for Vancouver route, visitor, weather, and place discovery with official links.",
+          "The strongest public CityAtlas planning surfaces for Vancouver visitors, weather shifts, neighborhood choices, and place discovery with official site links.",
         numberOfItems: cityHubItems.length,
         itemListElement: cityHubItems,
       },
@@ -557,9 +598,9 @@ export function buildJsonLd(
       {
         "@type": "ItemList",
         "@id": `${baseUrl}/vancouver/guides#featured-guides`,
-        name: "Featured Vancouver guide clusters and answer-first routes",
+        name: "Featured Vancouver guide collections",
         description:
-          "The strongest answer-first CityAtlas guide routes for visitor choice, weekend planning, neighborhood discovery, and handoff to pages with official links.",
+          "The strongest CityAtlas guide pages for visitor choice, weekend planning, neighborhood discovery, and handoff to local places.",
         numberOfItems: guideHubItems.length,
         itemListElement: guideHubItems,
       },
@@ -603,7 +644,7 @@ export function buildJsonLd(
         "@id": `${baseUrl}${path}#list`,
         name: `${guideHubMeta.cityName} guide pilot`,
         description:
-          `The current CityAtlas ${guideHubMeta.cityName} pilot guide set for first-visit planning and pages with official links.`,
+          `The current CityAtlas ${guideHubMeta.cityName} pilot guide set for first-visit planning and local places.`,
         numberOfItems: guideHubItems.length,
         itemListElement: guideHubItems,
       },
@@ -653,7 +694,7 @@ export function buildJsonLd(
         "@id": `${baseUrl}/vancouver/missions#list`,
         name: "CityAtlas Vancouver saved plans",
         description:
-          "Saveable Vancouver route plans that turn guide logic, starting-point pages, and planner actions into reusable CityAtlas plans.",
+          "Saveable Vancouver plans that turn guide logic, starting pages, and planner actions into reusable CityAtlas plans.",
         numberOfItems: missionItems.length,
         itemListElement: missionItems,
       },

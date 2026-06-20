@@ -8,25 +8,38 @@ export function TermsPage() {
     <section className="section-block page-top legal-page">
       <section className="city-hero legal-hero">
         <div>
-          <p className="section-label">Current terms</p>
-          <h1>CityAtlas terms for the public site today</h1>
+          <p className="section-label">Terms</p>
+          <h1>CityAtlas terms for the public site</h1>
           <p>
-            These terms describe the public discovery site, the review-request flow, and what is
-            still not live yet. Checkout is still off.
+            These terms explain the public guide site, the business request form, and what is not
+            live yet. CityAtlas does not take payments on this site today.
           </p>
+          <div className="hero-actions">
+            <AppLink className="button secondary" to="/editorial-standards">
+              Editorial standards
+            </AppLink>
+            <AppLink className="button secondary" to="/privacy">
+              Privacy
+            </AppLink>
+          </div>
+          <div className="tag-cloud pricing-tag-cloud">
+            <span>Public guides live</span>
+            <span>Payments off</span>
+            <span>Requests are review-first</span>
+          </div>
         </div>
         <div className="public-intro-card legal-hero-card">
           <div className="public-intro-card-header">
             <div>
               <strong>Plain-English summary</strong>
-              <p>The public site is live, but payment and publication still stay review-first.</p>
+              <p>The public guide site is live. Payment is not.</p>
             </div>
             <StatusPill tone="amber">Payments off</StatusPill>
           </div>
           <ul className="public-note-list">
-            <li><ShieldIcon /> Public guides and route pages are live.</li>
+            <li><ShieldIcon /> Public guides and starting pages are live.</li>
             <li><LockIcon /> Checkout, subscriptions, and invoices are not live.</li>
-            <li><ShieldIcon /> A business request is a review request, not an approved listing.</li>
+            <li><ShieldIcon /> A business request is not an approved listing.</li>
           </ul>
         </div>
       </section>
@@ -34,10 +47,10 @@ export function TermsPage() {
       <div className="legal-grid">
         <article className="source-panel">
           <ShieldIcon />
-          <h2>What the public site is today</h2>
+          <h2>What the public site includes today</h2>
           <p>
-            CityAtlas is a Vancouver-first discovery product with public guides, source-backed
-            pages, and business review requests. Some marketplace-style pages are still illustrative
+            CityAtlas is a Vancouver-first discovery product with public guides, carefully checked
+            local places with official links, and business requests. Some marketplace-style pages are still examples
             and should not be treated as verified public listings.
           </p>
         </article>
@@ -53,9 +66,9 @@ export function TermsPage() {
         </article>
 
         <article className="source-panel">
-          <h2>What a review request means</h2>
+          <h2>What a business request means</h2>
           <p>
-            A review request is not an approved listing, partnership, endorsement, or contract.
+            A business request is not an approved listing, partnership, endorsement, or contract.
             CityAtlas may review, verify, decline, or request more information before any business
             page, offer, or event is published.
           </p>
@@ -65,14 +78,14 @@ export function TermsPage() {
           <h2>How CityAtlas handles facts and claims</h2>
           <p>
             CityAtlas avoids public claims about real businesses until facts, media rights, source
-            permissions, and removal paths are clear. Source-backed pages must link to official
-            sources and correction paths. Ratings, reviews, popularity, traffic, booking, and
-            revenue claims must be backed by evidence before public use.
+            permissions, and removal paths are clear. Local places must link to official sources and
+            report-an-issue paths. Ratings, reviews, popularity, traffic, booking, and revenue
+            claims must be backed by evidence before public use.
           </p>
         </article>
 
         <article className="source-panel">
-          <h2>What to double-check yourself</h2>
+          <h2>What to verify yourself</h2>
           <p>
             CityAtlas is provided for public discovery as-is. It should not
             be relied on for legal, financial, safety, travel, accessibility, dietary, health, or
@@ -96,8 +109,8 @@ export function TermsPage() {
         <div>
           <h2>Before checkout opens</h2>
           <p>
-            Finalize terms, refund policy, fulfillment scope, Stripe products, support process, and
-            business data policy before enabling checkout.
+            Finalize terms, refund policy, fulfillment scope, Stripe products, support process,
+            and business data policy before enabling checkout.
           </p>
         </div>
         <AppLink className="button secondary" to="/privacy">
@@ -113,25 +126,38 @@ export function PrivacyPage() {
     <section className="section-block page-top legal-page">
       <section className="city-hero legal-hero">
         <div>
-          <p className="section-label">Current privacy</p>
+          <p className="section-label">Privacy</p>
           <h1>How CityAtlas handles data today</h1>
           <p>
-            This page explains how the public site currently handles data and what has to change
-            before analytics, CRM, email, AI tools, or payments are connected.
+            This page explains what the public site stores today and what would need to change
+            before outside tools, analytics, or payments are added.
           </p>
+          <div className="hero-actions">
+            <AppLink className="button secondary" to="/editorial-standards">
+              Editorial standards
+            </AppLink>
+            <AppLink className="button secondary" to="/terms">
+              Terms
+            </AppLink>
+          </div>
+          <div className="tag-cloud pricing-tag-cloud">
+            <span>Saved on this device</span>
+            <span>No outside tools</span>
+            <span>Protected pages stay separate</span>
+          </div>
         </div>
         <div className="public-intro-card legal-hero-card">
           <div className="public-intro-card-header">
             <div>
               <strong>Plain-English summary</strong>
-              <p>Saved plans stay in this browser today, and no outside providers are connected yet.</p>
+              <p>Saved plans stay on this device today, and no outside providers are connected yet.</p>
             </div>
             <StatusPill tone="blue">Public site</StatusPill>
           </div>
           <ul className="public-note-list">
-            <li><ShieldIcon /> Saved plans and submissions stay in browser storage right now.</li>
+            <li><ShieldIcon /> Saved plans and submissions stay on this device right now.</li>
             <li><LockIcon /> No CRM, analytics, AI, email, or payment tools are connected.</li>
-            <li><ShieldIcon /> Admin and protected routes stay off the public site.</li>
+            <li><ShieldIcon /> Admin and protected pages stay off the public site.</li>
           </ul>
         </div>
       </section>
@@ -139,11 +165,11 @@ export function PrivacyPage() {
       <div className="legal-grid">
         <article className="source-panel">
           <ShieldIcon />
-          <h2>What stays in this browser</h2>
+          <h2>What stays on this device</h2>
           <p>
-            Currently, submissions, saves, and planning activity are stored in browser
-            localStorage. They do not sync to a database, CRM, email provider, analytics provider,
-            AI provider, or payment provider.
+            Currently, submissions, saves, and planning activity are stored only on this device.
+            They do not sync to a database, CRM, email provider, analytics provider, AI provider,
+            or payment provider.
           </p>
         </article>
 
@@ -151,15 +177,15 @@ export function PrivacyPage() {
           <h2>What may be added later</h2>
           <p>
             As CityAtlas expands, it may collect business contact details, package interest,
-            visitor analytics, saved-route activity, source records, support requests, billing
+            visitor analytics, saved-plan activity, source records, support requests, billing
             status, and permissioned communication history.
           </p>
         </article>
 
         <article className="source-panel">
-          <h2>What has to be decided first</h2>
+          <h2>What would need clear rules first</h2>
           <p>
-            Any future Supabase, Vercel, Cloudflare, Stripe, analytics, AI, email, or CRM
+            Any future database, hosting, analytics, AI, email, or payment
             integrations should have a clear purpose, retention policy, access plan, deletion path,
             and rollback behavior before they are connected.
           </p>
@@ -175,9 +201,9 @@ export function PrivacyPage() {
         </article>
 
         <article className="source-panel">
-          <h2>Why admin stays protected</h2>
+          <h2>Why protected pages stay separate</h2>
           <p>
-            Admin and protected routes are kept off the public site before any hosted version
+            Admin and protected pages are kept off the public site before any hosted version
             contains non-public business submissions or review notes.
           </p>
         </article>
@@ -197,7 +223,7 @@ export function PrivacyPage() {
         <div>
           <h2>Before outside tools connect</h2>
           <p>
-            Analytics, CRM, outreach, provider imports, AI summaries, and Stripe are not connected
+            Analytics, CRM, outreach, AI summaries, and payment tools are not connected
             on the public site today.
           </p>
         </div>

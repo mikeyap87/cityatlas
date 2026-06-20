@@ -4,7 +4,8 @@ import { siteConfig } from "../../config/site";
 import { MissionCard } from "../../components/Cards";
 import { AppLink } from "../../components/Link";
 import { ArrowRightIcon, CalendarIcon, CheckIcon, MapIcon, SparkIcon, StoreIcon } from "../../components/Icons";
-import { EmptyState, SectionHeader, StatusPill } from "../../components/UI";
+import { EmptyState, HeroMediaCard, SectionHeader, StatusPill } from "../../components/UI";
+import { simplifyGuideDisplayText, simplifyMissionDisplayText } from "../../lib/publicCopy";
 
 interface PlannerPageProps {
   data: CityAtlasData;
@@ -30,6 +31,9 @@ export function PlannerPage({ data, onToggleSave, onSaveMission, onTrack }: Plan
   const cityGuides = data.guides.filter(
     (guide) => (guide.citySlug ?? siteConfig.citySlug) === siteConfig.citySlug,
   );
+  const plannerGuideCandidates = cityGuides.slice(0, 4);
+  const plannerBusinessCandidates = data.businesses.filter((business) => business.featured).slice(0, 4);
+  const plannerEventCandidates = data.events.slice(0, 3);
   const savedBusinesses = data.savedItems
     .filter((item) => item.itemType === "business")
     .map((item) => data.businesses.find((business) => business.id === item.itemId))
@@ -42,11 +46,16 @@ export function PlannerPage({ data, onToggleSave, onSaveMission, onTrack }: Plan
     .filter((item) => item.itemType === "guide")
     .map((item) => data.guides.find((guide) => guide.id === item.itemId))
     .filter(Boolean);
+  const savedOffers = data.savedItems
+    .filter((item) => item.itemType === "offer")
+    .map((item) => data.offers.find((offer) => offer.id === item.itemId))
+    .filter(Boolean);
 
   const itineraryText = [
     ...savedBusinesses.map((business) => `Visit ${business?.name} in ${business?.neighborhood}`),
     ...savedEvents.map((event) => `Check ${event?.title} on ${event?.date}`),
-    ...savedGuides.map((guide) => `Read ${guide?.title}`),
+    ...savedGuides.map((guide) => `Read ${guide ? simplifyGuideDisplayText(guide.title) : ""}`),
+    ...savedOffers.map((offer) => `Save ${offer?.title}`),
   ].join(" -> ");
   const missionScores = useMemo(
     () =>
@@ -76,10 +85,10 @@ export function PlannerPage({ data, onToggleSave, onSaveMission, onTrack }: Plan
       <section className="city-hero">
         <div>
           <p className="section-label">Planner</p>
-          <h1>Build a Vancouver itinerary</h1>
+          <h1>Save a Vancouver plan</h1>
           <p>
-            Save places, events, and guides into a simple Vancouver plan. For now, your saved plan
-            stays in this browser while sharing tools roll out in stages.
+            Save places, events, and guides into one simple Vancouver plan. For now, it stays in
+            this device and can be shared manually when you are ready.
           </p>
           <div className="hero-actions">
             <AppLink className="button primary" to="/vancouver/missions">
@@ -89,18 +98,53 @@ export function PlannerPage({ data, onToggleSave, onSaveMission, onTrack }: Plan
               className="button secondary"
               to="/vancouver/guides/cityatlas-guide-roundup-which-vancouver-route-should-you-open-by-situation"
             >
-              Pick a route first
+              Start with a guide
             </AppLink>
           </div>
+          <article className="source-panel business-hero-note-card business-hero-note-card-safe pricing-hero-summary-card">
+            <strong>Start with a short list, not a giant plan.</strong>
+            <p>
+              Save a few strong places, events, or guides first. Then tighten that short list into
+              one plan you can keep and share manually.
+            </p>
+          </article>
         </div>
-        <div className="public-intro-card planner-hero-card">
-          <SparkIcon />
-          <h2>Use it in three quick steps</h2>
+        <div className="starter-hero-side">
+          <HeroMediaCard
+            image={siteConfig.media.waterfront}
+            alt="Vancouver waterfront walkway and skyline"
+            eyebrow="Planner"
+            title="Save the short list that actually fits the day"
+            copy="Keep the best place, event, and guide together in one simple Vancouver plan before you decide whether to share it."
+            className="hero-media-compact"
+          />
+        </div>
+      </section>
+
+      <section className="split-section">
+        <div className="source-panel planner-hero-card">
+          <div className="public-intro-title">
+            <SparkIcon />
+            <h2>Use it in three quick steps</h2>
+          </div>
           <ul className="public-note-list">
             <li><CheckIcon /> Save a few places, events, or guides.</li>
-            <li><CheckIcon /> Turn that short list into one route or saved plan.</li>
-            <li><CheckIcon /> Prepare the share draft when the plan feels right.</li>
+            <li><CheckIcon /> Turn that short list into one clean plan.</li>
+            <li><CheckIcon /> Prepare share text when the plan feels right.</li>
           </ul>
+        </div>
+        <div className="source-panel conversion-panel">
+          <h2>Best first move before you save anything</h2>
+          <p>
+            Open one guide first when the pace, weather, or neighborhood still needs to become
+            clearer before the plan should be saved.
+          </p>
+          <AppLink
+            className="button secondary"
+            to="/vancouver/guides/cityatlas-guide-roundup-which-vancouver-route-should-you-open-by-situation"
+          >
+            Start with a guide <ArrowRightIcon />
+          </AppLink>
         </div>
       </section>
 
@@ -114,7 +158,7 @@ export function PlannerPage({ data, onToggleSave, onSaveMission, onTrack }: Plan
           <span>Mission steps</span>
         </article>
         <article>
-          <strong>{bestMission?.title ?? "Start a route"}</strong>
+          <strong>{bestMission ? simplifyMissionDisplayText(bestMission.title) : "Start a plan"}</strong>
           <span>Best active mission</span>
         </article>
       </section>
@@ -123,7 +167,7 @@ export function PlannerPage({ data, onToggleSave, onSaveMission, onTrack }: Plan
         <div>
           <SectionHeader
             title="Your saved plan"
-            copy="Use this as a simple working list for routes, collections, referrals, and future city plans."
+            copy="Use this as a simple working list you can keep, reorder, and revisit later."
             action={<StatusPill tone="blue">{data.savedItems.length} saved</StatusPill>}
           />
           {data.savedItems.length === 0 ? (
@@ -149,19 +193,19 @@ export function PlannerPage({ data, onToggleSave, onSaveMission, onTrack }: Plan
         <div>
           <SectionHeader
             title="Share draft"
-            copy="Prepare a message-ready route summary here before you send it anywhere else."
+            copy="Prepare a message-ready plan summary here before you send it anywhere else."
           />
           <div className="share-draft">
             <p>
               {itineraryText ||
-                "I found a Vancouver route on CityAtlas with places, events, and guides I want to revisit. Take a look when you plan your next city day."}
+                "Save two or three strong picks first, then CityAtlas turns them into one simple share-ready Vancouver plan."}
             </p>
             <div className="share-actions">
               <button className="button primary" type="button" onClick={stageShareDraft}>
                 Prepare share text
               </button>
-              <AppLink className="button secondary" to="/">
-                Get updates <ArrowRightIcon />
+              <AppLink className="button secondary" to="/vancouver/guides">
+                Browse guides <ArrowRightIcon />
               </AppLink>
             </div>
             {shareState ? <small className="local-success">{shareState}</small> : null}
@@ -171,9 +215,9 @@ export function PlannerPage({ data, onToggleSave, onSaveMission, onTrack }: Plan
 
       <section className="section-block">
         <SectionHeader
-          label="Recommended routes"
-          title="Save a full mission"
-          copy="The fastest path to activation is saving a complete route, not one isolated listing."
+          label="Recommended plans"
+          title="Save a full plan"
+          copy="The fastest path is saving a complete plan, not one isolated stop."
         />
         <div className="card-grid three">
           {data.cityMissions.map((mission) => (
@@ -190,43 +234,86 @@ export function PlannerPage({ data, onToggleSave, onSaveMission, onTrack }: Plan
       <section className="section-block">
         <SectionHeader
           label="Save candidates"
-          title="Pick a few items"
-          copy="This helps you shape a route without creating an account or syncing personal data."
+          title="Build the plan one short list at a time"
+          copy="Pick one place, one event, and one guide first. Then add more only if the plan still needs it."
         />
-        <div className="planner-pool">
-          {data.businesses.map((business) => (
-            <button
-              className={isSaved(data.savedItems, "business", business.id) ? "planner-chip saved" : "planner-chip"}
-              type="button"
-              onClick={() => onToggleSave("business", business.id, business.name)}
-              key={business.id}
-            >
-              <StoreIcon />
-              <span>{business.name}</span>
-            </button>
-          ))}
-          {data.events.map((event) => (
-            <button
-              className={isSaved(data.savedItems, "event", event.id) ? "planner-chip saved" : "planner-chip"}
-              type="button"
-              onClick={() => onToggleSave("event", event.id, event.title)}
-              key={event.id}
-            >
-              <CalendarIcon />
-              <span>{event.title}</span>
-            </button>
-          ))}
-          {cityGuides.map((guide) => (
-            <button
-              className={isSaved(data.savedItems, "guide", guide.id) ? "planner-chip saved" : "planner-chip"}
-              type="button"
-              onClick={() => onToggleSave("guide", guide.id, guide.title)}
-              key={guide.id}
-            >
-              <MapIcon />
-              <span>{guide.title}</span>
-            </button>
-          ))}
+        <div className="planner-pool-groups">
+          <article className="source-panel planner-pool-group">
+            <div className="planner-pool-group-header">
+              <div>
+                <p className="section-label">Places</p>
+                <h2>Start with one place</h2>
+              </div>
+              <StatusPill tone="blue">{plannerBusinessCandidates.length} picks</StatusPill>
+            </div>
+            <p>Choose one place that feels like the anchor before you add anything else.</p>
+            <div className="planner-pool">
+              {plannerBusinessCandidates.map((business) => (
+                <button
+                  className={isSaved(data.savedItems, "business", business.id) ? "planner-chip saved" : "planner-chip"}
+                  type="button"
+                  onClick={() => onToggleSave("business", business.id, business.name)}
+                  key={business.id}
+                >
+                  <StoreIcon />
+                  <span>{business.name}</span>
+                </button>
+              ))}
+            </div>
+          </article>
+
+          <article className="source-panel planner-pool-group">
+            <div className="planner-pool-group-header">
+              <div>
+                <p className="section-label">Events</p>
+                <h2>Add one timed stop</h2>
+              </div>
+              <StatusPill tone="blue">{plannerEventCandidates.length} picks</StatusPill>
+            </div>
+            <p>Use one event when the plan needs a clear moment, not a packed schedule.</p>
+            <div className="planner-pool">
+              {plannerEventCandidates.map((event) => (
+                <button
+                  className={isSaved(data.savedItems, "event", event.id) ? "planner-chip saved" : "planner-chip"}
+                  type="button"
+                  onClick={() => onToggleSave("event", event.id, event.title)}
+                  key={event.id}
+                >
+                  <CalendarIcon />
+                  <span>{event.title}</span>
+                </button>
+              ))}
+            </div>
+          </article>
+
+          <article className="source-panel planner-pool-group">
+            <div className="planner-pool-group-header">
+              <div>
+                <p className="section-label">Guides</p>
+                <h2>Use one guide for shape</h2>
+              </div>
+              <StatusPill tone="blue">{plannerGuideCandidates.length} picks</StatusPill>
+            </div>
+            <p>Open one guide when the plan still needs neighborhood logic, pacing, or a better next move.</p>
+            <div className="planner-pool">
+              {plannerGuideCandidates.map((guide) => (
+                <button
+                  className={isSaved(data.savedItems, "guide", guide.id) ? "planner-chip saved" : "planner-chip"}
+                  type="button"
+                  onClick={() => onToggleSave("guide", guide.id, simplifyGuideDisplayText(guide.title))}
+                  key={guide.id}
+                >
+                  <MapIcon />
+                  <span>{simplifyGuideDisplayText(guide.title)}</span>
+                </button>
+              ))}
+            </div>
+          </article>
+        </div>
+        <div className="hero-actions">
+          <AppLink className="button secondary" to="/vancouver/guides">
+            Open all Vancouver guides
+          </AppLink>
         </div>
       </section>
     </>

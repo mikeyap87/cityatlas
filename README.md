@@ -82,7 +82,7 @@ Fallback Vercel alias:
 - Local editorial machine docs for query mapping, source-backed wedge templating, hook scoring, and content release gating.
 - Public `llms.txt` and sitemap aligned to the crawlable release and current guide library.
 - Lazyweb design research artifact under `.lazyweb/design-research/cityatlas-missions-2026-06-14/`.
-- Generated visual concept and hero media under `public/`.
+- Runtime hero and business media under `public/assets/`, with design and QA reference images stored under `docs/design/` and `docs/visual_references/`.
 - Pre-domain launch docs and live-risk approval gates.
 
 ## What Is Intentionally Excluded

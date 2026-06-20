@@ -90,6 +90,7 @@ The public product helps locals find places, events, offers, and guides. The bus
 - TypeScript
 - CSS modules are not used; styles are organized under `src/styles/`
 - Local browser storage for demo state
+- Public business-coverage copy now reads from a lightweight published snapshot, while the heavier city-rollout and prospect machine hydrates only for `/admin`.
 - Supabase schema draft for future backend
 - Vercel-ready SPA rewrite config
 - Live Vercel project: `cityatlas`
@@ -98,8 +99,8 @@ The public product helps locals find places, events, offers, and guides. The bus
 
 ## Important Constraints
 
-- Seed data is fictional.
-- Most public business claims stay fictional or gated; the only live narrow exceptions are the source-backed date-night, rainy-day, and first-evening starter pages, which must link to official sources and the correction path.
+- The public Vancouver business showcase now includes a small source-backed business layer with real venue names, official-source checks, and actual venue imagery.
+- Many wider route, offer, event, and growth-system surfaces still use preview, gated, or mixed seed data; keep public claims conservative and source-backed.
 - The current hosted Vancouver ranking library now includes `/vancouver/first-time-visitor-starters`, `/vancouver/kitsilano-scenic-starters`, `/vancouver/west-side-daytime-starters`, `/vancouver/false-creek-culture-starters`, `/vancouver/ubc-discovery-starters`, `/vancouver/garden-day-starters`, `/vancouver/returning-visitor-starters`, `/vancouver/out-of-town-guest-starters`, `/vancouver/weekend-route-starters`, `/vancouver/sunday-starters`, `/vancouver/wellness-reset-starters`, `/vancouver/guides/vancouver-itinerary-starter-pack-which-cityatlas-page-should-you-open-first`, `/vancouver/guides/cityatlas-guide-roundup-which-vancouver-route-should-you-open-by-situation`, and `/vancouver/guides/which-low-friction-vancouver-route-should-you-open-today`, plus the matching destination-choice, neighborhood-starter, daytime-route, culture-afternoon, UBC-discovery, garden-day, returning-visitor, guest-hosting, weekend-planning, Sunday-planning, and wellness guide upgrades. The Toronto first-time visitor plus weekend-route pilot pair now also has hosted smoke proof on the approved domain, but route-level Search Console indexing proof and ranking movement are still unproven.
 - Public routes are crawlable; `/admin`, `/private-preview/*`, `/planner`, and `/for-businesses/submit` stay noindex.
 - No Stripe/payment acceptance is active.

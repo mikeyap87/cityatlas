@@ -47,10 +47,10 @@ const publicLaneDefinitions: PublicLaneDefinition[] = [
   },
   {
     id: "culture",
-    title: "Culture, galleries, and slower-route coverage",
+    title: "Culture, galleries, and slower-day coverage",
     path: "/vancouver/false-creek-culture-starters",
     description:
-      "Use this lane when the better decision is choosing a compact culture route, not forcing a fake one-size-fits-all itinerary.",
+      "Use this page when the better decision is choosing a compact culture plan, not forcing a fake one-size-fits-all itinerary.",
     batchLanes: ["culture"],
   },
   {
@@ -58,15 +58,15 @@ const publicLaneDefinitions: PublicLaneDefinition[] = [
     title: "Hotels, visitor support, and guest-hosting coverage",
     path: "/vancouver/out-of-town-guest-starters",
     description:
-      "Open this route when the plan depends on where guests are staying, how far they want to move, and how easy the handoff needs to feel.",
+      "Open this page when the plan depends on where guests are staying, how far they want to move, and how easy the handoff needs to feel.",
     batchLanes: ["hotel_guest"],
   },
   {
     id: "event-group",
-    title: "Event, gathering, and group-route coverage",
+    title: "Event, gathering, and group-plan coverage",
     path: "/vancouver/weekend-route-starters",
     description:
-      "This lane is strongest when the goal is a compact group plan, a hosted weekend shape, or one clean route that avoids crossing the city all day.",
+      "This page is strongest when the goal is a compact group plan, a hosted weekend shape, or one clear plan that avoids crossing the city all day.",
     batchLanes: ["event_group"],
   },
   {
@@ -74,7 +74,7 @@ const publicLaneDefinitions: PublicLaneDefinition[] = [
     title: "Wellness, reset, and slower-day coverage",
     path: "/vancouver/wellness-reset-starters",
     description:
-      "Use this lane when the plan needs lower-friction wellness anchors, calmer pacing, or a reset route instead of a packed schedule.",
+      "Use this page when the plan needs easier wellness anchors, calmer pacing, or a calmer reset instead of a packed schedule.",
     batchLanes: ["wellness"],
   },
   {

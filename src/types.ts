@@ -59,11 +59,11 @@ export interface Business extends AuditFields {
   fullDescription: string;
   highlights: string[];
   bestFor: string[];
-  priceTier: "$" | "$$" | "$$$" | "$$$$";
-  rating: number;
-  reviewCount: number;
-  openNow: boolean;
-  hoursToday: string;
+  priceTier?: "$" | "$$" | "$$$" | "$$$$";
+  rating?: number;
+  reviewCount?: number;
+  openNow?: boolean;
+  hoursToday?: string;
   featured: boolean;
   claimedStatus: "unclaimed" | "claim_pending" | "claimed";
   partnerFitScore: number;
@@ -258,7 +258,7 @@ export interface NewsletterLead {
 
 export interface SavedItem {
   id: string;
-  itemType: "business" | "event" | "guide";
+  itemType: "business" | "event" | "guide" | "offer";
   itemId: string;
   label: string;
   createdAt: string;

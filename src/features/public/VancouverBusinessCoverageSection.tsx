@@ -1,10 +1,8 @@
 import { AppLink } from "../../components/Link";
 import { MetricCard, SectionHeader, StatusPill } from "../../components/UI";
-import { buildPublicBusinessCoverageSnapshot } from "../../lib/publicBusinessCoverage";
-import type { CityAtlasData } from "../../types";
+import { vancouverPublicBusinessCoverageSnapshot } from "../../data/publicBusinessCoverageSnapshot";
 
 interface VancouverBusinessCoverageSectionProps {
-  data: CityAtlasData;
   variant?: "home" | "city";
 }
 
@@ -24,12 +22,33 @@ function formatTagList(tags: { label: string }[], fallback: string) {
   return `${tags[0].label}, ${tags[1].label}, and ${tags[2].label}`;
 }
 
+function simplifyCoverageCopy(value: string) {
+  return value
+    .replace(/\bThis lane\b/gi, "This page")
+    .replace(/\bthis lane\b/gi, "this page")
+    .replace(/\bChoose this lane\b/gi, "Choose this page")
+    .replace(/\bUse this lane\b/gi, "Use this page")
+    .replace(/\bOpen this route\b/gi, "Open this page")
+    .replace(/\bthe right CityAtlas route\b/gi, "the right CityAtlas guide")
+    .replace(/\bCityAtlas route\b/gi, "CityAtlas guide")
+    .replace(/slower-route/gi, "slower-day")
+    .replace(/group-route/gi, "group-plan")
+    .replace(/culture route/gi, "culture plan")
+    .replace(/reset route/gi, "calmer reset")
+    .replace(/lower-friction/gi, "easier")
+    .replace(/\bUse This page\b/g, "Use this page")
+    .replace(/\bChoose This page\b/g, "Choose this page")
+    .replace(/\blane\b/gi, "page")
+    .replace(/route to open first/gi, "guide to open first")
+    .replace(/route pages/gi, "guide pages");
+}
+
 export function VancouverBusinessCoverageSection({
-  data,
   variant = "home",
 }: VancouverBusinessCoverageSectionProps) {
-  const snapshot = buildPublicBusinessCoverageSnapshot(data);
+  const snapshot = vancouverPublicBusinessCoverageSnapshot;
   const isHome = variant === "home";
+  const visibleLanes = isHome ? snapshot.lanes : snapshot.lanes.slice(0, 4);
 
   return (
     <section className="section-block">
@@ -37,32 +56,32 @@ export function VancouverBusinessCoverageSection({
         label="Vancouver business coverage"
         title={
           isHome
-            ? "Vancouver coverage already reaches far beyond the first public pages"
-            : "The live guides are only one layer of the current Vancouver coverage"
+            ? "CityAtlas already covers more of Vancouver than the first guides show"
+            : "The public guides are only one part of Vancouver coverage"
         }
         copy={
           isHome
-            ? `CityAtlas already maps ${snapshot.totalBusinesses} Vancouver businesses across hospitality, culture, guest stays, events, wellness, and neighborhood planning. The public site still starts with guides, but the city layer underneath is already much broader.`
-            : `CityAtlas already maps ${snapshot.totalBusinesses} Vancouver businesses behind the live guides and starting-point pages. The public site still leads with the best route to open first, while the wider city map keeps that advice more grounded.`
+            ? `CityAtlas already tracks ${snapshot.totalBusinesses} Vancouver businesses across hospitality, culture, guest stays, events, wellness, and neighborhood planning. The public site starts with guides, but the wider local coverage is already there underneath.`
+            : `CityAtlas already tracks ${snapshot.totalBusinesses} Vancouver businesses behind the public guides and local places. The public site still leads with the best page to open first, while the wider city coverage helps keep that advice grounded.`
         }
-        action={<StatusPill tone="green">{snapshot.totalBusinesses} businesses in the map</StatusPill>}
+        action={<StatusPill tone="green">{snapshot.totalBusinesses} businesses already in the map</StatusPill>}
       />
 
       <div className="metrics-strip">
         <MetricCard
-          label="Official source places"
+          label="Real places named"
           value={`${snapshot.sourceBackedAnchors}`}
-          detail="Real Vancouver places already named on starting-point pages"
+          detail="Real Vancouver places already named on live local place lists"
         />
         <MetricCard
-          label="Starter groups"
+          label="Local place lists"
           value={`${snapshot.sourceBackedCollections}`}
-          detail="Official source groups already supporting discovery"
+          detail="Live local place lists already supporting discovery"
         />
         <MetricCard
-          label="Guide pages"
+          label="Vancouver guides"
           value={`${snapshot.guideCount}`}
-          detail="Answer-first Vancouver guides already live in the library"
+          detail="Clear Vancouver guides already live"
         />
         <MetricCard
           label="Categories covered"
@@ -75,8 +94,8 @@ export function VancouverBusinessCoverageSection({
         <div className="source-panel">
           <SectionHeader
             label="What this means"
-            title="Start with the right route, then the right place"
-            copy="The first public job is still helping someone choose the right guide or route. Wider business coverage makes those pages feel more grounded without pretending every business already has a full public profile."
+            title="Start with the right guide, then the right place"
+            copy="The first public job is still helping someone choose the right guide. The broader place map makes those pages feel more grounded while fuller local pages keep rolling out."
           />
           <div className="tag-cloud">
             {snapshot.topCategories.map((category) => (
@@ -88,9 +107,9 @@ export function VancouverBusinessCoverageSection({
         </div>
         <div className="source-panel">
           <SectionHeader
-            label="Best public next moves"
-            title="Open the route that matches the moment first"
-            copy="Use the live route pages below when the real decision is where to start in Vancouver, not which single venue should carry the whole day."
+            label="Best starting pages"
+            title="Open the page that matches the moment first"
+            copy="Use the live guide pages below when the real decision is where to start in Vancouver, not which single place should carry the whole day."
           />
           <div className="tag-cloud">
             {snapshot.topNeighborhoods.length > 0 ? (
@@ -100,18 +119,18 @@ export function VancouverBusinessCoverageSection({
                 </span>
               ))
             ) : (
-              <span>Coverage is still strongest when you start with the route, not the venue.</span>
+              <span>Coverage is still strongest when you start with a guide, not one venue.</span>
             )}
           </div>
           <div className="hero-actions">
             <AppLink className="button primary" to="/vancouver/guides">
-              Open guide library
+              Open Vancouver guides
             </AppLink>
             <AppLink
               className="button secondary"
               to="/vancouver/guides/cityatlas-guide-roundup-which-vancouver-route-should-you-open-by-situation"
             >
-              Choose a route
+              Read the start-here guide
             </AppLink>
             <AppLink className="button secondary" to="/for-businesses/submit">
               Start a business request
@@ -121,15 +140,15 @@ export function VancouverBusinessCoverageSection({
       </div>
 
       <div className="guide-query-grid">
-        {snapshot.lanes.map((lane) => (
+        {visibleLanes.map((lane) => (
           <AppLink className="query-card query-card-link" to={lane.path} key={lane.id}>
-            <span className="query-card-kicker">{lane.count} businesses in this lane</span>
+            <span className="query-card-kicker">{lane.count} businesses already mapped here</span>
             <strong>{lane.title}</strong>
-            <p>{lane.description}</p>
+            <p>{simplifyCoverageCopy(lane.description)}</p>
             <p>
-              Best-covered mix: {formatTagList(lane.topCategories, "Route-led Vancouver planning")}
+              Mostly {formatTagList(lane.topCategories, "local places across Vancouver")}
               {lane.topNeighborhoods.length > 0
-                ? `. Named areas include ${formatTagList(lane.topNeighborhoods, "multiple Vancouver areas")}.`
+                ? `. Areas include ${formatTagList(lane.topNeighborhoods, "multiple Vancouver areas")}.`
                 : "."}
             </p>
           </AppLink>

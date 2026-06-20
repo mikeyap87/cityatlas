@@ -1,6 +1,14 @@
+export function resolvePublicAssetPath(path: string) {
+  if (typeof window !== "undefined" && window.location.protocol === "file:" && path.startsWith("/")) {
+    return `.${path}`;
+  }
+
+  return path;
+}
+
 export const siteConfig = {
   name: "CityAtlas",
-  tagline: "Vancouver Plans, Guides, And Local Picks",
+  tagline: "Find the right part of Vancouver first",
   city: "Vancouver",
   citySlug: "vancouver",
   localUrl: "http://127.0.0.1:5178/",
@@ -8,11 +16,10 @@ export const siteConfig = {
   launchModeLabel: "Univenture private-launch package",
   contactEmail: "city@univenturestudio.com",
   media: {
-    hero: "/assets/vancouver-market-hero.png",
-    concept: "/design/launch-product-concept.png",
-    referenceHome: "/visual_references/01_homepage_public_site.png",
-    referenceComposite: "/visual_references/02_public_pages_and_admin_composite.png",
-    referenceDashboard: "/visual_references/03_ai_dashboards_owner_creator_mobile.png",
+    hero: resolvePublicAssetPath("/assets/vancouver-market-hero.jpg"),
+    city: resolvePublicAssetPath("/assets/vancouver-waterfront-park-hero.jpg"),
+    waterfront: resolvePublicAssetPath("/assets/vancouver-waterfront-skyline.jpg"),
+    wellness: resolvePublicAssetPath("/assets/wellness-session-room.jpg"),
   },
   gatedActions: [
     "Domain purchase",

@@ -34,11 +34,11 @@ export function getPartnerPipelineValue(data: CityAtlasData) {
 
 export function getReadinessChecklist(business: Business) {
   return [
-    { label: "Profile", complete: business.pageReadiness.profile },
-    { label: "Media", complete: business.pageReadiness.media },
-    { label: "Categories", complete: business.pageReadiness.categories },
-    { label: "Description", complete: business.pageReadiness.description },
-    { label: "Offer", complete: business.pageReadiness.offer },
+    { label: "Basic details", complete: business.pageReadiness.profile },
+    { label: "Photos", complete: business.pageReadiness.media },
+    { label: "Best for", complete: business.pageReadiness.categories },
+    { label: "Page copy", complete: business.pageReadiness.description },
+    { label: "Offer slot", complete: business.pageReadiness.offer },
   ];
 }
 

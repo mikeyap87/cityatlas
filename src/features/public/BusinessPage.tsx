@@ -1,4 +1,4 @@
-import type { Business, CityAtlasData } from "../../types";
+import type { Business, CityAtlasData, SourceRecord } from "../../types";
 import { getReadinessChecklist } from "../../lib/scoring";
 import { AppLink } from "../../components/Link";
 import { ArrowRightIcon, MapIcon, ShieldIcon, StoreIcon } from "../../components/Icons";
@@ -11,43 +11,141 @@ interface BusinessPageProps {
   data: CityAtlasData;
 }
 
+function isExampleBusiness(business: Business) {
+  return business.trustLevel === "fictional_seed";
+}
+
+function getBusinessExampleLabel(business: Business) {
+  const text = [business.category, business.slug, ...business.subcategories, ...business.bestFor]
+    .join(" ")
+    .toLowerCase();
+
+  if (text.includes("coffee") || text.includes("cafe")) return "Cafe";
+  if (text.includes("restaurant") || text.includes("dinner")) return "Dinner spot";
+  if (text.includes("wellness") || text.includes("recovery") || text.includes("spa")) return "Wellness spot";
+  if (text.includes("cycle") || text.includes("outdoor") || text.includes("beach")) return "Activity stop";
+  return "Local business";
+}
+
+function getBusinessHeroTitle(business: Business) {
+  const primaryMoment = business.bestFor[0];
+  if (primaryMoment) {
+    return `${primaryMoment} in ${business.neighborhood}`;
+  }
+
+  return `${business.category} in ${business.neighborhood}`;
+}
+
+function getSourceStatusLabel(source: SourceRecord) {
+  if (source.type === "demo_seed") return "Example data";
+  if (source.type === "public_link") return source.verified ? "Official source" : "Source link added";
+  if (source.type === "business_submission") {
+    return source.verified ? "Business confirmed" : "Business submitted";
+  }
+  if (source.type === "founder_review") return source.verified ? "Checked manually" : "Needs checking";
+  return source.verified ? "Checked" : "Needs checking";
+}
+
 export function BusinessPage({ business, data }: BusinessPageProps) {
   if (!business) {
     return (
       <section className="not-found">
         <h1>Business not found</h1>
         <p>This page does not have a matching listing.</p>
-        <AppLink className="button primary" to="/vancouver">Back to Vancouver</AppLink>
+        <div className="hero-actions">
+          <AppLink className="button primary" to="/vancouver">
+            Back to Vancouver
+          </AppLink>
+          <AppLink className="button secondary" to="/for-businesses/submit">
+            Start business request
+          </AppLink>
+        </div>
       </section>
     );
   }
 
   const offers = data.offers.filter((offer) => offer.businessId === business.id);
   const checklist = getReadinessChecklist(business);
+  const hasLiveWebsite = !/example\.(com|invalid)$/i.test(new URL(business.website).hostname);
+  const businessVisual = getBusinessVisual(business);
+  const sources = business.sourceIds
+    .map((sourceId) => data.sources.find((item) => item.id === sourceId))
+    .filter((source): source is SourceRecord => Boolean(source));
+  const exampleOnly = isExampleBusiness(business);
+  const businessPageLabel = getBusinessExampleLabel(business);
+  const heroStatusLabel = exampleOnly ? "Sample page" : "Source-backed page";
+  const proofBannerTitle = exampleOnly ? "What is live on this page" : "What CityAtlas checked";
+  const proofBannerCopy = exampleOnly
+    ? "The page shape is live now. Official hours, booking details, and offer terms are added only after a real business check."
+    : "CityAtlas checked the official source, contact path, and venue details first. Confirm live hours, menus, prices, and reservation availability on the official site before you go.";
+  const heroHighlights = business.bestFor.slice(0, 3);
+  const quickFacts = [
+    { label: "Type", value: business.category },
+    { label: "Area", value: business.neighborhood },
+    business.priceTier ? { label: "Budget", value: business.priceTier } : null,
+    typeof business.openNow === "boolean"
+      ? { label: "Status", value: business.openNow ? "Open now" : "Closed now" }
+      : { label: "Hours", value: "Check official site" },
+  ].filter((item): item is { label: string; value: string } => Boolean(item));
 
   return (
     <>
       <section className="business-detail-hero">
-        <img src={getBusinessVisual(business)} alt={`Photo or scene for ${business.name}`} />
+        <div className="business-media-panel">
+          <div className="business-media-frame">
+            <img
+              src={businessVisual}
+              alt={`Photo or scene for ${business.name}`}
+              decoding="async"
+              fetchPriority="high"
+              loading="eager"
+            />
+            <div className="business-media-copy">
+              <span>{businessPageLabel}</span>
+              <strong>{getBusinessHeroTitle(business)}</strong>
+              <p>{business.shortDescription}</p>
+            </div>
+          </div>
+        </div>
         <div className="business-detail-panel">
           <div className="card-topline">
-            <StatusPill tone="blue">Example business page</StatusPill>
-            <StatusPill tone="amber">Checked before publishing</StatusPill>
+            <StatusPill tone="blue">{heroStatusLabel}</StatusPill>
+            <StatusPill tone="amber">Check official details before you visit</StatusPill>
           </div>
           <h1>{business.name}</h1>
           <p>{business.fullDescription}</p>
+          <div className="business-highlight-row">
+            <span className="query-card-kicker">Best for</span>
+            <div className="tag-cloud business-highlight-cloud">
+              {heroHighlights.map((item) => (
+                <span key={item}>{item}</span>
+              ))}
+            </div>
+          </div>
           <div className="business-meta-grid">
-            <span>{business.category}</span>
-            <span>{business.neighborhood}</span>
-            <span>{business.priceTier}</span>
-            <span>{business.openNow ? "Open now" : "Closed now"}</span>
+            {quickFacts.map((item) => (
+              <div className="business-meta-card" key={item.label}>
+                <small>{item.label}</small>
+                <strong>{item.value}</strong>
+              </div>
+            ))}
+          </div>
+          <div className="business-proof-banner">
+            <strong>{proofBannerTitle}</strong>
+            <p>{proofBannerCopy}</p>
           </div>
           <div className="hero-actions">
-            <a className="button primary" href={business.website} target="_blank" rel="noreferrer">
-              Visit website
-            </a>
-            <AppLink className="button secondary" to="/for-businesses/submit">
-              Start business request
+            {hasLiveWebsite ? (
+              <a className="button primary" href={business.website} target="_blank" rel="noreferrer">
+                Visit website
+              </a>
+            ) : (
+              <AppLink className="button primary" to="/for-businesses/submit">
+                Start business request
+              </AppLink>
+            )}
+            <AppLink className="button secondary" to={hasLiveWebsite ? "/for-businesses/submit" : "/vancouver/guides"}>
+              {hasLiveWebsite ? "Start business request" : "Open Vancouver guides"}
             </AppLink>
           </div>
         </div>
@@ -56,9 +154,17 @@ export function BusinessPage({ business, data }: BusinessPageProps) {
       <section className="split-section">
         <div>
           <SectionHeader
-            label="How this page works"
-            title="What a CityAtlas business page can include"
-            copy="This example shows the shape of a CityAtlas business page while facts, photos, and participation details are still being checked."
+            label={exampleOnly ? "What a finished page includes" : "What this page includes"}
+            title={
+              exampleOnly
+                ? "The basics, photos, and guide context in one place"
+                : "The basics, photos, and official source path in one place"
+            }
+            copy={
+              exampleOnly
+                ? "Use this sample to see how one CityAtlas page can bring the basics, photos, and nearby guide context together after review."
+                : "CityAtlas keeps these pages tight on purpose: the useful basics, a clear fit note, and the official path to re-check details before you go."
+            }
           />
           <ul className="checklist-grid">
             {checklist.map((item) => (
@@ -68,28 +174,55 @@ export function BusinessPage({ business, data }: BusinessPageProps) {
         </div>
         <div className="source-panel">
           <ShieldIcon />
-          <h2>What gets checked first</h2>
+          <h2>{exampleOnly ? "How to read this sample page" : "What CityAtlas checks before a page is listed"}</h2>
           <p>
-            CityAtlas checks hours, prices, availability, and contact details against the
-            official site before treating a page like a live business listing.
+            {exampleOnly
+              ? "This page shape is public now, but the official hours, pricing, and booking details only go live after a real business review."
+              : "Before a real page goes public, CityAtlas checks the official site, basic contact details, and the simplest route-fit explanation without turning the page into hype."}
           </p>
-          <div className="source-rows">
-            {business.sourceIds.map((sourceId) => {
-              const source = data.sources.find((item) => item.id === sourceId);
-              return source ? (
+          {exampleOnly ? (
+            <ul className="public-note-list business-proof-list">
+              <li>
+                <ShieldIcon />
+                <div>
+                  <strong>Page shape first</strong>
+                  <span>This sample shows where details, photos, and guide context can sit on a finished page.</span>
+                </div>
+              </li>
+              <li>
+                <MapIcon />
+                <div>
+                  <strong>Official details added after review</strong>
+                  <span>Website links, live hours, and booking details appear here after a real business check.</span>
+                </div>
+              </li>
+              <li>
+                <StoreIcon />
+                <div>
+                  <strong>Offers appear only when clear</strong>
+                  <span>Offer timing and redemption rules stay off the page until they are confirmed.</span>
+                </div>
+              </li>
+            </ul>
+          ) : (
+            <div className="source-rows">
+              {sources.map((source) => (
                 <div className="source-row" key={source.id}>
                   <strong>{source.label}</strong>
-                  <span>{source.verified ? "Verified" : "Unverified"}</span>
+                  <span>{getSourceStatusLabel(source)}</span>
                 </div>
-              ) : null;
-            })}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
       <section className="split-section">
         <div>
-          <SectionHeader title="Best for" copy="Editorial and partner positioning that can later inform guide placement." />
+          <SectionHeader
+            title="Best for"
+            copy="These tags show the kinds of guides and moments this business could work well in."
+          />
           <div className="tag-cloud">
             {business.bestFor.map((item) => (
               <span key={item}>{item}</span>
@@ -106,16 +239,24 @@ export function BusinessPage({ business, data }: BusinessPageProps) {
         </div>
         <div>
           <SectionHeader
-            title="Offers"
-            copy="Offers can appear here once the business confirms the details, timing, and redemption rules."
+            title={exampleOnly ? "Offers on a finished page" : "Offer status"}
+            copy={
+              exampleOnly
+                ? "A finished business page can also show one simple offer once the timing, details, and redemption rules are confirmed."
+                : "CityAtlas only adds a business-specific offer after the timing, terms, and redemption details are clear."
+            }
           />
           <div className="stacked-list">
             {offers.length > 0 ? (
               offers.map((offer) => <OfferCard offer={offer} business={business} key={offer.id} />)
             ) : (
               <div className="empty-state">
-                <strong>No offer attached yet</strong>
-                <p>This page can still be considered for feature or guide placement.</p>
+                <strong>{exampleOnly ? "No sample offer attached yet" : "No live offer is attached right now"}</strong>
+                <p>
+                  {exampleOnly
+                    ? "This page can still be considered for a feature, guide mention, or later offer."
+                    : "This page can still be used for route planning, an official source check, or a future guide mention."}
+                </p>
               </div>
             )}
           </div>
@@ -127,8 +268,8 @@ export function BusinessPage({ business, data }: BusinessPageProps) {
         <div>
           <h2>Start a business request</h2>
           <p>
-            Share details, then CityAtlas can check source support, page fit, and feature
-            possibilities before anything is published.
+            Share the details and CityAtlas can check the match, official details, and page options before
+            anything goes live.
           </p>
         </div>
         <AppLink className="button primary" to="/for-businesses/submit">

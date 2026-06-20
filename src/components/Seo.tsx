@@ -48,7 +48,7 @@ export function SeoManager({ path, data }: { path: string; data: CityAtlasData }
     upsertMeta("og:title", meta.title, true);
     upsertMeta("og:description", meta.description, true);
     upsertMeta("og:type", meta.type, true);
-    upsertMeta("og:image", `${baseUrl}${siteConfig.media.hero}`, true);
+    upsertMeta("og:image", `${baseUrl}${meta.imagePath ?? siteConfig.media.hero}`, true);
     upsertMeta("twitter:card", "summary_large_image");
     upsertMeta("og:url", `${baseUrl}${path}`, true);
     upsertLink("canonical", `${baseUrl}${path}`);

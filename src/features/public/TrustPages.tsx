@@ -17,56 +17,92 @@ import {
   type SourceBackedCollectionId,
   sourceBackedCollectionMeta,
 } from "../../lib/sourceBackedCollections";
+import {
+  getSourceBackedCollectionVisual,
+  hasSpecificSourceBackedPlaceVisual,
+  getSourceBackedPlaceVisual,
+} from "../../lib/visuals";
 
 function SourceBackedReferenceCard({
   reference,
 }: {
   reference: SourceBackedPlaceReference;
 }) {
+  const visibleTags = [
+    reference.neighborhood,
+    ...reference.bestFor.slice(0, 2),
+  ];
+  const visibleFacts = reference.verifiedFacts.slice(0, 2);
+  const leadBoundary = reference.claimBoundaries[0];
+  const hasSpecificVisual = hasSpecificSourceBackedPlaceVisual(reference);
+
   return (
-    <article className="source-panel">
-      <p className="section-label">{reference.category}</p>
-      <div className="hero-actions">
-        <h2>{reference.name}</h2>
-        <StatusPill tone="green">Official source checked</StatusPill>
+    <article className="source-panel source-reference-card">
+      <div className={`source-reference-media${hasSpecificVisual ? "" : " source-reference-media-fallback"}`}>
+        {hasSpecificVisual ? (
+          <img
+            src={getSourceBackedPlaceVisual(reference)}
+            alt={`${reference.name} place photo`}
+            decoding="async"
+            loading="lazy"
+          />
+        ) : (
+          <div className="source-reference-media-fallback-note" aria-hidden="true">
+            <span><ShieldIcon /> Official site linked</span>
+            <span><MapIcon /> Photo not added yet</span>
+          </div>
+        )}
+        <div className="source-reference-media-copy">
+          <span>{reference.neighborhood}</span>
+          <strong>{reference.name}</strong>
+          <p>{simplifyCollectionCopy(reference.routeRole)}</p>
+        </div>
       </div>
-      <p>{reference.summary}</p>
-      <div className="tag-cloud">
-        <span>{reference.neighborhood}</span>
-        <span>{reference.routeRole}</span>
-        {reference.bestFor.map((item) => (
-          <span key={`${reference.id}-${item}`}>{item}</span>
-        ))}
+      <div className="source-reference-body">
+        <div className="source-reference-header">
+          <p className="section-label">{reference.category}</p>
+          <StatusPill tone="green">Official site</StatusPill>
+        </div>
+        <p className="source-reference-summary">{simplifyReferenceText(reference.summary)}</p>
+        <div className="tag-cloud">
+          {visibleTags.map((item) => (
+            <span key={`${reference.id}-${item}`}>{item}</span>
+          ))}
+        </div>
+        <p className="source-reference-why">
+          <strong>Why it fits:</strong> {simplifyReferenceText(reference.whyItFits)}
+        </p>
+        <div className="hero-actions">
+          <a
+            className="button secondary"
+            href={reference.officialSourceUrl}
+            rel="noreferrer"
+            target="_blank"
+          >
+            Open official site
+          </a>
+          <AppLink className="button secondary" to={reference.correctionPath}>
+            Report an issue
+          </AppLink>
+        </div>
+        <small className="source-reference-meta">
+          Source: {reference.sourceOwner}. Checked {reference.sourceCheckedAt}.
+        </small>
+        <details className="source-reference-proof">
+          <summary className="source-reference-proof-summary">
+            <strong>What this page checked</strong>
+            <span>Open</span>
+          </summary>
+          <div className="source-reference-proof-body">
+            <ul className="plain-list compact source-reference-proof-list">
+              {visibleFacts.map((fact) => (
+                <li key={fact}>{fact}</li>
+              ))}
+            </ul>
+            {leadBoundary ? <p className="source-reference-limit">{leadBoundary}</p> : null}
+          </div>
+        </details>
       </div>
-      <p>
-        <strong>Why it fits:</strong> {reference.whyItFits}
-      </p>
-      <ul className="plain-list compact">
-        {reference.verifiedFacts.map((fact) => (
-          <li key={fact}>{fact}</li>
-        ))}
-      </ul>
-      <div className="hero-actions">
-        <a
-          className="button secondary"
-          href={reference.officialSourceUrl}
-          rel="noreferrer"
-          target="_blank"
-        >
-          Open official site
-        </a>
-        <AppLink className="button secondary" to={reference.correctionPath}>
-          Report an issue
-        </AppLink>
-      </div>
-      <small>
-        Source: {reference.sourceOwner}. Checked {reference.sourceCheckedAt}.
-      </small>
-      <ul className="plain-list compact">
-        {reference.claimBoundaries.map((boundary) => (
-          <li key={boundary}>{boundary}</li>
-        ))}
-      </ul>
     </article>
   );
 }
@@ -96,7 +132,7 @@ function getCollectionNextLinks(
       title: guide.title,
       path: getGuidePath(guide),
       description:
-        "Open the matching answer-first guide when these official-source anchors need a clearer CityAtlas route shape instead of a short real-place list alone.",
+        "Open the matching guide when these real places need fuller planning context than a short list can give.",
     },
   ];
   const seenPaths = new Set(nextLinks.map((link) => link.path));
@@ -119,42 +155,110 @@ function getCollectionNextLinks(
       title: getSourceBackedCollectionGuideHubLabel(collection),
       path: guideHubPath,
       description:
-        `Use the broader ${cityName} guide hub when the strongest next move is comparing CityAtlas route clusters instead of staying inside one starter page.`,
+        `Use the broader ${cityName} guides when you still need to compare a few options instead of staying with one local place.`,
     });
   }
 
   return nextLinks;
 }
 
+function simplifyReferenceText(value: string) {
+  return value
+    .replace(
+      /The official ([^.]+?) gives CityAtlas a (?:direct )?public source for /gi,
+      "The official $1 confirms ",
+    )
+    .replace(/ without pretending [^.]+?\./gi, ".")
+    .replace(/ without pretending [^.]+?,$/gi, "")
+    .replace(/ without pretending [^.]+$/gi, "")
+    .replace(/  +/g, " ")
+    .trim();
+}
+
 function simplifyCollectionCopy(value: string) {
   return value
-    .replace(/Source-backed ([A-Za-z0-9\- ]+) coverage/gi, "$1 page")
-    .replace(/source-backed starter page/gi, "page with official links")
-    .replace(/source-backed page/gi, "page with official links")
+    .replace(/fake /gi, "overblown ")
+    .replace(/answer-first/gi, "clear")
+    .replace(/with official source notes/gi, "with official links")
+    .replace(/with source links/gi, "with official links")
+    .replace(/Source-backed ([A-Za-z0-9\- ]+) coverage/gi, "$1 pages with official site links")
+    .replace(
+      /Start here if you want (?:CityAtlas to name )?(?:a few )?real ([^.]+?) without pretending [^.]+?\./gi,
+      "This page brings together a smaller set of real $1, links to official sites, and stays clear about what is checked.",
+    )
+    .replace(/Start here if you want/gi, "Use this page when you want")
+    .replace(
+      /Use this page when you want (?:CityAtlas to name )?(?:a few )?real ([^.]+?) without pretending [^.]+?\./gi,
+      "This page brings together a smaller set of real $1, links to official sites, and stays clear about what is checked.",
+    )
+    .replace(
+      /Readers do not need CityAtlas to pretend it already owns all of Vancouver\./gi,
+      "Readers do not need CityAtlas to cover everything at once.",
+    )
+    .replace(/source-backed starter page/gi, "local place")
+    .replace(/source-backed page/gi, "local place")
     .replace(/source-backed entry/gi, "place here")
     .replace(/official-source/gi, "official")
-    .replace(/official source notes/gi, "official source links")
-    .replace(/starter pages/gi, "starting-point pages")
-    .replace(/starter page/gi, "starting-point page")
+    .replace(/official source notes/gi, "official site links")
+    .replace(/starter pages live/gi, "starting pages live")
+    .replace(/starter pages/gi, "starting pages")
+    .replace(/starter page/gi, "starting page")
     .replace(/\bstarters\b/gi, "starting points")
-    .replace(/source-owner, source-date, and correction rules/gi, "source dates, official links, and correction rules")
+    .replace(/guide hub/gi, "guides")
+    .replace(/guide library/gi, "guides")
+    .replace(/These are official[^.]+?, not universal [^.]+?\./gi, "These are useful starting points, not one-size-fits-all picks.")
+    .replace(/route guide/gi, "guide")
+    .replace(/route links/gi, "guide links")
+    .replace(/weekend-route/gi, "weekend plan")
+    .replace(/route-fit/gi, "plan-fit")
+    .replace(/route choices/gi, "plan choices")
+    .replace(/route shapes/gi, "plan shapes")
+    .replace(/route shape/gi, "plan shape")
+    .replace(/route help/gi, "guide help")
+    .replace(/source-owner, source-date, and correction rules/gi, "source dates, official site links, and correction rules")
     .replace(/carefully sourced/gi, "real")
     .replace(/anchor(s)?/gi, "place$1")
+    .replace(/keeps the claim limits visible/gi, "stays clear about what is checked")
     .replace(/claim limits visible/gi, "keeps the page honest about what it knows")
     .replace(/visible claim boundaries/gi, "clear claim limits")
     .replace(/visible source discipline/gi, "clear source rules")
     .replace(/source discipline/gi, "source rules")
     .replace(/route role/gi, "why it belongs in this kind of plan")
-    .replace(/route fit/gi, "plan fit")
+    .replace(/\broute fit\b/gi, "best match")
+    .replace(/\bplan fit\b/gi, "best match")
     .replace(/route logic/gi, "planning logic")
+    .replace(/destination fit/gi, "destination choice")
+    .replace(/visitor-intent/gi, "visitor")
+    .replace(/host-intent/gi, "hosting")
+    .replace(/weekend-intent/gi, "weekend")
+    .replace(/neighborhood-depth/gi, "neighborhood")
+    .replace(/trust-first/gi, "careful")
+    .replace(/what kind of ([a-z\- ]+?) it fits/gi, "which kind of $1 it suits")
+    .replace(/what kind of ([a-z\- ]+?) route it fits/gi, "what kind of $1 it fits")
     .replace(/low-friction/gi, "easy")
     .replace(/destination-choice/gi, "destination choice")
+    .replace(/CityAtlas is packaging [^.]+?, not /gi, "CityAtlas is helping you choose, not ")
     .replace(/This coverage is intentionally narrow\./gi, "This page stays intentionally focused.")
+    .replace(/This coverage is intentionally tight\./gi, "This page stays intentionally focused.")
+    .replace(/It gives readers a credible [^.]+? layer now, while /gi, "It gives you a smaller, more useful short list now, while ")
+    .replace(
+      /Every source-backed entry routes to a public correction or removal path\./gi,
+      "Every place here includes a public way to report a mistake or ask for a change.",
+    )
     .replace(/Every official-link entry routes to a public correction or removal path\./gi, "Every place here includes a public way to report a mistake or ask for a change.")
     .replace(/correction or removal path/gi, "way to report a mistake or ask for a change")
+    .replace(/Hours, [^.]+? can change, so confirm them on the official source\./gi, "Hours and details can change, so confirm them on the official site.")
     .replace(/broader itinerary and real-business publication is still being expanded carefully\./gi, "The wider business directory is still being built carefully.")
     .replace(/broader real-business and itinerary publication is still being expanded carefully\./gi, "The wider business directory is still being built carefully.")
-    .replace(/broader real-business publication is still being expanded carefully\./gi, "The wider business directory is still being built carefully.");
+    .replace(/broader real-business publication is still being expanded carefully\./gi, "The wider business directory is still being built carefully.")
+    .replace(
+      /Expand only one careful ([^.]+?) at a time: [^.]+? only where stronger? official-source support exists\./gi,
+      "Next, CityAtlas can add more $1 while keeping the same official-link and correction standards.",
+    )
+    .replace(
+      /Expand only one careful ([^.]+?) before anything broader is published\./gi,
+      "Next, CityAtlas can expand $1 while keeping the same official-link and report-an-issue rules.",
+    );
 }
 
 const sourceBackedPageContent: Record<
@@ -566,40 +670,68 @@ export function SourceBackedCollectionPage({
     sourceBackedCollectionMeta[collection].path,
     collection,
   );
+  const starterHelpBullets = content.helpBullets.slice(0, 3);
+  const heroVisual = getSourceBackedCollectionVisual(collection);
+  const collectionMeta = sourceBackedCollectionMeta[collection];
 
   return (
     <>
-      <section className="city-hero">
+      <section className="city-hero source-backed-hero">
         <div>
           <p className="section-label">{simplifyCollectionCopy(content.heroLabel)}</p>
           <h1>{simplifyCollectionCopy(content.heroTitle)}</h1>
           <p>{simplifyCollectionCopy(content.heroCopy)}</p>
           <div className="hero-actions">
             <AppLink className="button primary" to={content.primaryCtaPath}>
-              {content.primaryCtaLabel} <ArrowRightIcon />
+              {simplifyCollectionCopy(content.primaryCtaLabel)} <ArrowRightIcon />
             </AppLink>
             <AppLink className="button secondary" to="/editorial-standards">
               Editorial standards
             </AppLink>
           </div>
+          <div className="tag-cloud source-backed-hero-tags">
+            <span>{starters.length} official-link places</span>
+            <span>Start with one place</span>
+            <span>Report a mistake</span>
+          </div>
+          <div className="city-hero-support-grid">
+            <article className="city-hero-support-card">
+              <strong>{starters.length} places with official links</strong>
+              <p>Each place links to an official public source and keeps a visible correction path.</p>
+            </article>
+            <article className="city-hero-support-card">
+              <strong>Open one place first</strong>
+              <p>Choose one strong fit first, then widen into the fuller guide only if you still need more context.</p>
+            </article>
+            <article className="city-hero-support-card wide">
+              <strong>Confirm final details on the official site</strong>
+              <p>Hours, tickets, and availability can change, so use CityAtlas to narrow the choice and the official source to confirm the details.</p>
+            </article>
+          </div>
         </div>
-        <div className="source-panel">
-          <ShieldIcon />
-          <h2>How to read this page</h2>
-          <ul className="plain-list compact">
-            {content.helpBullets.map((bullet) => (
-              <li key={bullet}>{simplifyCollectionCopy(bullet)}</li>
-            ))}
-          </ul>
-          <StatusPill tone="blue">{starters.length} real places with official links</StatusPill>
+        <div className="starter-hero-side">
+          <div className="starter-hero-media hero-media-compact">
+            <img
+              src={heroVisual}
+              alt={`${collectionMeta.shortLabel} scene`}
+              decoding="async"
+              fetchPriority="high"
+              loading="eager"
+            />
+            <div className="starter-hero-media-copy">
+              <span>{collectionMeta.shortLabel}</span>
+              <strong>{matchingGuide?.title ?? simplifyCollectionCopy(content.sectionTitle)}</strong>
+              <p>{matchingGuide?.excerpt ?? simplifyCollectionCopy(content.sectionCopy)}</p>
+            </div>
+          </div>
         </div>
       </section>
 
       <section className="section-block">
         <SectionHeader
-          label="Official source picks"
-          title={simplifyCollectionCopy(content.sectionTitle)}
-          copy={simplifyCollectionCopy(content.sectionCopy)}
+          label="Local places"
+          title="Local places to open first"
+          copy="Open one strong local place with official links first, then switch to the fuller guide only if you still need more context."
         />
         <div className="card-grid two">
           {starters.map((reference) => (
@@ -608,12 +740,40 @@ export function SourceBackedCollectionPage({
         </div>
       </section>
 
+      <section className="split-section">
+        <div className="source-panel starter-hero-note">
+          <ShieldIcon />
+          <h2>How to read this page</h2>
+          <ul className="plain-list compact">
+            {starterHelpBullets.map((bullet) => (
+              <li key={bullet}>{simplifyCollectionCopy(bullet)}</li>
+            ))}
+          </ul>
+        </div>
+        <div className="source-panel conversion-panel">
+          <h2>Best next move after one place fits</h2>
+          <p>
+            Open the fuller guide when you want more pace, neighborhood, or route context after
+            one strong place already looks right.
+          </p>
+          {matchingGuide ? (
+            <AppLink className="button secondary" to={getGuidePath(matchingGuide)}>
+              Open the guide <ArrowRightIcon />
+            </AppLink>
+          ) : (
+            <AppLink className="button secondary" to={content.primaryCtaPath}>
+              Open the next page <ArrowRightIcon />
+            </AppLink>
+          )}
+        </div>
+      </section>
+
       {nextLinks.length > 0 ? (
         <section className="section-block">
           <SectionHeader
             label="Next pages"
-            title="Move from real places into the right guide"
-            copy="These route links help readers move from a short list of real places into fuller route guidance instead of hitting a dead end."
+            title="Need more context?"
+            copy="Open one of these guides when you want more neighborhood or pacing context after choosing a place."
           />
           <div className="guide-query-grid">
             {nextLinks.map((link) => (
@@ -629,16 +789,19 @@ export function SourceBackedCollectionPage({
       <section className="split-section">
         <div className="source-panel">
           <MapIcon />
-          <h2>{simplifyCollectionCopy(content.whyTitle)}</h2>
-          <p>{simplifyCollectionCopy(content.whyCopy)}</p>
+          <h2>Why this page helps</h2>
+          <p>
+            This page stays intentionally short so you can compare a few solid options without
+            getting buried in a giant city list.
+          </p>
         </div>
         <div className="source-panel">
           <SparkIcon />
-          <h2>Best next move</h2>
+          <h2>When to open the full guide</h2>
           <p>
-            Start with this page when named places need official source context, then open the
-            matching guide or guide library when you want a fuller route than one short list can
-            provide.
+            {matchingGuide
+              ? `Open ${simplifyCollectionCopy(matchingGuide.title)} when you need neighborhood context, pacing, or a fuller plan after choosing the kind of place that fits.`
+              : "Open the fuller guide when you need neighborhood context, pacing, or a backup plan after narrowing the kind of place you want."}
           </p>
         </div>
       </section>
@@ -646,14 +809,14 @@ export function SourceBackedCollectionPage({
       <section className="cta-band">
         <ShieldIcon />
         <div>
-          <h2>Need a correction, claim update, or removal review?</h2>
+          <h2>Need a correction or page change?</h2>
           <p>
-            Use the CityAtlas editorial standards page for correction, removal, outdated-info, and
-            claim-this-page requests.
+            Use the editorial standards page to report outdated details, request a correction, or
+            ask for a page change.
           </p>
         </div>
         <AppLink className="button primary" to="/editorial-standards">
-          Open standards <ArrowRightIcon />
+          How corrections work <ArrowRightIcon />
         </AppLink>
       </section>
     </>
@@ -731,30 +894,82 @@ export function WellnessResetStartersPage({ data }: { data: CityAtlasData }) {
 export function EditorialStandardsPage() {
   return (
     <section className="section-block page-top legal-page">
-      <SectionHeader
-        label="Editorial standards"
-        title="How CityAtlas handles sources, claims, corrections, and removals"
-        copy="This page explains how public CityAtlas pages are reviewed before they name real businesses, events, or route anchors. It also provides the public correction and removal path for official-source pages."
-        action={<StatusPill tone="blue">Public trust page</StatusPill>}
-      />
+      <section className="city-hero legal-hero">
+        <div>
+          <p className="section-label">Editorial standards</p>
+          <h1>How CityAtlas checks sources, claims, and corrections</h1>
+          <p>
+            This page explains what CityAtlas can publish now, what it will not publish, and how
+            someone can ask for a correction or removal.
+          </p>
+          <div className="hero-actions">
+            <AppLink className="button secondary" to="/terms">
+              Terms
+            </AppLink>
+            <AppLink className="button secondary" to="/privacy">
+              Privacy
+            </AppLink>
+          </div>
+          <div className="tag-cloud pricing-tag-cloud">
+            <span>Official links first</span>
+            <span>Claim limits stay visible</span>
+            <span>Public correction path</span>
+          </div>
+        </div>
+        <div className="public-intro-card legal-hero-card">
+          <div className="public-intro-card-header">
+            <div>
+              <strong>Plain-English summary</strong>
+              <p>CityAtlas can publish focused public pages, but only when the source path is clear.</p>
+            </div>
+            <StatusPill tone="blue">Public trust page</StatusPill>
+          </div>
+          <ul className="public-note-list">
+            <li><ShieldIcon /> Official links beat broad claims.</li>
+            <li><MapIcon /> Narrow planning pages beat giant city lists.</li>
+            <li><SparkIcon /> Every public place needs a clear way to report a mistake.</li>
+          </ul>
+        </div>
+      </section>
 
-      <div className="legal-grid">
-        <article className="source-panel">
+      <section className="split-section legal-support-section">
+        <article className="source-panel legal-support-panel legal-support-panel-safe">
           <ShieldIcon />
           <h2>What can be public now</h2>
           <p>
-            CityAtlas can publish answer-first route logic, neighborhood guidance, and narrow
-            official-source pages that link directly to official public sources and keep claim limits
-            visible.
+            CityAtlas can publish clear planning guidance, neighborhood guidance, and smaller
+            pages that link directly to official public sources and stay clear about what is
+            checked.
           </p>
+          <ul className="public-note-list legal-note-list">
+            <li><ShieldIcon /> Focused city guides that help people choose the right first page.</li>
+            <li><MapIcon /> Smaller local-place pages with official links and correction paths.</li>
+            <li><SparkIcon /> Narrow public pages that stay honest about what they do and do not know.</li>
+          </ul>
         </article>
 
+        <article className="source-panel legal-support-panel">
+          <MapIcon />
+          <h2>How to ask for a correction or removal</h2>
+          <p>
+            Email <a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a> with
+            the page URL, what needs changing, and the best official source or contact page.
+          </p>
+          <ul className="plain-list compact legal-step-list">
+            <li>Include the CityAtlas page URL.</li>
+            <li>Say what is wrong, outdated, or should come down.</li>
+            <li>Link the best official page or contact path for the fix.</li>
+          </ul>
+        </article>
+      </section>
+
+      <div className="legal-grid">
         <article className="source-panel">
           <MapIcon />
           <h2>What CityAtlas will not publish</h2>
           <p>
-            Fake ratings, scraped images, unsupported "best of" claims, live availability claims,
-            private contact data, and broad real-business listings do not belong on the public
+            Unsupported ratings, scraped images, broad "best of" claims, live availability claims,
+            private contact data, and broad real-business directories do not belong on the public
             site.
           </p>
         </article>
@@ -771,26 +986,16 @@ export function EditorialStandardsPage() {
         <article className="source-panel">
           <h2>Claim limits</h2>
           <p>
-            Public CityAtlas pages should stay neutral about quality, rankings, popularity, safety,
+            Public pages should stay neutral about quality, rankings, popularity, safety,
             pricing, or availability unless those details are clearly supported by an approved
-            source and still fit the page's visible scope.
-          </p>
-        </article>
-
-        <article className="source-panel">
-          <h2>Correction and removal requests</h2>
-          <p>
-            To claim a page, request a correction, request removal, or report outdated information,
-            email{" "}
-            <a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a> with the
-            page URL, the issue, and the best official source or official contact path for review.
+            source and still belong on the page.
           </p>
         </article>
 
         <article className="source-panel">
           <h2>Suggested subject lines</h2>
           <ul className="plain-list compact">
-            <li>Claim this CityAtlas page</li>
+            <li>Claim this page</li>
             <li>CityAtlas correction request</li>
             <li>CityAtlas removal request</li>
             <li>CityAtlas outdated info report</li>
@@ -801,10 +1006,9 @@ export function EditorialStandardsPage() {
       <div className="cta-band">
         <ShieldIcon />
         <div>
-          <h2>Need the broader policy context?</h2>
+          <h2>Need the site basics too?</h2>
           <p>
-            Review the current terms and privacy pages for the public discovery surface, the
-            current data posture, and future provider boundaries.
+            Review the terms and privacy pages for the public site and current data handling.
           </p>
         </div>
         <div className="hero-actions">

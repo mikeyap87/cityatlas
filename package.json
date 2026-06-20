@@ -7,6 +7,7 @@
     "dev": "vite --host 127.0.0.1 --port 5178",
     "build": "tsc -b && vite build",
     "preview": "vite preview --host 127.0.0.1 --port 4178",
+    "smoke": "npm run qa:smoke:local",
     "typecheck": "tsc -b",
     "readiness": "node scripts/readiness-report.mjs",
     "growth:verify": "node --experimental-strip-types scripts/verify-growth-machine.mjs",
@@ -20,6 +21,7 @@
     "growth:sync:roam:business-wave": "node scripts/sync-roam-public-business-wave-seeds.mjs",
     "growth:sync:roam:cities": "node scripts/sync-roam-city-sourcing-seeds.mjs",
     "qa:smoke:local": "node scripts/verify-local-product-smoke.mjs",
+    "qa:planner:summary": "node --experimental-strip-types --experimental-specifier-resolution=node scripts/verify-planner-save-summary.mjs",
     "seo:proof": "node --experimental-strip-types scripts/verify-seo-content-machine.mjs",
     "seo:structure:proof": "node --experimental-strip-types scripts/verify-seo-structure.mjs",
     "seo:copy:proof": "node scripts/verify-public-copy-safety.mjs",
@@ -43,7 +45,8 @@
     "seo:smoke:toronto": "node --experimental-strip-types scripts/verify-seo-hosted-smoke.mjs --profile toronto-pilot",
     "seo:proof:stack": "node scripts/verify-seo-proof-stack.mjs",
     "proof:sprint": "node scripts/build-proof-sprint-packet.mjs",
-    "replies:analyze": "node scripts/analyze-proof-sprint-replies.mjs"
+    "replies:analyze": "node scripts/analyze-proof-sprint-replies.mjs",
+    "qa:file-preview": "node scripts/build-file-preview.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^5.1.1",

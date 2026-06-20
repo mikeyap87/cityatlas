@@ -1,6 +1,7 @@
 :root {
   color-scheme: light;
-  --font-sans: "Avenir Next", "Segoe UI", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans: "Avenir Next", "Helvetica Neue", "Segoe UI", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-reading: "Avenir Next", "Helvetica Neue", "Segoe UI", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
   --ink: #0b1726;
   --ink-soft: #2f4056;

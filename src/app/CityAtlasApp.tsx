@@ -1,4 +1,5 @@
-import { useEffect, useMemo } from "react";
+import { Suspense, lazy, useEffect, useMemo } from "react";
+import type { ComponentType } from "react";
 import { AppLink } from "../components/Link";
 import { PublicLayout } from "../components/Layout";
 import { SeoManager } from "../components/Seo";
@@ -9,41 +10,69 @@ import {
   canShowHostedPrivatePreview,
   siteConfig,
 } from "../config/site";
-import { AdminConsole } from "../features/admin/AdminConsole";
-import { PricingPage } from "../features/business/PricingPage";
-import { SubmitBusinessPage } from "../features/business/SubmitBusinessPage";
-import { PrivacyPage, TermsPage } from "../features/legal/LegalPages";
-import { DateNightPreviewPage } from "../features/private/DateNightPreviewPage";
-import { AboutPage } from "../features/public/AboutPage";
-import { BusinessPage } from "../features/public/BusinessPage";
-import { CityPage } from "../features/public/CityPage";
-import { EventsPage, GuidesPage, OffersPage } from "../features/public/CollectionPages";
-import { GuideDetailPage } from "../features/public/GuideDetailPage";
-import { HomePage } from "../features/public/HomePage";
-import { MissionsPage } from "../features/public/MissionsPage";
-import { PlannerPage } from "../features/public/PlannerPage";
-import { SecondaryCityGuidesPage } from "../features/public/SecondaryCityGuidesPage";
-import {
-  DateNightStartersPage,
-  EditorialStandardsPage,
-  FalseCreekCultureStartersPage,
-  FirstEveningStartersPage,
-  FirstTimeVisitorStartersPage,
-  GardenDayStartersPage,
-  KitsilanoScenicStartersPage,
-  OutOfTownGuestStartersPage,
-  RainyDayStartersPage,
-  ReturningVisitorStartersPage,
-  SundayStartersPage,
-  UbcDiscoveryStartersPage,
-  WeekendRouteStartersPage,
-  WestSideDaytimeStartersPage,
-  WellnessResetStartersPage,
-  SourceBackedCollectionPage,
-} from "../features/public/TrustPages";
 import { getSourceBackedCollectionForPath } from "../lib/sourceBackedCollections";
 import { usePathname } from "./router";
 import { useCityAtlasStore } from "./useCityAtlasStore";
+
+function lazyNamed<TModule extends Record<string, unknown>>(
+  load: () => Promise<TModule>,
+  exportName: keyof TModule,
+) {
+  return lazy(async () => {
+    const module = await load();
+    return { default: module[exportName] as ComponentType<any> };
+  });
+}
+
+const loadPricingPage = () => import("../features/business/PricingPage");
+const loadSubmitBusinessPage = () => import("../features/business/SubmitBusinessPage");
+const loadLegalPages = () => import("../features/legal/LegalPages");
+const loadAboutPage = () => import("../features/public/AboutPage");
+const loadBusinessPage = () => import("../features/public/BusinessPage");
+const loadCityPage = () => import("../features/public/CityPage");
+const loadCollectionPages = () => import("../features/public/CollectionPages");
+const loadGuideDetailPage = () => import("../features/public/GuideDetailPage");
+const loadHomePage = () => import("../features/public/HomePage");
+const loadMissionsPage = () => import("../features/public/MissionsPage");
+const loadPlannerPage = () => import("../features/public/PlannerPage");
+const loadSecondaryCityGuidesPage = () => import("../features/public/SecondaryCityGuidesPage");
+const loadTrustPages = () => import("../features/public/TrustPages");
+const loadAdminConsole = () => import("../features/admin/AdminConsole");
+const loadDateNightPreviewPage = () => import("../features/private/DateNightPreviewPage");
+
+const PricingPage = lazyNamed(loadPricingPage, "PricingPage");
+const SubmitBusinessPage = lazyNamed(loadSubmitBusinessPage, "SubmitBusinessPage");
+const PrivacyPage = lazyNamed(loadLegalPages, "PrivacyPage");
+const TermsPage = lazyNamed(loadLegalPages, "TermsPage");
+const AboutPage = lazyNamed(loadAboutPage, "AboutPage");
+const BusinessPage = lazyNamed(loadBusinessPage, "BusinessPage");
+const CityPage = lazyNamed(loadCityPage, "CityPage");
+const EventsPage = lazyNamed(loadCollectionPages, "EventsPage");
+const GuidesPage = lazyNamed(loadCollectionPages, "GuidesPage");
+const OffersPage = lazyNamed(loadCollectionPages, "OffersPage");
+const GuideDetailPage = lazyNamed(loadGuideDetailPage, "GuideDetailPage");
+const HomePage = lazyNamed(loadHomePage, "HomePage");
+const MissionsPage = lazyNamed(loadMissionsPage, "MissionsPage");
+const PlannerPage = lazyNamed(loadPlannerPage, "PlannerPage");
+const SecondaryCityGuidesPage = lazyNamed(loadSecondaryCityGuidesPage, "SecondaryCityGuidesPage");
+const DateNightStartersPage = lazyNamed(loadTrustPages, "DateNightStartersPage");
+const EditorialStandardsPage = lazyNamed(loadTrustPages, "EditorialStandardsPage");
+const FalseCreekCultureStartersPage = lazyNamed(loadTrustPages, "FalseCreekCultureStartersPage");
+const FirstEveningStartersPage = lazyNamed(loadTrustPages, "FirstEveningStartersPage");
+const FirstTimeVisitorStartersPage = lazyNamed(loadTrustPages, "FirstTimeVisitorStartersPage");
+const GardenDayStartersPage = lazyNamed(loadTrustPages, "GardenDayStartersPage");
+const KitsilanoScenicStartersPage = lazyNamed(loadTrustPages, "KitsilanoScenicStartersPage");
+const OutOfTownGuestStartersPage = lazyNamed(loadTrustPages, "OutOfTownGuestStartersPage");
+const RainyDayStartersPage = lazyNamed(loadTrustPages, "RainyDayStartersPage");
+const ReturningVisitorStartersPage = lazyNamed(loadTrustPages, "ReturningVisitorStartersPage");
+const SundayStartersPage = lazyNamed(loadTrustPages, "SundayStartersPage");
+const UbcDiscoveryStartersPage = lazyNamed(loadTrustPages, "UbcDiscoveryStartersPage");
+const WeekendRouteStartersPage = lazyNamed(loadTrustPages, "WeekendRouteStartersPage");
+const WestSideDaytimeStartersPage = lazyNamed(loadTrustPages, "WestSideDaytimeStartersPage");
+const WellnessResetStartersPage = lazyNamed(loadTrustPages, "WellnessResetStartersPage");
+const SourceBackedCollectionPage = lazyNamed(loadTrustPages, "SourceBackedCollectionPage");
+const AdminConsole = lazyNamed(loadAdminConsole, "AdminConsole");
+const DateNightPreviewPage = lazyNamed(loadDateNightPreviewPage, "DateNightPreviewPage");
 
 function NotFoundPage() {
   return (
@@ -51,9 +80,43 @@ function NotFoundPage() {
       <p className="section-label">Route not found</p>
       <h1>CityAtlas does not have that page yet.</h1>
       <p>
-        Try one of the Vancouver guides, neighborhood starters, business pages, or saved routes
+        Try one of the Vancouver guides, neighborhood starting pages, business pages, or saved plans
         instead.
       </p>
+      <div className="hero-actions">
+        <AppLink className="button primary" to="/vancouver/guides">
+          Open Vancouver guides
+        </AppLink>
+        <AppLink className="button secondary" to="/">
+          Back to homepage
+        </AppLink>
+      </div>
+      <div className="guide-query-grid">
+        <AppLink className="query-card query-card-link" to="/vancouver">
+          <strong>Start with Vancouver</strong>
+          <p>Use the city page when you know the kind of day you want, but not the exact place yet.</p>
+        </AppLink>
+        <AppLink className="query-card query-card-link" to="/vancouver/missions">
+          <strong>Saved plans</strong>
+          <p>Open reusable Vancouver plans when the next step is saving or reusing a plan instead of browsing.</p>
+        </AppLink>
+        <AppLink className="query-card query-card-link" to="/for-businesses/pricing">
+          <strong>For businesses</strong>
+          <p>Open the business path when the real goal is a clearer page, offer, or guide fit.</p>
+        </AppLink>
+      </div>
+    </section>
+  );
+}
+
+function RouteLoading() {
+  return (
+    <section className="route-loading">
+      <div className="route-loading-card">
+        <p className="section-label">Opening page</p>
+        <strong>Loading CityAtlas</strong>
+        <p>Pulling the next page into place.</p>
+      </div>
     </section>
   );
 }
@@ -78,7 +141,7 @@ function ProtectedRouteNotice({
       <ul>
         <li><LockIcon /> Partner operations stay inside the protected CityAtlas workspace.</li>
         <li><LockIcon /> Packages, perks, and outreach open only after review.</li>
-        <li><LockIcon /> Public CityAtlas pages focus on guides, neighborhoods, and routes.</li>
+        <li><LockIcon /> Public CityAtlas pages focus on guides, neighborhoods, and clear local plans.</li>
       </ul>
       <div className="button-row">
         <AppLink className="button primary" to="/">
@@ -94,14 +157,16 @@ function ProtectedRouteNotice({
 
 export function CityAtlasApp() {
   const path = usePathname();
-  const { data, actions } = useCityAtlasStore();
+  const { data, actions, hydrated, growthHydrated } = useCityAtlasStore(path);
   const collectionRoute = getSourceBackedCollectionForPath(path);
   const guidePath = parseGuidePath(path);
   const guideHubPath = parseGuideHubPath(path);
+  const waitingForProtectedAdminData = path === "/admin" && !growthHydrated;
 
   useEffect(() => {
+    if (!hydrated) return;
     actions.trackEvent("page_view", { path });
-  }, [actions, path]);
+  }, [actions, hydrated, path]);
 
   const route = useMemo(() => {
     if (path === "/") {
@@ -225,8 +290,8 @@ export function CityAtlasApp() {
       if (!canShowHostedPrivatePreview()) {
         return (
           <ProtectedRouteNotice
-            label="Protected route"
-            title="This route is only available inside a protected sharing flow."
+            label="Protected page"
+            title="This page is only available inside a protected sharing flow."
             copy="It includes planning material that is shared selectively, so it stays outside the public CityAtlas experience."
           />
         );
@@ -246,7 +311,7 @@ export function CityAtlasApp() {
       if (!canShowHostedAdmin()) {
         return (
           <ProtectedRouteNotice
-            label="Protected operations route"
+            label="Protected operations page"
             title="This page is only available inside the protected CityAtlas workspace."
             copy="Business reviews, partner notes, and operations data are handled in a protected workspace, so this page stays outside the public experience."
           />
@@ -275,10 +340,18 @@ export function CityAtlasApp() {
     return <NotFoundPage />;
   }, [actions, data, path]);
 
+  if (!hydrated || waitingForProtectedAdminData) {
+    return (
+      <PublicLayout path={path}>
+        <RouteLoading />
+      </PublicLayout>
+    );
+  }
+
   return (
     <PublicLayout path={path}>
       <SeoManager path={path} data={data} />
-      {route}
+      <Suspense fallback={<RouteLoading />}>{route}</Suspense>
     </PublicLayout>
   );
 }

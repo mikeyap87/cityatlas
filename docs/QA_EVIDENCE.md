@@ -2,7 +2,7 @@
 
 ## Design Reference
 
-- Concept: `public/design/launch-product-concept.png`
+- Concept: `docs/design/launch-product-concept.png`
 - Implemented screenshots captured locally with headless Chrome because the in-app Browser did not expose a direct local navigation/screenshot tool in this thread.
 
 ## Screenshot Evidence
@@ -19,18 +19,18 @@
 - Planner mobile, true 390px viewport: `.lazyweb/design-research/cityatlas-missions-2026-06-14/references/current-state-planner-mobile-cdp.png`
 - Admin growth radar full capture: `.lazyweb/design-research/cityatlas-missions-2026-06-14/references/current-state-admin-growth-radar-full.png`
 - Lazyweb design research report: `.lazyweb/design-research/cityatlas-missions-2026-06-14/report.html`
-- Admin proof sprint desktop: `public/visual_references/04_admin_proof_sprint_desktop.png`
-- Admin proof sprint mobile: `public/visual_references/05_admin_proof_sprint_mobile.png`
-- Admin mobile header after nav fix: `public/visual_references/06_admin_mobile_header.png`
-- Admin Founder CRM desktop: `public/visual_references/07_admin_founder_crm_desktop.png`
-- Admin Founder CRM mobile: `public/visual_references/08_admin_founder_crm_mobile.png`
-- Private Date Night preview desktop: `public/visual_references/09_private_preview_desktop.png`
-- Private Date Night preview mobile: `public/visual_references/10_private_preview_mobile.png`
-- Admin reply tracker desktop: `public/visual_references/11_admin_reply_tracker_desktop.png`
-- Admin AI Brain command engine desktop: `public/visual_references/12_admin_ai_brain_desktop.png`
-- Admin AI Brain command engine mobile: `public/visual_references/13_admin_ai_brain_mobile.png`
-- Univenture terms desktop: `public/visual_references/14_univenture_terms_desktop.png`
-- Univenture privacy mobile: `public/visual_references/15_univenture_privacy_mobile.png`
+- Admin proof sprint desktop: `docs/visual_references/04_admin_proof_sprint_desktop.png`
+- Admin proof sprint mobile: `docs/visual_references/05_admin_proof_sprint_mobile.png`
+- Admin mobile header after nav fix: `docs/visual_references/06_admin_mobile_header.png`
+- Admin Founder CRM desktop: `docs/visual_references/07_admin_founder_crm_desktop.png`
+- Admin Founder CRM mobile: `docs/visual_references/08_admin_founder_crm_mobile.png`
+- Private Date Night preview desktop: `docs/visual_references/09_private_preview_desktop.png`
+- Private Date Night preview mobile: `docs/visual_references/10_private_preview_mobile.png`
+- Admin reply tracker desktop: `docs/visual_references/11_admin_reply_tracker_desktop.png`
+- Admin AI Brain command engine desktop: `docs/visual_references/12_admin_ai_brain_desktop.png`
+- Admin AI Brain command engine mobile: `docs/visual_references/13_admin_ai_brain_mobile.png`
+- Univenture terms desktop: `docs/visual_references/14_univenture_terms_desktop.png`
+- Univenture privacy mobile: `docs/visual_references/15_univenture_privacy_mobile.png`
 - Out-of-town guest mobile after shared header fix: `/tmp/cityatlas_out_of_town_guest_mobile_v2.png`
 
 ## Checks

@@ -7,7 +7,6 @@ import {
   variantCopy,
 } from "../../lib/experiments";
 import { getGuidePath } from "../../lib/cityPaths";
-import { buildPublicBusinessCoverageSnapshot } from "../../lib/publicBusinessCoverage";
 import { AppLink } from "../../components/Link";
 import {
   ArrowRightIcon,
@@ -16,22 +15,18 @@ import {
   SparkIcon,
 } from "../../components/Icons";
 import {
-  BusinessCard,
-  EventCard,
   GuideCard,
+  GuideCompactCard,
   MissionCard,
-  OfferCard,
   TrustCard,
 } from "../../components/Cards";
 import {
-  MetricCard,
-  SafeModeNotice,
   SectionHeader,
   StatusPill,
 } from "../../components/UI";
 import { getSourceBackedPlaces } from "../../lib/sourceBackedCollections";
 import { navigate } from "../../app/router";
-import { VancouverBusinessCoverageSection } from "./VancouverBusinessCoverageSection";
+import { simplifyGuideDisplayText } from "../../lib/publicCopy";
 
 interface HomePageProps {
   data: CityAtlasData;
@@ -40,7 +35,7 @@ interface HomePageProps {
   onSaveMission: (mission: CityMission) => void;
 }
 
-type HomeSearchKind = "guide" | "business" | "event" | "offer";
+type HomeSearchKind = "shortcut" | "guide" | "business" | "event" | "offer";
 
 interface HomeSearchResult {
   id: string;
@@ -55,44 +50,82 @@ const heroMapStops = [
   {
     id: "gastown",
     label: "Gastown",
-    caption: "Old-core dinner and evening plans",
+    caption: "Old-core evening",
+    detail: "Best for dinner, a walk, and a compact first evening without crossing the city.",
     path: "/vancouver/guides/gastown-evening-guide-when-to-choose-it-and-how-to-keep-the-plan-compact",
   },
   {
     id: "kits",
     label: "Kitsilano",
-    caption: "Beach, flow, and slower west-side plans",
+    caption: "Beach and seawall",
+    detail: "Best for shoreline time, easy movement, and a lighter west-side pace.",
     path: "/vancouver/kitsilano-scenic-starters",
   },
   {
     id: "mount-pleasant",
     label: "Mount Pleasant",
-    caption: "Coffee, flexible nights, and local wandering",
+    caption: "Coffee and casual plans",
+    detail: "Useful for cafes, casual meals, and a short neighborhood wander.",
     path: "/vancouver/guides/mount-pleasant-local-discovery-starter-guide-for-casual-vancouver-plans",
   },
   {
     id: "false-creek",
     label: "False Creek",
-    caption: "Museums, culture, and shoreline routes",
+    caption: "Culture afternoon",
+    detail: "A better fit for museums, harbour walks, and a compact daytime plan.",
     path: "/vancouver/false-creek-culture-starters",
   },
   {
     id: "ubc",
-    label: "UBC and Point Grey",
-    caption: "Gardens, campus stops, and scenic daytime picks",
+    label: "UBC + Point Grey",
+    caption: "Garden and campus day",
+    detail: "Open this for campus stops, gardens, and a quieter scenic reset.",
     path: "/vancouver/ubc-discovery-starters",
   },
 ] as const;
 
 const heroSearchSuggestions = [
-  { label: "Rainy day", value: "rainy day" },
-  { label: "Kits Beach", value: "kits beach" },
-  { label: "First evening", value: "first evening" },
-  { label: "Coffee", value: "coffee" },
-  { label: "Weekend route", value: "weekend route" },
+  { label: "Rainy day", value: "rainy day", path: "/vancouver/rainy-day-starters" },
+  { label: "Gastown", value: "gastown", path: "/vancouver/guides/gastown-evening-guide-when-to-choose-it-and-how-to-keep-the-plan-compact" },
+  { label: "Kits Beach", value: "kits beach", path: "/vancouver/kitsilano-scenic-starters" },
+  {
+    label: "Weekend plan",
+    value: "weekend plan",
+    path: "/vancouver/weekend-route-starters",
+  },
+] as const;
+
+const heroSearchShortcuts = [
+  {
+    id: "shortcut-rainy-day",
+    label: "Rainy day starters",
+    detail: "Start with an indoor Vancouver plan.",
+    path: "/vancouver/rainy-day-starters",
+    matches: ["rainy day", "rain", "indoor plan"],
+  },
+  {
+    id: "shortcut-weekend-route",
+    label: "Weekend route starters",
+    detail: "Keep a Vancouver weekend compact and easy to follow.",
+    path: "/vancouver/weekend-route-starters",
+    matches: ["weekend", "weekend plan", "weekend route"],
+  },
+  ...heroMapStops.map((stop) => ({
+    id: `shortcut-${stop.id}`,
+    label: stop.label,
+    detail: stop.caption,
+    path: stop.path,
+    matches: [
+      stop.label.toLowerCase(),
+      stop.caption.toLowerCase(),
+      ...(stop.id === "kits" ? ["kits beach", "kitsilano"] : []),
+      ...(stop.id === "ubc" ? ["ubc", "point grey"] : []),
+    ],
+  })),
 ] as const;
 
 const homeResultKindLabels: Record<HomeSearchKind, string> = {
+  shortcut: "Start here",
   guide: "Guide",
   business: "Place",
   event: "Event",
@@ -111,53 +144,40 @@ const trustedStartingPointLinks = [
   { path: "/vancouver/ubc-discovery-starters", label: "UBC day" },
   { path: "/vancouver/returning-visitor-starters", label: "Returning visit" },
   { path: "/vancouver/out-of-town-guest-starters", label: "Hosting guests" },
-  { path: "/vancouver/weekend-route-starters", label: "Weekend route" },
+  { path: "/vancouver/weekend-route-starters", label: "Weekend plan" },
   { path: "/vancouver/sunday-starters", label: "Sunday plan" },
   { path: "/vancouver/wellness-reset-starters", label: "Wellness reset" },
 ] as const;
 
 const homePlanningLanes = [
   {
-    title: "Date night",
-    description: "Choose a smoother neighborhood or route before the night turns into too many tabs.",
+    title: "First visit",
+    description: "Choose the right part of Vancouver before a first trip gets overbuilt.",
+    path: "/vancouver/first-time-visitor-starters",
+    hint: "Plan the start",
   },
   {
     title: "Rainy day",
-    description: "Open calmer indoor ideas fast when the weather changes the plan.",
+    description: "Move fast into a good indoor plan when the weather turns.",
+    path: "/vancouver/rainy-day-starters",
+    hint: "See indoor routes",
   },
   {
-    title: "First visit",
-    description: "Start with the part of Vancouver that gives the right first impression.",
-  },
-  {
-    title: "Weekend route",
-    description: "Keep the day compact instead of bouncing across the city for one plan.",
-  },
-  {
-    title: "Work-friendly cafes",
-    description: "Find a better coffee-and-laptop fit without guessing from generic list posts.",
-  },
-  {
-    title: "Wellness reset",
-    description: "Choose a lower-friction recovery or slower-day plan without the hype layer.",
+    title: "Weekend plan",
+    description: "Keep one city day compact instead of crossing Vancouver for too many stops.",
+    path: "/vancouver/weekend-route-starters",
+    hint: "Keep it compact",
   },
 ] as const;
 
-const whyCityAtlasFeelsEasier = [
-  "It starts with the real decision: where to begin, not which place looks loudest.",
-  "Search, route chips, and area links all lead into the same guide library.",
-  "Official-link pages stay separate from broader guide pages so trust is easier to read.",
-  "Saved plans turn a good city idea into something you can come back to later.",
-] as const;
-
-export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePageProps) {
-  const [email, setEmail] = useState("");
-  const [referralCode, setReferralCode] = useState("");
+export function HomePage({ data, onNewsletter: _onNewsletter, onTrack, onSaveMission }: HomePageProps) {
   const [heroQuery, setHeroQuery] = useState("");
+  const [activeHeroStopId, setActiveHeroStopId] = useState<(typeof heroMapStops)[number]["id"]>(
+    heroMapStops[0].id,
+  );
   const activeVariant = getActiveVariant();
   const copy = variantCopy[activeVariant];
   const nextBestAction = getNextBestAction(data);
-  const featuredBusinesses = data.businesses.filter((business) => business.featured).slice(0, 3);
   const featuredMissions = data.cityMissions.filter((mission) => mission.featured);
   const cityGuides = data.guides.filter(
     (guide) => (guide.citySlug ?? siteConfig.citySlug) === siteConfig.citySlug,
@@ -266,22 +286,48 @@ export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePag
   const featuredSourceBackedPlaces = featuredSourceBackedCollections.flat();
   const featuredSourceBackedNames = Array.from(
     new Set(featuredSourceBackedPlaces.map((reference) => reference.name)),
-  ).slice(0, 12);
+  ).slice(0, 8);
   const sourceBackedWedgeCount = featuredSourceBackedCollections.filter(
     (collection) => collection.length > 0,
   ).length;
-  const businessCoverage = buildPublicBusinessCoverageSnapshot(data);
+  const localPlacePageLabel = `${sourceBackedWedgeCount} place pages`;
+  const activeHeroStop =
+    heroMapStops.find((stop) => stop.id === activeHeroStopId) ?? heroMapStops[0];
+  const heroSignals = [
+    {
+      tone: "blue" as const,
+      label: "Start with a neighborhood",
+    },
+    {
+      tone: "green" as const,
+      label: "Or search by need",
+    },
+  ];
   const homeSearchResults = useMemo(() => {
-    const guideResults: HomeSearchResult[] = cityGuides.map((guide) => ({
-      id: `guide-${guide.id}`,
-      kind: "guide",
-      label: guide.title,
-      detail: guide.summary,
-      path: getGuidePath(guide),
-      haystack: [guide.title, guide.summary, guide.queryClass, guide.category, guide.neighborhood]
-        .join(" ")
-        .toLowerCase(),
+    const shortcutResults: HomeSearchResult[] = heroSearchShortcuts.map((shortcut) => ({
+      id: shortcut.id,
+      kind: "shortcut",
+      label: shortcut.label,
+      detail: shortcut.detail,
+      path: shortcut.path,
+      haystack: shortcut.matches.join(" ").toLowerCase(),
     }));
+    const guideResults: HomeSearchResult[] = cityGuides.map((guide) => {
+      const guideTitle = simplifyGuideDisplayText(guide.title);
+      const guideSummary = simplifyGuideDisplayText(guide.summary);
+      const guideQuery = simplifyGuideDisplayText(guide.queryClass);
+
+      return {
+        id: `guide-${guide.id}`,
+        kind: "guide",
+        label: guideTitle,
+        detail: guideSummary,
+        path: getGuidePath(guide),
+        haystack: [guideTitle, guideSummary, guideQuery, guide.category, guide.neighborhood]
+          .join(" ")
+          .toLowerCase(),
+      };
+    });
     const businessResults: HomeSearchResult[] = data.businesses.map((business) => ({
       id: `business-${business.id}`,
       kind: "business",
@@ -319,7 +365,7 @@ export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePag
       };
     });
 
-    return [...guideResults, ...businessResults, ...eventResults, ...offerResults];
+    return [...shortcutResults, ...guideResults, ...businessResults, ...eventResults, ...offerResults];
   }, [cityGuides, data.businesses, data.events, data.offers]);
   const filteredHomeResults = useMemo(() => {
     const query = heroQuery.trim().toLowerCase();
@@ -336,16 +382,50 @@ export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePag
           (score, term) => score + (haystack.includes(term) ? 1 : 0),
           0,
         );
+        const kindBonus =
+          result.kind === "shortcut"
+            ? 6
+            : result.kind === "guide"
+              ? 4
+              : result.kind === "business"
+                ? 2
+                : result.kind === "event"
+                  ? 1
+                  : 0;
 
         return {
           ...result,
-          score: exactMatch + termScore,
+          matchScore: exactMatch + termScore,
+          score: exactMatch + termScore + kindBonus,
         };
       })
-      .filter((result) => result.score > 0)
+      .filter((result) => result.matchScore > 0)
       .sort((left, right) => right.score - left.score || left.label.localeCompare(right.label))
       .slice(0, 3);
   }, [heroQuery, homeSearchResults]);
+  const hasHeroQuery = heroQuery.trim().length > 0;
+  const heroSearchHasMatches = filteredHomeResults.length > 0;
+  const preferredHomepageGuides = [
+    "where-should-a-first-time-vancouver-visitor-start",
+    "how-to-build-a-vancouver-weekend-route-without-crossing-the-city-all-day",
+    "rainy-day-vancouver-plan-coffee-walk-and-reset",
+  ]
+    .map((slug) => cityGuides.find((guide) => guide.slug === slug))
+    .filter((guide): guide is (typeof cityGuides)[number] => Boolean(guide));
+  const fallbackHomepageGuides = cityGuides.filter(
+    (guide) => !preferredHomepageGuides.some((preferredGuide) => preferredGuide.id === guide.id),
+  );
+  const homepageGuideHighlights = [...preferredHomepageGuides, ...fallbackHomepageGuides].slice(0, 3);
+  const [featuredHomepageGuide, ...supportingHomepageGuides] = homepageGuideHighlights;
+  const trustHighlightLinks = trustedStartingPointLinks.slice(0, 4);
+  const nextStepLabel =
+    nextBestAction.label === "Pick your first Vancouver guide"
+      ? "Start with the Vancouver guide library"
+      : nextBestAction.label;
+  const nextStepCopy =
+    nextBestAction.label === "Pick your first Vancouver guide"
+      ? "That is the fastest way to compare rainy-day, visitor, weekend, and neighborhood guides without scanning the whole city first."
+      : nextBestAction.copy;
 
   useEffect(() => {
     onTrack("experiment_exposed", { experiment: "homepage_positioning", variant: activeVariant });
@@ -355,9 +435,15 @@ export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePag
     <>
       <section className="hero-grid">
         <div className="hero-media">
-          <img src={siteConfig.media.hero} alt="Vancouver evening market scene" />
+          <img
+            src={siteConfig.media.hero}
+            alt="Vancouver evening market scene"
+            decoding="async"
+            fetchPriority="high"
+            loading="eager"
+          />
           <div className="hero-copy">
-            <p className="hero-kicker">Vancouver city guide</p>
+            <p className="hero-kicker">Vancouver guide</p>
             <h1>{copy.heroTitle}</h1>
             <p>{copy.heroCopy}</p>
             <div className="hero-actions">
@@ -369,98 +455,101 @@ export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePag
                 <ArrowRightIcon />
               </AppLink>
               <AppLink className="button secondary" to="/for-businesses/pricing">
-                For businesses
+                For Vancouver businesses
               </AppLink>
             </div>
-            <div className="hero-quick-picks" aria-label="Popular planning shortcuts">
-              <AppLink className="hero-quick-pick" to="/vancouver/rainy-day-starters">
-                Rainy day plan
-              </AppLink>
-              <AppLink className="hero-quick-pick" to="/vancouver/first-time-visitor-starters">
-                First visit
-              </AppLink>
-              <AppLink className="hero-quick-pick" to="/vancouver/kitsilano-scenic-starters">
-                Kitsilano
-              </AppLink>
+            <div className="home-hero-lane-group">
+              <p className="home-hero-lane-label">Useful ways to start</p>
+              <div className="home-hero-lane-row">
+                {homePlanningLanes.map((lane) => (
+                  <AppLink className="home-hero-lane-pill" key={lane.title} to={lane.path}>
+                    <strong>{lane.title}</strong>
+                    <span>{lane.description}</span>
+                  </AppLink>
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
         <div className="hero-side-column">
-          <div className="hero-map-panel">
-            <div className="map-toolbar">
-              <strong>Choose a Vancouver area</strong>
-              <StatusPill tone="blue">Clickable</StatusPill>
+          <div className="hero-utility-panel">
+            <div className="hero-utility-head">
+              <div>
+                <strong>Tap an area or search by what kind of day you want</strong>
+                <p className="hero-panel-copy">
+                  Use the area picker or search to open one useful Vancouver page fast.
+                </p>
+              </div>
             </div>
-            <p className="hero-panel-copy">
-              Click a neighborhood lane and CityAtlas will open the guide or starting page that fits.
-            </p>
-            <div className="atlas-map" aria-label="Clickable Vancouver route map">
-              <svg className="atlas-map-art" viewBox="0 0 520 320" aria-hidden="true">
-                <defs>
-                  <linearGradient id="atlas-water" x1="0%" x2="100%" y1="0%" y2="100%">
-                    <stop offset="0%" stopColor="#f4fbff" />
-                    <stop offset="100%" stopColor="#d9eef8" />
-                  </linearGradient>
-                  <linearGradient id="atlas-land" x1="0%" x2="100%" y1="0%" y2="100%">
-                    <stop offset="0%" stopColor="#fbfdff" />
-                    <stop offset="100%" stopColor="#eef5ef" />
-                  </linearGradient>
-                </defs>
-                <rect width="520" height="320" rx="24" fill="url(#atlas-water)" />
+            <div className="hero-signal-row">
+              {heroSignals.map((signal) => (
+                <StatusPill key={signal.label} tone={signal.tone}>
+                  {signal.label}
+                </StatusPill>
+              ))}
+            </div>
+            <div className="atlas-map" aria-label="Clickable Vancouver area picker">
+              <svg
+                aria-hidden="true"
+                className="atlas-map-art"
+                preserveAspectRatio="none"
+                viewBox="0 0 1000 340"
+              >
                 <path
                   className="atlas-map-land"
-                  d="M44 64C84 44 136 44 172 66C208 88 250 112 292 108C333 104 370 72 416 71C448 70 478 87 500 113V320H30V106C32 92 35 76 44 64Z"
-                  fill="url(#atlas-land)"
+                  d="M0 26C92 34 162 84 226 92C312 103 350 52 431 56C520 60 567 126 645 132C754 140 844 86 1000 98V0H0Z"
+                  fill="rgba(255,255,255,0.62)"
                 />
                 <path
-                  className="atlas-map-waterway"
-                  d="M0 116C76 103 138 111 203 145C258 173 309 180 375 166C426 154 468 127 520 118"
+                  className="atlas-map-land"
+                  d="M0 248C115 221 176 159 260 160C352 162 401 226 491 236C607 249 703 182 784 178C861 174 916 202 1000 224V340H0Z"
+                  fill="rgba(255,255,255,0.7)"
                 />
-                <path
-                  className="atlas-map-waterway"
-                  d="M108 236C153 219 207 219 258 231C321 246 379 247 452 227"
-                />
-                <path
-                  className="atlas-map-route"
-                  d="M92 94C146 109 183 137 223 174C255 203 292 212 342 201C385 191 427 163 455 128"
-                />
-                <path
-                  className="atlas-map-route alt"
-                  d="M116 244C181 221 231 215 285 225C330 233 370 226 429 190"
-                />
-                <text className="atlas-map-label" x="64" y="86">
-                  Burrard Inlet
+                <path className="atlas-map-waterway" d="M44 170C180 130 275 132 392 165C500 196 625 206 774 183C868 169 933 150 980 135" />
+                <path className="atlas-map-route" d="M120 104C212 122 313 150 404 191C492 229 612 243 747 227" />
+                <path className="atlas-map-route alt" d="M182 246C283 219 390 203 511 213C616 221 699 204 847 164" />
+                <text className="atlas-map-label atlas-map-label-land" x="128" y="86">
+                  Downtown
                 </text>
-                <text className="atlas-map-label" x="320" y="256">
+                <text className="atlas-map-label" x="515" y="156">
                   False Creek
                 </text>
-                <text className="atlas-map-label atlas-map-label-land" x="370" y="78">
-                  West Side
+                <text className="atlas-map-label atlas-map-label-land" x="728" y="270">
+                  West side
                 </text>
               </svg>
-              {heroMapStops.map((stop) => (
-                <AppLink className={`map-stop map-stop-${stop.id}`} key={stop.id} to={stop.path}>
-                  <span className="map-stop-dot" />
-                  <strong>{stop.label}</strong>
-                  <small>{stop.caption}</small>
-                </AppLink>
-              ))}
+              {heroMapStops.map((stop) => {
+                const mapStopClassName =
+                  stop.id === "mount-pleasant"
+                    ? "map-stop-mount-pleasant"
+                    : stop.id === "false-creek"
+                      ? "map-stop-false-creek"
+                      : stop.id === "kits"
+                        ? "map-stop-kits"
+                        : stop.id === "ubc"
+                          ? "map-stop-ubc"
+                          : "map-stop-gastown";
+
+                return (
+                  <AppLink
+                    aria-label={`Open ${stop.label}`}
+                    className={`map-stop ${mapStopClassName}${stop.id === activeHeroStop.id ? " active" : ""}`}
+                    key={stop.id}
+                    onFocus={() => setActiveHeroStopId(stop.id)}
+                    onMouseEnter={() => setActiveHeroStopId(stop.id)}
+                    to={stop.path}
+                  >
+                    <span className="map-stop-dot" aria-hidden="true" />
+                    <strong>{stop.label}</strong>
+                  </AppLink>
+                );
+              })}
             </div>
-            <div className="hero-map-list">
-              {heroMapStops.map((stop) => (
-                <AppLink className="hero-map-link" key={stop.id} to={stop.path}>
-                  <strong>{stop.label}</strong>
-                  <span>{stop.caption}</span>
-                </AppLink>
-              ))}
-            </div>
-            <div className="hero-search-stack">
-              <div className="hero-search-intro">
-                <strong>Search by mood, place, or occasion</strong>
-                <StatusPill tone="green">Live search</StatusPill>
-              </div>
-              <p className="hero-search-copy">Type one need and open the closest match.</p>
+            <div className="hero-search-panel">
+              <p className="hero-search-copy">
+                Try rainy day, first visit, Kits Beach, or weekend plan.
+              </p>
               <form
                 className="hero-search-form"
                 onSubmit={(event) => {
@@ -479,196 +568,123 @@ export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePag
                 <input
                   aria-label="Search CityAtlas"
                   onChange={(event) => setHeroQuery(event.target.value)}
-                  placeholder="Try rainy day, Kits Beach, coffee, or first evening"
+                  placeholder="Search rainy day, Gastown, or weekend plan"
                   type="search"
                   value={heroQuery}
                 />
                 <button className="button primary hero-search-submit" type="submit">
-                  Open match
+                  Go
                 </button>
               </form>
-              {filteredHomeResults.length > 0 ? (
+              {heroSearchHasMatches ? (
                 <div className="hero-search-results">
                   {filteredHomeResults.map((result) => (
                     <AppLink className="hero-search-result" key={result.id} to={result.path}>
                       <strong>{result.label}</strong>
-                      <span>{`${homeResultKindLabels[result.kind]} | ${result.detail}`}</span>
+                      <span>{`${homeResultKindLabels[result.kind]}: ${result.detail}`}</span>
                     </AppLink>
                   ))}
                 </div>
+              ) : hasHeroQuery ? (
+                <div className="hero-search-empty hero-search-empty-active">
+                  <strong>No exact page yet</strong>
+                  <p>Open the Vancouver guide library or start with the main Vancouver page.</p>
+                  <div className="hero-search-suggestions">
+                    <AppLink className="hero-search-suggestion" to="/vancouver/guides">
+                      Open guides
+                    </AppLink>
+                    <AppLink className="hero-search-suggestion" to="/vancouver">
+                      Browse Vancouver
+                    </AppLink>
+                  </div>
+                </div>
               ) : (
                 <div className="hero-search-empty">
-                  <p>Popular starting points</p>
+                  <p>Popular searches</p>
                   <div className="hero-search-suggestions">
                     {heroSearchSuggestions.map((suggestion) => (
-                      <button
+                      <AppLink
                         className="hero-search-suggestion"
                         key={suggestion.value}
-                        onClick={() => setHeroQuery(suggestion.value)}
-                        type="button"
+                        onMouseEnter={() => setHeroQuery(suggestion.value)}
+                        to={suggestion.path}
                       >
                         {suggestion.label}
-                      </button>
+                      </AppLink>
                     ))}
                   </div>
                 </div>
               )}
             </div>
+            <div className="hero-active-route-row">
+              <div className="hero-active-route-copy">
+                <p className="hero-route-preview-kicker">Why this area works</p>
+                <strong>{activeHeroStop.label}</strong>
+                <p>{activeHeroStop.caption}</p>
+                <p className="hero-active-route-summary">{activeHeroStop.detail}</p>
+              </div>
+              <AppLink className="button secondary" to={activeHeroStop.path}>
+                Open page
+              </AppLink>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="hero-business-strip partner-panel">
-        <div>
-          <p className="section-label">For businesses</p>
-          <h2>{copy.partnerHeadline}</h2>
-          <p>{copy.partnerCopy}</p>
-          <div className="hero-actions">
-            <AppLink className="button primary" to="/for-businesses/submit">
-              Start business request
-              <ArrowRightIcon />
-            </AppLink>
-            <AppLink className="button secondary" to="/for-businesses/pricing">
-              See packages
-            </AppLink>
-          </div>
-        </div>
-        <div>
-          <SafeModeNotice />
-          <div className="mini-pricing-row">
-            {data.packages.map((plan) => (
-              <article className={plan.highlighted ? "mini-plan highlighted" : "mini-plan"} key={plan.id}>
-                <strong>{plan.name}</strong>
-                <span>{plan.priceLabel}</span>
-                <small>Starts with a quick check</small>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="metrics-strip">
-        <MetricCard label="Guide pages" value={`${cityGuides.length}`} detail="Planning guides already live" />
-        <MetricCard label="Official source pages" value={`${sourceBackedWedgeCount}`} detail="Starting-point pages with real source links" />
-        <MetricCard label="Businesses tracked" value={`${businessCoverage.totalBusinesses}`} detail="Vancouver businesses already mapped" />
-        <MetricCard label="Saved plans" value={`${data.cityMissions.length}`} detail="Route ideas you can keep and reuse" />
-      </section>
-
-      <section className="section-block">
-        <SectionHeader
-          label="Next city"
-          title="Toronto now has its first CityAtlas starter library"
-          copy="Toronto starts smaller for now: one guide hub, two pages with official links, and two simple guides for a first visit or a compact weekend."
-          action={<StatusPill tone="blue">Toronto starter library</StatusPill>}
-        />
-        <div className="guide-query-grid">
-          <AppLink className="query-card query-card-link" to="/toronto/guides">
-            <strong>Toronto guide library</strong>
-            <p>Open Toronto when the real question is where a first-time visitor should begin or how to keep a weekend compact, not how to cover the whole city.</p>
-          </AppLink>
-          <AppLink className="query-card query-card-link" to="/toronto/first-time-visitor-starters">
-            <strong>Toronto first-visit starting points</strong>
-            <p>Use the official source page for Distillery, St. Lawrence, Harbourfront, AGO, and ROM when the first decision is where to begin.</p>
-          </AppLink>
-          <AppLink
-            className="query-card query-card-link"
-            to="/toronto/guides/where-should-a-first-time-toronto-visitor-start"
-          >
-            <strong>Toronto destination guide</strong>
-            <p>Read the answer-first Toronto guide when the goal is choosing the right first impression instead of building a giant itinerary.</p>
-          </AppLink>
-          <AppLink className="query-card query-card-link" to="/toronto/weekend-route-starters">
-            <strong>Toronto weekend starting points</strong>
-            <p>Use the official source page for STACKT, Toronto Music Garden, The Bentway, Evergreen Brick Works, and Toronto Botanical Garden when you want one cleaner weekend shape.</p>
-          </AppLink>
-        </div>
-      </section>
-
-      <section className="split-section">
-        <div className="source-panel">
-          <SectionHeader
-            label="What is CityAtlas?"
-            title="A Vancouver-first guide for making the next city choice easier"
-            copy="CityAtlas is built for the moment when you know the kind of day you want, but not the best place or route to start with."
-          />
-          <div className="home-explainer-grid">
-            {homePlanningLanes.map((lane) => (
-              <article className="home-explainer-card" key={lane.title}>
-                <strong>{lane.title}</strong>
-                <p>{lane.description}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-        <div className="source-panel">
-          <SectionHeader
-            label="Why it feels easier"
-            title="Built to help you choose, not scroll forever"
-            copy="The strongest CityAtlas pages narrow the first decision quickly, then move you into the right guide, route, or saved plan."
-          />
-          <ul className="home-why-list">
-            {whyCityAtlasFeelsEasier.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-          <div className="hero-actions">
-            <AppLink className="button secondary" to="/about">
-              About CityAtlas
-            </AppLink>
-            <AppLink
-              className="button secondary"
-              to="/vancouver/guides/vancouver-itinerary-starter-pack-which-cityatlas-page-should-you-open-first"
-            >
-              Where to start
-            </AppLink>
-            <AppLink className="button secondary" to="/vancouver/guides">
-              Guide library
-            </AppLink>
-          </div>
-        </div>
-      </section>
-
-      <section className="adaptive-band">
+      <section className="home-next-step-band">
         <SparkIcon />
-        <div>
-          <strong>Try this next: {nextBestAction.label}</strong>
-          <p>{nextBestAction.copy}</p>
+        <div className="home-next-step-band-copy">
+          <span className="query-card-kicker">Need one clear start?</span>
+          <strong>{nextStepLabel}</strong>
+          <p>{nextStepCopy}</p>
         </div>
-        <AppLink className="button secondary" to={nextBestAction.path}>
-          Continue <ArrowRightIcon />
-        </AppLink>
+        <div className="hero-actions">
+          <AppLink className="button primary" to={nextBestAction.path}>
+            {nextBestAction.primaryLabel} <ArrowRightIcon />
+          </AppLink>
+          <AppLink className="button secondary" to={nextBestAction.secondaryPath}>
+            {nextBestAction.secondaryLabel}
+          </AppLink>
+        </div>
       </section>
 
       <section className="section-block">
         <SectionHeader
-          label="Popular planning questions"
-          title="Popular Vancouver planning questions"
-          copy="These are the city questions CityAtlas is built to answer first."
+          label="Start with one useful guide"
+          title="Three strong Vancouver guides to open first"
+          copy="Start with the guide that fits the day, then go deeper only if you still need more."
+          action={<AppLink className="text-link" to="/vancouver/guides">Open guide library <ArrowRightIcon /></AppLink>}
         />
-        <div className="guide-query-grid">
-          {cityGuides.slice(0, 8).map((guide) => (
-            <AppLink className="query-card query-card-link" to={`/vancouver/guides/${guide.slug}`} key={guide.id}>
-              <strong>{guide.queryClass}</strong>
-              <p>{guide.summary}</p>
-            </AppLink>
-          ))}
-        </div>
+        {featuredHomepageGuide ? (
+          <div className="guide-cluster-layout home-guide-layout">
+            <GuideCard guide={featuredHomepageGuide} key={featuredHomepageGuide.id} />
+            <div className="guide-cluster-stack">
+              {supportingHomepageGuides.map((guide) => (
+                <GuideCompactCard guide={guide} key={guide.id} variant="tight" />
+              ))}
+              <AppLink className="guide-more-card" to="/vancouver/guides">
+                <strong>See the full Vancouver guide library</strong>
+                <span>Open the full list when you already know the question and just need the right page fast.</span>
+              </AppLink>
+            </div>
+          </div>
+        ) : null}
       </section>
 
       {neighborhoodGuides.length > 0 ? (
         <section className="section-block">
           <SectionHeader
             label="Choose a neighborhood first"
-            title="Start with the part of Vancouver that fits the plan"
-            copy="These pages help readers choose the right neighborhood before they overthink the exact stops. CityAtlas now has starting-point guides for Gastown, Mount Pleasant, and Kitsilano."
+            title="Choose the neighborhood before the exact stop"
+            copy="These pages help people pick the right part of Vancouver before they overthink the exact stop list."
           />
           <div className="guide-query-grid">
             {(neighborhoodStarterGuides.length > 0 ? neighborhoodStarterGuides : neighborhoodGuides)
               .slice(0, 3)
               .map((guide) => (
               <AppLink className="query-card query-card-link" to={`/vancouver/guides/${guide.slug}`} key={guide.id}>
-                <strong>{guide.title}</strong>
-                <p>{guide.excerpt}</p>
+                <strong>{simplifyGuideDisplayText(guide.title)}</strong>
+                <p>{simplifyGuideDisplayText(guide.excerpt)}</p>
               </AppLink>
             ))}
           </div>
@@ -692,25 +708,25 @@ export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePag
         <section className="split-section">
           <div className="source-panel">
             <SectionHeader
-              label="Official sources now"
-              title="Real Vancouver places with official source links"
-              copy="CityAtlas now has fourteen focused pages that name real Vancouver anchors, link straight to official sources, and stay clear about what each page covers."
-              action={<StatusPill tone="green">{sourceBackedWedgeCount} checked city topics</StatusPill>}
+              label="Local places"
+              title="Real Vancouver places with official links"
+              copy="When CityAtlas names a specific place, it links to the official site and stays clear about what it confirmed."
+              action={<StatusPill tone="green">{localPlacePageLabel}</StatusPill>}
             />
             <div className="tag-cloud">
-              {featuredSourceBackedNames.map((name) => (
+              {featuredSourceBackedNames.slice(0, 6).map((name) => (
                 <span key={name}>{name}</span>
               ))}
             </div>
           </div>
           <div className="source-panel">
             <SectionHeader
-              label="Trust layer"
-              title="Useful enough to share, clear enough to trust"
-              copy="CityAtlas starts smaller, links to official sources where needed, and keeps corrections easy."
+              label="Open local places"
+              title="Start with a few strong local places first"
+              copy="Open a strong local place here, then go deeper only if the day still needs more."
             />
             <div className="hero-actions">
-              {trustedStartingPointLinks.map((link, index) => (
+              {trustHighlightLinks.map((link, index) => (
                 <AppLink
                   className={index === 0 ? "button primary" : "button secondary"}
                   key={link.path}
@@ -720,34 +736,18 @@ export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePag
                   {index === 0 ? <ArrowRightIcon /> : null}
                 </AppLink>
               ))}
-              <AppLink className="button secondary" to="/editorial-standards">
-                See editorial standards
+              <AppLink className="button secondary" to="/vancouver/guides">
+                Browse all place pages
               </AppLink>
             </div>
           </div>
         </section>
       ) : null}
 
-      <VancouverBusinessCoverageSection data={data} variant="home" />
-
-      <section className="section-block">
-        <SectionHeader
-          label="Business pages"
-          title="See how a CityAtlas business page can look"
-          copy="These examples show how CityAtlas can present a business once facts, photos, and participation details are checked."
-          action={<AppLink className="text-link" to="/vancouver">View all discovery <ArrowRightIcon /></AppLink>}
-        />
-        <div className="card-grid three">
-          {featuredBusinesses.map((business) => (
-            <BusinessCard business={business} key={business.id} />
-          ))}
-        </div>
-      </section>
-
       <section className="section-block">
         <SectionHeader
           label="Saved plans"
-          title="Routes built for repeat visits and easy sharing"
+          title="Saved plans built for repeat visits and easy sharing"
           copy="Make a plan, save it, share it, and turn a good city idea into something easy to reuse."
           action={<AppLink className="text-link" to="/vancouver/missions">View saved plans <ArrowRightIcon /></AppLink>}
         />
@@ -766,94 +766,99 @@ export function HomePage({ data, onNewsletter, onTrack, onSaveMission }: HomePag
       <section className="split-section">
         <div>
           <SectionHeader
-            label="Events and offers"
-            title="Event pages and local offers"
-            copy="CityAtlas can support events, offers, and partner moments without pretending every listing is already live."
+            label="Next city"
+            title="Toronto now has a smaller starter set"
+            copy="Use Toronto when the real question is where a first-time visitor should begin or how to keep a weekend compact. Vancouver still has the deeper guide library."
           />
-          <div className="stacked-list">
-            {data.events.map((event) => (
-              <EventCard event={event} key={event.id} />
-            ))}
+          <div className="guide-query-grid">
+            <AppLink className="query-card query-card-link" to="/toronto/guides">
+              <strong>Toronto guides</strong>
+              <p>Start with Toronto when the goal is one clear first-visit or weekend decision.</p>
+            </AppLink>
+            <AppLink className="query-card query-card-link" to="/toronto/first-time-visitor-starters">
+              <strong>Toronto first-visit starting points</strong>
+              <p>Open the Toronto starting page when the first job is choosing where to begin.</p>
+            </AppLink>
           </div>
         </div>
         <div>
           <SectionHeader
-            label="Partner offers"
-            title="How a local offer can appear"
-            copy="These examples show how a local offer can appear after the business confirms the details."
+            label="For Vancouver businesses"
+            title="Want your business to show up more clearly?"
+            copy={copy.partnerCopy}
+            action={<StatusPill tone="green">Request review first</StatusPill>}
           />
-          <div className="stacked-list">
-            {data.offers.map((offer) => (
-              <OfferCard
-                offer={offer}
-                business={data.businesses.find((business) => business.id === offer.businessId)}
-                key={offer.id}
-              />
-            ))}
+          <div className="source-panel">
+            <p>
+              Start with one clear business need. CityAtlas can turn that into the smallest useful
+              next step, whether that is a stronger page, better guide fit, or a simple offer.
+            </p>
+            <div className="hero-actions">
+              <AppLink className="button primary" to="/for-businesses/submit">
+                Start business request
+                <ArrowRightIcon />
+              </AppLink>
+              <AppLink className="button secondary" to="/for-businesses/pricing">
+                See packages
+              </AppLink>
+            </div>
+            <div className="mini-pricing-row">
+              {data.packages.map((plan) => (
+                <article className={plan.highlighted ? "mini-plan highlighted" : "mini-plan"} key={plan.id}>
+                  <strong>{plan.name}</strong>
+                  <span>{plan.priceLabel}</span>
+                  <small>Starts with a request</small>
+                </article>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
-
-      <section className="section-block">
-        <SectionHeader
-          label="Guides"
-          title="Guides for neighborhoods, occasions, and city decisions"
-          copy="Guides turn broad city questions into something useful and easy to act on."
-          action={<AppLink className="text-link" to="/vancouver/guides">Read guides <ArrowRightIcon /></AppLink>}
-        />
-        <div className="card-grid two">
-          {cityGuides.map((guide) => (
-            <GuideCard guide={guide} key={guide.id} />
-          ))}
         </div>
       </section>
 
       <section className="trust-section">
         <TrustCard />
-        <article className="trust-card">
+        <article className="trust-card trust-card-rules">
           <ShieldIcon />
-          <strong>Public claims stay conservative</strong>
-          <p>
-            CityAtlas avoids traffic, ranking, booking, and offer claims unless the support is
-            clear and the page can explain them honestly.
-          </p>
-        </article>
-        <form
-          className="newsletter-card"
-          onSubmit={(event) => {
-            event.preventDefault();
-            if (!email.trim()) return;
-            const lead = onNewsletter(email, "local_discovery");
-            setReferralCode(lead.referralCode);
-            setEmail("");
-          }}
-        >
-          <strong>Get CityAtlas updates</strong>
-          <p>
-            For now, this signup stays on this device and gives you a referral code to keep for
-            future invites.
-          </p>
-          <div className="inline-form">
-            <input
-              aria-label="Email address"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              placeholder="you@example.com"
-              type="email"
-              required
-            />
-            <button className="button primary" type="submit">
-              Save
-            </button>
+          <div className="card-topline">
+            <strong>What CityAtlas will not pretend</strong>
+            <StatusPill tone="green">Trust first</StatusPill>
           </div>
-          {referralCode ? (
-            <div className="referral-box">
-              <strong>Your saved referral code</strong>
-              <code>{referralCode}</code>
-              <p>Keep this code handy for future invite and sharing features.</p>
-            </div>
-          ) : null}
-        </form>
+          <p>
+            The site is built to stay useful without pretending it already knows more than it does.
+          </p>
+          <ul className="plain-list compact trust-rule-list">
+            <li>No traffic, ranking, or booking claims without proof.</li>
+            <li>No public business profile until facts are checked.</li>
+            <li>No offer or event claims unless the page can support them clearly.</li>
+          </ul>
+        </article>
+        <article className="newsletter-card newsletter-card-wide">
+          <div className="card-topline">
+            <strong>Need updates, a new city, or a business review?</strong>
+            <StatusPill tone="blue">Direct contact</StatusPill>
+          </div>
+          <p>
+            CityAtlas keeps the first contact path simple on purpose. Open a business request or
+            email the team directly when you want help, updates, or a city request.
+          </p>
+          <div className="tag-cloud contact-tag-row">
+            <span>Business reviews</span>
+            <span>Future city launches</span>
+            <span>Direct email path</span>
+          </div>
+          <div className="hero-actions contact-card-actions">
+            <AppLink className="button primary" to="/for-businesses/submit">
+              Start business request
+            </AppLink>
+            <a
+              className="button secondary"
+              href={`mailto:${siteConfig.contactEmail}?subject=${encodeURIComponent("CityAtlas question")}`}
+            >
+              Email CityAtlas
+            </a>
+          </div>
+          <p className="contact-card-note">Direct email goes to {siteConfig.contactEmail}.</p>
+        </article>
       </section>
     </>
   );

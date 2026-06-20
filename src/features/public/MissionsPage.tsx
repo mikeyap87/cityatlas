@@ -116,7 +116,7 @@ export function MissionsPage({ data, onSaveMission }: MissionsPageProps) {
         <div className="starter-hero-side">
           <HeroMediaCard
             image={siteConfig.media.city}
-            alt="Vancouver waterfront skyline at golden hour"
+            alt="English Bay Beach shoreline in Vancouver"
             eyebrow="Saved plans"
             title="Keep the plan that already works instead of starting from zero again"
             copy="Saved plans help you reuse a good Vancouver shape, tighten it, and come back to it without reopening the whole city."

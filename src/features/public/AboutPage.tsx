@@ -39,7 +39,7 @@ export function AboutPage() {
         <div className="starter-hero-side about-hero-side">
           <HeroMediaCard
             image={siteConfig.media.city}
-            alt="Vancouver waterfront skyline and seawall at golden hour"
+            alt="English Bay Beach shoreline in Vancouver"
             eyebrow="How CityAtlas helps"
             title="One clear starting point beats a long city list"
             copy="Choose the right part of Vancouver first, then open the guide, plan, or local place that actually fits."

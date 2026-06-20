@@ -1494,6 +1494,32 @@
   background:
     linear-gradient(135deg, rgba(14, 139, 90, 0.09), rgba(10, 94, 168, 0.06)),
     #fff;
+  overflow: hidden;
+}
+
+.offer-card-media {
+  min-height: 0;
+}
+
+.offer-card-media-copy p {
+  max-width: 24ch;
+}
+
+.offer-card-inner {
+  gap: 0;
+}
+
+.offer-card .card-topline span:last-child {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.offer-card small {
+  color: var(--muted);
+  display: block;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  margin-top: 14px;
 }
 
 .dashboard-preview {

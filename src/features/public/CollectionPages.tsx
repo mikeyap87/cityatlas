@@ -6,6 +6,7 @@ import { ArrowRightIcon } from "../../components/Icons";
 import { HeroMediaCard, SectionHeader, StatusPill } from "../../components/UI";
 import { siteConfig } from "../../config/site";
 import { getGuidePath } from "../../lib/cityPaths";
+import { getOfferDisplayBusiness } from "../../lib/offers";
 import { simplifyGuideCategoryLabel, simplifyGuideDisplayText } from "../../lib/publicCopy";
 import { getSourceBackedPlaces } from "../../lib/sourceBackedCollections";
 import { getBusinessVisual, getEventVisual } from "../../lib/visuals";
@@ -42,7 +43,11 @@ export function EventsPage({ data }: { data: CityAtlasData }) {
         <div className="starter-hero-side">
           <HeroMediaCard
             image={featuredEvent ? getEventVisual(featuredEvent) : siteConfig.media.hero}
-            alt={featuredEvent ? `${featuredEvent.title} event scene` : "Vancouver event scene"}
+            alt={
+              featuredEvent
+                ? `Supporting place photo for ${featuredEvent.title}`
+                : "Granville Island Public Market in Vancouver"
+            }
             eyebrow={featuredEvent ? featuredEvent.neighborhood : "Event ideas"}
             title={featuredEvent?.title ?? "Vancouver event ideas"}
             copy={
@@ -95,9 +100,9 @@ export function EventsPage({ data }: { data: CityAtlasData }) {
 
 export function OffersPage({ data }: { data: CityAtlasData }) {
   const featuredOffer = data.offers[0];
-  const featuredOfferBusiness = data.businesses.find(
-    (business) => business.id === featuredOffer?.businessId,
-  );
+  const featuredOfferBusiness = featuredOffer
+    ? getOfferDisplayBusiness(featuredOffer, data.businesses)
+    : undefined;
 
   return (
     <>
@@ -133,7 +138,7 @@ export function OffersPage({ data }: { data: CityAtlasData }) {
             alt={
               featuredOfferBusiness
                 ? `${featuredOfferBusiness.name} venue photo`
-                : "Vancouver local offer scene"
+                : "Kitsilano Beach shoreline in Vancouver"
             }
             eyebrow={featuredOfferBusiness?.name ?? "Local offer"}
             title={featuredOffer?.title ?? "Vancouver local offers"}
@@ -179,7 +184,7 @@ export function OffersPage({ data }: { data: CityAtlasData }) {
           {data.offers.map((offer) => (
             <OfferCard
               offer={offer}
-              business={data.businesses.find((business) => business.id === offer.businessId)}
+              business={getOfferDisplayBusiness(offer, data.businesses)}
               key={offer.id}
             />
           ))}
@@ -435,7 +440,7 @@ export function GuidesPage({ data }: { data: CityAtlasData }) {
         <div className="starter-hero-side guide-library-side-stack">
           <HeroMediaCard
             image={siteConfig.media.waterfront}
-            alt="Vancouver waterfront skyline and seawall"
+            alt="Kitsilano Beach shoreline in Vancouver"
             eyebrow="Guide library"
             title="Choose the kind of day first"
             copy="Pick the visitor type, neighborhood, weather, or pace first. Then open the page that already fits."

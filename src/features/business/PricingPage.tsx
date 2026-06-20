@@ -94,7 +94,7 @@ export function PricingPage({ data }: PricingPageProps) {
         <div className="pricing-hero-side">
           <HeroMediaCard
             image={siteConfig.media.hero}
-            alt="Vancouver public market and skyline at dusk"
+            alt="Granville Island Public Market in Vancouver"
             eyebrow="For local businesses"
             title="Start with the smallest useful local visibility move"
             copy="CityAtlas works best when a business starts with one useful page, one stronger guide fit, or one simple offer people can understand fast."

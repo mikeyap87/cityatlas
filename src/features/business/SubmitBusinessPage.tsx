@@ -152,7 +152,7 @@ export function SubmitBusinessPage({ data, onSubmitBusiness }: SubmitBusinessPag
         <div className="pricing-hero-side">
           <HeroMediaCard
             image={siteConfig.media.city}
-            alt="Vancouver waterfront skyline and seawall"
+            alt="English Bay Beach shoreline in Vancouver"
             eyebrow="Start simple"
             title="Lead with one real business need"
             copy="A clear neighborhood, business need, and contact path is enough for CityAtlas to point the request in the right direction."

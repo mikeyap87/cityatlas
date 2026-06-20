@@ -112,7 +112,7 @@ export function PlannerPage({ data, onToggleSave, onSaveMission, onTrack }: Plan
         <div className="starter-hero-side">
           <HeroMediaCard
             image={siteConfig.media.waterfront}
-            alt="Vancouver waterfront walkway and skyline"
+            alt="Kitsilano Beach shoreline in Vancouver"
             eyebrow="Planner"
             title="Save the short list that actually fits the day"
             copy="Keep the best place, event, and guide together in one simple Vancouver plan before you decide whether to share it."

@@ -96,7 +96,8 @@ export interface EventItem extends AuditFields {
 
 export interface Offer extends AuditFields {
   id: string;
-  businessId: string;
+  businessId?: string;
+  previewBusinessId?: string;
   title: string;
   description: string;
   redemptionInstructions: string;

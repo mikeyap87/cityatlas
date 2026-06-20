@@ -6,6 +6,7 @@ import {
   simplifyGuideDisplayText,
   simplifyMissionDisplayText,
 } from "../lib/publicCopy";
+import { isOfferBusinessPreviewContext } from "../lib/offers";
 import { getBusinessVisual, getEventVisual, getGuideVisual } from "../lib/visuals";
 import { ArrowRightIcon, CalendarIcon, MapIcon, ShieldIcon, SparkIcon, StoreIcon } from "./Icons";
 import { AppLink } from "./Link";
@@ -73,7 +74,12 @@ export function BusinessCard({ business }: { business: Business }) {
 export function EventCard({ event }: { event: EventItem }) {
   return (
     <article className="content-card compact-card">
-      <img src={getEventVisual(event)} alt={`${event.title} scene`} decoding="async" loading="lazy" />
+      <img
+        src={getEventVisual(event)}
+        alt={`Supporting place photo for ${event.title}`}
+        decoding="async"
+        loading="lazy"
+      />
       <div className="card-body">
         <div className="card-icon-line">
           <CalendarIcon />
@@ -98,15 +104,40 @@ export function OfferCard({
   offer: Offer;
   business?: Business;
 }) {
+  const previewContext = isOfferBusinessPreviewContext(offer, business);
+  const mediaTitle = business?.name ?? "CityAtlas offer preview";
+  const mediaDetail = business
+    ? previewContext
+      ? "Source-backed page example"
+      : "Offer preview context"
+    : "Preview only";
+
   return (
     <article className="content-card offer-card">
+      <div className="business-card-media offer-card-media">
+        <img
+          src={business ? getBusinessVisual(business) : "/assets/places/granville-island-public-market-official.jpg"}
+          alt={business ? `${business.name} venue photo` : "CityAtlas offer preview photo"}
+          decoding="async"
+          loading="lazy"
+        />
+        <div className="business-card-media-copy offer-card-media-copy">
+          <span>{business?.neighborhood ?? "Vancouver"}</span>
+          <strong>{mediaTitle}</strong>
+          <p>{mediaDetail}</p>
+        </div>
+      </div>
       <div className="offer-card-inner">
-        <StatusPill tone="amber">Offer preview</StatusPill>
+        <div className="card-topline">
+          <StatusPill tone="amber">Offer preview</StatusPill>
+          <span>{previewContext ? "Page example only" : "Terms still need review"}</span>
+        </div>
         <h3>{offer.title}</h3>
         <p>{offer.description}</p>
         <div className="card-meta">
-          <span>{business?.name ?? "Business to confirm"}</span>
+          <span>{business ? (previewContext ? `${business.name} page example` : business.name) : "Business to confirm"}</span>
           <span>Ends {formatDate(offer.endDate)}</span>
+          <span>Illustrative cap {offer.maxClaims}</span>
         </div>
         <small>{offer.redemptionInstructions}</small>
       </div>
@@ -120,7 +151,12 @@ export function GuideCard({ guide }: { guide: Guide }) {
 
   return (
     <article className="content-card guide-card">
-      <img src={getGuideVisual(guide)} alt={`${guideTitle} scene`} decoding="async" loading="lazy" />
+      <img
+        src={getGuideVisual(guide)}
+        alt={`Supporting photo for ${guideTitle}`}
+        decoding="async"
+        loading="lazy"
+      />
       <div className="card-body">
         <div className="card-icon-line">
           <MapIcon />
@@ -153,7 +189,12 @@ export function GuideCompactCard({
 
   return (
     <article className={`compact-guide-card${variant === "tight" ? " tight" : ""}`}>
-      <img src={getGuideVisual(guide)} alt={`${guideTitle} scene`} decoding="async" loading="lazy" />
+      <img
+        src={getGuideVisual(guide)}
+        alt={`Supporting photo for ${guideTitle}`}
+        decoding="async"
+        loading="lazy"
+      />
       <div className="compact-guide-card-body">
         <div className="card-icon-line">
           <MapIcon />

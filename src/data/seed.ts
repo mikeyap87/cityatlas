@@ -308,7 +308,7 @@ export const seedData: CityAtlasData = {
       time: "6:30 PM",
       priceLabel: "Free admission",
       capacity: 160,
-      image: "/assets/vancouver-rainy-market-hero.jpg",
+      image: "/assets/places/granville-island-public-market-official.jpg",
       description:
         "A neighborhood night market pick with local food, light wandering, and easy add-to-plan value.",
       safetyNotes:
@@ -327,7 +327,7 @@ export const seedData: CityAtlasData = {
       time: "9:00 AM",
       priceLabel: "By donation",
       capacity: 24,
-      image: "/assets/kits-rope-flow-reference.png",
+      image: "/assets/places/kitsilano-beach-official.jpg",
       description:
         "A sunrise rope-flow session for beach movement, fresh air, and easy weekend energy.",
       safetyNotes:
@@ -339,12 +339,12 @@ export const seedData: CityAtlasData = {
     {
       ...demoAudit,
       id: "offer-dessert",
-      businessId: "biz-offer-preview-dessert",
-      title: "Late dessert add-on",
+      previewBusinessId: "biz-harbour-table",
+      title: "Sample late-night add-on",
       description:
-        "A preview of the kind of simple dining add-on CityAtlas can show once the timing and terms are confirmed.",
+        "A sample follow-through card showing how a dinner page could frame one simple after-dinner add-on once the timing and terms are confirmed.",
       redemptionInstructions:
-        "Final timing and redemption details are confirmed on the published offer page.",
+        "Preview only. The exact add-on, timing, and redemption rules would be checked before anything goes public.",
       endDate: "2026-07-15",
       claimCount: 18,
       maxClaims: 80,
@@ -353,12 +353,12 @@ export const seedData: CityAtlasData = {
     {
       ...demoAudit,
       id: "offer-recovery",
-      businessId: "biz-offer-preview-recovery",
-      title: "First-visit recovery add-on",
+      previewBusinessId: "biz-seaside-cycle",
+      title: "Sample first-visit add-on",
       description:
-        "A preview of the kind of calm, guest-friendly offer CityAtlas can show once the details are fully confirmed.",
+        "A sample visitor-friendly add-on card showing how a waterfront page could frame one clear extra step once the details are confirmed.",
       redemptionInstructions:
-        "Final timing and redemption details are confirmed on the published offer page.",
+        "Preview only. The exact timing, inclusion details, and redemption rules would be checked before anything goes public.",
       endDate: "2026-07-30",
       claimCount: 9,
       maxClaims: 40,

@@ -44,6 +44,7 @@
     "seo:smoke:lowfriction": "node --experimental-strip-types scripts/verify-seo-hosted-smoke.mjs --profile low-friction-routing",
     "seo:smoke:toronto": "node --experimental-strip-types scripts/verify-seo-hosted-smoke.mjs --profile toronto-pilot",
     "seo:proof:stack": "node scripts/verify-seo-proof-stack.mjs",
+    "assets:sync:places": "node scripts/sync-official-place-photos.mjs",
     "proof:sprint": "node scripts/build-proof-sprint-packet.mjs",
     "replies:analyze": "node scripts/analyze-proof-sprint-replies.mjs",
     "qa:file-preview": "node scripts/build-file-preview.mjs"

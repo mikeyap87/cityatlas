@@ -310,7 +310,7 @@ function buildGuideJsonLd(baseUrl: string, guide: Guide) {
     "@id": `${baseUrl}${guidePath}#article`,
     headline: guideTitle,
     description: guideSummary,
-    image: `${baseUrl}${guide.image}`,
+    image: `${baseUrl}${getGuideHeroVisual(guide)}`,
     dateModified: guide.updatedAt,
     datePublished: guide.publishedAt ?? guide.createdAt,
     author: {

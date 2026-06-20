@@ -7,6 +7,7 @@ import {
   variantCopy,
 } from "../../lib/experiments";
 import { getGuidePath } from "../../lib/cityPaths";
+import { getOfferDisplayBusiness } from "../../lib/offers";
 import { AppLink } from "../../components/Link";
 import {
   ArrowRightIcon,
@@ -354,12 +355,12 @@ export function HomePage({ data, onNewsletter: _onNewsletter, onTrack, onSaveMis
         .toLowerCase(),
     }));
     const offerResults: HomeSearchResult[] = data.offers.map((offer) => {
-      const business = data.businesses.find((item) => item.id === offer.businessId);
+      const business = getOfferDisplayBusiness(offer, data.businesses);
       return {
         id: `offer-${offer.id}`,
         kind: "offer" as const,
         label: offer.title,
-        detail: business ? `${business.name} offer` : "Local offer",
+        detail: business ? `${business.name} offer preview` : "Local offer preview",
         path: `/${siteConfig.citySlug}/offers`,
         haystack: [offer.title, offer.description, business?.name ?? ""].join(" ").toLowerCase(),
       };
@@ -437,7 +438,7 @@ export function HomePage({ data, onNewsletter: _onNewsletter, onTrack, onSaveMis
         <div className="hero-media">
           <img
             src={siteConfig.media.hero}
-            alt="Vancouver evening market scene"
+            alt="Granville Island Public Market in Vancouver"
             decoding="async"
             fetchPriority="high"
             loading="eager"

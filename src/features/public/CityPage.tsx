@@ -5,6 +5,7 @@ import { AppLink } from "../../components/Link";
 import { BusinessCard, EventCard, GuideCard, MissionCard, OfferCard } from "../../components/Cards";
 import { ArrowRightIcon, SearchIcon } from "../../components/Icons";
 import { HeroMediaCard, SectionHeader, StatusPill } from "../../components/UI";
+import { getOfferDisplayBusiness } from "../../lib/offers";
 import { getSourceBackedPlaces } from "../../lib/sourceBackedCollections";
 import { VancouverBusinessCoverageSection } from "./VancouverBusinessCoverageSection";
 
@@ -259,7 +260,7 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
         <div className="starter-hero-side city-hero-side">
           <HeroMediaCard
             image={siteConfig.media.city}
-            alt="Vancouver waterfront skyline at golden hour"
+            alt="English Bay Beach in Vancouver"
             eyebrow="Start with Vancouver"
             title="Choose the right part of the city before the options pile up"
             copy="Start with the area, weather, or visitor pace first. Then open the exact place once the day feels narrower."
@@ -441,7 +442,7 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
             {featuredOffers.map((offer) => (
               <OfferCard
                 offer={offer}
-                business={data.businesses.find((business) => business.id === offer.businessId)}
+                business={getOfferDisplayBusiness(offer, data.businesses)}
                 key={offer.id}
               />
             ))}

@@ -12,6 +12,7 @@
 - Added rules-based AI Brain command engine, QA checks, next-best-batch recommendation, and saved local Brain Runs.
 - Moved CityAtlas into the Univenture workspace and added protected-preview, Stripe, and readiness packets.
 - Added hosted route guards, Vercel project/deploy, live Univenture custom domain, Stripe planner decision, generated proof-sprint packet, and no-send proof-sprint approval handoff.
+- Added paid-traffic readiness instrumentation for the business funnel, UTM-aware local event tracking, the paid-traffic readiness packet, and `npm run qa:paid-traffic`.
 
 ## 2026-06-14 - Shadow outreach and reply-learning pass
 

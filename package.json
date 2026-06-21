@@ -21,6 +21,8 @@
     "growth:sync:roam:business-wave": "node scripts/sync-roam-public-business-wave-seeds.mjs",
     "growth:sync:roam:cities": "node scripts/sync-roam-city-sourcing-seeds.mjs",
     "qa:smoke:local": "node scripts/verify-local-product-smoke.mjs",
+    "qa:paid-traffic": "node scripts/verify-paid-traffic-readiness.mjs",
+    "qa:paid-traffic:strict": "node scripts/verify-paid-traffic-readiness.mjs --strict",
     "qa:planner:summary": "node --experimental-strip-types --experimental-specifier-resolution=node scripts/verify-planner-save-summary.mjs",
     "seo:proof": "node --experimental-strip-types scripts/verify-seo-content-machine.mjs",
     "seo:structure:proof": "node --experimental-strip-types scripts/verify-seo-structure.mjs",

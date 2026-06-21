@@ -308,7 +308,7 @@ export const seedData: CityAtlasData = {
       time: "6:30 PM",
       priceLabel: "Free admission",
       capacity: 160,
-      image: "/assets/places/granville-island-public-market-official.jpg",
+      image: "/assets/places-generated/granville-island-public-market-generated.jpg",
       description:
         "A neighborhood night market pick with local food, light wandering, and easy add-to-plan value.",
       safetyNotes:
@@ -327,7 +327,7 @@ export const seedData: CityAtlasData = {
       time: "9:00 AM",
       priceLabel: "By donation",
       capacity: 24,
-      image: "/assets/places/kitsilano-beach-official.jpg",
+      image: "/assets/places-generated/kitsilano-beach-generated.jpg",
       description:
         "A sunrise rope-flow session for beach movement, fresh air, and easy weekend energy.",
       safetyNotes:

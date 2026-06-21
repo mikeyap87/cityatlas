@@ -45,8 +45,8 @@ export function EventsPage({ data }: { data: CityAtlasData }) {
             image={featuredEvent ? getEventVisual(featuredEvent) : siteConfig.media.hero}
             alt={
               featuredEvent
-                ? `Supporting place photo for ${featuredEvent.title}`
-                : "Granville Island Public Market in Vancouver"
+                ? `Supporting image for ${featuredEvent.title}`
+                : "Illustrated market scene inspired by Granville Island Public Market in Vancouver"
             }
             eyebrow={featuredEvent ? featuredEvent.neighborhood : "Event ideas"}
             title={featuredEvent?.title ?? "Vancouver event ideas"}
@@ -138,7 +138,7 @@ export function OffersPage({ data }: { data: CityAtlasData }) {
             alt={
               featuredOfferBusiness
                 ? `${featuredOfferBusiness.name} venue photo`
-                : "Kitsilano Beach shoreline in Vancouver"
+                : "Illustrated shoreline scene inspired by Kitsilano Beach in Vancouver"
             }
             eyebrow={featuredOfferBusiness?.name ?? "Local offer"}
             title={featuredOffer?.title ?? "Vancouver local offers"}
@@ -440,7 +440,7 @@ export function GuidesPage({ data }: { data: CityAtlasData }) {
         <div className="starter-hero-side guide-library-side-stack">
           <HeroMediaCard
             image={siteConfig.media.waterfront}
-            alt="Kitsilano Beach shoreline in Vancouver"
+            alt="Illustrated shoreline scene inspired by Kitsilano Beach in Vancouver"
             eyebrow="Guide library"
             title="Choose the kind of day first"
             copy="Pick the visitor type, neighborhood, weather, or pace first. Then open the page that already fits."

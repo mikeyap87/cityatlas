@@ -1,6 +1,13 @@
 # Public Image Sources
 
-This file records the public image sources currently used for CityAtlas business and place visuals.
+This file records the public image sources and image-generation inputs currently used for CityAtlas business and place visuals.
+
+## Active Place Visual Layer
+
+- The active place-image layer for CityAtlas now lives in `public/assets/places-generated/`.
+- Those files are AI-generated editorial-style place illustrations created from place-specific prompts and normalized into consistent export sizes before being wired into the app.
+- The public app now describes these visuals as illustrated scenes or illustrated place views, not documentary photos.
+- The older official-source place images under `public/assets/places/` still stay in the repo as source-reference material and proof context for factual coverage, correction paths, and future refreshes.
 
 ## Existing Public Business Photos
 
@@ -44,7 +51,8 @@ This file records the public image sources currently used for CityAtlas business
 ## Current Source Mix
 
 - Business photos under `public/assets/businesses/` are public-source venue images already saved in the repo.
-- Place photos under `public/assets/places/` are pulled from official city, venue, or district pages listed above.
+- Active place visuals under `public/assets/places-generated/` are generated editorial-style illustrations inspired by the real places above.
+- Reference place photos under `public/assets/places/` are pulled from official city, venue, or district pages listed above.
 - Most place photos can be downloaded directly by script. City of Vancouver and Vancouver Public Library files that returned direct-fetch `403` were instead captured from those same official public pages through the in-app browser asset bundle and then saved locally.
-- Shared public hero and fallback surfaces now reuse official place photos already listed above, including Granville Island Public Market, English Bay Beach, Kitsilano Beach, Queen Elizabeth Park, Commercial Drive, Vancouver Public Library Central Library, and Vancouver Art Gallery.
+- Shared public hero and fallback surfaces now reuse the generated place-image layer, while the official place photos above remain the source-reference record for the underlying location choices.
 - Older generic scene files can still remain in `public/assets/`, but they are no longer the preferred imagery layer for the main public CityAtlas surfaces covered by this source record.

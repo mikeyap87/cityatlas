@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { siteConfig } from "../../config/site";
 import type { BusinessSubmission, CityAtlasData, PackageId } from "../../types";
 import { AppLink } from "../../components/Link";
@@ -17,6 +17,7 @@ interface SubmitBusinessPageProps {
     message: string;
     packageInterest?: PackageId;
   }) => BusinessSubmission;
+  onTrack: (name: string, detail?: Record<string, string | number | boolean>) => void;
 }
 
 const packageIds: PackageId[] = ["community", "city_partner", "signature_partner"];
@@ -64,7 +65,7 @@ function buildBusinessRequestEmailDraft(input: {
   )}`;
 }
 
-export function SubmitBusinessPage({ data, onSubmitBusiness }: SubmitBusinessPageProps) {
+export function SubmitBusinessPage({ data, onSubmitBusiness, onTrack }: SubmitBusinessPageProps) {
   const params = new URLSearchParams(window.location.search);
   const initialPackage = packageIds.includes(params.get("package") as PackageId)
     ? (params.get("package") as PackageId)
@@ -92,6 +93,13 @@ export function SubmitBusinessPage({ data, onSubmitBusiness }: SubmitBusinessPag
     }, [])
     .slice(0, 5);
 
+  useEffect(() => {
+    onTrack("business_request_form_viewed", {
+      packageInterest: initialPackage,
+      hasPackageQuery: params.has("package"),
+    });
+  }, [initialPackage, onTrack]);
+
   function resetForm() {
     setForm({
       businessName: "",
@@ -108,6 +116,12 @@ export function SubmitBusinessPage({ data, onSubmitBusiness }: SubmitBusinessPag
   function saveRequest(mode: SubmitMode) {
     const nextForm = { ...form };
     const submission = onSubmitBusiness(nextForm);
+    onTrack(mode === "email" ? "business_request_email_draft_opened" : "business_request_saved_for_later", {
+      packageInterest: nextForm.packageInterest,
+      categoryProvided: Boolean(nextForm.category.trim()),
+      websiteProvided: Boolean(nextForm.website.trim()),
+      messageLength: nextForm.message.trim().length,
+    });
     setSaved(submission);
     setLastSubmitMode(mode);
     resetForm();
@@ -152,7 +166,7 @@ export function SubmitBusinessPage({ data, onSubmitBusiness }: SubmitBusinessPag
         <div className="pricing-hero-side">
           <HeroMediaCard
             image={siteConfig.media.city}
-            alt="English Bay Beach shoreline in Vancouver"
+            alt="Illustrated shoreline scene inspired by English Bay Beach in Vancouver"
             eyebrow="Start simple"
             title="Lead with one real business need"
             copy="A clear neighborhood, business need, and contact path is enough for CityAtlas to point the request in the right direction."
@@ -275,9 +289,11 @@ export function SubmitBusinessPage({ data, onSubmitBusiness }: SubmitBusinessPag
             Package interest
             <select
               value={form.packageInterest}
-              onChange={(event) =>
-                setForm({ ...form, packageInterest: event.target.value as PackageId })
-              }
+              onChange={(event) => {
+                const packageInterest = event.target.value as PackageId;
+                setForm({ ...form, packageInterest });
+                onTrack("business_request_package_changed", { packageInterest });
+              }}
             >
               {data.packages.map((plan) => (
                 <option value={plan.id} key={plan.id}>

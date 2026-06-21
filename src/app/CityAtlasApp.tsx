@@ -281,10 +281,16 @@ export function CityAtlasApp() {
       );
     }
     if (path === "/for-businesses/pricing") {
-      return <PricingPage data={data} />;
+      return <PricingPage data={data} onTrack={actions.trackEvent} />;
     }
     if (path === "/for-businesses/submit") {
-      return <SubmitBusinessPage data={data} onSubmitBusiness={actions.addBusinessSubmission} />;
+      return (
+        <SubmitBusinessPage
+          data={data}
+          onSubmitBusiness={actions.addBusinessSubmission}
+          onTrack={actions.trackEvent}
+        />
+      );
     }
     if (path === "/private-preview/date-night") {
       if (!canShowHostedPrivatePreview()) {

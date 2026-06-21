@@ -260,7 +260,7 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
         <div className="starter-hero-side city-hero-side">
           <HeroMediaCard
             image={siteConfig.media.city}
-            alt="English Bay Beach in Vancouver"
+            alt="Illustrated shoreline scene inspired by English Bay Beach in Vancouver"
             eyebrow="Start with Vancouver"
             title="Choose the right part of the city before the options pile up"
             copy="Start with the area, weather, or visitor pace first. Then open the exact place once the day feels narrower."

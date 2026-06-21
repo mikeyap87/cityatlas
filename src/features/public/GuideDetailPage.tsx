@@ -83,7 +83,11 @@ function GuideSourceBackedReferenceCard({
       <article className="source-panel source-reference-card source-reference-card-compact">
         <div className={`source-reference-media${hasSpecificVisual ? "" : " source-reference-media-fallback"}`}>
           {hasSpecificVisual ? (
-            <img src={getSourceBackedPlaceVisual(reference)} alt={`${reference.name} place photo`} loading="lazy" />
+            <img
+              src={getSourceBackedPlaceVisual(reference)}
+              alt={`Illustrated view inspired by ${reference.name}`}
+              loading="lazy"
+            />
           ) : (
             <div className="source-reference-media-fallback-note" aria-hidden="true">
               <span><ShieldIcon /> Official site linked</span>
@@ -137,7 +141,11 @@ function GuideSourceBackedReferenceCard({
     <article className="source-panel source-reference-card">
       <div className={`source-reference-media${hasSpecificVisual ? "" : " source-reference-media-fallback"}`}>
         {hasSpecificVisual ? (
-          <img src={getSourceBackedPlaceVisual(reference)} alt={`${reference.name} place photo`} loading="lazy" />
+          <img
+            src={getSourceBackedPlaceVisual(reference)}
+            alt={`Illustrated view inspired by ${reference.name}`}
+            loading="lazy"
+          />
         ) : (
           <div className="source-reference-media-fallback-note" aria-hidden="true">
             <span><ShieldIcon /> Official site linked</span>
@@ -304,7 +312,7 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
           <div className="guide-hero-media">
             <img
               src={guideVisual}
-              alt={`${guideTitle} scene`}
+              alt={`Illustrated guide scene for ${guideTitle}`}
               decoding="async"
               fetchPriority="high"
               loading="eager"

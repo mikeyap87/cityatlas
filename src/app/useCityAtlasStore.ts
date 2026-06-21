@@ -28,6 +28,7 @@ import {
   resetCityAtlasData,
   saveCityAtlasData,
 } from "../lib/storage";
+import { getTrafficContext, trackProductEvent } from "../lib/analytics";
 
 let cityGrowthModulePromise: Promise<typeof import("../lib/cityGrowth")> | null = null;
 let businessInboundPreviewModulePromise: Promise<typeof import("../lib/businessInboundPreview")> | null =
@@ -128,10 +129,16 @@ export function useCityAtlasStore(pathname: string) {
         return lead;
       },
       trackEvent(name: string, detail: Record<string, string | number | boolean> = {}) {
+        const path = window.location.pathname;
+        const enrichedDetail = {
+          ...getTrafficContext(),
+          ...detail,
+        };
+        trackProductEvent(name, path, enrichedDetail);
         setData((current) => ({
           ...current,
           growthEvents: [
-            createGrowthEvent(name, window.location.pathname, detail),
+            createGrowthEvent(name, path, enrichedDetail),
             ...current.growthEvents,
           ].slice(0, 200),
         }));

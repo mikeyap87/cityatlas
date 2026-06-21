@@ -76,7 +76,7 @@ export function EventCard({ event }: { event: EventItem }) {
     <article className="content-card compact-card">
       <img
         src={getEventVisual(event)}
-        alt={`Supporting place photo for ${event.title}`}
+        alt={`Supporting image for ${event.title}`}
         decoding="async"
         loading="lazy"
       />
@@ -116,8 +116,8 @@ export function OfferCard({
     <article className="content-card offer-card">
       <div className="business-card-media offer-card-media">
         <img
-          src={business ? getBusinessVisual(business) : "/assets/places/granville-island-public-market-official.jpg"}
-          alt={business ? `${business.name} venue photo` : "CityAtlas offer preview photo"}
+          src={business ? getBusinessVisual(business) : "/assets/places-generated/granville-island-public-market-generated.jpg"}
+          alt={business ? `${business.name} venue photo` : "Illustrated Vancouver offer preview scene"}
           decoding="async"
           loading="lazy"
         />
@@ -153,7 +153,7 @@ export function GuideCard({ guide }: { guide: Guide }) {
     <article className="content-card guide-card">
       <img
         src={getGuideVisual(guide)}
-        alt={`Supporting photo for ${guideTitle}`}
+        alt={`Supporting guide image for ${guideTitle}`}
         decoding="async"
         loading="lazy"
       />
@@ -191,7 +191,7 @@ export function GuideCompactCard({
     <article className={`compact-guide-card${variant === "tight" ? " tight" : ""}`}>
       <img
         src={getGuideVisual(guide)}
-        alt={`Supporting photo for ${guideTitle}`}
+        alt={`Supporting guide image for ${guideTitle}`}
         decoding="async"
         loading="lazy"
       />

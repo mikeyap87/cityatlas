@@ -144,6 +144,8 @@ Open `http://127.0.0.1:5178/`.
 - `npm run growth:sync:roam:business-wave` - regenerate the saved Roam public-business-wave donor layer so CityAtlas can absorb official-contact wellness/service businesses from reusable provider-discovery fixtures.
 - `npm run growth:sync:roam:cities` - regenerate the Roam city-sourcing donor seed layer for the wider shared-city rollout map by merging all qualifying local preview artifacts per city, normalizing donor titles, and filtering obvious non-business plus beauty/salon noise.
 - `npm run qa:smoke:local` - run repeatable Playwright smoke checks across the built local product surface for homepage, city navigation, planner, business request, admin, and private-preview flows on desktop and mobile; writes `output/qa/local-product-smoke.json`.
+- `npm run qa:paid-traffic` - run the local paid-traffic business-funnel proof from campaign landing to package interest and saved request; writes `output/qa/paid-traffic-readiness.json` and keeps paid-traffic blockers explicit.
+- `npm run qa:paid-traffic:strict` - same proof, but fails while analytics or hosted proof blockers remain.
 - `npm run seo:proof` - verify the local CityAtlas content machine, crawl-file coverage, and source-backed route integrity; writes `output/seo/local-content-machine-proof.json`.
 - `npm run seo:structure:proof` - verify route metadata, robots directives, breadcrumbs, hub JSON-LD, guide FAQ schema, and source-backed collection structure on key CityAtlas routes; writes `output/seo/local-structure-proof.json`.
 - `npm run seo:copy:proof` - verify that checked public, business, legal, route-shell, metadata, and experiment source files do not leak blocked internal/operator language; writes `output/seo/public-copy-safety-proof.json`.
@@ -168,6 +170,12 @@ Optional future discovery/sending-prep env vars:
 - `EXA_API_KEY=`
 - `CITYATLAS_OUTREACH_MAILING_ADDRESS=`
 
+Optional future analytics env vars:
+
+- `VITE_CITYATLAS_ANALYTICS_PROVIDER=`
+- `VITE_GA_MEASUREMENT_ID=`
+- `VITE_ANALYTICS_ID=`
+
 ## Live-Risk Gates
 
 See [docs/LAUNCH_GATES.md](docs/LAUNCH_GATES.md). A simple "yes" is not enough for live-risk actions. The owner should approve the exact action, provider/account, scope, rollback path, and spend/customer impact.
@@ -180,7 +188,7 @@ Use these locally:
 - `/?variant=founding-partner`
 - `/?variant=weekend-atlas`
 
-Variant exposure is stored locally in browser storage. No third-party analytics provider is connected.
+Variant exposure and business-funnel events are stored locally in browser storage. No third-party analytics provider is connected until the analytics env vars are approved and configured.
 
 ## City Missions
 

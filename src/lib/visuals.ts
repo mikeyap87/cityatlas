@@ -2,14 +2,14 @@ import { resolvePublicAssetPath } from "../config/site.ts";
 import type { Business, EventItem, Guide, SourceBackedPlaceReference } from "../types";
 
 const visualLibrary = {
-  evening: resolvePublicAssetPath("/assets/places/granville-island-public-market-official.jpg"),
-  rainy: resolvePublicAssetPath("/assets/places/vancouver-public-library-central-official.webp"),
-  coffee: resolvePublicAssetPath("/assets/places/commercial-drive-official.png"),
-  kits: resolvePublicAssetPath("/assets/places/kitsilano-beach-official.jpg"),
-  wellness: resolvePublicAssetPath("/assets/places/queen-elizabeth-park-official.jpg"),
-  garden: resolvePublicAssetPath("/assets/places/vandusen-botanical-garden-official.jpg"),
-  culture: resolvePublicAssetPath("/assets/places/vancouver-art-gallery-official.jpg"),
-  waterfront: resolvePublicAssetPath("/assets/places/english-bay-beach-official.png"),
+  evening: resolvePublicAssetPath("/assets/places-generated/granville-island-public-market-generated.jpg"),
+  rainy: resolvePublicAssetPath("/assets/places-generated/vancouver-public-library-central-generated.jpg"),
+  coffee: resolvePublicAssetPath("/assets/places-generated/commercial-drive-generated.jpg"),
+  kits: resolvePublicAssetPath("/assets/places-generated/kitsilano-beach-generated.jpg"),
+  wellness: resolvePublicAssetPath("/assets/places-generated/queen-elizabeth-park-generated.jpg"),
+  garden: resolvePublicAssetPath("/assets/places-generated/vandusen-botanical-garden-generated.jpg"),
+  culture: resolvePublicAssetPath("/assets/places-generated/vancouver-art-gallery-generated.jpg"),
+  waterfront: resolvePublicAssetPath("/assets/places-generated/english-bay-beach-generated.jpg"),
 } as const;
 
 const venueVisualLibrary = {
@@ -21,42 +21,42 @@ const venueVisualLibrary = {
 } as const;
 
 const placeVisualLibrary = {
-  artGalleryOfOntario: resolvePublicAssetPath("/assets/places/art-gallery-of-ontario-official.jpg"),
-  beatyBiodiversityMuseum: resolvePublicAssetPath("/assets/places/beaty-biodiversity-museum-official.jpg"),
-  bentwayStagingGrounds: resolvePublicAssetPath("/assets/places/bentway-staging-grounds-official.jpg"),
-  billReidGallery: resolvePublicAssetPath("/assets/places/bill-reid-gallery-official.jpg"),
-  bloedelConservatory: resolvePublicAssetPath("/assets/places/bloedel-conservatory-official.jpg"),
-  chinatownStorytellingCentre: resolvePublicAssetPath("/assets/places/chinatown-storytelling-centre-foohung.jpg"),
-  commercialDrive: resolvePublicAssetPath("/assets/places/commercial-drive-official.png"),
-  distilleryDistrict: resolvePublicAssetPath("/assets/places/distillery-district-official.jpg"),
-  drSunYatSenChineseGarden: resolvePublicAssetPath("/assets/places/dr-sun-yat-sen-classical-chinese-garden-official.png"),
-  englishBayBeach: resolvePublicAssetPath("/assets/places/english-bay-beach-official.png"),
-  evergreenBrickWorks: resolvePublicAssetPath("/assets/places/evergreen-brick-works-official.jpg"),
-  gastown: resolvePublicAssetPath("/assets/places/gastown-official.webp"),
-  granvilleIslandPublicMarket: resolvePublicAssetPath("/assets/places/granville-island-public-market-official.jpg"),
-  greenheartTreewalk: resolvePublicAssetPath("/assets/places/greenheart-treewalk-official.jpg"),
-  harbourfrontCentre: resolvePublicAssetPath("/assets/places/harbourfront-centre-official.jpg"),
-  moa: resolvePublicAssetPath("/assets/places/museum-of-anthropology-official.jpg"),
-  museumOfVancouver: resolvePublicAssetPath("/assets/places/museum-of-vancouver-directions.webp"),
-  nitobe: resolvePublicAssetPath("/assets/places/nitobe-memorial-garden-official.jpg"),
-  jerichoBeach: resolvePublicAssetPath("/assets/places/jericho-beach-official.jpg"),
-  kitsilanoBeach: resolvePublicAssetPath("/assets/places/kitsilano-beach-official.jpg"),
-  kitsilanoPool: resolvePublicAssetPath("/assets/places/kitsilano-pool-official.jpg"),
-  locarnoBeach: resolvePublicAssetPath("/assets/places/locarno-beach-official.jpg"),
-  queenElizabethPark: resolvePublicAssetPath("/assets/places/queen-elizabeth-park-official.jpg"),
-  royalOntarioMuseum: resolvePublicAssetPath("/assets/places/royal-ontario-museum-official.webp"),
-  spaceCentre: resolvePublicAssetPath("/assets/places/hr-macmillan-space-centre-official.jpg"),
-  stacktMarket: resolvePublicAssetPath("/assets/places/stackt-market-official.jpg"),
-  stanleyPark: resolvePublicAssetPath("/assets/places/stanley-park-official.jpg"),
-  stLawrenceMarket: resolvePublicAssetPath("/assets/places/st-lawrence-market-official.jpg"),
-  torontoBotanicalGarden: resolvePublicAssetPath("/assets/places/toronto-botanical-garden-official.jpg"),
-  torontoMusicGarden: resolvePublicAssetPath("/assets/places/toronto-music-garden-official.jpg"),
-  troutLakeBeach: resolvePublicAssetPath("/assets/places/trout-lake-beach-official.jpg"),
-  ubcBotanicalGarden: resolvePublicAssetPath("/assets/places/ubc-botanical-garden-official.jpg"),
-  vancouverPublicLibraryCentral: resolvePublicAssetPath("/assets/places/vancouver-public-library-central-official.webp"),
-  vancouverArtGallery: resolvePublicAssetPath("/assets/places/vancouver-art-gallery-official.jpg"),
-  vancouverMaritimeMuseum: resolvePublicAssetPath("/assets/places/vancouver-maritime-museum-official.jpg"),
-  vandusenBotanicalGarden: resolvePublicAssetPath("/assets/places/vandusen-botanical-garden-official.jpg"),
+  artGalleryOfOntario: resolvePublicAssetPath("/assets/places-generated/art-gallery-of-ontario-generated.jpg"),
+  beatyBiodiversityMuseum: resolvePublicAssetPath("/assets/places-generated/beaty-biodiversity-museum-generated.jpg"),
+  bentwayStagingGrounds: resolvePublicAssetPath("/assets/places-generated/bentway-staging-grounds-generated.jpg"),
+  billReidGallery: resolvePublicAssetPath("/assets/places-generated/bill-reid-gallery-generated.jpg"),
+  bloedelConservatory: resolvePublicAssetPath("/assets/places-generated/bloedel-conservatory-generated.jpg"),
+  chinatownStorytellingCentre: resolvePublicAssetPath("/assets/places-generated/chinatown-storytelling-centre-generated.jpg"),
+  commercialDrive: resolvePublicAssetPath("/assets/places-generated/commercial-drive-generated.jpg"),
+  distilleryDistrict: resolvePublicAssetPath("/assets/places-generated/distillery-district-generated.jpg"),
+  drSunYatSenChineseGarden: resolvePublicAssetPath("/assets/places-generated/dr-sun-yat-sen-classical-chinese-garden-generated.jpg"),
+  englishBayBeach: resolvePublicAssetPath("/assets/places-generated/english-bay-beach-generated.jpg"),
+  evergreenBrickWorks: resolvePublicAssetPath("/assets/places-generated/evergreen-brick-works-generated.jpg"),
+  gastown: resolvePublicAssetPath("/assets/places-generated/gastown-generated.jpg"),
+  granvilleIslandPublicMarket: resolvePublicAssetPath("/assets/places-generated/granville-island-public-market-generated.jpg"),
+  greenheartTreewalk: resolvePublicAssetPath("/assets/places-generated/greenheart-treewalk-generated.jpg"),
+  harbourfrontCentre: resolvePublicAssetPath("/assets/places-generated/harbourfront-centre-generated.jpg"),
+  moa: resolvePublicAssetPath("/assets/places-generated/museum-of-anthropology-generated.jpg"),
+  museumOfVancouver: resolvePublicAssetPath("/assets/places-generated/museum-of-vancouver-generated.jpg"),
+  nitobe: resolvePublicAssetPath("/assets/places-generated/nitobe-memorial-garden-generated.jpg"),
+  jerichoBeach: resolvePublicAssetPath("/assets/places-generated/jericho-beach-generated.jpg"),
+  kitsilanoBeach: resolvePublicAssetPath("/assets/places-generated/kitsilano-beach-generated.jpg"),
+  kitsilanoPool: resolvePublicAssetPath("/assets/places-generated/kitsilano-pool-generated.jpg"),
+  locarnoBeach: resolvePublicAssetPath("/assets/places-generated/locarno-beach-generated.jpg"),
+  queenElizabethPark: resolvePublicAssetPath("/assets/places-generated/queen-elizabeth-park-generated.jpg"),
+  royalOntarioMuseum: resolvePublicAssetPath("/assets/places-generated/royal-ontario-museum-generated.jpg"),
+  spaceCentre: resolvePublicAssetPath("/assets/places-generated/hr-macmillan-space-centre-generated.jpg"),
+  stacktMarket: resolvePublicAssetPath("/assets/places-generated/stackt-market-generated.jpg"),
+  stanleyPark: resolvePublicAssetPath("/assets/places-generated/stanley-park-generated.jpg"),
+  stLawrenceMarket: resolvePublicAssetPath("/assets/places-generated/st-lawrence-market-generated.jpg"),
+  torontoBotanicalGarden: resolvePublicAssetPath("/assets/places-generated/toronto-botanical-garden-generated.jpg"),
+  torontoMusicGarden: resolvePublicAssetPath("/assets/places-generated/toronto-music-garden-generated.jpg"),
+  troutLakeBeach: resolvePublicAssetPath("/assets/places-generated/trout-lake-beach-generated.jpg"),
+  ubcBotanicalGarden: resolvePublicAssetPath("/assets/places-generated/ubc-botanical-garden-generated.jpg"),
+  vancouverPublicLibraryCentral: resolvePublicAssetPath("/assets/places-generated/vancouver-public-library-central-generated.jpg"),
+  vancouverArtGallery: resolvePublicAssetPath("/assets/places-generated/vancouver-art-gallery-generated.jpg"),
+  vancouverMaritimeMuseum: resolvePublicAssetPath("/assets/places-generated/vancouver-maritime-museum-generated.jpg"),
+  vandusenBotanicalGarden: resolvePublicAssetPath("/assets/places-generated/vandusen-botanical-garden-generated.jpg"),
 } as const;
 
 const genericGuidePhotos = new Set([
@@ -276,7 +276,11 @@ export function getSourceBackedCollectionVisual(collection: SourceBackedPlaceRef
 }
 
 function isSpecificSourceBackedPlaceVisualPath(path: string) {
-  return path.includes("/assets/businesses/") || path.includes("/assets/places/");
+  return (
+    path.includes("/assets/businesses/") ||
+    path.includes("/assets/places/") ||
+    path.includes("/assets/places-generated/")
+  );
 }
 
 const sourceBackedPlaceNameVisuals: Partial<Record<SourceBackedPlaceReference["name"], string>> = {

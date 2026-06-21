@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { siteConfig } from "../../config/site";
 import type { CityAtlasData, PackageId } from "../../types";
 import { AppLink } from "../../components/Link";
@@ -6,6 +7,7 @@ import { HeroMediaCard, SectionHeader, StatusPill } from "../../components/UI";
 
 interface PricingPageProps {
   data: CityAtlasData;
+  onTrack: (name: string, detail?: Record<string, string | number | boolean>) => void;
 }
 
 function getPackageLead(packageId: PackageId) {
@@ -59,7 +61,27 @@ const pricingQuestions = [
   },
 ];
 
-export function PricingPage({ data }: PricingPageProps) {
+const paidTrafficFitChecks = [
+  "A business can understand the offer without checkout being open.",
+  "The first conversion is a qualified request, not a payment promise.",
+  "Package interest, page intent, and local campaign context are measurable.",
+];
+
+export function PricingPage({ data, onTrack }: PricingPageProps) {
+  useEffect(() => {
+    onTrack("business_pricing_viewed", {
+      packageCount: data.packages.length,
+      highlightedPackage: data.packages.find((plan) => plan.highlighted)?.id ?? "none",
+    });
+  }, [data.packages, onTrack]);
+
+  function trackRequestClick(location: string, packageId: PackageId | "none" = "none") {
+    onTrack("business_package_cta_clicked", {
+      location,
+      packageId,
+    });
+  }
+
   return (
     <>
       <section className="pricing-hero pricing-hero-compact">
@@ -71,7 +93,11 @@ export function PricingPage({ data }: PricingPageProps) {
             step before any billing opens.
           </p>
           <div className="hero-actions">
-            <AppLink className="button primary" to="/for-businesses/submit">
+            <AppLink
+              className="button primary"
+              onClick={() => trackRequestClick("hero")}
+              to="/for-businesses/submit"
+            >
               Start a business request
               <ArrowRightIcon />
             </AppLink>
@@ -94,7 +120,7 @@ export function PricingPage({ data }: PricingPageProps) {
         <div className="pricing-hero-side">
           <HeroMediaCard
             image={siteConfig.media.hero}
-            alt="Granville Island Public Market in Vancouver"
+            alt="Illustrated market scene inspired by Granville Island Public Market in Vancouver"
             eyebrow="For local businesses"
             title="Start with the smallest useful local visibility move"
             copy="CityAtlas works best when a business starts with one useful page, one stronger guide fit, or one simple offer people can understand fast."
@@ -131,6 +157,25 @@ export function PricingPage({ data }: PricingPageProps) {
           copy="All three paths start with the same request. The difference is how much hands-on page, guide, and offer help CityAtlas adds after the review."
           action={<StatusPill tone="blue">3 starting paths</StatusPill>}
         />
+        <div className="source-panel conversion-panel pricing-readiness-panel">
+          <div className="card-topline">
+            <strong>Paid-traffic fit</strong>
+            <StatusPill tone="green">Qualified lead first</StatusPill>
+          </div>
+          <p>
+            The paid-traffic goal is not instant checkout. It is one qualified Vancouver business
+            request that identifies the page, guide, offer, or package need clearly enough to
+            review.
+          </p>
+          <ul className="conversion-list">
+            {paidTrafficFitChecks.map((check) => (
+              <li key={check}>
+                <CheckIcon />
+                <span>{check}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
         <div className="pricing-grid">
           {data.packages.map((plan) => (
             <article
@@ -159,7 +204,11 @@ export function PricingPage({ data }: PricingPageProps) {
                 <LockIcon />
                 <span>Review first</span>
               </div>
-              <AppLink className="button secondary wide" to={`/for-businesses/submit?package=${plan.id}`}>
+              <AppLink
+                className="button secondary wide"
+                onClick={() => trackRequestClick("package_card", plan.id)}
+                to={`/for-businesses/submit?package=${plan.id}`}
+              >
                 {getPackageCtaLabel(plan.id)}
               </AppLink>
             </article>
@@ -183,7 +232,11 @@ export function PricingPage({ data }: PricingPageProps) {
               placement, or one simple offer worth shaping.
             </p>
             <div className="hero-actions">
-              <AppLink className="button primary" to="/for-businesses/submit">
+              <AppLink
+                className="button primary"
+                onClick={() => trackRequestClick("best_next_move")}
+                to="/for-businesses/submit"
+              >
                 Start the request <ArrowRightIcon />
               </AppLink>
               <AppLink className="button secondary" to="/editorial-standards">
@@ -230,7 +283,11 @@ export function PricingPage({ data }: PricingPageProps) {
             clear.
           </p>
         </div>
-        <AppLink className="button primary" to="/for-businesses/submit">
+        <AppLink
+          className="button primary"
+          onClick={() => trackRequestClick("bottom_cta")}
+          to="/for-businesses/submit"
+        >
           Start a business request <ArrowRightIcon />
         </AppLink>
       </section>

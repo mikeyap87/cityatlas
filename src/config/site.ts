@@ -16,10 +16,10 @@ export const siteConfig = {
   launchModeLabel: "Univenture private-launch package",
   contactEmail: "city@univenturestudio.com",
   media: {
-    hero: resolvePublicAssetPath("/assets/places/granville-island-public-market-official.jpg"),
-    city: resolvePublicAssetPath("/assets/places/english-bay-beach-official.png"),
-    waterfront: resolvePublicAssetPath("/assets/places/kitsilano-beach-official.jpg"),
-    wellness: resolvePublicAssetPath("/assets/places/queen-elizabeth-park-official.jpg"),
+    hero: resolvePublicAssetPath("/assets/places-generated/granville-island-public-market-hero-generated.jpg"),
+    city: resolvePublicAssetPath("/assets/places-generated/english-bay-beach-generated.jpg"),
+    waterfront: resolvePublicAssetPath("/assets/places-generated/kitsilano-beach-generated.jpg"),
+    wellness: resolvePublicAssetPath("/assets/places-generated/queen-elizabeth-park-generated.jpg"),
   },
   gatedActions: [
     "Domain purchase",

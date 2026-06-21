@@ -42,7 +42,7 @@ function SourceBackedReferenceCard({
         {hasSpecificVisual ? (
           <img
             src={getSourceBackedPlaceVisual(reference)}
-            alt={`${reference.name} place photo`}
+            alt={`Illustrated view inspired by ${reference.name}`}
             decoding="async"
             loading="lazy"
           />
@@ -713,7 +713,7 @@ export function SourceBackedCollectionPage({
           <div className="starter-hero-media hero-media-compact">
             <img
               src={heroVisual}
-              alt={`${collectionMeta.shortLabel} scene`}
+              alt={`Illustrated collection scene for ${collectionMeta.shortLabel}`}
               decoding="async"
               fetchPriority="high"
               loading="eager"

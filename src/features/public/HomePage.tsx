@@ -438,7 +438,7 @@ export function HomePage({ data, onNewsletter: _onNewsletter, onTrack, onSaveMis
         <div className="hero-media">
           <img
             src={siteConfig.media.hero}
-            alt="Granville Island Public Market in Vancouver"
+            alt="Illustrated market scene inspired by Granville Island Public Market in Vancouver"
             decoding="async"
             fetchPriority="high"
             loading="eager"
@@ -455,7 +455,11 @@ export function HomePage({ data, onNewsletter: _onNewsletter, onTrack, onSaveMis
                 {copy.primaryCta}
                 <ArrowRightIcon />
               </AppLink>
-              <AppLink className="button secondary" to="/for-businesses/pricing">
+              <AppLink
+                className="button secondary"
+                onClick={() => onTrack("business_funnel_cta_clicked", { location: "home_hero" })}
+                to="/for-businesses/pricing"
+              >
                 For Vancouver businesses
               </AppLink>
             </div>
@@ -795,11 +799,19 @@ export function HomePage({ data, onNewsletter: _onNewsletter, onTrack, onSaveMis
               next step, whether that is a stronger page, better guide fit, or a simple offer.
             </p>
             <div className="hero-actions">
-              <AppLink className="button primary" to="/for-businesses/submit">
+              <AppLink
+                className="button primary"
+                onClick={() => onTrack("business_funnel_cta_clicked", { location: "home_business_panel" })}
+                to="/for-businesses/submit"
+              >
                 Start business request
                 <ArrowRightIcon />
               </AppLink>
-              <AppLink className="button secondary" to="/for-businesses/pricing">
+              <AppLink
+                className="button secondary"
+                onClick={() => onTrack("business_funnel_cta_clicked", { location: "home_business_panel_packages" })}
+                to="/for-businesses/pricing"
+              >
                 See packages
               </AppLink>
             </div>
@@ -848,7 +860,11 @@ export function HomePage({ data, onNewsletter: _onNewsletter, onTrack, onSaveMis
             <span>Direct email path</span>
           </div>
           <div className="hero-actions contact-card-actions">
-            <AppLink className="button primary" to="/for-businesses/submit">
+            <AppLink
+              className="button primary"
+              onClick={() => onTrack("business_funnel_cta_clicked", { location: "home_contact_card" })}
+              to="/for-businesses/submit"
+            >
               Start business request
             </AppLink>
             <a

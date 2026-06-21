@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { siteConfig } from "../config/site";
+import { AnalyticsConsentBanner } from "./AnalyticsConsent";
 import { AppLink } from "./Link";
 import { CityAtlasMarkIcon, CloseIcon, MenuIcon, SearchIcon } from "./Icons";
 
@@ -151,6 +152,7 @@ export function PublicLayout({ children, path }: LayoutProps) {
       </header>
 
       <main>{children}</main>
+      <AnalyticsConsentBanner path={path} />
 
       <footer className="site-footer">
         <div className="footer-intro">

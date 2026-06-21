@@ -176,6 +176,8 @@ Optional future analytics env vars:
 - `VITE_GA_MEASUREMENT_ID=`
 - `VITE_ANALYTICS_ID=`
 
+If these are configured and the site is redeployed, CityAtlas now shows a consent choice before loading external analytics.
+
 ## Live-Risk Gates
 
 See [docs/LAUNCH_GATES.md](docs/LAUNCH_GATES.md). A simple "yes" is not enough for live-risk actions. The owner should approve the exact action, provider/account, scope, rollback path, and spend/customer impact.
@@ -188,7 +190,7 @@ Use these locally:
 - `/?variant=founding-partner`
 - `/?variant=weekend-atlas`
 
-Variant exposure and business-funnel events are stored locally in browser storage. No third-party analytics provider is connected until the analytics env vars are approved and configured.
+Variant exposure and business-funnel events are stored locally in browser storage. No third-party analytics provider is connected until the analytics env vars are approved, configured, and redeployed. When they are present, the public site waits for visitor consent before loading external analytics.
 
 ## City Missions
 

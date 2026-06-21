@@ -2,6 +2,7 @@ import { AppLink } from "../../components/Link";
 import { LockIcon, ShieldIcon } from "../../components/Icons";
 import { StatusPill } from "../../components/UI";
 import { siteConfig } from "../../config/site";
+import { getAnalyticsReadiness } from "../../lib/analytics";
 
 export function TermsPage() {
   return (
@@ -122,6 +123,8 @@ export function TermsPage() {
 }
 
 export function PrivacyPage() {
+  const analyticsReady = getAnalyticsReadiness().hasExternalDestination;
+
   return (
     <section className="section-block page-top legal-page">
       <section className="city-hero legal-hero">
@@ -129,8 +132,8 @@ export function PrivacyPage() {
           <p className="section-label">Privacy</p>
           <h1>How CityAtlas handles data today</h1>
           <p>
-            This page explains what the public site stores today and what would need to change
-            before outside tools, analytics, or payments are added.
+            This page explains what the public site stores today and how analytics, business
+            requests, and future provider tools are handled.
           </p>
           <div className="hero-actions">
             <AppLink className="button secondary" to="/editorial-standards">
@@ -142,7 +145,7 @@ export function PrivacyPage() {
           </div>
           <div className="tag-cloud pricing-tag-cloud">
             <span>Saved on this device</span>
-            <span>No outside tools</span>
+            <span>{analyticsReady ? "Analytics needs consent" : "No outside analytics yet"}</span>
             <span>Protected pages stay separate</span>
           </div>
         </div>
@@ -150,13 +153,22 @@ export function PrivacyPage() {
           <div className="public-intro-card-header">
             <div>
               <strong>Plain-English summary</strong>
-              <p>Saved plans stay on this device today, and no outside providers are connected yet.</p>
+              <p>
+                {analyticsReady
+                  ? "Saved plans stay on this device, and analytics only runs if a visitor allows it."
+                  : "Saved plans stay on this device today, and no outside analytics provider is connected yet."}
+              </p>
             </div>
             <StatusPill tone="blue">Public site</StatusPill>
           </div>
           <ul className="public-note-list">
             <li><ShieldIcon /> Saved plans and submissions stay on this device right now.</li>
-            <li><LockIcon /> No CRM, analytics, AI, email, or payment tools are connected.</li>
+            <li>
+              <LockIcon />
+              {analyticsReady
+                ? "Analytics can run only after a visitor allows it on this device."
+                : "No CRM, analytics, AI, email, or payment tools are connected."}
+            </li>
             <li><ShieldIcon /> Admin and protected pages stay off the public site.</li>
           </ul>
         </div>
@@ -168,8 +180,11 @@ export function PrivacyPage() {
           <h2>What stays on this device</h2>
           <p>
             Currently, submissions, saves, and planning activity are stored only on this device.
-            They do not sync to a database, CRM, email provider, analytics provider, AI provider,
+            They do not sync to a database, CRM, email provider, AI provider,
             or payment provider.
+            {analyticsReady
+              ? " If analytics is enabled, campaign and page events are measured only after visitor consent."
+              : " They also do not sync to an analytics provider today."}
           </p>
         </article>
 
@@ -221,10 +236,11 @@ export function PrivacyPage() {
       <div className="cta-band">
         <LockIcon />
         <div>
-          <h2>Before outside tools connect</h2>
+          <h2>{analyticsReady ? "Analytics stays consent-based" : "Before outside tools connect"}</h2>
           <p>
-            Analytics, CRM, outreach, AI summaries, and payment tools are not connected
-            on the public site today.
+            {analyticsReady
+              ? "CityAtlas can measure visit and business-request events only after a visitor allows analytics. CRM, outreach, AI summaries, and payment tools still stay off."
+              : "Analytics, CRM, outreach, AI summaries, and payment tools are not connected on the public site today."}
           </p>
         </div>
         <AppLink className="button secondary" to="/terms">

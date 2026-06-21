@@ -15,6 +15,8 @@ const reportPath = join(outputDir, "paid-traffic-readiness.json");
 const previewPort = Number(process.env.CITYATLAS_PAID_TRAFFIC_PORT || "4281");
 const baseUrl = `http://127.0.0.1:${previewPort}`;
 const strict = process.argv.includes("--strict");
+const ANALYTICS_CONSENT_STORAGE_KEY = "cityatlas.analytics.consent.v1";
+const ANALYTICS_SCRIPT_ID = "cityatlas-ga4-script";
 
 const requiredEvents = [
   "page_view",
@@ -48,6 +50,23 @@ async function readPersistedData(page) {
   });
 }
 
+async function readAnalyticsProof(page) {
+  return page.evaluate(({ consentKey, scriptId }) => {
+    const dataLayer = Array.isArray(window.dataLayer) ? window.dataLayer : [];
+    const hasTuple = (matcher) => dataLayer.some((entry) => Array.isArray(entry) && matcher(entry));
+
+    return {
+      consentState: window.localStorage.getItem(consentKey),
+      bannerVisible: Boolean(document.querySelector('[aria-label="Analytics choice"]')),
+      scriptInjected: Boolean(document.getElementById(scriptId)),
+      configuredMeasurementId: window.__cityatlasAnalyticsState?.configuredMeasurementId ?? "",
+      consentUpdated: hasTuple((entry) => entry[0] === "consent" && entry[1] === "update"),
+      configured: hasTuple((entry) => entry[0] === "config"),
+      pageViewForwarded: hasTuple((entry) => entry[0] === "event" && entry[1] === "page_view"),
+    };
+  }, { consentKey: ANALYTICS_CONSENT_STORAGE_KEY, scriptId: ANALYTICS_SCRIPT_ID });
+}
+
 async function main() {
   const server = startVitePreviewServer({
     root,
@@ -57,6 +76,16 @@ async function main() {
   const failures = [];
   const blockers = [];
   const warnings = [];
+  const analyticsProof = {
+    externalDestinationConfigured: hasExternalAnalyticsDestination(),
+    bannerVisibleBeforeConsent: false,
+    scriptInjectedBeforeConsent: false,
+    bannerVisibleAfterConsent: false,
+    consentStoredAfterChoice: false,
+    scriptInjectedAfterConsent: false,
+    configuredAfterConsent: false,
+    pageViewForwardedAfterConsent: false,
+  };
   let browser;
 
   mkdirSync(outputDir, { recursive: true });
@@ -75,6 +104,7 @@ async function main() {
       window.localStorage.removeItem("cityatlas.launch.package.v1");
       window.localStorage.removeItem("cityatlas.traffic.context.v1");
       window.localStorage.removeItem("cityatlas.analytics.debug.v1");
+      window.localStorage.removeItem("cityatlas.analytics.consent.v1");
     });
 
     const page = await context.newPage();
@@ -82,6 +112,49 @@ async function main() {
       `${baseUrl}/?utm_source=paid_test&utm_medium=cpc&utm_campaign=city_partner_qa&utm_content=hero_business_cta`,
       { waitUntil: "networkidle" },
     );
+
+    if (hasExternalAnalyticsDestination()) {
+      await page.getByLabel("Analytics choice").waitFor();
+      const beforeConsent = await readAnalyticsProof(page);
+      analyticsProof.bannerVisibleBeforeConsent = beforeConsent.bannerVisible;
+      analyticsProof.scriptInjectedBeforeConsent = beforeConsent.scriptInjected;
+
+      if (!beforeConsent.bannerVisible) {
+        noteFailure(failures, "analytics consent", "Consent banner did not appear when external analytics was configured.");
+      }
+
+      if (beforeConsent.scriptInjected) {
+        noteFailure(failures, "analytics consent", "Analytics script loaded before consent.");
+      }
+
+      await page.getByRole("button", { name: /Allow analytics/i }).click();
+      await page.waitForFunction(
+        ({ consentKey, scriptId }) =>
+          window.localStorage.getItem(consentKey) === "granted" &&
+          Boolean(document.getElementById(scriptId)),
+        { consentKey: ANALYTICS_CONSENT_STORAGE_KEY, scriptId: ANALYTICS_SCRIPT_ID },
+      );
+
+      const afterConsent = await readAnalyticsProof(page);
+      analyticsProof.bannerVisibleAfterConsent = afterConsent.bannerVisible;
+      analyticsProof.consentStoredAfterChoice = afterConsent.consentState === "granted";
+      analyticsProof.scriptInjectedAfterConsent = afterConsent.scriptInjected;
+      analyticsProof.configuredAfterConsent =
+        afterConsent.configured && afterConsent.consentUpdated && Boolean(afterConsent.configuredMeasurementId);
+      analyticsProof.pageViewForwardedAfterConsent = afterConsent.pageViewForwarded;
+
+      if (afterConsent.bannerVisible) {
+        noteFailure(failures, "analytics consent", "Consent banner stayed visible after allowing analytics.");
+      }
+
+      if (!afterConsent.configured || !afterConsent.consentUpdated || !afterConsent.scriptInjected) {
+        noteFailure(failures, "analytics consent", "Analytics was not fully configured after consent.");
+      }
+
+      if (!afterConsent.pageViewForwarded) {
+        noteFailure(failures, "analytics consent", "Granting consent did not forward the landing page view.");
+      }
+    }
 
     await page.getByRole("link", { name: /For Vancouver businesses/i }).click();
     await page.waitForURL(`${baseUrl}/for-businesses/pricing`);
@@ -180,6 +253,7 @@ async function main() {
           (submission) => submission.businessName === "Paid Traffic QA Bistro",
         ),
         capturedEvents: eventNames,
+        analytics: analyticsProof,
       },
       revenueStory: {
         trafficSource: "Business-side paid traffic to the Vancouver business offer.",

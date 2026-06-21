@@ -1345,3 +1345,20 @@
     text-align: center;
   }
 }
+
+@media (max-width: 860px) {
+  .analytics-consent-banner {
+    bottom: 12px;
+    gap: 12px;
+    grid-template-columns: 1fr;
+    padding: 14px;
+  }
+
+  .analytics-consent-actions {
+    justify-content: stretch;
+  }
+
+  .analytics-consent-actions .button {
+    width: 100%;
+  }
+}

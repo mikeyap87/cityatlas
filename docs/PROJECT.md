@@ -108,7 +108,7 @@ The public product helps locals find places, events, offers, and guides. The bus
 - No automated outreach is active.
 - No live inbox webhook, Resend connector, CRM sync, or automated business follow-up is active.
 - No paid EXA discovery or scraping run is triggered automatically by the app; future research batches must be staged manually or by an owner-approved separate run.
-- Paid-traffic readiness is intentionally blocked until real analytics and hosted conversion proof exist. The local business funnel can be checked with `npm run qa:paid-traffic`, but local event tracking is not enough to buy traffic safely.
+- Paid-traffic readiness is intentionally blocked until real analytics and hosted conversion proof exist. The app now supports a consent-based GA4 handoff once approved env vars are configured, but production still has no analytics env configured today. The local business funnel can be checked with `npm run qa:paid-traffic`, but local event tracking is not enough to buy traffic safely.
 - The Vancouver business machine now uses deduped prospect truth: repeated source-backed venues do not count as separate business rows, and the admin rollup separates partner-eligible coverage from anchor-only city guidance.
 - First six owner-approved proof-sprint emails were sent manually and logged; no follow-up or second batch is approved.
 - Vercel deploy is live at `https://cityatlas-one.vercel.app`.

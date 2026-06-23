@@ -13,6 +13,7 @@ import type {
   PackageId,
   SavedItem,
 } from "../types";
+import { buildFlags } from "../config/site";
 import { shouldTreatProspectAsPartnerAnchor } from "./businessProspectRole";
 import { slugify } from "./format";
 
@@ -44,15 +45,25 @@ let cityGrowthModulePromise: Promise<typeof import("./cityGrowth")> | null = nul
 let businessInboundPreviewModulePromise: Promise<typeof import("./businessInboundPreview")> | null =
   null;
 
-function loadCityGrowthModule() {
-  cityGrowthModulePromise ??= import("./cityGrowth");
-  return cityGrowthModulePromise;
-}
+const loadCityGrowthModule: () => Promise<typeof import("./cityGrowth")> =
+  buildFlags.hostedAdminArtifacts
+    ? () => {
+        cityGrowthModulePromise ??= import("./cityGrowth");
+        return cityGrowthModulePromise;
+      }
+    : async () => {
+        throw new Error("Protected CityAtlas admin artifacts are disabled in this build.");
+      };
 
-function loadBusinessInboundPreviewModule() {
-  businessInboundPreviewModulePromise ??= import("./businessInboundPreview");
-  return businessInboundPreviewModulePromise;
-}
+const loadBusinessInboundPreviewModule: () => Promise<typeof import("./businessInboundPreview")> =
+  buildFlags.hostedAdminArtifacts
+    ? () => {
+        businessInboundPreviewModulePromise ??= import("./businessInboundPreview");
+        return businessInboundPreviewModulePromise;
+      }
+    : async () => {
+        throw new Error("Protected CityAtlas admin artifacts are disabled in this build.");
+      };
 
 function createId(prefix: string) {
   return `${prefix}-${Date.now().toString(36)}-${Math.random()
@@ -104,6 +115,14 @@ async function buildBaseData(): Promise<CityAtlasData> {
 export async function loadCityAtlasGrowthData(
   persisted: Pick<CityAtlasPersistedData, "businessInboundMirror" | "businessProspects"> = {},
 ) {
+  if (!buildFlags.hostedAdminArtifacts) {
+    return {
+      cityRolloutTargets: [],
+      businessProspects: [],
+      businessInboundMirror: [],
+    };
+  }
+
   const seed = await seedDataPromise;
   const [
     { buildDefaultBusinessProspects, buildDefaultCityRolloutTargets, mergeBusinessProspects },

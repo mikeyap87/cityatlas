@@ -11,6 +11,7 @@ import type {
   PackageId,
   SavedItem,
 } from "../types";
+import { buildFlags, canRenderAdminExperience } from "../config/site";
 import {
   audit,
   createBrainRun,
@@ -34,18 +35,28 @@ let cityGrowthModulePromise: Promise<typeof import("../lib/cityGrowth")> | null 
 let businessInboundPreviewModulePromise: Promise<typeof import("../lib/businessInboundPreview")> | null =
   null;
 
-function loadCityGrowthModule() {
-  cityGrowthModulePromise ??= import("../lib/cityGrowth");
-  return cityGrowthModulePromise;
-}
+const loadCityGrowthModule: () => Promise<typeof import("../lib/cityGrowth")> =
+  buildFlags.hostedAdminArtifacts
+    ? () => {
+        cityGrowthModulePromise ??= import("../lib/cityGrowth");
+        return cityGrowthModulePromise;
+      }
+    : async () => {
+        throw new Error("Protected CityAtlas admin artifacts are disabled in this build.");
+      };
 
-function loadBusinessInboundPreviewModule() {
-  businessInboundPreviewModulePromise ??= import("../lib/businessInboundPreview");
-  return businessInboundPreviewModulePromise;
-}
+const loadBusinessInboundPreviewModule: () => Promise<typeof import("../lib/businessInboundPreview")> =
+  buildFlags.hostedAdminArtifacts
+    ? () => {
+        businessInboundPreviewModulePromise ??= import("../lib/businessInboundPreview");
+        return businessInboundPreviewModulePromise;
+      }
+    : async () => {
+        throw new Error("Protected CityAtlas admin artifacts are disabled in this build.");
+      };
 
 function shouldLoadGrowthData(pathname: string) {
-  return pathname === "/admin";
+  return pathname === "/admin" && canRenderAdminExperience();
 }
 
 export function useCityAtlasStore(pathname: string) {

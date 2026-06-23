@@ -15,6 +15,8 @@ const screenshotDir = join(outputDir, "local-product-smoke");
 const distIndexPath = join(root, "dist/index.html");
 const previewPort = Number(process.env.CITYATLAS_SMOKE_PORT || "4278");
 const useExistingServer = process.env.CITYATLAS_SMOKE_USE_EXISTING_SERVER === "1";
+const expectProtectedPreviewRoutes =
+  process.env.CITYATLAS_SMOKE_EXPECT_PROTECTED_ROUTES === "1" || !useExistingServer;
 const baseUrl = `http://127.0.0.1:${previewPort}`;
 const navigationWaitUntil = useExistingServer ? "domcontentloaded" : "networkidle";
 const failures = [];
@@ -454,6 +456,24 @@ async function runDesktopFlow(browser) {
 
   await runStep(steps, "desktop private preview render", async () => {
     await page.goto(`${baseUrl}/private-preview/date-night`, { waitUntil: navigationWaitUntil });
+    if (expectProtectedPreviewRoutes) {
+      await page.getByRole("heading", {
+        level: 1,
+        name: /only available inside a protected sharing flow/i,
+      }).waitFor();
+      const bodyText = await page.locator("body").innerText();
+      ensure(
+        /shared selectively|outside the public cityatlas experience/i.test(bodyText),
+        "Protected preview route did not render the expected sharing guardrail copy.",
+      );
+
+      return {
+        route: "/private-preview/date-night",
+        access: "protected",
+        screenshot: await saveScreenshot(page, "desktop-private-preview.png"),
+      };
+    }
+
     await page.getByRole("heading", { level: 1, name: /Vancouver Date Night route preview/i }).waitFor();
     const bodyText = await page.locator("body").innerText();
     ensure(/review-only surface/i.test(bodyText), "Private preview did not render the review-only safety copy.");
@@ -471,7 +491,15 @@ async function runDesktopFlow(browser) {
       `${importedBusinessName},hello@smokegallery.example,Taylor,Vancouver,Mount Pleasant,Gallery,Arts venue,Manual source,https://smokegallery.example,https://smokegallery.example,https://smokegallery.example/contact,Smoke import row for local QA,medium`,
     ].join("\n");
 
+    if (expectProtectedPreviewRoutes) {
+      return {
+        route: "/admin",
+        access: "protected",
+      };
+    }
+
     await page.goto(`${baseUrl}/admin`, { waitUntil: navigationWaitUntil });
+
     await page.getByRole("heading", { level: 1, name: /CityAtlas operator console/i }).waitFor();
     await page.getByRole("button", { name: /Queue cleanup/i }).click();
     await page.getByText(/No-send business prospect queue/i).waitFor();
@@ -514,6 +542,13 @@ async function runDesktopFlow(browser) {
   });
 
   await runStep(steps, "desktop admin reply log", async () => {
+    if (expectProtectedPreviewRoutes) {
+      return {
+        route: "/admin",
+        access: "protected",
+      };
+    }
+
     const replySummary = "Smoke test reply summary for local QA.";
     const nextStep = "Keep this in local review only after smoke.";
     await page.getByRole("button", { name: /Outreach rehearsal/i }).click();
@@ -530,6 +565,14 @@ async function runDesktopFlow(browser) {
   });
 
   await runStep(steps, "desktop admin brain save", async () => {
+    if (expectProtectedPreviewRoutes) {
+      return {
+        route: "/admin",
+        access: "protected",
+        screenshot: await saveScreenshot(page, "desktop-admin.png"),
+      };
+    }
+
     const before = await page.locator(".brain-run-row").count();
     await page.getByRole("button", { name: /Signals \+ controls/i }).click();
     await page.getByText(/Local command engine/i).waitFor();
@@ -731,7 +774,15 @@ async function runMobileFlow(browser) {
   });
 
   await runStep(steps, "mobile admin render", async () => {
+    if (expectProtectedPreviewRoutes) {
+      return {
+        route: "/admin",
+        access: "protected",
+      };
+    }
+
     await page.goto(`${baseUrl}/admin`, { waitUntil: navigationWaitUntil });
+
     await page.getByRole("heading", { level: 1, name: /CityAtlas operator console/i }).waitFor();
     await page.getByRole("button", { name: /Queue cleanup/i }).click();
     await page.getByLabel("Queue focus").selectOption("needs_research");
@@ -747,6 +798,24 @@ async function runMobileFlow(browser) {
 
   await runStep(steps, "mobile private preview render", async () => {
     await page.goto(`${baseUrl}/private-preview/date-night`, { waitUntil: navigationWaitUntil });
+    if (expectProtectedPreviewRoutes) {
+      await page.getByRole("heading", {
+        level: 1,
+        name: /only available inside a protected sharing flow/i,
+      }).waitFor();
+      const bodyText = await page.locator("body").innerText();
+      ensure(
+        /shared selectively|outside the public cityatlas experience/i.test(bodyText),
+        "Protected mobile preview route did not render the expected sharing guardrail copy.",
+      );
+
+      return {
+        route: "/private-preview/date-night",
+        access: "protected",
+        screenshot: await saveScreenshot(page, "mobile-private-preview.png"),
+      };
+    }
+
     await page.getByRole("heading", { level: 1, name: /Vancouver Date Night route preview/i }).waitFor();
 
     return {

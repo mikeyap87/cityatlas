@@ -1,6 +1,6 @@
 import { useLayoutEffect } from "react";
 import type { CityAtlasData } from "../types";
-import { canShowHostedAdmin, canShowHostedPrivatePreview, siteConfig } from "../config/site";
+import { canRenderAdminExperience, canRenderPrivatePreviewExperience, siteConfig } from "../config/site";
 import { buildJsonLd, getRouteMeta, getRobotsDirectives, resolveBaseUrl } from "../lib/seo";
 
 const runtimeEnv = ((import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env ??
@@ -32,9 +32,8 @@ function upsertLink(rel: string, href: string) {
 export function SeoManager({ path, data }: { path: string; data: CityAtlasData }) {
   useLayoutEffect(() => {
     const metaOptions = {
-      adminVisible: path === "/admin" && canShowHostedAdmin(),
-      privatePreviewVisible:
-        path === "/private-preview/date-night" && canShowHostedPrivatePreview(),
+      adminVisible: path === "/admin" && canRenderAdminExperience(),
+      privatePreviewVisible: path === "/private-preview/date-night" && canRenderPrivatePreviewExperience(),
     };
     const meta = getRouteMeta(path, data, metaOptions);
     const baseUrl = resolveBaseUrl({

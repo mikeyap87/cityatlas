@@ -37,8 +37,10 @@ export const siteConfig = {
   ],
 };
 
-const runtimeEnv = ((import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env ??
-  {}) as Record<string, string | undefined>;
+const runtimeEnv = ((import.meta as ImportMeta & {
+  env?: { DEV?: boolean } & Record<string, string | undefined>;
+}).env ?? {}) as { DEV?: boolean } & Record<string, string | undefined>;
+const isDevBuild = runtimeEnv.DEV === true;
 
 export const envFlags = {
   livePayments: runtimeEnv.VITE_CITYATLAS_ENABLE_LIVE_PAYMENTS === "true",
@@ -46,6 +48,11 @@ export const envFlags = {
   automatedOutreach: runtimeEnv.VITE_CITYATLAS_ENABLE_AUTOMATED_OUTREACH === "true",
   hostedAdmin: runtimeEnv.VITE_CITYATLAS_ENABLE_HOSTED_ADMIN === "true",
   hostedPrivatePreview: runtimeEnv.VITE_CITYATLAS_ENABLE_HOSTED_PRIVATE_PREVIEW === "true",
+};
+
+export const buildFlags = {
+  hostedAdminArtifacts: isDevBuild || envFlags.hostedAdmin,
+  hostedPrivatePreviewArtifacts: isDevBuild || envFlags.hostedPrivatePreview,
 };
 
 export function isLocalPreviewRuntime() {
@@ -59,4 +66,12 @@ export function canShowHostedAdmin() {
 
 export function canShowHostedPrivatePreview() {
   return isLocalPreviewRuntime() || envFlags.hostedPrivatePreview;
+}
+
+export function canRenderAdminExperience() {
+  return isDevBuild ? isLocalPreviewRuntime() : envFlags.hostedAdmin;
+}
+
+export function canRenderPrivatePreviewExperience() {
+  return isDevBuild ? isLocalPreviewRuntime() : envFlags.hostedPrivatePreview;
 }

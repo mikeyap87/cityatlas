@@ -6,8 +6,9 @@ import { SeoManager } from "../components/Seo";
 import { LockIcon, ShieldIcon } from "../components/Icons";
 import { parseGuideHubPath, parseGuidePath } from "../lib/cityPaths";
 import {
-  canShowHostedAdmin,
-  canShowHostedPrivatePreview,
+  buildFlags,
+  canRenderAdminExperience,
+  canRenderPrivatePreviewExperience,
   siteConfig,
 } from "../config/site";
 import { getSourceBackedCollectionForPath } from "../lib/sourceBackedCollections";
@@ -37,8 +38,12 @@ const loadMissionsPage = () => import("../features/public/MissionsPage");
 const loadPlannerPage = () => import("../features/public/PlannerPage");
 const loadSecondaryCityGuidesPage = () => import("../features/public/SecondaryCityGuidesPage");
 const loadTrustPages = () => import("../features/public/TrustPages");
-const loadAdminConsole = () => import("../features/admin/AdminConsole");
-const loadDateNightPreviewPage = () => import("../features/private/DateNightPreviewPage");
+const loadAdminConsole = buildFlags.hostedAdminArtifacts
+  ? () => import("../features/admin/AdminConsole")
+  : () => import("../features/admin/AdminConsoleDisabled");
+const loadDateNightPreviewPage = buildFlags.hostedPrivatePreviewArtifacts
+  ? () => import("../features/private/DateNightPreviewPage")
+  : () => import("../features/private/DateNightPreviewDisabled");
 
 const PricingPage = lazyNamed(loadPricingPage, "PricingPage");
 const SubmitBusinessPage = lazyNamed(loadSubmitBusinessPage, "SubmitBusinessPage");
@@ -293,7 +298,7 @@ export function CityAtlasApp() {
       );
     }
     if (path === "/private-preview/date-night") {
-      if (!canShowHostedPrivatePreview()) {
+      if (!canRenderPrivatePreviewExperience()) {
         return (
           <ProtectedRouteNotice
             label="Protected page"
@@ -314,7 +319,7 @@ export function CityAtlasApp() {
       return <PrivacyPage />;
     }
     if (path === "/admin") {
-      if (!canShowHostedAdmin()) {
+      if (!canRenderAdminExperience()) {
         return (
           <ProtectedRouteNotice
             label="Protected operations page"

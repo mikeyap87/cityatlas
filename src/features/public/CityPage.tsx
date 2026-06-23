@@ -242,7 +242,7 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
               className="button secondary"
               to="/vancouver/guides/vancouver-itinerary-starter-pack-which-cityatlas-page-should-you-open-first"
             >
-              Read the start-here guide
+              Open the start-here guide
             </AppLink>
           </div>
           <div className="city-hero-support-grid">
@@ -269,8 +269,8 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
           <aside className="city-search-card">
             <div className="city-search-header">
               <div>
-                <strong>Search places or open a strong starting page</strong>
-                <p>Search the place list below, or jump straight into a page that already fits.</p>
+                <strong>Search places or jump straight into a strong starting page</strong>
+                <p>Search the current place list, or open the page that already fits the day.</p>
               </div>
               <StatusPill tone="blue">{sourceBackedPlaceCount} places with official links</StatusPill>
             </div>
@@ -279,7 +279,7 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Search cafes, wellness, date night..."
+                placeholder="Search cafes, services, wellness, date night..."
                 aria-label="Search CityAtlas"
               />
               <select
@@ -293,7 +293,7 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
               </select>
             </div>
             <div className="city-search-secondary">
-              <p className="city-search-secondary-label">Quick starts</p>
+              <p className="city-search-secondary-label">Strong starting pages</p>
               <div className="city-search-secondary-links">
                 {cityHeroQuickStarts.map((item) => (
                   <AppLink
@@ -301,7 +301,8 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
                     key={item.to}
                     to={item.to}
                   >
-                    {item.label}
+                    <strong>{item.label}</strong>
+                    <span>{item.detail}</span>
                   </AppLink>
                 ))}
               </div>

@@ -13,6 +13,7 @@ const aboutAudienceGroups = [
   "People planning one low-effort Vancouver Sunday",
   "People looking for a rainy-day or wellness reset",
   "Neighborhood businesses improving local visibility",
+  "Service businesses improving local visibility",
 ] as const;
 
 export function AboutPage() {
@@ -24,22 +25,22 @@ export function AboutPage() {
           <h1>CityAtlas helps people choose the right Vancouver start</h1>
           <p>
             CityAtlas helps locals and visitors choose the right guide, saved plan, or local place
-            first. It also gives neighborhood businesses a simpler way to understand how they can
-            show up in local discovery.
+            first. It also helps Vancouver businesses and service operators show up more clearly in
+            local discovery.
           </p>
           <div className="hero-actions">
             <AppLink className="button primary" to="/vancouver/guides">
               Read Vancouver guides <ArrowRightIcon />
             </AppLink>
-            <AppLink className="button secondary" to="/vancouver/date-night-starters">
-              Local places
+            <AppLink className="button secondary" to="/for-businesses/pricing">
+              For businesses
             </AppLink>
           </div>
         </div>
         <div className="starter-hero-side about-hero-side">
           <HeroMediaCard
-            image={siteConfig.media.city}
-            alt="Illustrated shoreline scene inspired by English Bay Beach in Vancouver"
+            image={siteConfig.media.about}
+            alt="Illustrated market scene inspired by Granville Island Public Market in Vancouver"
             eyebrow="How CityAtlas helps"
             title="One clear starting point beats a long city list"
             copy="Choose the right part of Vancouver first, then open the guide, plan, or local place that actually fits."
@@ -59,6 +60,7 @@ export function AboutPage() {
             <li>Saved plans help when you want to keep a route, not just read about it.</li>
             <li>Open a local place when the next move is a real stop, not more browsing.</li>
             <li>Vancouver is the deepest city today, and Toronto shows the same structure can travel well.</li>
+            <li>The business side can also start with local services that need clearer city-facing positioning.</li>
           </ul>
         </div>
         <div className="source-panel about-quick-links-panel">
@@ -77,9 +79,9 @@ export function AboutPage() {
               <strong>Local places</strong>
               <p>Open local places when the next step is a real stop.</p>
             </AppLink>
-            <AppLink className="query-card query-card-link" to="/toronto/guides">
-              <strong>Toronto preview</strong>
-              <p>See the first repeatable city pack beyond Vancouver.</p>
+            <AppLink className="query-card query-card-link" to="/for-businesses/pricing">
+              <strong>For businesses</strong>
+              <p>See packages and the business request path.</p>
             </AppLink>
           </div>
         </div>
@@ -120,7 +122,7 @@ export function AboutPage() {
             <li>Guides help people solve one specific Vancouver planning question.</li>
             <li>Saved plans turn those ideas into reusable local plans.</li>
             <li>Local places stay clear about what they checked and where the source lives.</li>
-            <li>Businesses can request a page or package through a simpler review flow.</li>
+            <li>Businesses and service operators can request a page or package through a simpler review flow.</li>
           </ul>
         </div>
         <div className="source-panel">

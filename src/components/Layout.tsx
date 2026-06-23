@@ -7,12 +7,12 @@ import { CityAtlasMarkIcon, CloseIcon, MenuIcon, SearchIcon } from "./Icons";
 const footerGroups = [
   {
     title: "Start with Vancouver",
-    note: "Best first pages, saved plans, and the planner.",
+    note: "Best first guides, local places, saved plans, and the planner.",
     links: [
       { to: "/vancouver/guides", label: "Vancouver guides" },
       {
         to: "/vancouver/guides/vancouver-itinerary-starter-pack-which-cityatlas-page-should-you-open-first",
-        label: "Start with Vancouver",
+        label: "Start-here guide",
       },
       { to: "/vancouver", label: "Explore Vancouver" },
       { to: "/vancouver/missions", label: "Saved plans" },
@@ -60,9 +60,22 @@ interface LayoutProps {
 }
 
 function navClass(path: string, target: string) {
-  return path === target || (target !== "/" && path.startsWith(target))
-    ? "nav-link active"
-    : "nav-link";
+  const isPlacesRoute = path.startsWith("/vancouver/") && path.endsWith("-starters");
+  const isGuidesRoute = path.startsWith("/vancouver/guides");
+  const isBusinessRoute = path.startsWith("/for-businesses");
+
+  const isActive =
+    target === "/vancouver"
+      ? path === "/vancouver"
+      : target === "/vancouver/guides"
+        ? isGuidesRoute
+        : target === "/vancouver/date-night-starters"
+          ? isPlacesRoute
+          : target === "/for-businesses"
+            ? isBusinessRoute
+            : path === target;
+
+  return isActive ? "nav-link active" : "nav-link";
 }
 
 export function PublicLayout({ children, path }: LayoutProps) {
@@ -112,7 +125,7 @@ export function PublicLayout({ children, path }: LayoutProps) {
             className={navClass(path, "/vancouver/date-night-starters")}
             onClick={closeMobileNav}
           >
-            Start here
+            Local places
           </AppLink>
           <AppLink
             to="/vancouver/missions"
@@ -166,7 +179,8 @@ export function PublicLayout({ children, path }: LayoutProps) {
             </div>
           </div>
           <p>
-            Use CityAtlas when you know the kind of day you want, but not the best first page yet.
+            Use CityAtlas to open the right Vancouver guide, local place, or business path without
+            scanning the whole city first.
           </p>
           <div className="footer-action-row">
             <AppLink className="button primary" to="/vancouver/guides">

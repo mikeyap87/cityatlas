@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import type { CityAtlasData, CityMission, NewsletterLead } from "../../types";
-import { siteConfig } from "../../config/site";
+import { resolvePublicAssetPath, siteConfig } from "../../config/site";
 import {
   getActiveVariant,
   getNextBestAction,
@@ -37,6 +37,14 @@ interface HomePageProps {
 }
 
 type HomeSearchKind = "shortcut" | "guide" | "business" | "event" | "offer";
+type HeroPreviewId =
+  | "gastown"
+  | "kits"
+  | "mount-pleasant"
+  | "false-creek"
+  | "ubc"
+  | "rainy-day"
+  | "weekend-plan";
 
 interface HomeSearchResult {
   id: string;
@@ -47,86 +55,153 @@ interface HomeSearchResult {
   haystack: string;
 }
 
-const heroMapStops = [
-  {
+interface HeroPreview {
+  id: HeroPreviewId;
+  label: string;
+  caption: string;
+  detail: string;
+  path: string;
+  image: string;
+  alt: string;
+  queryTerms: string[];
+  mapClassName?: string;
+  suggestionLabel?: string;
+  searchValue?: string;
+}
+
+const heroPreviewLookup: Record<HeroPreviewId, HeroPreview> = {
+  gastown: {
     id: "gastown",
     label: "Gastown",
     caption: "Old-core evening",
     detail: "Best for dinner, a walk, and a compact first evening without crossing the city.",
     path: "/vancouver/guides/gastown-evening-guide-when-to-choose-it-and-how-to-keep-the-plan-compact",
+    image: resolvePublicAssetPath("/assets/places-generated/gastown-generated.jpg"),
+    alt: "Illustrated evening street scene inspired by Gastown in Vancouver",
+    queryTerms: ["gastown", "old core evening", "historic core", "dinner walk"],
+    mapClassName: "map-stop-gastown",
+    suggestionLabel: "Gastown",
+    searchValue: "gastown",
   },
-  {
+  kits: {
     id: "kits",
     label: "Kitsilano",
     caption: "Beach and seawall",
     detail: "Best for shoreline time, easy movement, and a lighter west-side pace.",
     path: "/vancouver/kitsilano-scenic-starters",
+    image: resolvePublicAssetPath("/assets/places-generated/kitsilano-beach-generated.jpg"),
+    alt: "Illustrated shoreline scene inspired by Kitsilano Beach in Vancouver",
+    queryTerms: ["kits", "kits beach", "kitsilano", "beach", "seawall"],
+    mapClassName: "map-stop-kits",
+    suggestionLabel: "Kits Beach",
+    searchValue: "kits beach",
   },
-  {
+  "mount-pleasant": {
     id: "mount-pleasant",
     label: "Mount Pleasant",
     caption: "Coffee and casual plans",
     detail: "Useful for cafes, casual meals, and a short neighborhood wander.",
     path: "/vancouver/guides/mount-pleasant-local-discovery-starter-guide-for-casual-vancouver-plans",
+    image: resolvePublicAssetPath("/assets/vancouver-rainline-cafe-hero.jpg"),
+    alt: "Illustrated cafe scene for casual Vancouver neighborhood plans",
+    queryTerms: ["mount pleasant", "coffee", "casual plan", "casual meals"],
+    mapClassName: "map-stop-mount-pleasant",
   },
-  {
+  "false-creek": {
     id: "false-creek",
     label: "False Creek",
     caption: "Culture afternoon",
     detail: "A better fit for museums, harbour walks, and a compact daytime plan.",
     path: "/vancouver/false-creek-culture-starters",
+    image: resolvePublicAssetPath("/assets/places-generated/museum-of-vancouver-generated.jpg"),
+    alt: "Illustrated museum-and-waterfront scene inspired by False Creek in Vancouver",
+    queryTerms: ["false creek", "culture afternoon", "museum", "harbour walk"],
+    mapClassName: "map-stop-false-creek",
   },
-  {
+  ubc: {
     id: "ubc",
     label: "UBC + Point Grey",
     caption: "Garden and campus day",
     detail: "Open this for campus stops, gardens, and a quieter scenic reset.",
     path: "/vancouver/ubc-discovery-starters",
+    image: resolvePublicAssetPath("/assets/places-generated/ubc-botanical-garden-generated.jpg"),
+    alt: "Illustrated garden scene inspired by UBC Botanical Garden in Vancouver",
+    queryTerms: ["ubc", "point grey", "campus day", "garden day"],
+    mapClassName: "map-stop-ubc",
   },
-] as const;
-
-const heroSearchSuggestions = [
-  { label: "Rainy day", value: "rainy day", path: "/vancouver/rainy-day-starters" },
-  { label: "Gastown", value: "gastown", path: "/vancouver/guides/gastown-evening-guide-when-to-choose-it-and-how-to-keep-the-plan-compact" },
-  { label: "Kits Beach", value: "kits beach", path: "/vancouver/kitsilano-scenic-starters" },
-  {
-    label: "Weekend plan",
-    value: "weekend plan",
-    path: "/vancouver/weekend-route-starters",
-  },
-] as const;
-
-const heroSearchShortcuts = [
-  {
-    id: "shortcut-rainy-day",
-    label: "Rainy day starters",
-    detail: "Start with an indoor Vancouver plan.",
+  "rainy-day": {
+    id: "rainy-day",
+    label: "Rainy day",
+    caption: "Indoor fallback",
+    detail: "Best when the weather turns and you want one clear indoor Vancouver start fast.",
     path: "/vancouver/rainy-day-starters",
-    matches: ["rainy day", "rain", "indoor plan"],
+    image: resolvePublicAssetPath("/assets/vancouver-rainy-market-hero.jpg"),
+    alt: "Illustrated rainy-day Vancouver market scene",
+    queryTerms: ["rainy day", "rain", "indoor plan", "indoor Vancouver"],
+    suggestionLabel: "Rainy day",
+    searchValue: "rainy day",
   },
-  {
-    id: "shortcut-weekend-route",
-    label: "Weekend route starters",
-    detail: "Keep a Vancouver weekend compact and easy to follow.",
+  "weekend-plan": {
+    id: "weekend-plan",
+    label: "Weekend plan",
+    caption: "Compact day plan",
+    detail: "Best when you want one Vancouver day that stays compact instead of crossing the city all day.",
     path: "/vancouver/weekend-route-starters",
-    matches: ["weekend", "weekend plan", "weekend route"],
+    image: resolvePublicAssetPath("/assets/vancouver-waterfront-park-hero.jpg"),
+    alt: "Illustrated Vancouver waterfront scene for a compact weekend plan",
+    queryTerms: ["weekend", "weekend plan", "weekend route", "one city day"],
+    suggestionLabel: "Weekend plan",
+    searchValue: "weekend plan",
   },
-  ...heroMapStops.map((stop) => ({
-    id: `shortcut-${stop.id}`,
-    label: stop.label,
-    detail: stop.caption,
-    path: stop.path,
-    matches: [
-      stop.label.toLowerCase(),
-      stop.caption.toLowerCase(),
-      ...(stop.id === "kits" ? ["kits beach", "kitsilano"] : []),
-      ...(stop.id === "ubc" ? ["ubc", "point grey"] : []),
-    ],
-  })),
+};
+
+const heroMapStopIds = [
+  "gastown",
+  "kits",
+  "mount-pleasant",
+  "false-creek",
+  "ubc",
 ] as const;
+
+const heroMapStops = heroMapStopIds.map((id) => heroPreviewLookup[id]);
+
+const heroSearchSuggestionIds = ["rainy-day", "gastown", "kits", "weekend-plan"] as const;
+
+const heroSearchSuggestions = heroSearchSuggestionIds.map((id) => {
+  const preview = heroPreviewLookup[id];
+
+  return {
+    label: preview.suggestionLabel ?? preview.label,
+    value: preview.searchValue ?? preview.label.toLowerCase(),
+    path: preview.path,
+    previewId: preview.id,
+  };
+});
+
+const heroSearchShortcutIds = [
+  "rainy-day",
+  "weekend-plan",
+  "gastown",
+  "kits",
+  "mount-pleasant",
+  "false-creek",
+  "ubc",
+] as const;
+
+const heroSearchShortcuts = heroSearchShortcutIds.map((id) => {
+  const preview = heroPreviewLookup[id];
+
+  return {
+    id: `shortcut-${preview.id}`,
+    label: preview.suggestionLabel ?? preview.label,
+    detail: preview.caption,
+    path: preview.path,
+    matches: preview.queryTerms,
+  };
+});
 
 const homeResultKindLabels: Record<HomeSearchKind, string> = {
-  shortcut: "Start here",
+  shortcut: "Quick start",
   guide: "Guide",
   business: "Place",
   event: "Event",
@@ -173,9 +248,7 @@ const homePlanningLanes = [
 
 export function HomePage({ data, onNewsletter: _onNewsletter, onTrack, onSaveMission }: HomePageProps) {
   const [heroQuery, setHeroQuery] = useState("");
-  const [activeHeroStopId, setActiveHeroStopId] = useState<(typeof heroMapStops)[number]["id"]>(
-    heroMapStops[0].id,
-  );
+  const [activeHeroPreviewId, setActiveHeroPreviewId] = useState<HeroPreviewId>(heroMapStops[0].id);
   const activeVariant = getActiveVariant();
   const copy = variantCopy[activeVariant];
   const nextBestAction = getNextBestAction(data);
@@ -292,8 +365,7 @@ export function HomePage({ data, onNewsletter: _onNewsletter, onTrack, onSaveMis
     (collection) => collection.length > 0,
   ).length;
   const localPlacePageLabel = `${sourceBackedWedgeCount} place pages`;
-  const activeHeroStop =
-    heroMapStops.find((stop) => stop.id === activeHeroStopId) ?? heroMapStops[0];
+  const activeHeroPreview = heroPreviewLookup[activeHeroPreviewId] ?? heroMapStops[0];
   const heroSignals = [
     {
       tone: "blue" as const,
@@ -421,7 +493,7 @@ export function HomePage({ data, onNewsletter: _onNewsletter, onTrack, onSaveMis
   const trustHighlightLinks = trustedStartingPointLinks.slice(0, 4);
   const nextStepLabel =
     nextBestAction.label === "Pick your first Vancouver guide"
-      ? "Start with the Vancouver guide library"
+      ? "Start with Vancouver guides"
       : nextBestAction.label;
   const nextStepCopy =
     nextBestAction.label === "Pick your first Vancouver guide"
@@ -437,8 +509,8 @@ export function HomePage({ data, onNewsletter: _onNewsletter, onTrack, onSaveMis
       <section className="hero-grid">
         <div className="hero-media">
           <img
-            src={siteConfig.media.hero}
-            alt="Illustrated market scene inspired by Granville Island Public Market in Vancouver"
+            src={activeHeroPreview.image}
+            alt={activeHeroPreview.alt}
             decoding="async"
             fetchPriority="high"
             loading="eager"
@@ -539,10 +611,10 @@ export function HomePage({ data, onNewsletter: _onNewsletter, onTrack, onSaveMis
                 return (
                   <AppLink
                     aria-label={`Open ${stop.label}`}
-                    className={`map-stop ${mapStopClassName}${stop.id === activeHeroStop.id ? " active" : ""}`}
+                    className={`map-stop ${mapStopClassName}${stop.id === activeHeroPreview.id ? " active" : ""}`}
                     key={stop.id}
-                    onFocus={() => setActiveHeroStopId(stop.id)}
-                    onMouseEnter={() => setActiveHeroStopId(stop.id)}
+                    onFocus={() => setActiveHeroPreviewId(stop.id)}
+                    onMouseEnter={() => setActiveHeroPreviewId(stop.id)}
                     to={stop.path}
                   >
                     <span className="map-stop-dot" aria-hidden="true" />
@@ -593,7 +665,7 @@ export function HomePage({ data, onNewsletter: _onNewsletter, onTrack, onSaveMis
               ) : hasHeroQuery ? (
                 <div className="hero-search-empty hero-search-empty-active">
                   <strong>No exact page yet</strong>
-                  <p>Open the Vancouver guide library or start with the main Vancouver page.</p>
+                  <p>Open Vancouver guides or browse the main Vancouver page.</p>
                   <div className="hero-search-suggestions">
                     <AppLink className="hero-search-suggestion" to="/vancouver/guides">
                       Open guides
@@ -605,13 +677,14 @@ export function HomePage({ data, onNewsletter: _onNewsletter, onTrack, onSaveMis
                 </div>
               ) : (
                 <div className="hero-search-empty">
-                  <p>Popular searches</p>
+                  <p>Popular starts</p>
                   <div className="hero-search-suggestions">
                     {heroSearchSuggestions.map((suggestion) => (
                       <AppLink
-                        className="hero-search-suggestion"
+                        className={`hero-search-suggestion${suggestion.previewId === activeHeroPreview.id ? " active" : ""}`}
                         key={suggestion.value}
-                        onMouseEnter={() => setHeroQuery(suggestion.value)}
+                        onFocus={() => setActiveHeroPreviewId(suggestion.previewId)}
+                        onMouseEnter={() => setActiveHeroPreviewId(suggestion.previewId)}
                         to={suggestion.path}
                       >
                         {suggestion.label}
@@ -623,12 +696,12 @@ export function HomePage({ data, onNewsletter: _onNewsletter, onTrack, onSaveMis
             </div>
             <div className="hero-active-route-row">
               <div className="hero-active-route-copy">
-                <p className="hero-route-preview-kicker">Why this area works</p>
-                <strong>{activeHeroStop.label}</strong>
-                <p>{activeHeroStop.caption}</p>
-                <p className="hero-active-route-summary">{activeHeroStop.detail}</p>
+                <p className="hero-route-preview-kicker">Previewed start</p>
+                <strong>{activeHeroPreview.label}</strong>
+                <p>{activeHeroPreview.caption}</p>
+                <p className="hero-active-route-summary">{activeHeroPreview.detail}</p>
               </div>
-              <AppLink className="button secondary" to={activeHeroStop.path}>
+              <AppLink className="button secondary" to={activeHeroPreview.path}>
                 Open page
               </AppLink>
             </div>
@@ -658,7 +731,7 @@ export function HomePage({ data, onNewsletter: _onNewsletter, onTrack, onSaveMis
           label="Start with one useful guide"
           title="Three strong Vancouver guides to open first"
           copy="Start with the guide that fits the day, then go deeper only if you still need more."
-          action={<AppLink className="text-link" to="/vancouver/guides">Open guide library <ArrowRightIcon /></AppLink>}
+          action={<AppLink className="text-link" to="/vancouver/guides">Open all guides <ArrowRightIcon /></AppLink>}
         />
         {featuredHomepageGuide ? (
           <div className="guide-cluster-layout home-guide-layout">
@@ -668,7 +741,7 @@ export function HomePage({ data, onNewsletter: _onNewsletter, onTrack, onSaveMis
                 <GuideCompactCard guide={guide} key={guide.id} variant="tight" />
               ))}
               <AppLink className="guide-more-card" to="/vancouver/guides">
-                <strong>See the full Vancouver guide library</strong>
+                <strong>See all Vancouver guides</strong>
                 <span>Open the full list when you already know the question and just need the right page fast.</span>
               </AppLink>
             </div>
@@ -773,7 +846,7 @@ export function HomePage({ data, onNewsletter: _onNewsletter, onTrack, onSaveMis
           <SectionHeader
             label="Next city"
             title="Toronto now has a smaller starter set"
-            copy="Use Toronto when the real question is where a first-time visitor should begin or how to keep a weekend compact. Vancouver still has the deeper guide library."
+            copy="Use Toronto when the real question is where a first-time visitor should begin or how to keep a weekend compact. Vancouver still has the broader guide set."
           />
           <div className="guide-query-grid">
             <AppLink className="query-card query-card-link" to="/toronto/guides">

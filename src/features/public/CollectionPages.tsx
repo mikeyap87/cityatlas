@@ -28,8 +28,8 @@ export function EventsPage({ data }: { data: CityAtlasData }) {
             <AppLink className="button primary" to="/vancouver/guides">
               Open Vancouver guides
             </AppLink>
-            <AppLink className="button secondary" to="/vancouver">
-              Back to Vancouver
+            <AppLink className="button secondary" to="/vancouver/date-night-starters">
+              Open local places
             </AppLink>
           </div>
           <article className="source-panel business-hero-note-card business-hero-note-card-safe pricing-hero-summary-card">
@@ -76,7 +76,7 @@ export function EventsPage({ data }: { data: CityAtlasData }) {
             weather shape before the event itself matters.
           </p>
           <AppLink className="button secondary" to="/vancouver/guides">
-            Open Vancouver guides <ArrowRightIcon />
+            Open all guides <ArrowRightIcon />
           </AppLink>
         </div>
       </section>
@@ -118,8 +118,8 @@ export function OffersPage({ data }: { data: CityAtlasData }) {
             <AppLink className="button primary" to="/for-businesses/submit">
               Start business request
             </AppLink>
-            <AppLink className="button secondary" to="/vancouver">
-              Back to Vancouver
+            <AppLink className="button secondary" to="/vancouver/date-night-starters">
+              Open local places
             </AppLink>
           </div>
           <article className="source-panel business-hero-note-card business-hero-note-card-safe pricing-hero-summary-card">
@@ -429,19 +429,19 @@ export function GuidesPage({ data }: { data: CityAtlasData }) {
                 className="button primary"
                 to={`/vancouver/guides/${starterPackGuide.slug}`}
               >
-                Where do I start?
+                Open the start-here guide
               </AppLink>
             ) : null}
             <AppLink className="button secondary" to="/vancouver/date-night-starters">
-              Local Vancouver places
+              Open local places
             </AppLink>
           </div>
         </div>
         <div className="starter-hero-side guide-library-side-stack">
           <HeroMediaCard
-            image={siteConfig.media.waterfront}
-            alt="Illustrated shoreline scene inspired by Kitsilano Beach in Vancouver"
-            eyebrow="Guide library"
+            image={siteConfig.media.guides}
+            alt="Illustrated neighborhood scene inspired by Gastown in Vancouver"
+            eyebrow="Guides"
             title="Choose the kind of day first"
             copy="Pick the visitor type, neighborhood, weather, or pace first. Then open the page that already fits."
             className="hero-media-compact"
@@ -493,7 +493,7 @@ export function GuidesPage({ data }: { data: CityAtlasData }) {
 
       <section className="section-block">
         <SectionHeader
-          label="Start here"
+          label="Choose a path"
           title="Pick the kind of day you are planning"
           copy="Open the strongest next page for the situation instead of browsing the whole city at once."
           action={<StatusPill tone="blue">4 starting points</StatusPill>}

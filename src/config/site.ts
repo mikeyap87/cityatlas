@@ -17,7 +17,12 @@ export const siteConfig = {
   contactEmail: "city@univenturestudio.com",
   media: {
     hero: resolvePublicAssetPath("/assets/places-generated/granville-island-public-market-hero-generated.jpg"),
+    about: resolvePublicAssetPath("/assets/places-generated/granville-island-public-market-hero-generated.jpg"),
+    business: resolvePublicAssetPath("/assets/places-generated/granville-island-public-market-generated.jpg"),
     city: resolvePublicAssetPath("/assets/places-generated/english-bay-beach-generated.jpg"),
+    guides: resolvePublicAssetPath("/assets/places-generated/gastown-generated.jpg"),
+    missions: resolvePublicAssetPath("/assets/places-generated/stanley-park-generated.jpg"),
+    planner: resolvePublicAssetPath("/assets/places-generated/commercial-drive-generated.jpg"),
     waterfront: resolvePublicAssetPath("/assets/places-generated/kitsilano-beach-generated.jpg"),
     wellness: resolvePublicAssetPath("/assets/places-generated/queen-elizabeth-park-generated.jpg"),
   },

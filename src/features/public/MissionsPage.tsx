@@ -89,10 +89,10 @@ export function MissionsPage({ data, onSaveMission }: MissionsPageProps) {
       <section className="city-hero mission-hero">
         <div>
           <p className="section-label">Saved plans</p>
-          <h1>Save a Vancouver plan you can reuse</h1>
+          <h1>Save the Vancouver plan that already works</h1>
           <p>
-            Use saved plans when the question is already clear and the next step is saving,
-            sharing, or tightening one plan instead of reopening the whole city.
+            Use saved plans once the kind of day is already clear and the next step is keeping,
+            sharing, or tightening one route instead of reopening the whole city.
           </p>
           <div className="hero-actions">
             <AppLink
@@ -115,11 +115,11 @@ export function MissionsPage({ data, onSaveMission }: MissionsPageProps) {
         </div>
         <div className="starter-hero-side">
           <HeroMediaCard
-            image={siteConfig.media.city}
-            alt="Illustrated shoreline scene inspired by English Bay Beach in Vancouver"
+            image={siteConfig.media.missions}
+            alt="Illustrated park scene inspired by Stanley Park in Vancouver"
             eyebrow="Saved plans"
-            title="Keep the plan that already works instead of starting from zero again"
-            copy="Saved plans help you reuse a good Vancouver shape, tighten it, and come back to it without reopening the whole city."
+            title="Keep one Vancouver route worth coming back to"
+            copy="Saved plans help you keep a good route, tighten it later, and share it without reopening every page."
             className="hero-media-compact"
           />
         </div>
@@ -219,14 +219,14 @@ export function MissionsPage({ data, onSaveMission }: MissionsPageProps) {
       <section className="cta-band">
         <ShieldIcon />
         <div>
-          <h2>Guides first, broader coverage later</h2>
+          <h2>For businesses, clearer routes can become clearer pages later</h2>
           <p>
-            Saved plans show how CityAtlas can turn planning into reusable itineraries. As verified
-            business coverage expands, those plans can become more specific.
+            Saved plans show the kind of route people actually want. Business packages are for
+            operators who want clearer pages, offers, or guide placement as coverage grows.
           </p>
         </div>
         <AppLink className="button primary" to="/for-businesses/pricing">
-          Partner packages <ArrowRightIcon />
+          See business packages <ArrowRightIcon />
         </AppLink>
       </section>
     </>

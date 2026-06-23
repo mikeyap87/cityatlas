@@ -5842,8 +5842,8 @@ export const seedData: CityAtlasData = {
       priceLabel: "$0 / month",
       paymentState: "disabled_until_launch_approval",
       description:
-        "A simple starting point for businesses that want a CityAtlas page request on file.",
-      bestFor: "Businesses that want to be considered for future coverage.",
+        "A simple starting point for businesses that want a CityAtlas page or review request on file.",
+      bestFor: "Businesses that want to be considered for future coverage or keep a request ready before paid help.",
       highlighted: false,
       features: [
         "Basic business request",
@@ -5858,8 +5858,9 @@ export const seedData: CityAtlasData = {
       priceLabel: "$49 / month on launch",
       paymentState: "disabled_until_launch_approval",
       description:
-        "A fuller local-visibility package with a stronger page, guide consideration, and one offer or event slot.",
-      bestFor: "Restaurants, cafes, wellness studios, and experience operators.",
+        "A fuller local-visibility package with a stronger page, guide consideration, and one offer, service angle, or event slot.",
+      bestFor:
+        "Restaurants, cafes, wellness businesses, repair shops, cleaners, mobile services, and experience operators.",
       highlighted: true,
       features: [
         "Enhanced business page",
@@ -5874,8 +5875,8 @@ export const seedData: CityAtlasData = {
       priceLabel: "$149 / month on launch",
       paymentState: "disabled_until_launch_approval",
       description:
-        "A higher-touch local package for deeper page work, sponsored ideas, and campaign planning.",
-      bestFor: "Businesses ready for a hands-on content and local growth push.",
+        "A higher-touch local package for deeper page work, sponsored ideas, service positioning, and campaign planning.",
+      bestFor: "Businesses ready for a hands-on content, offer, and local growth push.",
       highlighted: false,
       features: [
         "Premium feature page",

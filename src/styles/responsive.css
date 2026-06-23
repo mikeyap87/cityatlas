@@ -46,8 +46,28 @@
     grid-template-columns: repeat(2, 1fr);
   }
 
+  .admin-workspace-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-workspace-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-subworkspace-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-subworkspace-tabs {
+    grid-template-columns: 1fr;
+  }
+
   .pricing-proof-grid {
     grid-template-columns: 1fr;
+  }
+
+  .pricing-choice-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .business-hero-support-grid {
@@ -203,6 +223,24 @@
   .brand-mark small,
   .header-search {
     display: none;
+  }
+
+  .admin-workspace-tabs {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-workspace-tab {
+    grid-template-columns: auto 1fr;
+  }
+
+  .admin-workspace-tab-count {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .admin-disclosure summary {
+    align-items: start;
+    grid-template-columns: 1fr;
   }
 
   .mobile-nav-toggle {
@@ -665,6 +703,10 @@
   .inventory-grid,
   .cta-band,
   .checklist-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pricing-choice-grid {
     grid-template-columns: 1fr;
   }
 
@@ -1343,6 +1385,12 @@
 
   .city-search-secondary-link {
     text-align: center;
+  }
+}
+
+@media (max-width: 560px) {
+  .city-search-secondary-links {
+    grid-template-columns: 1fr;
   }
 }
 

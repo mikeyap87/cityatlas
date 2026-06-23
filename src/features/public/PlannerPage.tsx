@@ -77,7 +77,7 @@ export function PlannerPage({ data, onToggleSave, onSaveMission, onTrack }: Plan
       savedItems: data.savedItems.length,
       completedSteps,
     });
-    setShareState("Share draft prepared here. Copy it into your message app when you are ready.");
+    setShareState("Share text is ready here. Copy it into your message app when you are ready.");
   }
 
   return (
@@ -85,10 +85,10 @@ export function PlannerPage({ data, onToggleSave, onSaveMission, onTrack }: Plan
       <section className="city-hero">
         <div>
           <p className="section-label">Planner</p>
-          <h1>Save a Vancouver plan</h1>
+          <h1>Build a simple Vancouver plan you can keep</h1>
           <p>
-            Save places, events, and guides into one simple Vancouver plan. For now, it stays in
-            this device and can be shared manually when you are ready.
+            Save places, events, and guides into one simple Vancouver plan. It stays on this
+            device for now and can prepare share text when you are ready.
           </p>
           <div className="hero-actions">
             <AppLink className="button primary" to="/vancouver/missions">
@@ -111,11 +111,11 @@ export function PlannerPage({ data, onToggleSave, onSaveMission, onTrack }: Plan
         </div>
         <div className="starter-hero-side">
           <HeroMediaCard
-            image={siteConfig.media.waterfront}
-            alt="Illustrated shoreline scene inspired by Kitsilano Beach in Vancouver"
+            image={siteConfig.media.planner}
+            alt="Illustrated neighborhood scene inspired by Commercial Drive in Vancouver"
             eyebrow="Planner"
-            title="Save the short list that actually fits the day"
-            copy="Keep the best place, event, and guide together in one simple Vancouver plan before you decide whether to share it."
+            title="Keep the short list that already fits together"
+            copy="Save the best place, event, and guide together in one simple Vancouver plan before you decide whether to share it."
             className="hero-media-compact"
           />
         </div>
@@ -167,7 +167,7 @@ export function PlannerPage({ data, onToggleSave, onSaveMission, onTrack }: Plan
         <div>
           <SectionHeader
             title="Your saved plan"
-            copy="Use this as a simple working list you can keep, reorder, and revisit later."
+            copy="Use this as a simple working list you can keep and revisit later."
             action={<StatusPill tone="blue">{data.savedItems.length} saved</StatusPill>}
           />
           {data.savedItems.length === 0 ? (
@@ -192,7 +192,7 @@ export function PlannerPage({ data, onToggleSave, onSaveMission, onTrack }: Plan
 
         <div>
           <SectionHeader
-            title="Share draft"
+            title="Share text"
             copy="Prepare a message-ready plan summary here before you send it anywhere else."
           />
           <div className="share-draft">
@@ -205,7 +205,7 @@ export function PlannerPage({ data, onToggleSave, onSaveMission, onTrack }: Plan
                 Prepare share text
               </button>
               <AppLink className="button secondary" to="/vancouver/guides">
-                Browse guides <ArrowRightIcon />
+                See all guides <ArrowRightIcon />
               </AppLink>
             </div>
             {shareState ? <small className="local-success">{shareState}</small> : null}

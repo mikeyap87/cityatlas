@@ -273,7 +273,7 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
   }));
   const guidePrimaryAction = sourceBackedGuideMeta
     ? {
-        label: "Open official places",
+        label: "See local places",
         path: sourceBackedGuideMeta.path,
       }
     : {
@@ -302,7 +302,7 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
                 {guidePrimaryAction.label} <ArrowRightIcon />
               </AppLink>
               <AppLink className="text-link" to={resolvedGuideHubPath}>
-                All guides <ArrowRightIcon />
+                See all guides <ArrowRightIcon />
               </AppLink>
             </div>
           </div>
@@ -455,7 +455,7 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
               <strong>Open next</strong>
             </div>
             <div className="rail-links">
-              <AppLink to={resolvedGuideHubPath}>All guides</AppLink>
+              <AppLink to={resolvedGuideHubPath}>See all guides</AppLink>
               <AppLink to="/vancouver/missions">Saved plans</AppLink>
               <AppLink to="/planner">Planner</AppLink>
               <AppLink to="/for-businesses/pricing">For businesses</AppLink>

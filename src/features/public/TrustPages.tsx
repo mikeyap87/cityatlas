@@ -79,7 +79,7 @@ function SourceBackedReferenceCard({
             rel="noreferrer"
             target="_blank"
           >
-            Open official site
+            Official site
           </a>
           <AppLink className="button secondary" to={reference.correctionPath}>
             Report an issue
@@ -259,6 +259,23 @@ function simplifyCollectionCopy(value: string) {
       /Expand only one careful ([^.]+?) before anything broader is published\./gi,
       "Next, CityAtlas can expand $1 while keeping the same official-link and report-an-issue rules.",
     );
+}
+
+function simplifyCollectionHeroLabel(value: string) {
+  return simplifyCollectionCopy(value)
+    .replace(/^Source-backed /i, "")
+    .replace(/ pages with official site links$/i, "")
+    .replace(/ coverage$/i, "")
+    .trim();
+}
+
+function simplifyCollectionHeroTitle(value: string) {
+  return simplifyCollectionCopy(value)
+    .replace(/ with official links$/i, "")
+    .replace(/ with official source notes$/i, "")
+    .replace(/\bstarters\b/gi, "starting points")
+    .replace(/  +/g, " ")
+    .trim();
 }
 
 const sourceBackedPageContent: Record<
@@ -678,9 +695,13 @@ export function SourceBackedCollectionPage({
     <>
       <section className="city-hero source-backed-hero">
         <div>
-          <p className="section-label">{simplifyCollectionCopy(content.heroLabel)}</p>
-          <h1>{simplifyCollectionCopy(content.heroTitle)}</h1>
-          <p>{simplifyCollectionCopy(content.heroCopy)}</p>
+          <p className="section-label">{simplifyCollectionHeroLabel(content.heroLabel)}</p>
+          <h1>{simplifyCollectionHeroTitle(content.heroTitle)}</h1>
+          <p>
+            Use this page when you want a smaller set of real places before you open a fuller
+            guide. Each place links to an official site, explains why it fits, and includes a way
+            to report a mistake.
+          </p>
           <div className="hero-actions">
             <AppLink className="button primary" to={content.primaryCtaPath}>
               {simplifyCollectionCopy(content.primaryCtaLabel)} <ArrowRightIcon />
@@ -690,22 +711,23 @@ export function SourceBackedCollectionPage({
             </AppLink>
           </div>
           <div className="tag-cloud source-backed-hero-tags">
-            <span>{starters.length} official-link places</span>
+            <span>{starters.length} places</span>
+            <span>Official links</span>
             <span>Start with one place</span>
             <span>Report a mistake</span>
           </div>
           <div className="city-hero-support-grid">
             <article className="city-hero-support-card">
-              <strong>{starters.length} places with official links</strong>
-              <p>Each place links to an official public source and keeps a visible correction path.</p>
+              <strong>{starters.length} places checked</strong>
+              <p>Each place links to an official site and includes a way to report a mistake.</p>
             </article>
             <article className="city-hero-support-card">
               <strong>Open one place first</strong>
               <p>Choose one strong fit first, then widen into the fuller guide only if you still need more context.</p>
             </article>
             <article className="city-hero-support-card wide">
-              <strong>Confirm final details on the official site</strong>
-              <p>Hours, tickets, and availability can change, so use CityAtlas to narrow the choice and the official source to confirm the details.</p>
+              <strong>Confirm the last details before you go</strong>
+              <p>Hours, tickets, and availability can change, so use CityAtlas to narrow the choice and the official site to confirm the last details.</p>
             </article>
           </div>
         </div>

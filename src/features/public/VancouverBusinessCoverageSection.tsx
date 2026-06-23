@@ -61,8 +61,8 @@ export function VancouverBusinessCoverageSection({
         }
         copy={
           isHome
-            ? `CityAtlas already tracks ${snapshot.totalBusinesses} Vancouver businesses across hospitality, culture, guest stays, events, wellness, and neighborhood planning. The public site starts with guides, but the wider local coverage is already there underneath.`
-            : `CityAtlas already tracks ${snapshot.totalBusinesses} Vancouver businesses behind the public guides and local places. The public site still leads with the best page to open first, while the wider city coverage helps keep that advice grounded.`
+            ? `CityAtlas already tracks ${snapshot.totalBusinesses} Vancouver businesses across hospitality, culture, guest stays, events, wellness, and broader neighborhood business coverage. The public site starts with guides, but the wider local coverage is already there underneath.`
+            : `CityAtlas already tracks ${snapshot.totalBusinesses} Vancouver businesses behind the public guides and local places. The public site still leads with the best page to open first, while the wider place and business coverage helps keep that advice grounded.`
         }
         action={<StatusPill tone="green">{snapshot.totalBusinesses} businesses already in the map</StatusPill>}
       />
@@ -95,7 +95,7 @@ export function VancouverBusinessCoverageSection({
           <SectionHeader
             label="What this means"
             title="Start with the right guide, then the right place"
-            copy="The first public job is still helping someone choose the right guide. The broader place map makes those pages feel more grounded while fuller local pages keep rolling out."
+            copy="The first public job is still helping someone choose the right guide. The broader place and business map makes those pages feel more grounded while fuller local pages keep rolling out."
           />
           <div className="tag-cloud">
             {snapshot.topCategories.map((category) => (

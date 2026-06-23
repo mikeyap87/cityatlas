@@ -142,34 +142,39 @@ export function SubmitBusinessPage({ data, onSubmitBusiness, onTrack }: SubmitBu
             with the request and keep a saved copy here if you want to come back later.
           </p>
           <div className="hero-actions">
-            <AppLink className="button primary" to="/for-businesses/pricing">
-              See packages
-            </AppLink>
-            <AppLink className="button secondary" to="/editorial-standards">
-              See trust rules
+            <a
+              className="button primary"
+              href="#business-request-form"
+              onClick={() => onTrack("business_request_jump_to_form_clicked")}
+            >
+              Start the request below
+              <ArrowRightIcon />
+            </a>
+            <AppLink className="button secondary" to="/for-businesses/pricing">
+              Compare packages
             </AppLink>
           </div>
           <div className="tag-cloud pricing-tag-cloud">
             <span>Email draft opens</span>
             <span>Save a copy here</span>
-            <span>Stronger page</span>
-            <span>Guide or offer help</span>
+            <span>Restaurants + service businesses</span>
+            <span>Guide, offer, or service help</span>
           </div>
           <article className="source-panel business-hero-note-card business-hero-note-card-safe pricing-hero-summary-card">
             <strong>Most requests only need one neighborhood, one contact path, and one clear business goal.</strong>
             <p>
               That is usually enough for CityAtlas to point you toward the next useful page, guide,
-              offer, or package without overcomplicating the first step.
+              offer, or service-focused package without overcomplicating the first step.
             </p>
           </article>
         </div>
         <div className="pricing-hero-side">
           <HeroMediaCard
-            image={siteConfig.media.city}
-            alt="Illustrated shoreline scene inspired by English Bay Beach in Vancouver"
+            image={siteConfig.media.business}
+            alt="Illustrated market scene inspired by Granville Island Public Market in Vancouver"
             eyebrow="Start simple"
-            title="Lead with one real business need"
-            copy="A clear neighborhood, business need, and contact path is enough for CityAtlas to point the request in the right direction."
+            title="Lead with one clear neighborhood need"
+            copy="One neighborhood, one business need, and one contact path are enough for CityAtlas to point the request in the right direction."
           />
         </div>
       </section>
@@ -188,7 +193,8 @@ export function SubmitBusinessPage({ data, onSubmitBusiness, onTrack }: SubmitBu
             <strong>Why this request works</strong>
             <p>
               One clear neighborhood, category, and business need is usually enough for CityAtlas
-              to point you to the right next step.
+              to point you to the right next step, whether you run a restaurant, a wellness brand,
+              or a local service business.
             </p>
           </article>
           <article className="source-panel business-hero-note-card">
@@ -207,6 +213,7 @@ export function SubmitBusinessPage({ data, onSubmitBusiness, onTrack }: SubmitBu
 
       <section className="form-layout">
         <form
+          id="business-request-form"
           className="submission-form"
           onSubmit={(event) => {
             event.preventDefault();
@@ -248,7 +255,7 @@ export function SubmitBusinessPage({ data, onSubmitBusiness, onTrack }: SubmitBu
               <input
                 value={form.category}
                 onChange={(event) => setForm({ ...form, category: event.target.value })}
-                placeholder="Restaurant, cafe, wellness..."
+                placeholder="Restaurant, repair shop, cleaner, wellness..."
               />
             </label>
             <label>

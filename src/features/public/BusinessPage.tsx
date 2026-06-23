@@ -23,6 +23,9 @@ function getBusinessExampleLabel(business: Business) {
   if (text.includes("coffee") || text.includes("cafe")) return "Cafe";
   if (text.includes("restaurant") || text.includes("dinner")) return "Dinner spot";
   if (text.includes("wellness") || text.includes("recovery") || text.includes("spa")) return "Wellness spot";
+  if (text.includes("repair") || text.includes("clean") || text.includes("detailing") || text.includes("auto")) {
+    return "Service business";
+  }
   if (text.includes("cycle") || text.includes("outdoor") || text.includes("beach")) return "Activity stop";
   return "Local business";
 }
@@ -54,7 +57,7 @@ export function BusinessPage({ business, data }: BusinessPageProps) {
         <p>This page does not have a matching listing.</p>
         <div className="hero-actions">
           <AppLink className="button primary" to="/vancouver">
-            Back to Vancouver
+            Open Vancouver
           </AppLink>
           <AppLink className="button secondary" to="/for-businesses/submit">
             Start business request

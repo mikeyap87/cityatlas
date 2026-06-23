@@ -3595,6 +3595,14 @@
   line-height: 1.42;
 }
 
+.pricing-choice-feature-list {
+  margin: 0;
+}
+
+.pricing-choice-feature-list li {
+  font-size: 0.82rem;
+}
+
 .pricing-choice-note strong {
   color: var(--ink);
 }

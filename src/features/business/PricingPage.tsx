@@ -94,12 +94,6 @@ const pricingQuestions = [
   },
 ];
 
-const pricingUpgradeChecks = [
-  "Community Listing keeps the first step light and reviewed.",
-  "City Partner adds the strongest first paid page-and-guide layer.",
-  "Signature Partner adds more hands-on planning and reporting.",
-];
-
 const pricingFitTags = [
   "Restaurants",
   "Cafes",
@@ -133,8 +127,8 @@ export function PricingPage({ data, onTrack }: PricingPageProps) {
           <p className="section-label">For businesses</p>
           <h1>Choose the right first CityAtlas package for your Vancouver business</h1>
           <p>
-            Start with one clear business need, get a fit review first, and choose the smallest
-            useful package before any billing opens.
+            Tell CityAtlas what needs help first, get a fit review, and only pay for the level of
+            help that actually moves the business forward.
           </p>
           <div className="hero-actions">
             <AppLink
@@ -151,15 +145,15 @@ export function PricingPage({ data, onTrack }: PricingPageProps) {
           </div>
           <div className="tag-cloud pricing-tag-cloud">
             <span>Starts at $0 / month</span>
-            <span>Review first</span>
+            <span>Review before payment</span>
             <span>Restaurants + service businesses</span>
           </div>
           <article className="source-panel business-hero-note-card business-hero-note-card-safe pricing-hero-summary-card">
-            <strong>Most businesses only need one clearer page, one better guide match, or one simpler offer first.</strong>
+            <strong>Most businesses should start with City Partner or lighter.</strong>
             <p>
-              This page should help you choose the smallest useful package in under a minute. If it
-              does not, start the request and CityAtlas can point you to the right level before
-              payment opens.
+              Community Listing is the review-only option. City Partner is the strongest first paid
+              fit for most businesses. Signature Partner is for the cases where the bigger lift is
+              already obvious before payment opens.
             </p>
           </article>
         </div>
@@ -207,9 +201,9 @@ export function PricingPage({ data, onTrack }: PricingPageProps) {
 
       <section className="section-block">
         <SectionHeader
-          label="Choose fast"
-          title="Pick the level of help you actually need"
-          copy="Use this if you want the quick answer before reading every package detail."
+          label="Choose once"
+          title="Choose your starting level in one pass"
+          copy="All three options start with the same request. The difference is how much help CityAtlas adds after the review."
         />
         <div className="card-grid three pricing-choice-grid">
           {data.packages.map((plan) => (
@@ -224,6 +218,14 @@ export function PricingPage({ data, onTrack }: PricingPageProps) {
                 <strong>{plan.name}</strong>
                 <span>{plan.priceLabel}</span>
               </div>
+              <ul className="conversion-list pricing-choice-feature-list">
+                {plan.features.slice(0, 3).map((feature) => (
+                  <li key={`${plan.id}-${feature}`}>
+                    <CheckIcon />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
               <p className="pricing-choice-note">
                 <strong>Best when:</strong> {getPackageBestFit(plan.name, plan.id)}
               </p>
@@ -239,78 +241,11 @@ export function PricingPage({ data, onTrack }: PricingPageProps) {
         </div>
       </section>
 
-      <section className="section-block pricing-packages-section">
-        <SectionHeader
-          label="Packages"
-          title="Compare the full package details"
-          copy="Every package starts with the same request. What changes is how much page, guide, offer, and reporting help CityAtlas adds after the review."
-          action={<StatusPill tone="blue">3 starting paths</StatusPill>}
-        />
-        <div className="source-panel conversion-panel pricing-readiness-panel">
-          <div className="card-topline">
-            <strong>What changes as the package gets deeper</strong>
-            <StatusPill tone="green">Same request, more help</StatusPill>
-          </div>
-          <p>
-            The first decision is not about checkout. It is about how much hands-on help the
-            business needs once CityAtlas has reviewed the fit.
-          </p>
-          <ul className="conversion-list">
-            {pricingUpgradeChecks.map((check) => (
-              <li key={check}>
-                <CheckIcon />
-                <span>{check}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="pricing-grid">
-          {data.packages.map((plan) => (
-            <article
-              className={plan.highlighted ? "pricing-card highlighted" : "pricing-card"}
-              id={`package-${plan.id}`}
-              key={plan.id}
-            >
-              <div className="pricing-card-header">
-                <span className="query-card-kicker">{getPackageLead(plan.id)}</span>
-                {plan.highlighted ? <span className="plan-flag">Most useful starting point</span> : null}
-              </div>
-              <h2>{plan.name}</h2>
-              <strong>{plan.priceLabel}</strong>
-              <small className="pricing-card-note">Starts with a business request and quick review.</small>
-              <p>{plan.description}</p>
-              <p className="pricing-card-best-fit">
-                <strong>Best when:</strong> {getPackageBestFit(plan.bestFor, plan.id)}
-              </p>
-              <ul>
-                {plan.features.map((feature) => (
-                  <li key={feature}>
-                    <CheckIcon />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              <div className="payment-locked">
-                <LockIcon />
-                <span>Review first</span>
-              </div>
-              <AppLink
-                className="button secondary wide"
-                onClick={() => trackRequestClick("package_card", plan.id)}
-                to={`/for-businesses/submit?package=${plan.id}`}
-              >
-                {getPackageCtaLabel(plan.id)}
-              </AppLink>
-            </article>
-          ))}
-        </div>
-      </section>
-
       <section className="section-block">
         <SectionHeader
           label="Still deciding"
-          title="Still unsure? Start the request and let CityAtlas point you to the right package"
-          copy="Use the request form when you already know what needs help, or when you want CityAtlas to help choose the right first package before billing opens."
+          title="Still unsure? Start the request and let CityAtlas point you to the smaller package first"
+          copy="If two packages both seem plausible, start the request. CityAtlas should only point you higher when the lighter option clearly will not do the job."
         />
         <div className="split-section business-next-step-row">
           <article className="business-guidance-card">
@@ -367,10 +302,9 @@ export function PricingPage({ data, onTrack }: PricingPageProps) {
       <section className="cta-band">
         <ShieldIcon />
         <div>
-          <h2>Tell CityAtlas what needs help before you worry about checkout</h2>
+          <h2>Start the request before you decide on payment</h2>
           <p>
-            The first step should stay small and honest. A paid path only opens after the fit is
-            clear.
+            CityAtlas reviews the fit first, then points you to the smallest useful package.
           </p>
         </div>
         <AppLink

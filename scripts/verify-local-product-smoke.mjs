@@ -385,9 +385,13 @@ async function runDesktopFlow(browser) {
       level: 1,
       name: /Choose the right first CityAtlas package for your Vancouver business/i,
     }).waitFor();
-    const packageCards = await page.locator(".pricing-card").count();
+    const pricingCardSelector = ".pricing-choice-card, .pricing-card";
+    const packageCards = await page.locator(pricingCardSelector).count();
     ensure(packageCards >= 3, `Expected at least 3 pricing cards, found ${packageCards}.`);
-    const firstChooseHref = await page.locator(".pricing-card .button.secondary").first().getAttribute("href");
+    const firstChooseHref = await page
+      .locator(".pricing-choice-card a.button, .pricing-card a.button")
+      .first()
+      .getAttribute("href");
     ensure(
       Boolean(firstChooseHref && firstChooseHref.includes("/for-businesses/submit?package=")),
       `Pricing cards should link to a prefilled business request. Got "${firstChooseHref}".`,
@@ -743,7 +747,8 @@ async function runMobileFlow(browser) {
       level: 1,
       name: /Choose the right first CityAtlas package for your Vancouver business/i,
     }).waitFor();
-    const packageCards = await page.locator(".pricing-card").count();
+    const pricingCardSelector = ".pricing-choice-card, .pricing-card";
+    const packageCards = await page.locator(pricingCardSelector).count();
     ensure(packageCards >= 3, `Expected at least 3 pricing cards on mobile, found ${packageCards}.`);
 
     return {

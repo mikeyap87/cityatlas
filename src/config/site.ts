@@ -69,9 +69,10 @@ export function canShowHostedPrivatePreview() {
 }
 
 export function canRenderAdminExperience() {
-  return isDevBuild ? isLocalPreviewRuntime() : envFlags.hostedAdmin;
+  return buildFlags.hostedAdminArtifacts && (isDevBuild ? isLocalPreviewRuntime() : envFlags.hostedAdmin);
 }
 
 export function canRenderPrivatePreviewExperience() {
-  return isDevBuild ? isLocalPreviewRuntime() : envFlags.hostedPrivatePreview;
+  return buildFlags.hostedPrivatePreviewArtifacts
+    && (isDevBuild ? isLocalPreviewRuntime() : envFlags.hostedPrivatePreview);
 }

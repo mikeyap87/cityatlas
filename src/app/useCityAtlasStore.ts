@@ -56,7 +56,7 @@ const loadBusinessInboundPreviewModule: () => Promise<typeof import("../lib/busi
       };
 
 function shouldLoadGrowthData(pathname: string) {
-  return pathname === "/admin" && canRenderAdminExperience();
+  return pathname === "/admin" && buildFlags.hostedAdminArtifacts && canRenderAdminExperience();
 }
 
 export function useCityAtlasStore(pathname: string) {

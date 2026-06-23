@@ -166,7 +166,8 @@ export function CityAtlasApp() {
   const collectionRoute = getSourceBackedCollectionForPath(path);
   const guidePath = parseGuidePath(path);
   const guideHubPath = parseGuideHubPath(path);
-  const waitingForProtectedAdminData = path === "/admin" && !growthHydrated;
+  const waitingForProtectedAdminData =
+    path === "/admin" && buildFlags.hostedAdminArtifacts && !growthHydrated;
 
   useEffect(() => {
     if (!hydrated) return;

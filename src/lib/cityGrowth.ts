@@ -7,6 +7,7 @@ import type {
   SourceBackedPlaceReference,
 } from "../types";
 import { buildDefaultSeededBusinessProspects } from "./businessProspectSeeds.ts";
+import { shouldTreatProspectAsPartnerAnchor } from "./businessProspectRole.ts";
 
 const rolloutTargets: CityRolloutTarget[] = [
   {
@@ -894,12 +895,7 @@ export function classifyBusinessProspectRole(
     return "partner_candidate";
   }
 
-  if (
-    prospect.contactReadiness !== "needs_research" ||
-    /(restaurant|bar|gallery|museum|market|attraction|hotel|cafe|venue|event|wellness|spa)/i.test(
-      `${prospect.category} ${prospect.segment}`,
-    )
-  ) {
+  if (shouldTreatProspectAsPartnerAnchor(prospect)) {
     return "partner_and_anchor";
   }
 
@@ -950,9 +946,16 @@ export function parseBusinessProspectImport(
 }
 
 export function createImportedBusinessProspects(rows: BusinessProspectImportRow[]) {
-  return rows
-    .filter((row) => row.importable)
-    .map((row) => buildManualImportProspect(row.input, row.prospect.importBatchId));
+  return createBusinessProspectsFromImportInputs(
+    rows.filter((row) => row.importable).map((row) => row.input),
+  );
+}
+
+export function createBusinessProspectsFromImportInputs(
+  inputs: BusinessProspectImportInput[],
+  importBatchId = `cityatlas-import-${Date.now()}`,
+) {
+  return inputs.map((input) => buildManualImportProspect(input, importBatchId));
 }
 
 function mapSourceBackedPlaceToProspect(place: SourceBackedPlaceReference): BusinessProspect {

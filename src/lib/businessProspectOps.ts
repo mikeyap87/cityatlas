@@ -1,4 +1,5 @@
 import type { BusinessProspect } from "../types";
+import { shouldTreatProspectAsPartnerAnchor } from "./businessProspectRole";
 
 type BusinessProspectRole =
   | "anchor_only"
@@ -31,12 +32,7 @@ function classifyProspectRole(prospect: BusinessProspect): BusinessProspectRole 
     return "partner_candidate";
   }
 
-  if (
-    prospect.contactReadiness !== "needs_research" ||
-    /(restaurant|bar|gallery|museum|market|attraction|hotel|cafe|venue|event|wellness|spa)/i.test(
-      `${prospect.category} ${prospect.segment}`,
-    )
-  ) {
+  if (shouldTreatProspectAsPartnerAnchor(prospect)) {
     return "partner_and_anchor";
   }
 

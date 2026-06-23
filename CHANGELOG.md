@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Reframed `/admin` as an operator console with workspace tabs, a business-database-first default, top-level preview controls, and a collapsed import lane so the core business workflow is no longer buried in one long scroll.
+- Added shorter operator subviews inside the admin business-database workspace so the main operator page can switch between database, queue-cleanup, and business-request views instead of rendering the whole operator stack in one long column.
+- Expanded the `/admin` operator database so Vancouver now shows both the official food inventory and the reviewed service-business inventory, with a source filter that cleanly separates combined, service-only, and official-food-only rows.
+- Added a focused local Playwright proof script at `scripts/verify-admin-service-inventory.mjs` plus fresh screenshot/report artifacts under `output/qa/admin-service-inventory/`.
+- Swapped `npm run build` to a local Vite wrapper at `scripts/build-production.mjs` so CityAtlas can keep producing a real `dist/` even though the native Vite 8 app write path still stalls on the current asset tree.
 - Ready for owner review before domain purchase.
 - Remaining live-risk work is documented and gated.
 - Added local growth, adaptive intelligence, AEO/GEO, and revenue experiment upgrades after initial launch package.

@@ -13,6 +13,7 @@ import type {
   PackageId,
   SavedItem,
 } from "../types";
+import { shouldTreatProspectAsPartnerAnchor } from "./businessProspectRole";
 import { slugify } from "./format";
 
 const STORAGE_KEY = "cityatlas.launch.package.v1";
@@ -417,18 +418,7 @@ export function createBusinessProspectAuditSummary(
   prospects: BusinessProspect[],
   importedCount: number,
 ) {
-  const partnerEligible = prospects.filter((prospect) => {
-    if (prospect.sourceType !== "source_backed_place") {
-      return true;
-    }
-
-    return (
-      prospect.contactReadiness !== "needs_research" ||
-      /(restaurant|bar|gallery|museum|market|attraction|hotel|cafe|venue|event|wellness|spa)/i.test(
-        `${prospect.category} ${prospect.segment}`,
-      )
-    );
-  }).length;
+  const partnerEligible = prospects.filter((prospect) => shouldTreatProspectAsPartnerAnchor(prospect)).length;
   const contactReady = prospects.filter(
     (prospect) => prospect.contactReadiness !== "needs_research",
   ).length;

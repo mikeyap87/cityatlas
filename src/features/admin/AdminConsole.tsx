@@ -1,6 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type {
   BrainRun,
+  BusinessInventoryRecord,
+  BusinessInventorySummary,
   BusinessInboundMirrorEntry,
   BusinessProspect,
   BusinessReplyLog,
@@ -54,11 +56,26 @@ import {
   listNamedConnectorRows,
   listOrganizationConnectorRows,
 } from "../../lib/cityConnectorWarmPaths";
+import {
+  buildBusinessInventoryStageLookup,
+  buildBusinessInventorySummary,
+  createBusinessProspectsFromInventoryRecords,
+  createServiceBusinessInventoryRecords,
+  getBusinessInventoryImportSourceLabel,
+  isBusinessInventoryRecordStagedInLookup,
+} from "../../lib/businessInventory";
 import { formatPercent } from "../../lib/format";
 import { siteConfig } from "../../config/site";
 import { BusinessMiniRow } from "../../components/Cards";
 import { AppLink } from "../../components/Link";
-import { ArrowRightIcon, LockIcon, ShieldIcon, SparkIcon } from "../../components/Icons";
+import {
+  ArrowRightIcon,
+  LockIcon,
+  MapIcon,
+  ShieldIcon,
+  SparkIcon,
+  StoreIcon,
+} from "../../components/Icons";
 import {
   EmptyState,
   MetricCard,
@@ -130,7 +147,15 @@ function getProspectPriority(prospect: BusinessProspect) {
       : prospect.sourceType === "manual_submission"
           ? 5
           : 3;
-  return role + readiness + confidence + source;
+  const approval =
+    prospect.approvalStatus === "owner_approved"
+      ? 10
+      : prospect.approvalStatus === "ready_for_owner_review"
+        ? 6
+        : prospect.approvalStatus === "blocked"
+          ? -4
+          : 0;
+  return role + readiness + confidence + source + approval;
 }
 
 function getProspectTone(prospect: BusinessProspect) {
@@ -179,6 +204,14 @@ type BusinessQueueFocus =
   | "email_ready"
   | "contact_path_ready"
   | "needs_research";
+
+type AdminWorkspace = "operator" | "outreach" | "expansion" | "launch" | "ops";
+type OperatorWorkspaceView = "database" | "queue" | "requests";
+type InventorySourceFilter =
+  | "all"
+  | "service_businesses"
+  | "official_service"
+  | "official_food";
 
 function formatPhrase(value: string) {
   return value.replaceAll("_", " ");
@@ -283,8 +316,28 @@ export function AdminConsole({
   );
   const brain = getCityAtlasBrain(data);
   const shadowPlan = getShadowOutreachPlan(data);
+  const [adminWorkspace, setAdminWorkspace] = useState<AdminWorkspace>("operator");
+  const [operatorWorkspaceView, setOperatorWorkspaceView] =
+    useState<OperatorWorkspaceView>("database");
   const [selectedCityKey, setSelectedCityKey] = useState("vancouver");
   const [queueFocus, setQueueFocus] = useState<BusinessQueueFocus>("all");
+  const [inventorySearch, setInventorySearch] = useState("");
+  const [inventorySourceFilter, setInventorySourceFilter] = useState<InventorySourceFilter>("all");
+  const [inventoryBusinessTypeFilter, setInventoryBusinessTypeFilter] = useState("all");
+  const [inventoryLocalAreaFilter, setInventoryLocalAreaFilter] = useState("all");
+  const [inventoryVisibleCount, setInventoryVisibleCount] = useState(25);
+  const [inventoryActionSummary, setInventoryActionSummary] = useState("");
+  const [inventoryLoadStatus, setInventoryLoadStatus] = useState<
+    "idle" | "loading" | "ready" | "error"
+  >("idle");
+  const [inventoryLoadError, setInventoryLoadError] = useState("");
+  const [officialFoodInventoryRecords, setOfficialFoodInventoryRecords] = useState<BusinessInventoryRecord[]>([]);
+  const [officialFoodInventorySummary, setOfficialFoodInventorySummary] =
+    useState<BusinessInventorySummary | null>(null);
+  const [officialServiceInventoryRecords, setOfficialServiceInventoryRecords] =
+    useState<BusinessInventoryRecord[]>([]);
+  const [officialServiceInventorySummary, setOfficialServiceInventorySummary] =
+    useState<BusinessInventorySummary | null>(null);
   const [replyForm, setReplyForm] = useState({
     candidateId: proofCandidates[0]?.id ?? "",
     channel: "email" as ManualReplyLog["channel"],
@@ -378,6 +431,215 @@ export function AdminConsole({
     () => buildBusinessInboundAdapterPreview(businessInboundText, data.businessProspects),
     [businessInboundText, data.businessProspects],
   );
+  useEffect(() => {
+    let cancelled = false;
+
+    if (selectedCityKey !== "vancouver") {
+      setInventoryLoadStatus("idle");
+      setInventoryLoadError("");
+      setOfficialFoodInventoryRecords([]);
+      setOfficialFoodInventorySummary(null);
+      setOfficialServiceInventoryRecords([]);
+      setOfficialServiceInventorySummary(null);
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    setInventoryLoadStatus("loading");
+    setInventoryLoadError("");
+
+    void Promise.all([
+      fetch("/operator/vancouverOfficialFoodInventory.json"),
+      fetch("/operator/vancouverOfficialFoodInventorySummary.json"),
+      fetch("/operator/vancouverOfficialServiceInventory.json"),
+      fetch("/operator/vancouverOfficialServiceInventorySummary.json"),
+    ])
+      .then(async ([
+        foodRecordsResponse,
+        foodSummaryResponse,
+        serviceRecordsResponse,
+        serviceSummaryResponse,
+      ]) => {
+        if (
+          !foodRecordsResponse.ok
+          || !foodSummaryResponse.ok
+          || !serviceRecordsResponse.ok
+          || !serviceSummaryResponse.ok
+        ) {
+          throw new Error("The local operator inventory files are missing from the current preview.");
+        }
+        const [foodRecords, foodSummary, serviceRecords, serviceSummary] = await Promise.all([
+          foodRecordsResponse.json(),
+          foodSummaryResponse.json(),
+          serviceRecordsResponse.json(),
+          serviceSummaryResponse.json(),
+        ]);
+        if (cancelled) return;
+        setOfficialFoodInventoryRecords((foodRecords ?? []) as BusinessInventoryRecord[]);
+        setOfficialFoodInventorySummary((foodSummary ?? null) as BusinessInventorySummary | null);
+        setOfficialServiceInventoryRecords((serviceRecords ?? []) as BusinessInventoryRecord[]);
+        setOfficialServiceInventorySummary((serviceSummary ?? null) as BusinessInventorySummary | null);
+        setInventoryLoadStatus("ready");
+      })
+      .catch((error: unknown) => {
+        if (cancelled) return;
+        setOfficialFoodInventoryRecords([]);
+        setOfficialFoodInventorySummary(null);
+        setOfficialServiceInventoryRecords([]);
+        setOfficialServiceInventorySummary(null);
+        setInventoryLoadStatus("error");
+        setInventoryLoadError(error instanceof Error ? error.message : "Unknown inventory load error");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedCityKey]);
+  useEffect(() => {
+    if (
+      selectedCityKey !== "vancouver"
+      && (
+        inventorySourceFilter === "official_food"
+        || inventorySourceFilter === "official_service"
+      )
+    ) {
+      setInventorySourceFilter("service_businesses");
+    }
+  }, [inventorySourceFilter, selectedCityKey]);
+  const serviceInventoryRecords = useMemo(
+    () => createServiceBusinessInventoryRecords(selectedCityAllProspects),
+    [selectedCityAllProspects],
+  );
+  const stagedInventoryLookup = useMemo(
+    () => buildBusinessInventoryStageLookup(data.businessProspects),
+    [data.businessProspects],
+  );
+  const officialInventoryRowCount =
+    selectedCityKey === "vancouver"
+      ? officialFoodInventorySummary?.recordCount ?? officialFoodInventoryRecords.length
+      : 0;
+  const officialServiceInventoryRowCount =
+    selectedCityKey === "vancouver"
+      ? officialServiceInventorySummary?.recordCount ?? officialServiceInventoryRecords.length
+      : 0;
+  const serviceInventoryRowCount = serviceInventoryRecords.length;
+  const operatorInventoryTotalRowCount =
+    officialInventoryRowCount + officialServiceInventoryRowCount + serviceInventoryRowCount;
+  const selectedCityInventory = useMemo(() => {
+    if (inventorySourceFilter === "official_food") {
+      return officialFoodInventoryRecords;
+    }
+    if (inventorySourceFilter === "official_service") {
+      return officialServiceInventoryRecords;
+    }
+    if (inventorySourceFilter === "service_businesses") {
+      return serviceInventoryRecords;
+    }
+
+    if (selectedCityKey === "vancouver") {
+      return [
+        ...serviceInventoryRecords,
+        ...officialServiceInventoryRecords,
+        ...officialFoodInventoryRecords,
+      ];
+    }
+
+    return serviceInventoryRecords;
+  }, [
+    inventorySourceFilter,
+    officialFoodInventoryRecords,
+    officialServiceInventoryRecords,
+    selectedCityKey,
+    serviceInventoryRecords,
+  ]);
+  const inventoryBusinessTypeOptions = useMemo(
+    () =>
+      Array.from(new Set(selectedCityInventory.map((record) => record.businessType)))
+        .filter(Boolean)
+        .sort((left, right) => left.localeCompare(right)),
+    [selectedCityInventory],
+  );
+  const inventoryLocalAreaOptions = useMemo(
+    () =>
+      Array.from(new Set(selectedCityInventory.map((record) => record.localArea)))
+        .filter(Boolean)
+        .sort((left, right) => left.localeCompare(right)),
+    [selectedCityInventory],
+  );
+  const filteredInventoryRows = useMemo(() => {
+    const query = inventorySearch.trim().toLowerCase();
+
+    return selectedCityInventory.filter((record) => {
+      if (
+        inventoryBusinessTypeFilter !== "all"
+        && record.businessType !== inventoryBusinessTypeFilter
+      ) {
+        return false;
+      }
+      if (inventoryLocalAreaFilter !== "all" && record.localArea !== inventoryLocalAreaFilter) {
+        return false;
+      }
+      if (!query) return true;
+
+      return [
+        record.businessName,
+        record.businessTradeName,
+        record.businessType,
+        record.businessSubtype,
+        record.localArea,
+        record.streetAddress,
+        record.postalCode,
+      ]
+        .filter(Boolean)
+        .some((value) => value.toLowerCase().includes(query));
+    });
+  }, [
+    inventoryBusinessTypeFilter,
+    inventoryLocalAreaFilter,
+    inventorySearch,
+    selectedCityInventory,
+  ]);
+  const visibleInventoryRows = filteredInventoryRows.slice(0, inventoryVisibleCount);
+  const stagedInventoryCount = useMemo(
+    () =>
+      selectedCityInventory.filter((record) =>
+        isBusinessInventoryRecordStagedInLookup(record, stagedInventoryLookup),
+      ).length,
+    [selectedCityInventory, stagedInventoryLookup],
+  );
+  const stageableVisibleInventoryRows = useMemo(
+    () =>
+      visibleInventoryRows.filter(
+        (record) => !isBusinessInventoryRecordStagedInLookup(record, stagedInventoryLookup),
+      ),
+    [stagedInventoryLookup, visibleInventoryRows],
+  );
+  const stageableMatchingInventoryRows = useMemo(
+    () =>
+      filteredInventoryRows.filter(
+        (record) => !isBusinessInventoryRecordStagedInLookup(record, stagedInventoryLookup),
+      ),
+    [filteredInventoryRows, stagedInventoryLookup],
+  );
+  const stageableBatchInventoryRows = useMemo(
+    () => stageableMatchingInventoryRows.slice(0, 100),
+    [stageableMatchingInventoryRows],
+  );
+  const selectedCityInventorySummary = useMemo(
+    () =>
+      buildBusinessInventorySummary(
+        selectedCityInventory,
+        selectedCityKey === "vancouver" && inventorySourceFilter === "all"
+          ? "vancouver_operator_inventory_combined"
+          : inventorySourceFilter === "official_food"
+            ? "vancouver_official_food_inventory"
+            : inventorySourceFilter === "official_service"
+              ? "vancouver_official_service_inventory"
+            : `${selectedCityKey}_service_business_inventory`,
+      ),
+    [inventorySourceFilter, selectedCityInventory, selectedCityKey],
+  );
   const businessMirrorReport = useMemo(
     () =>
       buildBusinessProtectedInboundMirrorReport({
@@ -426,29 +688,419 @@ export function AdminConsole({
     () => buildNamedConnectorLaneSummaries(selectedCityKey),
     [selectedCityKey],
   );
+  const selectedCityName = selectedCityRollup?.cityName ?? "Selected city";
+  const inventorySourceFilterLabel =
+    inventorySourceFilter === "official_food"
+      ? "Official food only"
+      : inventorySourceFilter === "official_service"
+        ? "Official service only"
+      : inventorySourceFilter === "service_businesses"
+        ? "Reviewed service only"
+        : "All inventory";
+  const inventoryRequiresOfficialRows =
+    selectedCityKey === "vancouver"
+    && (
+      inventorySourceFilter === "all"
+      || inventorySourceFilter === "official_food"
+      || inventorySourceFilter === "official_service"
+    );
+  const inventoryLoading = inventoryRequiresOfficialRows && inventoryLoadStatus === "loading";
+  const inventoryError = inventoryRequiresOfficialRows && inventoryLoadStatus === "error";
+  const workspaceTabs = [
+    {
+      id: "operator" as const,
+      label: "Business database",
+      caption: `${selectedCityName} queue + inventory`,
+      count:
+        selectedCityKey === "vancouver"
+          ? `${operatorInventoryTotalRowCount} rows`
+          : `${serviceInventoryRowCount} rows`,
+      Icon: StoreIcon,
+    },
+    {
+      id: "outreach" as const,
+      label: "Outreach rehearsal",
+      caption: "Batch, replies, supervised review",
+      count: `${businessBatch.selectedCount} active`,
+      Icon: SparkIcon,
+    },
+    {
+      id: "expansion" as const,
+      label: "City rollout",
+      caption: "Readiness + warm paths",
+      count: `${preparedCities}/${cityRollups.length} ready`,
+      Icon: MapIcon,
+    },
+    {
+      id: "launch" as const,
+      label: "Launch + trust",
+      caption: "Public surface and gates",
+      count: `${launchReadiness}% ready`,
+      Icon: ShieldIcon,
+    },
+    {
+      id: "ops" as const,
+      label: "Signals + controls",
+      caption: "Brain runs, logs, experiments",
+      count: `${data.growthEvents.length} events`,
+      Icon: LockIcon,
+    },
+  ];
+  const activeWorkspaceIntro =
+    adminWorkspace === "operator"
+      ? {
+          label: "Operator workflow",
+          title: "Business database first",
+          copy:
+            "The admin now opens on the actual working surface: search the combined business database, review service businesses, stage official rows, and clean the no-send queue before touching outreach rehearsal.",
+        }
+      : adminWorkspace === "outreach"
+        ? {
+            label: "Outreach workflow",
+            title: "Keep the rehearsal lane tight",
+            copy:
+              "This workspace is for tiny-batch prep, reply review, and supervised staging only. It still never widens into live sending.",
+          }
+        : adminWorkspace === "expansion"
+          ? {
+              label: "Expansion workflow",
+              title: "Choose the next city from current queue truth",
+              copy:
+                "Use the current donor, contact, and connector signals before building the next city packet or widening the discovery scope.",
+            }
+          : adminWorkspace === "launch"
+            ? {
+                label: "Launch workflow",
+                title: "Public trust and live-risk gates stay separate",
+                copy:
+                  "This is the smaller launch review surface: public inventory, guide quality, partner readiness, and the gates that still block live-risk actions.",
+              }
+            : {
+                label: "Operations workflow",
+                title: "Signals, intelligence, and local controls",
+                copy:
+                  "Use this workspace for brain runs, growth signals, experiment tracking, and local logs without touching any live system.",
+              };
+  const workspaceMetrics =
+    adminWorkspace === "operator"
+      ? [
+          {
+            label: "Database rows",
+            value: `${selectedCityKey === "vancouver" ? operatorInventoryTotalRowCount : serviceInventoryRowCount}`,
+            detail: `${selectedCityName} operator inventory`,
+          },
+          {
+            label: "Service rows",
+            value: `${serviceInventoryRowCount}`,
+            detail: "Hotels, wellness, events, venues",
+          },
+          {
+            label: "Official food",
+            value:
+              selectedCityKey === "vancouver" ? `${officialInventoryRowCount}` : "Not added",
+            detail:
+              selectedCityKey === "vancouver"
+                ? "City of Vancouver licence rows"
+                : "Official food inventory not added yet",
+          },
+          {
+            label: "Already staged",
+            value: `${stagedInventoryCount}`,
+            detail: "Rows already in the partner queue",
+          },
+        ]
+      : adminWorkspace === "outreach"
+        ? [
+            {
+              label: "Batch selected",
+              value: `${businessBatch.selectedCount}`,
+              detail: `${selectedCityName} owner-review rows`,
+            },
+            {
+              label: "Rehearsal-ready",
+              value: `${businessBatch.rehearsalReadyCount}`,
+              detail: "Can support owner inbox rehearsal",
+            },
+            {
+              label: "Supervised queue",
+              value: `${businessSupervisedExecutionReport.queue.length}`,
+              detail: "Rows in direct-email review",
+            },
+            {
+              label: "Manual replies",
+              value: `${data.manualReplyLogs.length}`,
+              detail: "Logged after real conversations",
+            },
+          ]
+        : adminWorkspace === "expansion"
+          ? [
+              {
+                label: "Planned cities",
+                value: `${data.cityRolloutTargets.length}`,
+                detail: "Tracked in the rollout machine",
+              },
+              {
+                label: "Prepared now",
+                value: `${preparedCities}`,
+                detail: "Cities already above threshold",
+              },
+              {
+                label: "Follow-on order",
+                value: `${followOnCityInsights.length}`,
+                detail: "Ranked next-city candidates",
+              },
+              {
+                label: "Warm paths",
+                value: `${selectedCityConnectorRows.length}`,
+                detail: `${selectedCityName} connector rows`,
+              },
+            ]
+          : adminWorkspace === "launch"
+            ? [
+                {
+                  label: "Launch readiness",
+                  value: formatPercent(launchReadiness),
+                  detail: "Local package score",
+                },
+                {
+                  label: "Coverage score",
+                  value: formatPercent(coverage),
+                  detail: "Average demo content depth",
+                },
+                {
+                  label: "Partner pipeline",
+                  value: `$${pipeline}`,
+                  detail: "Modeled monthly value",
+                },
+                {
+                  label: "Proof emails",
+                  value: `${sentManualCount}`,
+                  detail: "Manual sends logged",
+                },
+              ]
+            : [
+                {
+                  label: "Growth events",
+                  value: `${data.growthEvents.length}`,
+                  detail: "Local learning signals",
+                },
+                {
+                  label: "Brain progress",
+                  value: `${brain.averageProgress}%`,
+                  detail: "Average module progress",
+                },
+                {
+                  label: "Saved runs",
+                  value: `${data.brainRuns.length}`,
+                  detail: "Local command snapshots",
+                },
+            {
+              label: "Experiments",
+              value: `${data.revenueExperiments.length}`,
+              detail: "Pre-Stripe tests",
+            },
+          ];
+  const operatorWorkspaceTabs = [
+    {
+      id: "database" as const,
+      label: "Operator database",
+      caption: "Official + reviewed inventory",
+      count:
+        selectedCityKey === "vancouver"
+          ? `${operatorInventoryTotalRowCount} rows`
+          : `${serviceInventoryRowCount} rows`,
+    },
+    {
+      id: "queue" as const,
+      label: "Queue cleanup",
+      caption: "Selected-city partner stack",
+      count: `${selectedCityAllProspects.length} rows`,
+    },
+    {
+      id: "requests" as const,
+      label: "Business requests",
+      caption: "Local inbound asks",
+      count: `${data.submissions.length} saved`,
+    },
+  ];
+  const operatorWorkspaceIntro =
+    operatorWorkspaceView === "database"
+      ? {
+          label: "Operator database",
+          title: `${selectedCityName} inventory first`,
+          copy:
+            "Use this shorter view to search the combined operator database, separate service businesses from official food rows, and stage only the exact inventory slice you want to review next.",
+        }
+      : operatorWorkspaceView === "queue"
+        ? {
+            label: "Queue cleanup",
+            title: `${selectedCityName} no-send queue`,
+            copy:
+              "Open the selected-city queue only when you need to clean source lanes, review contact readiness, or add a tightly reviewed manual batch.",
+          }
+        : {
+            label: "Business requests",
+            title: "Local inbound review",
+            copy:
+              "Keep inbound business requests separate from the operator inventory so owner review stays faster and the main workspace does not sprawl.",
+          };
+
+  const stageInventoryRows = async (records: BusinessInventoryRecord[]) => {
+    const unstagedRows = records.filter(
+      (record) => !isBusinessInventoryRecordStagedInLookup(record, stagedInventoryLookup),
+    );
+    if (unstagedRows.length === 0) {
+      setInventoryActionSummary("Those rows are already staged in the local queue.");
+      return;
+    }
+
+    const importSourceLabel = getBusinessInventoryImportSourceLabel(unstagedRows);
+    const prospects = createBusinessProspectsFromInventoryRecords(unstagedRows);
+    const importedCount = await onImportBusinessProspects(
+      prospects,
+      importSourceLabel,
+    );
+    const stagedRowLabel =
+      importSourceLabel === "reviewed_service_business_inventory"
+        ? "service-business row"
+        : importSourceLabel === "combined_operator_inventory"
+          ? "operator-inventory row"
+          : "official-inventory row";
+    setInventoryActionSummary(
+      importedCount > 0
+        ? `Staged ${importedCount} ${stagedRowLabel}${importedCount === 1 ? "" : "s"} into the local review queue.`
+        : "No new rows were added because everything in that batch already existed locally.",
+      );
+  };
+
+  useEffect(() => {
+    setInventoryVisibleCount(25);
+  }, [
+    inventoryBusinessTypeFilter,
+    inventoryLocalAreaFilter,
+    inventorySearch,
+    inventorySourceFilter,
+    selectedCityKey,
+  ]);
 
   return (
     <>
       <section className="admin-hero">
         <div>
           <p className="section-label">Owner console</p>
-          <h1>CityAtlas launch readiness</h1>
+          <h1>CityAtlas operator console</h1>
           <p>
-            A local-only control surface for launch gates, founder pipeline review, and the first
-            Date Night proof sprint now waiting on replies.
+            A local-only control surface for the business database, outreach rehearsal, city
+            rollout, and the live-risk gates that still stay locked.
           </p>
         </div>
         <SafeModeNotice />
       </section>
 
-      <section className="metrics-strip">
-        <MetricCard label="Launch readiness" value={formatPercent(launchReadiness)} detail="Local package score" />
-        <MetricCard label="Coverage score" value={formatPercent(coverage)} detail="Average demo content depth" />
-        <MetricCard label="Partner pipeline" value={`$${pipeline}`} detail="Modeled monthly value" />
-        <MetricCard label="Proof emails" value={`${sentManualCount}`} detail="Manual sends logged" />
+      <section className="admin-workspace-shell">
+        <div className="admin-workspace-bar">
+          <div>
+            <p className="section-label">{activeWorkspaceIntro.label}</p>
+            <h2>{activeWorkspaceIntro.title}</h2>
+            <p>{activeWorkspaceIntro.copy}</p>
+          </div>
+          <div className="admin-workspace-actions">
+            <label>
+              Active city
+              <select
+                value={selectedCityKey}
+                onChange={(event) => setSelectedCityKey(event.target.value)}
+              >
+                {data.cityRolloutTargets.map((target) => (
+                  <option key={target.cityKey} value={target.cityKey}>
+                    {target.cityName}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <div className="hero-actions">
+              <AppLink className="button primary" to="/">
+                Public preview <ArrowRightIcon />
+              </AppLink>
+              <AppLink className="button secondary" to="/private-preview/date-night">
+                Private preview <ArrowRightIcon />
+              </AppLink>
+              <button
+                className="button secondary"
+                type="button"
+                onClick={() => {
+                  void onResetDemo();
+                }}
+              >
+                Reset local demo
+              </button>
+            </div>
+          </div>
+        </div>
+        <div className="admin-workspace-tabs" aria-label="Admin workspaces">
+          {workspaceTabs.map(({ id, label, caption, count, Icon }) => (
+            <button
+              key={id}
+              className={`admin-workspace-tab ${adminWorkspace === id ? "active" : ""}`}
+              type="button"
+              onClick={() => setAdminWorkspace(id)}
+              aria-pressed={adminWorkspace === id}
+            >
+              <Icon />
+              <span className="admin-workspace-tab-copy">
+                <strong>{label}</strong>
+                <small>{caption}</small>
+              </span>
+              <span className="admin-workspace-tab-count">{count}</span>
+            </button>
+          ))}
+        </div>
       </section>
 
+      <section className="metrics-strip">
+        {workspaceMetrics.map((metric) => (
+          <MetricCard
+            key={metric.label}
+            label={metric.label}
+            value={metric.value}
+            detail={metric.detail}
+          />
+        ))}
+      </section>
+
+      {adminWorkspace === "operator" ? (
+        <section className="admin-subworkspace-shell">
+          <div className="admin-subworkspace-bar">
+            <div>
+              <p className="section-label">{operatorWorkspaceIntro.label}</p>
+              <h2>{operatorWorkspaceIntro.title}</h2>
+              <p>{operatorWorkspaceIntro.copy}</p>
+            </div>
+            <StatusPill tone="blue">{selectedCityName}</StatusPill>
+          </div>
+          <div className="admin-subworkspace-tabs" aria-label="Operator views">
+            {operatorWorkspaceTabs.map(({ id, label, caption, count }) => (
+              <button
+                key={id}
+                className={`admin-subworkspace-tab ${operatorWorkspaceView === id ? "active" : ""}`}
+                type="button"
+                onClick={() => setOperatorWorkspaceView(id)}
+                aria-pressed={operatorWorkspaceView === id}
+              >
+                <span className="admin-subworkspace-tab-copy">
+                  <strong>{label}</strong>
+                  <small>{caption}</small>
+                </span>
+                <span className="admin-subworkspace-tab-count">{count}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
       <section className="admin-grid">
+        {adminWorkspace === "launch" ? (
+          <>
         <article className="admin-panel large">
           <div className="dashboard-card-header">
             <div>
@@ -536,7 +1188,11 @@ export function AdminConsole({
             ))}
           </div>
         </article>
+          </>
+        ) : null}
 
+        {adminWorkspace === "expansion" ? (
+          <>
         <article className="admin-panel large">
           <SectionHeader
             label="City rollout"
@@ -747,6 +1403,11 @@ export function AdminConsole({
           </div>
         </article>
 
+          </>
+        ) : null}
+
+        {adminWorkspace === "outreach" ? (
+          <>
         <article className="admin-panel large">
           <SectionHeader
             label="Outreach prep"
@@ -843,26 +1504,20 @@ export function AdminConsole({
           </div>
         </article>
 
+          </>
+        ) : null}
+
+        {adminWorkspace === "operator" ? (
+          <>
+        {operatorWorkspaceView === "queue" ? (
         <article className="admin-panel large">
           <SectionHeader
             label="Business machine"
             title="No-send business prospect queue"
-            copy="CityAtlas now stages source-backed Vancouver businesses and founder-proof candidates in one internal queue. This import lane is for previewing EXA or manual research rows before anything touches outreach."
+            copy="CityAtlas stages source-backed businesses and founder-proof candidates in one internal queue. Use it to clean the selected-city stack before anything touches outreach rehearsal."
+            action={<StatusPill tone="blue">{selectedCityName}</StatusPill>}
           />
           <div className="prospect-toolbar">
-            <label>
-              Review city
-              <select
-                value={selectedCityKey}
-                onChange={(event) => setSelectedCityKey(event.target.value)}
-              >
-                {data.cityRolloutTargets.map((target) => (
-                  <option key={target.cityKey} value={target.cityKey}>
-                    {target.cityName}
-                  </option>
-                ))}
-              </select>
-            </label>
             <label>
               Queue focus
               <select
@@ -969,85 +1624,108 @@ export function AdminConsole({
               </div>
             </div>
           ) : null}
-          <form
-            className="reply-tracker-form"
-            onSubmit={(event) => {
-              event.preventDefault();
-              void (async () => {
-                const rows = createImportedBusinessProspects(importPreview.importableRows);
-                const importedCount = await onImportBusinessProspects(
-                  rows,
-                  "manual_or_exa_preview",
-                );
-                if (importedCount > 0) {
-                  setProspectImportText("");
-                }
-              })();
-            }}
-          >
-            <label className="wide">
-              EXA or manual research rows
-              <textarea
-                placeholder="businessName,email,contactName,cityName,neighborhood,category,segment,sourceLabel,sourceUrl,website,contactPath,notes,relationshipWarmth"
-                value={prospectImportText}
-                onChange={(event) => setProspectImportText(event.target.value)}
-              />
-            </label>
-            <button
-              className="button primary wide"
-              type="submit"
-              disabled={importPreview.importableRows.length === 0}
-            >
-              Add importable rows to local queue
-            </button>
-            <p className="form-note">
-              Preview/import only. No scraping, messaging, CRM sync, or provider call happens in
-              this lane.
-            </p>
-          </form>
-          {prospectImportText.trim() ? (
-            <div className="prospect-import-preview">
-              <strong>{importPreview.summary}</strong>
-              <div className="city-rollout-metrics">
-                <span>
-                  <strong>{importPreview.importableRows.length}</strong>
-                  Importable
-                </span>
-                <span>
-                  <strong>{importPreview.duplicateCount}</strong>
-                  Duplicates
-                </span>
-                <span>
-                  <strong>{importPreview.warningCount}</strong>
-                  Warnings
-                </span>
-                <span>
-                  <strong>{importPreview.errorCount}</strong>
-                  Errors
-                </span>
+          <details className="admin-disclosure" open={prospectImportText.trim().length > 0}>
+            <summary>
+              <div>
+                <strong>Add manual or EXA preview rows</strong>
+                <small>Use this only when you want to widen the queue with reviewed research.</small>
               </div>
-              <div className="business-prospect-list compact">
-                {importPreview.rows.slice(0, 4).map((row) => (
-                  <div className="business-prospect-row" key={`${row.rowNumber}-${row.prospect.id}`}>
-                    <div>
-                      <div className="proof-candidate-heading">
-                        <div>
-                          <strong>{row.input.businessName || `Row ${row.rowNumber}`}</strong>
-                          <small>{row.input.cityName || "City missing"} - {row.input.segment || "Segment missing"}</small>
-                        </div>
-                        <StatusPill tone={row.importable ? "green" : "amber"}>
-                          {row.importable ? "importable" : "review first"}
-                        </StatusPill>
-                      </div>
-                      <p>{row.input.notes || "No note provided yet."}</p>
-                      {row.errors.length > 0 ? <small>Errors: {row.errors.join(" ")}</small> : null}
-                      {row.warnings.length > 0 ? <small>Warnings: {row.warnings.join(" ")}</small> : null}
-                    </div>
+              <span className="admin-disclosure-chip" aria-hidden="true">
+                {prospectImportText.trim() ? "Import active" : "Optional"}
+              </span>
+            </summary>
+            <div className="admin-disclosure-body">
+              <form
+                className="reply-tracker-form"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  void (async () => {
+                    const rows = createImportedBusinessProspects(importPreview.importableRows);
+                    const importedCount = await onImportBusinessProspects(
+                      rows,
+                      "manual_or_exa_preview",
+                    );
+                    if (importedCount > 0) {
+                      setProspectImportText("");
+                    }
+                  })();
+                }}
+              >
+                <label className="wide">
+                  EXA or manual research rows
+                  <textarea
+                    placeholder="businessName,email,contactName,cityName,neighborhood,category,segment,sourceLabel,sourceUrl,website,contactPath,notes,relationshipWarmth"
+                    value={prospectImportText}
+                    onChange={(event) => setProspectImportText(event.target.value)}
+                  />
+                </label>
+                <button
+                  className="button primary wide"
+                  type="submit"
+                  disabled={importPreview.importableRows.length === 0}
+                >
+                  Add importable rows to local queue
+                </button>
+                <p className="form-note">
+                  Preview/import only. No scraping, messaging, CRM sync, or provider call happens
+                  in this lane.
+                </p>
+              </form>
+              {prospectImportText.trim() ? (
+                <div className="prospect-import-preview">
+                  <strong>{importPreview.summary}</strong>
+                  <div className="city-rollout-metrics">
+                    <span>
+                      <strong>{importPreview.importableRows.length}</strong>
+                      Importable
+                    </span>
+                    <span>
+                      <strong>{importPreview.duplicateCount}</strong>
+                      Duplicates
+                    </span>
+                    <span>
+                      <strong>{importPreview.warningCount}</strong>
+                      Warnings
+                    </span>
+                    <span>
+                      <strong>{importPreview.errorCount}</strong>
+                      Errors
+                    </span>
                   </div>
-                ))}
-              </div>
+                  <div className="business-prospect-list compact">
+                    {importPreview.rows.slice(0, 4).map((row) => (
+                      <div
+                        className="business-prospect-row"
+                        key={`${row.rowNumber}-${row.prospect.id}`}
+                      >
+                        <div>
+                          <div className="proof-candidate-heading">
+                            <div>
+                              <strong>{row.input.businessName || `Row ${row.rowNumber}`}</strong>
+                              <small>
+                                {row.input.cityName || "City missing"} -{" "}
+                                {row.input.segment || "Segment missing"}
+                              </small>
+                            </div>
+                            <StatusPill tone={row.importable ? "green" : "amber"}>
+                              {row.importable ? "importable" : "review first"}
+                            </StatusPill>
+                          </div>
+                          <p>{row.input.notes || "No note provided yet."}</p>
+                          {row.errors.length > 0 ? (
+                            <small>Errors: {row.errors.join(" ")}</small>
+                          ) : null}
+                          {row.warnings.length > 0 ? (
+                            <small>Warnings: {row.warnings.join(" ")}</small>
+                          ) : null}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
             </div>
-          ) : null}
+          </details>
           {cityProspects.length > 0 ? (
             <div className="business-prospect-list">
               {cityProspects.slice(0, 12).map((prospect) => (
@@ -1084,6 +1762,10 @@ export function AdminConsole({
                       <span>
                         <strong>Action lane</strong>
                         {getBusinessProspectPromotionLabel(getBusinessProspectPromotionLane(prospect))}
+                      </span>
+                      <span>
+                        <strong>Approval</strong>
+                        {formatPhrase(prospect.approvalStatus)}
                       </span>
                       <span>
                         <strong>Promotion score</strong>
@@ -1123,11 +1805,288 @@ export function AdminConsole({
           )}
         </article>
 
+        ) : null}
+
+        {operatorWorkspaceView === "database" ? (
+        <article className="admin-panel large">
+          <SectionHeader
+            label="Operator inventory"
+            title={`${selectedCityName} business database`}
+            copy="This operator database now combines the official Vancouver food inventory, the official Vancouver service inventory, and the reviewed non-restaurant service businesses already staged inside CityAtlas."
+            action={<StatusPill tone="blue">{selectedCityName}</StatusPill>}
+          />
+          {inventoryLoading ? (
+              <EmptyState
+                title="Loading official inventory"
+                copy="Pulling the official Vancouver food and service inventories into the combined operator database."
+              />
+            ) : inventoryError ? (
+              <EmptyState
+                title="Official inventory could not load"
+                copy={`The local operator dataset is not available yet. ${inventoryLoadError}`}
+              />
+            ) : (
+            <>
+              <div className="proof-candidate-summary">
+                <span>
+                  <strong>{selectedCityInventorySummary.recordCount}</strong>
+                  Total rows
+                </span>
+                <span>
+                  <strong>{filteredInventoryRows.length}</strong>
+                  Matching filters
+                </span>
+                <span>
+                  <strong>{stagedInventoryCount}</strong>
+                  Already in queue
+                </span>
+                <span>
+                  <strong>{serviceInventoryRowCount}</strong>
+                  Service businesses
+                </span>
+                <span>
+                  <strong>
+                    {selectedCityKey === "vancouver" ? officialServiceInventoryRowCount : 0}
+                  </strong>
+                  Official service
+                </span>
+                <span>
+                  <strong>
+                    {selectedCityKey === "vancouver" ? officialInventoryRowCount : 0}
+                  </strong>
+                  Official food
+                </span>
+              </div>
+              <div className="prospect-toolbar">
+                <label>
+                  Inventory source
+                  <select
+                    value={inventorySourceFilter}
+                    onChange={(event) =>
+                      setInventorySourceFilter(event.target.value as InventorySourceFilter)
+                    }
+                  >
+                    <option value="all">All inventory</option>
+                    <option value="service_businesses">Service businesses only</option>
+                    {selectedCityKey === "vancouver" ? (
+                      <option value="official_service">Official service only</option>
+                    ) : null}
+                    {selectedCityKey === "vancouver" ? (
+                      <option value="official_food">Official food only</option>
+                    ) : null}
+                  </select>
+                </label>
+                <label>
+                  Search
+                  <input
+                    type="text"
+                    value={inventorySearch}
+                    onChange={(event) => setInventorySearch(event.target.value)}
+                    placeholder="Business, area, subtype, or address"
+                  />
+                </label>
+                <label>
+                  Business type
+                  <select
+                    value={inventoryBusinessTypeFilter}
+                    onChange={(event) => setInventoryBusinessTypeFilter(event.target.value)}
+                  >
+                    <option value="all">All types</option>
+                    {inventoryBusinessTypeOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  Local area
+                  <select
+                    value={inventoryLocalAreaFilter}
+                    onChange={(event) => setInventoryLocalAreaFilter(event.target.value)}
+                  >
+                    <option value="all">All areas</option>
+                    {inventoryLocalAreaOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+              <div className="gate-row">
+                <div>
+                  <strong>
+                    {inventorySourceFilter === "service_businesses"
+                      ? `${selectedCityName} reviewed service inventory`
+                      : inventorySourceFilter === "official_service"
+                        ? "Official Vancouver service inventory"
+                      : inventorySourceFilter === "official_food"
+                        ? "Official Vancouver food inventory"
+                        : `${selectedCityName} combined operator inventory`}
+                  </strong>
+                  <p>
+                    {inventorySourceFilter === "service_businesses"
+                      ? "This view shows the reviewed non-restaurant service businesses already staged in the local CityAtlas queue, including hotels, wellness operators, event planners, venues, and related partner types."
+                      : inventorySourceFilter === "official_service"
+                        ? "This view stays tied to the City of Vancouver business licence dataset for beauty, repair, fitness, and vehicle-service businesses so you can shortlist, inspect, and stage them into the local research queue."
+                      : inventorySourceFilter === "official_food"
+                        ? "This view stays tied to the City of Vancouver business licence dataset so you can shortlist, inspect, and stage official food rows into the outreach queue after manual verification."
+                        : "This combined view keeps all three source lanes in one place: the official Vancouver food inventory, the official Vancouver service inventory, and the reviewed service-business inventory already staged in CityAtlas."}
+                  </p>
+                  <small>
+                    Showing {visibleInventoryRows.length} of {filteredInventoryRows.length} matching
+                    rows. Current view: {inventorySourceFilterLabel}.
+                  </small>
+                  {inventoryActionSummary ? <small>{inventoryActionSummary}</small> : null}
+                  <small>
+                    Reviewed service-business rows are already in the local queue. Staging only
+                    affects new official inventory rows.
+                  </small>
+                  <small>
+                    {stageableMatchingInventoryRows.length} matching rows still need official-site
+                    research before any real outreach can be considered.
+                  </small>
+                </div>
+                <div className="gate-actions">
+                  <button
+                    className="button primary"
+                    type="button"
+                    disabled={stageableVisibleInventoryRows.length === 0}
+                    onClick={() => void stageInventoryRows(stageableVisibleInventoryRows)}
+                  >
+                    {stageableVisibleInventoryRows.length > 0
+                      ? "Stage visible rows into queue"
+                      : inventorySourceFilter === "service_businesses"
+                        ? "Service rows already in queue"
+                        : "No new rows to stage"}
+                  </button>
+                  <button
+                    className="button secondary"
+                    type="button"
+                    disabled={stageableBatchInventoryRows.length === 0}
+                    onClick={() => void stageInventoryRows(stageableBatchInventoryRows)}
+                  >
+                    {stageableBatchInventoryRows.length > 0
+                      ? `Stage first ${stageableBatchInventoryRows.length} matching rows`
+                      : "No 100-row batch ready"}
+                  </button>
+                </div>
+              </div>
+              {visibleInventoryRows.length > 0 ? (
+                <div className="business-prospect-list">
+                  {visibleInventoryRows.map((record) => {
+                    const staged = isBusinessInventoryRecordStagedInLookup(record, stagedInventoryLookup);
+                    const displayName = record.businessTradeName || record.businessName;
+                    const sourceLabel =
+                      record.sourceSystem === "cityatlas_service_partner_inventory"
+                        ? "CityAtlas reviewed service lane"
+                        : record.sourceScope === "vancouver_services_issued_2026"
+                          ? "City of Vancouver service-business licence dataset"
+                          : "City of Vancouver food licence dataset";
+                    const contactLabel =
+                      record.email
+                      || (record.publicContactType
+                        ? formatPhrase(record.publicContactType)
+                        : formatPhrase(record.contactReadiness));
+
+                    return (
+                      <div className="business-prospect-row" key={record.inventoryId}>
+                        <div>
+                          <div className="proof-candidate-heading">
+                            <div>
+                              <strong>{displayName}</strong>
+                              <small>
+                                {record.businessType}
+                                {record.businessSubtype ? ` - ${record.businessSubtype}` : ""}
+                              </small>
+                            </div>
+                            <StatusPill tone={staged ? "green" : "blue"}>
+                              {staged ? "already in queue" : "inventory only"}
+                            </StatusPill>
+                          </div>
+                          <div className="business-prospect-meta">
+                            <span>
+                              <strong>Area</strong>
+                              {record.localArea || "Unknown"}
+                            </span>
+                            <span>
+                              <strong>Contact</strong>
+                              {contactLabel || "Needs research"}
+                            </span>
+                            <span>
+                              <strong>Address</strong>
+                              {record.streetAddress || "Address not added yet"}
+                            </span>
+                            <span>
+                              <strong>Source</strong>
+                              {sourceLabel}
+                            </span>
+                          </div>
+                          <p>{record.notes}</p>
+                          <small className="business-prospect-note">
+                            Verification: {formatPhrase(record.verificationStatus)}. Last checked{" "}
+                            {record.lastVerifiedDate || "not recorded"}.
+                          </small>
+                          <div className="business-prospect-links">
+                            <a href={record.officialSourceUrl} target="_blank" rel="noreferrer">
+                              Official source
+                            </a>
+                            {record.website ? (
+                              <a href={record.website} target="_blank" rel="noreferrer">
+                                Website
+                              </a>
+                            ) : null}
+                            {record.publicContactPath && record.publicContactPath !== record.officialSourceUrl ? (
+                              <a href={record.publicContactPath} target="_blank" rel="noreferrer">
+                                Contact path
+                              </a>
+                            ) : null}
+                            <button
+                              className="button tiny"
+                              type="button"
+                              disabled={staged}
+                              onClick={() => void stageInventoryRows([record])}
+                            >
+                              {staged ? "Already staged" : "Stage into queue"}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <EmptyState
+                  title="No inventory rows match this view yet"
+                  copy="Switch the source filter, business type, or city to inspect a different part of the operator database."
+                />
+              )}
+              {visibleInventoryRows.length < filteredInventoryRows.length ? (
+                <button
+                  className="button secondary wide"
+                  type="button"
+                  onClick={() => setInventoryVisibleCount((current) => current + 25)}
+                >
+                  Show 25 more rows
+                </button>
+              ) : null}
+            </>
+          )}
+        </article>
+
+        ) : null}
+
+          </>
+        ) : null}
+
+        {adminWorkspace === "expansion" ? (
         <article className="admin-panel large">
           <SectionHeader
             label="Connector warm paths"
-            title={`${selectedCityRollup?.cityName ?? "Selected city"} relationship stack`}
+            title={`${selectedCityName} relationship stack`}
             copy="This Rooms-derived layer keeps founder, culture, and operator warm paths separate from the raw business queue so CityAtlas can prepare relationship-led city rollout without sending anything."
+            action={<StatusPill tone="blue">{selectedCityName}</StatusPill>}
           />
           <div className="proof-candidate-summary">
             <span>
@@ -1282,6 +2241,10 @@ export function AdminConsole({
           ) : null}
         </article>
 
+        ) : null}
+
+        {adminWorkspace === "outreach" ? (
+          <>
         <article className="admin-panel large">
           <SectionHeader
             label="Business reply rail"
@@ -1582,6 +2545,10 @@ export function AdminConsole({
           )}
         </article>
 
+          </>
+        ) : null}
+
+        {adminWorkspace === "operator" && operatorWorkspaceView === "requests" ? (
         <article className="admin-panel">
           <SectionHeader
             label="Requests"
@@ -1602,7 +2569,10 @@ export function AdminConsole({
             </div>
           )}
         </article>
+        ) : null}
 
+        {adminWorkspace === "ops" ? (
+          <>
         <article className="admin-panel">
           <SectionHeader
             label="Growth loops"
@@ -1639,6 +2609,11 @@ export function AdminConsole({
           </div>
         </article>
 
+          </>
+        ) : null}
+
+        {adminWorkspace === "outreach" ? (
+          <>
         <article className="admin-panel large">
           <SectionHeader
             label="Founder sprint"
@@ -1994,6 +2969,11 @@ export function AdminConsole({
           )}
         </article>
 
+          </>
+        ) : null}
+
+        {adminWorkspace === "ops" ? (
+          <>
         <article className="admin-panel">
           <SectionHeader
             label="AI Brain"
@@ -2148,8 +3128,11 @@ export function AdminConsole({
             <li>Approve payment terms before Stripe activation.</li>
           </ul>
         </article>
+          </>
+        ) : null}
       </section>
 
+      {adminWorkspace === "ops" ? (
       <section className="admin-grid bottom">
         <article className="admin-panel">
           <ShieldIcon className="panel-icon" />
@@ -2175,32 +3158,8 @@ export function AdminConsole({
             ))}
           </div>
         </article>
-        <article className="admin-panel">
-          <LockIcon className="panel-icon" />
-          <h2>Local controls</h2>
-          <p>
-            Resetting clears localStorage demo submissions and gate-ready markers, then restores
-            the original seed package.
-          </p>
-          <div className="hero-actions">
-            <button
-              className="button secondary"
-              type="button"
-              onClick={() => {
-                void onResetDemo();
-              }}
-            >
-              Reset local demo
-            </button>
-            <AppLink className="button secondary" to="/private-preview/date-night">
-              Private preview <ArrowRightIcon />
-            </AppLink>
-            <AppLink className="button primary" to="/">
-              Public preview <ArrowRightIcon />
-            </AppLink>
-          </div>
-        </article>
       </section>
+      ) : null}
     </>
   );
 }

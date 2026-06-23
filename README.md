@@ -92,7 +92,7 @@ Fallback Vercel alias:
 - Cloudflare DNS is live for `city.univenturestudio.com`, and public routes are now crawlable while admin/private routes stay blocked.
 - No Stripe SDK, checkout, invoices, payment links, or subscription creation.
 - No real provider imports.
-- No automated email or outreach sending.
+- No in-app automated email or outreach rail is active. A separate owner-approved Codex heartbeat is now scheduled to send up to 40 reviewed Vancouver restaurant emails plus up to 20 reviewed Vancouver service-business emails per day from the connected Gmail account starting June 22, 2026 at 2:05 PM PDT, with separate live send ledgers suppressing re-sends. That heartbeat now also sends a plain-English owner summary email after each run.
 - No automatic scraping or paid EXA discovery runs are triggered by the app itself.
 - Optional future EXA discovery remains discovery-only. It is not a send rail and does not unlock outreach by itself.
 - No live webhook, inbox connector, CRM sync, or automated business follow-up is active from the new reply rail.
@@ -135,6 +135,17 @@ Open `http://127.0.0.1:5178/`.
 - `npm run readiness` - regenerate `docs/READINESS_PROGRESS.md` and `output/readiness/latest.json`.
 - `npm run growth:verify` - verify the city-rollout machine, Vancouver business-prospect floor, and import-preview guardrails.
 - `npm run growth:packets` - regenerate the owner-facing Vancouver business machine packet, Vancouver first-batch packet, multi-city rollout readiness packet, EXA discovery approval packet, Vancouver outreach-prep packet, follow-on city outreach ladder packet, city rollout operator packet, and the local email-ready, promotion-candidate, first-batch, review-queue, plus rehearsal-overlay exports with current batch-lane, donor/source-lane, and next-step truth.
+- `npm run growth:service:inventory` - rebuild the official Vancouver service-business inventory for beauty, repair, fitness, and vehicle-service categories, plus the matching `/admin` operator files.
+- `npm run growth:service:research-batch` - cut a small official Vancouver service-business research batch for manual or Outscraper contact enrichment.
+- `npm run growth:service:research-batch:all` - cut the full current official Vancouver service-business research batch.
+- `npm run growth:service:outscraper-enrich` - run the paid Outscraper service-business enrichment lane on the current small service research batch, producing enriched rows plus review files.
+- `npm run growth:service:outscraper-enrich:all` - run the paid Outscraper service-business enrichment lane across the full current official Vancouver service batch.
+- `npm run growth:service:review-exports` - split the current reviewed service enrichment batch into email-candidate, contact-path, and manual-review artifacts plus import-ready CSVs.
+- `npm run growth:service:review-exports:all` - rebuild those reviewed service export artifacts for the full current official Vancouver service batch.
+- `npm run growth:service:sync-seeds` - regenerate the reviewed Vancouver service-business donor layer, blending the current local CityAtlas queue with the latest service enrichment review files when they exist.
+- `npm run growth:service:sync-seeds:all` - rebuild the reviewed Vancouver service-business donor layer from the full current official service enrichment batch.
+- `npm run growth:service:send-packet` - rebuild the Vancouver service-business email-ready send packet plus the current owner-review-ready counts.
+- `npm run growth:service:daily-send-window -- --limit=20` - cut the current reviewed Vancouver service-business daily Gmail send manifest without widening beyond the first 20 owner-review-ready rows.
 - `npm run growth:sync:all` - refresh the Rooms Vancouver email-ready donor layer, the wider Rooms Vancouver review donor layer, the Rooms multi-city donor layer, the Roam public-business-wave donor layer, and the Roam city-sourcing donor layer in one local pass.
 - `npm run growth:sync:rooms:vancouver` - regenerate the local Rooms-to-CityAtlas Vancouver business donor seed file from the reviewed Rooms host-space packet.
 - `npm run growth:sync:rooms:vancouver:review` - regenerate the wider local Rooms-to-CityAtlas Vancouver review donor layer, keeping contact-form-ready and research-only rows honest.

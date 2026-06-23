@@ -5,6 +5,8 @@ import { roomsVancouverBusinessSeeds } from "../data/roomsVancouverBusinessSeeds
 import { roomsVancouverReviewBusinessSeeds } from "../data/roomsVancouverReviewBusinessSeeds.ts";
 import { roomsMultiCityBusinessSeeds } from "../data/roomsMultiCityBusinessSeeds.ts";
 import { roamCitySourcingSeeds } from "../data/roamCitySourcingSeeds.ts";
+import { vancouverRestaurantReviewBusinessSeeds } from "../data/vancouverRestaurantReviewBusinessSeeds.ts";
+import { vancouverServiceReviewBusinessSeeds } from "../data/vancouverServiceReviewBusinessSeeds.ts";
 
 const seededAt = "2026-06-16T12:00:00.000Z";
 const roamDonorBatchId = "roam-official-vancouver-donor-2026-06-16";
@@ -13,6 +15,8 @@ const roamCitySourcingBatchId = "roam-city-sourcing-donor-2026-06-16";
 const roomsDonorBatchId = "rooms-vancouver-host-space-donor-2026-06-16";
 const roomsReviewDonorBatchId = "rooms-vancouver-host-space-review-donor-2026-06-16";
 const roomsMultiCityBatchId = "rooms-multi-city-host-space-donor-2026-06-16";
+const vancouverRestaurantReviewBatchId = "vancouver-restaurant-review-donor-2026-06-22";
+const vancouverServiceReviewBatchId = "cityatlas-vancouver-service-owner-review-donor-2026-06-22";
 
 type SeedInput = {
   cityKey?: string;
@@ -34,6 +38,10 @@ type SeedInput = {
   donorSourceLabel?: string;
   donorBatchId?: string;
   donorPrefix?: string;
+  outreachStatus?: BusinessProspect["outreachStatus"];
+  approvalStatus?: BusinessProspect["approvalStatus"];
+  relationshipWarmth?: BusinessProspect["relationshipWarmth"];
+  lastUpdatedAt?: string;
 };
 
 function formatCityName(cityKey: string) {
@@ -78,14 +86,14 @@ function createSeedProspect(input: SeedInput): BusinessProspect {
     contactPathType,
     contactConfidence: input.contactConfidence || (email ? "high" : contactPath ? "medium" : "low"),
     contactReadiness,
-    outreachStatus: "not_started",
-    approvalStatus: "review_only",
+    outreachStatus: input.outreachStatus || "not_started",
+    approvalStatus: input.approvalStatus || "review_only",
     sourceProof: input.sourceProof,
-    relationshipWarmth: "unknown",
+    relationshipWarmth: input.relationshipWarmth || "unknown",
     notes: `${input.notes} Reverify the contact path before any outreach or public claim.`,
     collectionIds: [],
     importBatchId: input.donorBatchId,
-    lastUpdatedAt: seededAt,
+    lastUpdatedAt: input.lastUpdatedAt || seededAt,
   };
 }
 
@@ -356,6 +364,56 @@ export function buildDefaultSeededBusinessProspects() {
     donorPrefix: "roam-city-sourcing-donor",
   }));
 
+  const vancouverRestaurantReviewSeeds: SeedInput[] = vancouverRestaurantReviewBusinessSeeds.map((seed) => ({
+    cityKey: "vancouver",
+    cityName: "Vancouver",
+    businessName: seed.businessName,
+    neighborhood: seed.neighborhood,
+    category: seed.category,
+    segment: seed.segment,
+    sourceUrl: seed.sourceUrl,
+    website: seed.website,
+    email: seed.email,
+    contactPath: seed.contactPath,
+    contactPathType: seed.contactPathType as BusinessProspect["contactPathType"],
+    contactReadiness: seed.contactReadiness as BusinessProspect["contactReadiness"],
+    sourceProof: seed.sourceProof,
+    notes: seed.notes,
+    contactConfidence: seed.contactConfidence as BusinessProspect["contactConfidence"],
+    donorSourceLabel: seed.donorSourceLabel,
+    donorBatchId: vancouverRestaurantReviewBatchId,
+    donorPrefix: "vancouver-restaurant-review-donor",
+    approvalStatus: seed.approvalStatus as BusinessProspect["approvalStatus"],
+    outreachStatus: seed.outreachStatus as BusinessProspect["outreachStatus"],
+    relationshipWarmth: seed.relationshipWarmth as BusinessProspect["relationshipWarmth"],
+    lastUpdatedAt: seed.lastUpdatedAt,
+  }));
+
+  const vancouverServiceReviewSeeds: SeedInput[] = vancouverServiceReviewBusinessSeeds.map((seed) => ({
+    cityKey: "vancouver",
+    cityName: "Vancouver",
+    businessName: seed.businessName,
+    neighborhood: seed.neighborhood,
+    category: seed.category,
+    segment: seed.segment,
+    sourceUrl: seed.sourceUrl,
+    website: seed.website,
+    email: seed.email,
+    contactPath: seed.contactPath,
+    contactPathType: seed.contactPathType as BusinessProspect["contactPathType"],
+    contactReadiness: seed.contactReadiness as BusinessProspect["contactReadiness"],
+    sourceProof: seed.sourceProof,
+    notes: seed.notes,
+    contactConfidence: seed.contactConfidence as BusinessProspect["contactConfidence"],
+    donorSourceLabel: seed.donorSourceLabel,
+    donorBatchId: vancouverServiceReviewBatchId,
+    donorPrefix: "vancouver-service-review-donor",
+    approvalStatus: seed.approvalStatus as BusinessProspect["approvalStatus"],
+    outreachStatus: seed.outreachStatus as BusinessProspect["outreachStatus"],
+    relationshipWarmth: seed.relationshipWarmth as BusinessProspect["relationshipWarmth"],
+    lastUpdatedAt: seed.lastUpdatedAt,
+  }));
+
   return [
     ...roamDonorSeeds,
     ...roomsDonorSeeds,
@@ -363,5 +421,7 @@ export function buildDefaultSeededBusinessProspects() {
     ...roomsMultiCitySeeds,
     ...roamPublicBusinessWaveDonorSeeds,
     ...roamCitySeeds,
+    ...vancouverRestaurantReviewSeeds,
+    ...vancouverServiceReviewSeeds,
   ].map(createSeedProspect);
 }

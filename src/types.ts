@@ -381,6 +381,52 @@ export interface BusinessProspect {
   lastUpdatedAt: string;
 }
 
+export interface BusinessInventoryRecord {
+  inventoryId: string;
+  sourceSystem: string;
+  sourceScope: string;
+  sourceRecordId: string;
+  licenseYear: string;
+  licenseStatus: string;
+  businessName: string;
+  businessTradeName: string;
+  businessType: string;
+  businessSubtype: string;
+  categoryPrimary: string;
+  categorySecondary: string;
+  cuisine: string;
+  cityName: string;
+  municipality: string;
+  sourceCityRaw: string;
+  localArea: string;
+  streetAddress: string;
+  postalCode: string;
+  latitude: string;
+  longitude: string;
+  website: string;
+  menuUrl: string;
+  publicContactPath: string;
+  publicContactType: string;
+  email: string;
+  phone: string;
+  officialSourceUrl: string;
+  osmSourceUrl: string;
+  verificationStatus: string;
+  contactReadiness: string;
+  outreachPriority: string;
+  notes: string;
+  lastVerifiedDate: string;
+}
+
+export interface BusinessInventorySummary {
+  generatedAt: string;
+  recordCount: number;
+  byBusinessType: Record<string, number>;
+  byLocalArea: Record<string, number>;
+  byCity: Record<string, number>;
+  sourceScope: string;
+}
+
 export interface ProofCandidate {
   id: string;
   proofSprintId: string;

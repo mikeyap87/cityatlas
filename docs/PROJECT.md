@@ -4,12 +4,13 @@
 
 CityAtlas is a Univenture Studio local discovery and business-growth platform. The first market is Vancouver.
 
-The public product helps locals find places, events, offers, and guides. The business side helps local operators request founder-partner review, prepare feature pages, and eventually buy packages after live payment approval.
+The public product helps locals find places, events, offers, and guides. The business side helps local operators request founder-partner review, prepare feature pages, and eventually buy packages after live payment approval. That business lane now explicitly includes neighborhood service businesses as well as restaurants, venues, and wellness operators.
 
 ## Who It Serves
 
 - Local residents looking for trusted city discovery.
 - Vancouver businesses that need better presentation, guide placement, offers, and local visibility.
+- Vancouver service businesses that need better presentation, clearer local positioning, and stronger neighborhood visibility.
 - The owner/operator who needs one console for launch readiness, content coverage, partner pipeline, and gated live-risk actions.
 
 ## Core Features In This Package
@@ -39,16 +40,19 @@ The public product helps locals find places, events, offers, and guides. The bus
 - Public source-backed Vancouver wellness reset starters page and upgraded wellness guide with official-source framing and correction path.
 - Public Toronto first-time visitor starter page and matching destination-choice guide, plus a Toronto weekend-route starter page and matching compact-weekend guide, as the first non-Vancouver preview cluster, now also threaded into the public homepage, guide-library, about-page, and footer internal-link architecture and verified live on the approved domain.
 - Business pricing page with payment acceptance disabled.
-- Business submission flow with local-only storage.
+- Business submission flow with local-only storage, now worded for restaurants, wellness operators, and broader neighborhood service businesses.
 - Draft terms and privacy pages.
 - Public editorial standards and corrections page.
 - Planner/save/share loop.
 - City Missions route layer for saveable plans, route progress, share prompts, and future sponsor angles.
 - Owner launch console with next-city rollout ranking, discovery-only EXA guardrails, and city-by-city business queue focus filters for promotion-candidate, email-ready, contact-path-review, and research-only rows.
+- Admin console now opens on a business-database workspace, with separate workspaces for outreach rehearsal, city rollout, launch review, and ops so the operator flow is not buried under one long page.
+- Inside the operator business-database workspace, separate database, queue-cleanup, and business-request views keep the main operator page shorter and easier to review.
+- The operator database in `/admin` now combines the official Vancouver food inventory, the official Vancouver service inventory for beauty, repair, fitness, and vehicle-service rows, and the reviewed service-business inventory already staged in CityAtlas. The source filter can split that view into combined, reviewed-service-only, official-service-only, or official-food-only rows.
 - Founder proof sprint and private founder CRM for the Vancouver Date Night wedge.
 - Source-backed candidate queue with fit scores, route angles, contact-path confidence, approval state, and outreach state.
 - Local city-rollout machine with a Vancouver-first proof city, the shared Roam + Rooms expansion map plus the wider Roam city ladder, per-city readiness targets for the next release markets, and donor-fed no-send queues now staged across all 25 target cities.
-- Local business prospect machine that combines source-backed place anchors, founder-proof rows, Roam partner-research plus public-business-wave donor layers of Vancouver businesses, the wider reviewed Rooms Vancouver contact-form and research queue, the read-only Rooms Browserbase and contact-review Vancouver artifacts for extra official-path and email-ready rows, reviewed Rooms multi-city donor packets, Roam city-sourcing donor rows merged across qualifying preview artifacts, donor-title cleanup plus obvious beauty/salon-noise filtering for the shared-city queue, and future EXA/manual import batches without sending outreach, while the admin console now exposes queue-focus filters and next-step guidance per city.
+- Local business prospect machine that combines source-backed place anchors, founder-proof rows, Roam partner-research plus public-business-wave donor layers of Vancouver businesses, the wider reviewed Rooms Vancouver contact-form and research queue, the new reviewed Vancouver restaurant donor layer from the first Outscraper pass, the reviewed Vancouver service-business donor layer generated from the local CityAtlas queue, the new official Vancouver service-business enrichment lane for beauty, repair, fitness, and vehicle-service review rows, the read-only Rooms Browserbase and contact-review Vancouver artifacts for extra official-path and email-ready rows, reviewed Rooms multi-city donor packets, Roam city-sourcing donor rows merged across qualifying preview artifacts, donor-title cleanup plus obvious beauty/salon-noise filtering for the shared-city queue, and future EXA/manual import batches without sending outreach, while the admin console now exposes queue-focus filters and next-step guidance per city.
 - Local connector warm-path machine that syncs Rooms city connector stacks and Vancouver named connector targets into CityAtlas so organization-level and named relationship routes can be reviewed per city without widening into live outreach.
 - Local outreach rehearsal overlay that syncs the Rooms Vancouver and Toronto supervised-send-window truth plus the Vancouver post-send outcome ledger into CityAtlas so exact-recipient review, bounce suppression, and next-city packet discipline stay visible without enabling any live send rail.
 - Local business proof-batch and owner-inbox rehearsal lane in `/admin`, adapted from the safer Rooms first-batch pattern so CityAtlas can stage a deliberately mixed 3-5 business packet across multiple business lanes and donor sources without sending anything.
@@ -89,6 +93,7 @@ The public product helps locals find places, events, offers, and guides. The bus
 - React
 - TypeScript
 - CSS modules are not used; styles are organized under `src/styles/`
+- The current production build is generated through a local Vite wrapper that writes the successful in-memory bundle to `dist/`, because the native Vite 8 app write path is still unstable on the current asset tree.
 - Local browser storage for demo state
 - Public business-coverage copy now reads from a lightweight published snapshot, while the heavier city-rollout and prospect machine hydrates only for `/admin`.
 - Supabase schema draft for future backend
@@ -105,12 +110,12 @@ The public product helps locals find places, events, offers, and guides. The bus
 - Public routes are crawlable; `/admin`, `/private-preview/*`, `/planner`, and `/for-businesses/submit` stay noindex.
 - No Stripe/payment acceptance is active.
 - No provider imports are active.
-- No automated outreach is active.
+- No in-app automated outreach rail is active. A separate owner-approved Codex heartbeat is now scheduled to send up to 40 reviewed Vancouver restaurant emails plus up to 20 reviewed Vancouver service-business emails per day from the connected Gmail account starting June 22, 2026 at 2:05 PM PDT, with live sends recorded back into the local restaurant and service ledgers plus the local queue. That same heartbeat now also sends a plain-English owner summary email after each run.
 - No live inbox webhook, Resend connector, CRM sync, or automated business follow-up is active.
 - No paid EXA discovery or scraping run is triggered automatically by the app; future research batches must be staged manually or by an owner-approved separate run.
 - Paid-traffic readiness is intentionally blocked until real analytics and hosted conversion proof exist. The app now supports a consent-based GA4 handoff once approved env vars are configured, but production still has no analytics env configured today. The local business funnel can be checked with `npm run qa:paid-traffic`, but local event tracking is not enough to buy traffic safely.
 - The Vancouver business machine now uses deduped prospect truth: repeated source-backed venues do not count as separate business rows, and the admin rollup separates partner-eligible coverage from anchor-only city guidance.
-- First six owner-approved proof-sprint emails were sent manually and logged; no follow-up or second batch is approved.
+- Manual outreach already sent and logged now includes the original six owner-approved Date Night proof-sprint emails plus the 22 owner-reviewed Vancouver restaurant emails sent from the connected Gmail account on 2026-06-22. The daily Codex heartbeat now stages both lanes together, capped at 40 reviewed restaurant sends plus 20 reviewed service-business sends per day unless the owner approves a higher limit.
 - Vercel deploy is live at `https://cityatlas-one.vercel.app`.
 - Custom Univenture subdomain is live at `https://city.univenturestudio.com`.
 - Cloudflare DNS and the Vercel alias are configured and serving crawlable robots on the approved domain.
@@ -146,7 +151,7 @@ Open `http://127.0.0.1:5178/`.
 22. Verify name/trademark risk before standalone domain purchase or brand lock.
 23. Keep admin/private-preview hosted flags false unless protected sharing is explicitly approved.
 24. Approve a real-data sourcing policy.
-25. Monitor the first six manual proof-sprint emails and log every reply, bounce, wrong-contact redirect, or concern in `/admin`.
+25. Monitor every manual outreach batch already sent, and log each reply, bounce, wrong-contact redirect, or concern in `/admin` before any follow-up or wider send decision.
 26. Approve payment terms before enabling Stripe/payment links.
 27. Keep noindex/private crawl settings only on founder and admin flows; do not widen crawl to protected routes.
 28. Validate City Missions with 5 to 10 real humans before building accounts or live sharing.

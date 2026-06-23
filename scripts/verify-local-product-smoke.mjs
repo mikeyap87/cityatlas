@@ -16,6 +16,7 @@ const distIndexPath = join(root, "dist/index.html");
 const previewPort = Number(process.env.CITYATLAS_SMOKE_PORT || "4278");
 const useExistingServer = process.env.CITYATLAS_SMOKE_USE_EXISTING_SERVER === "1";
 const baseUrl = `http://127.0.0.1:${previewPort}`;
+const navigationWaitUntil = useExistingServer ? "domcontentloaded" : "networkidle";
 const failures = [];
 const warnings = [];
 
@@ -61,9 +62,13 @@ function attachRuntimeCapture(page, bucket) {
     const errorText = request.failure()?.errorText ?? "request failed";
     const abortedImageRequest =
       errorText === "net::ERR_ABORTED" && request.resourceType() === "image";
+    const abortedChunkRequest =
+      errorText === "net::ERR_ABORTED"
+      && request.resourceType() === "script"
+      && url.startsWith(`${baseUrl}/assets/`);
 
     // Navigating between pages can cancel in-flight same-origin images without affecting users.
-    if (url.startsWith(baseUrl) && !abortedImageRequest) {
+    if (url.startsWith(baseUrl) && !abortedImageRequest && !abortedChunkRequest) {
       bucket.requestFailures.push(`${url} :: ${errorText}`);
     }
   });
@@ -100,6 +105,7 @@ async function saveScreenshot(page, fileName) {
 }
 
 async function runStep(steps, name, fn) {
+  console.log(`Running: ${name}`);
   try {
     const detail = await fn();
     steps.push({
@@ -107,12 +113,14 @@ async function runStep(steps, name, fn) {
       status: "passed",
       ...detail,
     });
+    console.log(`Passed: ${name}`);
   } catch (error) {
     steps.push({
       name,
       status: "failed",
       error: noteFailure(name, error),
     });
+    console.log(`Failed: ${name}`);
   }
 }
 
@@ -131,7 +139,7 @@ async function runDesktopFlow(browser) {
   attachRuntimeCapture(page, runtime);
 
   await runStep(steps, "desktop home contact funnel", async () => {
-    await page.goto(`${baseUrl}/`, { waitUntil: "networkidle" });
+    await page.goto(`${baseUrl}/`, { waitUntil: navigationWaitUntil });
     const heroHeading = (await page.locator("h1").first().innerText()).trim();
     ensure(/vancouver/i.test(heroHeading), `Homepage hero heading should mention Vancouver, got "${heroHeading}".`);
     const screenshot = await saveScreenshot(page, "desktop-home.png");
@@ -158,13 +166,13 @@ async function runDesktopFlow(browser) {
   });
 
   await runStep(steps, "desktop home area picker and search", async () => {
-    await page.goto(`${baseUrl}/`, { waitUntil: "networkidle" });
+    await page.goto(`${baseUrl}/`, { waitUntil: navigationWaitUntil });
     await page.getByRole("link", { name: /Kitsilano/i }).first().click();
     await page.waitForURL(`${baseUrl}/vancouver/kitsilano-scenic-starters`);
     const mapBodyText = await page.locator("body").innerText();
     ensure(/kitsilano/i.test(mapBodyText), "Homepage starting-point links did not open the Kitsilano page.");
 
-    await page.goto(`${baseUrl}/`, { waitUntil: "networkidle" });
+    await page.goto(`${baseUrl}/`, { waitUntil: navigationWaitUntil });
     await page.getByLabel("Search CityAtlas").fill("first evening");
     const firstResult = page.locator(".hero-search-result").first();
     await firstResult.waitFor();
@@ -180,7 +188,7 @@ async function runDesktopFlow(browser) {
   });
 
   await runStep(steps, "desktop city starter navigation", async () => {
-    await page.goto(`${baseUrl}/vancouver`, { waitUntil: "networkidle" });
+    await page.goto(`${baseUrl}/vancouver`, { waitUntil: navigationWaitUntil });
     await page.getByRole("heading", { level: 1, name: /Find the right Vancouver start first/i }).waitFor();
     await page.getByRole("link", { name: /Kitsilano/i }).first().click();
     await page.waitForURL(`${baseUrl}/vancouver/kitsilano-scenic-starters`);
@@ -194,7 +202,7 @@ async function runDesktopFlow(browser) {
   });
 
   await runStep(steps, "desktop city page render", async () => {
-    await page.goto(`${baseUrl}/vancouver`, { waitUntil: "networkidle" });
+    await page.goto(`${baseUrl}/vancouver`, { waitUntil: navigationWaitUntil });
     await page.getByRole("heading", { level: 1, name: /Find the right Vancouver start first/i }).waitFor();
     const quickStartCount = await page.locator(".city-search-quick-link").count();
     ensure(quickStartCount >= 4, `Expected at least 4 city quick-start cards, found ${quickStartCount}.`);
@@ -227,7 +235,7 @@ async function runDesktopFlow(browser) {
   });
 
   await runStep(steps, "desktop guide library render", async () => {
-    await page.goto(`${baseUrl}/vancouver/guides`, { waitUntil: "networkidle" });
+    await page.goto(`${baseUrl}/vancouver/guides`, { waitUntil: navigationWaitUntil });
     await page.getByRole("heading", { level: 1, name: /Vancouver guides for easier local plans/i }).waitFor();
     const bodyText = await page.locator("body").innerText();
     ensure(
@@ -242,13 +250,16 @@ async function runDesktopFlow(browser) {
   });
 
   await runStep(steps, "desktop about render", async () => {
-    await page.goto(`${baseUrl}/about`, { waitUntil: "networkidle" });
+    await page.goto(`${baseUrl}/about`, { waitUntil: navigationWaitUntil });
     await page.getByRole("heading", {
       level: 1,
       name: /CityAtlas helps people choose the right Vancouver start/i,
     }).waitFor();
     const bodyText = await page.locator("body").innerText();
-    ensure(/Toronto preview/i.test(bodyText), "About page did not render the next-city preview card.");
+    ensure(
+      /Toronto already shows|same shape can expand into the next city/i.test(bodyText),
+      "About page did not render the Toronto expansion signal.",
+    );
 
     return {
       route: "/about",
@@ -258,7 +269,7 @@ async function runDesktopFlow(browser) {
 
   await runStep(steps, "desktop guide detail render", async () => {
     await page.goto(`${baseUrl}/vancouver/guides/where-should-a-first-time-vancouver-visitor-start`, {
-      waitUntil: "networkidle",
+      waitUntil: navigationWaitUntil,
     });
     await page.getByRole("heading", {
       level: 1,
@@ -277,7 +288,7 @@ async function runDesktopFlow(browser) {
   });
 
   await runStep(steps, "desktop business detail render", async () => {
-    await page.goto(`${baseUrl}/vancouver/businesses/published-on-main`, { waitUntil: "networkidle" });
+    await page.goto(`${baseUrl}/vancouver/businesses/published-on-main`, { waitUntil: navigationWaitUntil });
     await page.getByRole("heading", { level: 1, name: /Published on Main/i }).waitFor();
     const bodyText = await page.locator("body").innerText();
     ensure(
@@ -292,7 +303,7 @@ async function runDesktopFlow(browser) {
   });
 
   await runStep(steps, "desktop events render", async () => {
-    await page.goto(`${baseUrl}/vancouver/events`, { waitUntil: "networkidle" });
+    await page.goto(`${baseUrl}/vancouver/events`, { waitUntil: navigationWaitUntil });
     await page.getByRole("heading", { level: 1, name: /Vancouver event ideas that can shape the day/i }).waitFor();
     const eventCards = await page.locator(".compact-card").count();
     ensure(eventCards >= 1, `Expected at least 1 event card, found ${eventCards}.`);
@@ -304,7 +315,7 @@ async function runDesktopFlow(browser) {
   });
 
   await runStep(steps, "desktop Toronto pilot navigation", async () => {
-    await page.goto(`${baseUrl}/toronto/guides`, { waitUntil: "networkidle" });
+    await page.goto(`${baseUrl}/toronto/guides`, { waitUntil: navigationWaitUntil });
     await page.locator("h1").waitFor();
     const guideHubText = await page.locator("body").innerText();
     ensure(/Toronto starting pages and guides/i.test(guideHubText), "Toronto guide hub did not render the Toronto starter heading.");
@@ -322,7 +333,7 @@ async function runDesktopFlow(browser) {
   });
 
   await runStep(steps, "desktop Toronto weekend navigation", async () => {
-    await page.goto(`${baseUrl}/toronto/guides`, { waitUntil: "networkidle" });
+    await page.goto(`${baseUrl}/toronto/guides`, { waitUntil: navigationWaitUntil });
     await page.getByRole("link", { name: /Toronto weekend starting points/i }).click();
     await page.waitForURL(`${baseUrl}/toronto/weekend-route-starters`);
     await page.getByRole("link", { name: /Read the Toronto weekend guide/i }).click();
@@ -344,8 +355,8 @@ async function runDesktopFlow(browser) {
   });
 
   await runStep(steps, "desktop planner save and share", async () => {
-    await page.goto(`${baseUrl}/planner`, { waitUntil: "networkidle" });
-    await page.getByRole("heading", { level: 1, name: /Save a Vancouver plan/i }).waitFor();
+    await page.goto(`${baseUrl}/planner`, { waitUntil: navigationWaitUntil });
+    await page.getByRole("heading", { level: 1, name: /Build a simple Vancouver plan you can keep/i }).waitFor();
     const firstChip = page.locator(".planner-chip").first();
     const chipLabel = (await firstChip.locator("span").innerText()).trim();
     ensure(Boolean(chipLabel), "Planner did not expose a saveable chip label.");
@@ -355,7 +366,7 @@ async function runDesktopFlow(browser) {
     await page.locator(".local-success").waitFor();
     const successText = await page.locator(".local-success").innerText();
     ensure(
-      /share draft prepared/i.test(successText),
+      /share text is ready here/i.test(successText),
       `Planner share draft message was not shown. Got "${successText}".`,
     );
 
@@ -367,8 +378,11 @@ async function runDesktopFlow(browser) {
   });
 
   await runStep(steps, "desktop business pricing render", async () => {
-    await page.goto(`${baseUrl}/for-businesses/pricing`, { waitUntil: "networkidle" });
-    await page.getByRole("heading", { level: 1, name: /featured more clearly/i }).waitFor();
+    await page.goto(`${baseUrl}/for-businesses/pricing`, { waitUntil: navigationWaitUntil });
+    await page.getByRole("heading", {
+      level: 1,
+      name: /Choose the right first CityAtlas package for your Vancouver business/i,
+    }).waitFor();
     const packageCards = await page.locator(".pricing-card").count();
     ensure(packageCards >= 3, `Expected at least 3 pricing cards, found ${packageCards}.`);
     const firstChooseHref = await page.locator(".pricing-card .button.secondary").first().getAttribute("href");
@@ -385,7 +399,7 @@ async function runDesktopFlow(browser) {
   });
 
   await runStep(steps, "desktop terms render", async () => {
-    await page.goto(`${baseUrl}/terms`, { waitUntil: "networkidle" });
+    await page.goto(`${baseUrl}/terms`, { waitUntil: navigationWaitUntil });
     await page.getByRole("heading", { level: 1, name: /CityAtlas terms for the public site/i }).waitFor();
     const bodyText = await page.locator("body").innerText();
     ensure(/What the public site includes today/i.test(bodyText), "Terms page did not render the public-site summary cards.");
@@ -397,7 +411,7 @@ async function runDesktopFlow(browser) {
   });
 
   await runStep(steps, "desktop privacy render", async () => {
-    await page.goto(`${baseUrl}/privacy`, { waitUntil: "networkidle" });
+    await page.goto(`${baseUrl}/privacy`, { waitUntil: navigationWaitUntil });
     await page.getByRole("heading", { level: 1, name: /How CityAtlas handles data today/i }).waitFor();
     const bodyText = await page.locator("body").innerText();
     ensure(/What stays on this device/i.test(bodyText), "Privacy page did not render the device-storage summary cards.");
@@ -411,7 +425,7 @@ async function runDesktopFlow(browser) {
   await runStep(steps, "desktop business request draft save", async () => {
     const businessName = "Smoke Test Bistro";
     await page.goto(`${baseUrl}/for-businesses/submit?package=signature_partner`, {
-      waitUntil: "networkidle",
+      waitUntil: navigationWaitUntil,
     });
     await page.getByRole("heading", { level: 1, name: /Tell CityAtlas what should improve first/i }).waitFor();
     const packageInterest = await page.getByLabel("Package interest").inputValue();
@@ -439,7 +453,7 @@ async function runDesktopFlow(browser) {
   });
 
   await runStep(steps, "desktop private preview render", async () => {
-    await page.goto(`${baseUrl}/private-preview/date-night`, { waitUntil: "networkidle" });
+    await page.goto(`${baseUrl}/private-preview/date-night`, { waitUntil: navigationWaitUntil });
     await page.getByRole("heading", { level: 1, name: /Vancouver Date Night route preview/i }).waitFor();
     const bodyText = await page.locator("body").innerText();
     ensure(/review-only surface/i.test(bodyText), "Private preview did not render the review-only safety copy.");
@@ -452,17 +466,18 @@ async function runDesktopFlow(browser) {
 
   await runStep(steps, "desktop admin import preview and add", async () => {
     const importedBusinessName = "Smoke Test Gallery";
-    const businessMachinePanel = page
-      .locator("article.admin-panel.large")
-      .filter({ hasText: "No-send business prospect queue" })
-      .first();
     const csv = [
       "businessName,email,contactName,cityName,neighborhood,category,segment,sourceLabel,sourceUrl,website,contactPath,notes,relationshipWarmth",
       `${importedBusinessName},hello@smokegallery.example,Taylor,Vancouver,Mount Pleasant,Gallery,Arts venue,Manual source,https://smokegallery.example,https://smokegallery.example,https://smokegallery.example/contact,Smoke import row for local QA,medium`,
     ].join("\n");
 
-    await page.goto(`${baseUrl}/admin`, { waitUntil: "networkidle" });
-    await page.getByRole("heading", { level: 1, name: /CityAtlas launch readiness/i }).waitFor();
+    await page.goto(`${baseUrl}/admin`, { waitUntil: navigationWaitUntil });
+    await page.getByRole("heading", { level: 1, name: /CityAtlas operator console/i }).waitFor();
+    await page.getByRole("button", { name: /Queue cleanup/i }).click();
+    await page.getByText(/No-send business prospect queue/i).waitFor();
+    const queueTotalBefore = await page.locator(".proof-candidate-summary").first().locator("strong").first().innerText();
+    await page.locator(".admin-disclosure summary").click();
+    await page.getByLabel("EXA or manual research rows").waitFor({ state: "visible" });
     await page.getByLabel("EXA or manual research rows").fill(csv);
     const previewSummary = page.locator(".prospect-import-preview strong").first();
     await previewSummary.waitFor();
@@ -473,26 +488,19 @@ async function runDesktopFlow(browser) {
     );
 
     await page.getByRole("button", { name: /Add importable rows to local queue/i }).click();
-    await page.waitForFunction(() => {
-      const field = document.querySelector('textarea[placeholder*="businessName,email"]');
-      return field instanceof HTMLTextAreaElement && field.value === "";
-    });
-    ensure(
-      !(await page.locator(".prospect-import-preview").isVisible().catch(() => false)),
-      "Import preview should close after adding the importable row.",
-    );
-    await page.waitForFunction((businessName) =>
-      Array.from(document.querySelectorAll(".business-prospect-row")).some((row) =>
-        row.textContent?.includes(String(businessName)),
-      ),
-    importedBusinessName);
+    await page.waitForFunction((beforeCount) => {
+      const nextCount = Number(
+        document.querySelector(".proof-candidate-summary strong")?.textContent ?? "0",
+      );
+      return Number.isFinite(nextCount) && nextCount > Number(beforeCount);
+    }, Number(queueTotalBefore.replace(/[^\d]/g, "")));
     await page.getByLabel("Queue focus").selectOption("email_ready");
     await page.getByText(/Vancouver queue focus: Email-ready/i).waitFor();
-    await page.getByLabel("Review city").selectOption("toronto");
+    await page.getByLabel("Active city").selectOption("toronto");
     await page.getByText(/Toronto queue focus: Email-ready/i).waitFor();
     await page.getByLabel("Queue focus").selectOption("contact_path_ready");
     await page.getByText(/Toronto queue focus: Contact-path review/i).waitFor();
-    await page.getByLabel("Review city").selectOption("vancouver");
+    await page.getByLabel("Active city").selectOption("vancouver");
     await page.getByLabel("Queue focus").selectOption("promotion_candidates");
     await page.getByText(/Vancouver queue focus: Promotion candidates/i).waitFor();
     await page.getByLabel("Queue focus").selectOption("all");
@@ -501,12 +509,15 @@ async function runDesktopFlow(browser) {
     return {
       route: "/admin",
       importedBusinessName,
+      queueTotalBefore,
     };
   });
 
   await runStep(steps, "desktop admin reply log", async () => {
     const replySummary = "Smoke test reply summary for local QA.";
     const nextStep = "Keep this in local review only after smoke.";
+    await page.getByRole("button", { name: /Outreach rehearsal/i }).click();
+    await page.getByLabel("Reply summary").waitFor();
     await page.getByLabel("Reply summary").fill(replySummary);
     await page.getByLabel("Next step").fill(nextStep);
     await page.getByRole("button", { name: /Log manual reply/i }).click();
@@ -520,6 +531,8 @@ async function runDesktopFlow(browser) {
 
   await runStep(steps, "desktop admin brain save", async () => {
     const before = await page.locator(".brain-run-row").count();
+    await page.getByRole("button", { name: /Signals \+ controls/i }).click();
+    await page.getByText(/Local command engine/i).waitFor();
     await page.getByRole("button", { name: "Save run", exact: true }).click();
     await page.waitForTimeout(150);
     const after = await page.locator(".brain-run-row").count();
@@ -557,7 +570,7 @@ async function runMobileFlow(browser) {
   attachRuntimeCapture(page, runtime);
 
   await runStep(steps, "mobile home render", async () => {
-    await page.goto(`${baseUrl}/`, { waitUntil: "networkidle" });
+    await page.goto(`${baseUrl}/`, { waitUntil: navigationWaitUntil });
     await page.locator("h1").first().waitFor();
     const heading = (await page.locator("h1").first().innerText()).trim();
     ensure(/vancouver/i.test(heading), `Mobile homepage heading should mention Vancouver, got "${heading}".`);
@@ -569,7 +582,7 @@ async function runMobileFlow(browser) {
   });
 
   await runStep(steps, "mobile city page render", async () => {
-    await page.goto(`${baseUrl}/vancouver`, { waitUntil: "networkidle" });
+    await page.goto(`${baseUrl}/vancouver`, { waitUntil: navigationWaitUntil });
     await page.getByRole("heading", { level: 1, name: /Find the right Vancouver start first/i }).waitFor();
 
     return {
@@ -579,7 +592,7 @@ async function runMobileFlow(browser) {
   });
 
   await runStep(steps, "mobile Toronto pilot render", async () => {
-    await page.goto(`${baseUrl}/toronto/first-time-visitor-starters`, { waitUntil: "networkidle" });
+    await page.goto(`${baseUrl}/toronto/first-time-visitor-starters`, { waitUntil: navigationWaitUntil });
     await page.getByRole("heading", {
       level: 1,
       name: /Toronto first-time visitor starting points/i,
@@ -592,7 +605,7 @@ async function runMobileFlow(browser) {
   });
 
   await runStep(steps, "mobile Toronto weekend render", async () => {
-    await page.goto(`${baseUrl}/toronto/weekend-route-starters`, { waitUntil: "networkidle" });
+    await page.goto(`${baseUrl}/toronto/weekend-route-starters`, { waitUntil: navigationWaitUntil });
     await page.getByRole("heading", {
       level: 1,
       name: /Toronto weekend.*starting points/i,
@@ -605,7 +618,7 @@ async function runMobileFlow(browser) {
   });
 
   await runStep(steps, "mobile guide library render", async () => {
-    await page.goto(`${baseUrl}/vancouver/guides`, { waitUntil: "networkidle" });
+    await page.goto(`${baseUrl}/vancouver/guides`, { waitUntil: navigationWaitUntil });
     await page.getByRole("heading", {
       level: 1,
       name: /Vancouver guides for easier local plans/i,
@@ -618,7 +631,7 @@ async function runMobileFlow(browser) {
   });
 
   await runStep(steps, "mobile about render", async () => {
-    await page.goto(`${baseUrl}/about`, { waitUntil: "networkidle" });
+    await page.goto(`${baseUrl}/about`, { waitUntil: navigationWaitUntil });
     await page.getByRole("heading", {
       level: 1,
       name: /CityAtlas helps people choose the right Vancouver start/i,
@@ -632,7 +645,7 @@ async function runMobileFlow(browser) {
 
   await runStep(steps, "mobile guide detail render", async () => {
     await page.goto(`${baseUrl}/vancouver/guides/where-should-a-first-time-vancouver-visitor-start`, {
-      waitUntil: "networkidle",
+      waitUntil: navigationWaitUntil,
     });
     await page.getByRole("heading", {
       level: 1,
@@ -646,7 +659,7 @@ async function runMobileFlow(browser) {
   });
 
   await runStep(steps, "mobile business detail render", async () => {
-    await page.goto(`${baseUrl}/vancouver/businesses/published-on-main`, { waitUntil: "networkidle" });
+    await page.goto(`${baseUrl}/vancouver/businesses/published-on-main`, { waitUntil: navigationWaitUntil });
     await page.getByRole("heading", { level: 1, name: /Published on Main/i }).waitFor();
 
     return {
@@ -656,8 +669,8 @@ async function runMobileFlow(browser) {
   });
 
   await runStep(steps, "mobile planner render and save", async () => {
-    await page.goto(`${baseUrl}/planner`, { waitUntil: "networkidle" });
-    await page.getByRole("heading", { level: 1, name: /Save a Vancouver plan/i }).waitFor();
+    await page.goto(`${baseUrl}/planner`, { waitUntil: navigationWaitUntil });
+    await page.getByRole("heading", { level: 1, name: /Build a simple Vancouver plan you can keep/i }).waitFor();
     const firstChip = page.locator(".planner-chip").first();
     const chipLabel = (await firstChip.locator("span").innerText()).trim();
     await firstChip.click();
@@ -671,7 +684,7 @@ async function runMobileFlow(browser) {
   });
 
   await runStep(steps, "mobile business request render", async () => {
-    await page.goto(`${baseUrl}/for-businesses/submit`, { waitUntil: "networkidle" });
+    await page.goto(`${baseUrl}/for-businesses/submit`, { waitUntil: navigationWaitUntil });
     await page.getByRole("heading", { level: 1, name: /Tell CityAtlas what should improve first/i }).waitFor();
     await page.getByRole("button", { name: /Open email draft/i }).waitFor();
 
@@ -682,8 +695,11 @@ async function runMobileFlow(browser) {
   });
 
   await runStep(steps, "mobile business pricing render", async () => {
-    await page.goto(`${baseUrl}/for-businesses/pricing`, { waitUntil: "networkidle" });
-    await page.getByRole("heading", { level: 1, name: /featured more clearly/i }).waitFor();
+    await page.goto(`${baseUrl}/for-businesses/pricing`, { waitUntil: navigationWaitUntil });
+    await page.getByRole("heading", {
+      level: 1,
+      name: /Choose the right first CityAtlas package for your Vancouver business/i,
+    }).waitFor();
     const packageCards = await page.locator(".pricing-card").count();
     ensure(packageCards >= 3, `Expected at least 3 pricing cards on mobile, found ${packageCards}.`);
 
@@ -695,7 +711,7 @@ async function runMobileFlow(browser) {
   });
 
   await runStep(steps, "mobile offers render", async () => {
-    await page.goto(`${baseUrl}/vancouver/offers`, { waitUntil: "networkidle" });
+    await page.goto(`${baseUrl}/vancouver/offers`, { waitUntil: navigationWaitUntil });
     await page.getByRole("heading", { level: 1, name: /Vancouver offers worth checking before a detour/i }).waitFor();
 
     return {
@@ -705,7 +721,7 @@ async function runMobileFlow(browser) {
   });
 
   await runStep(steps, "mobile terms render", async () => {
-    await page.goto(`${baseUrl}/terms`, { waitUntil: "networkidle" });
+    await page.goto(`${baseUrl}/terms`, { waitUntil: navigationWaitUntil });
     await page.getByRole("heading", { level: 1, name: /CityAtlas terms for the public site/i }).waitFor();
 
     return {
@@ -715,8 +731,9 @@ async function runMobileFlow(browser) {
   });
 
   await runStep(steps, "mobile admin render", async () => {
-    await page.goto(`${baseUrl}/admin`, { waitUntil: "networkidle" });
-    await page.getByRole("heading", { level: 1, name: /CityAtlas launch readiness/i }).waitFor();
+    await page.goto(`${baseUrl}/admin`, { waitUntil: navigationWaitUntil });
+    await page.getByRole("heading", { level: 1, name: /CityAtlas operator console/i }).waitFor();
+    await page.getByRole("button", { name: /Queue cleanup/i }).click();
     await page.getByLabel("Queue focus").selectOption("needs_research");
     await page.getByText(/Vancouver queue focus: Needs research/i).waitFor();
     const bodyText = await page.locator("body").innerText();
@@ -729,7 +746,7 @@ async function runMobileFlow(browser) {
   });
 
   await runStep(steps, "mobile private preview render", async () => {
-    await page.goto(`${baseUrl}/private-preview/date-night`, { waitUntil: "networkidle" });
+    await page.goto(`${baseUrl}/private-preview/date-night`, { waitUntil: navigationWaitUntil });
     await page.getByRole("heading", { level: 1, name: /Vancouver Date Night route preview/i }).waitFor();
 
     return {

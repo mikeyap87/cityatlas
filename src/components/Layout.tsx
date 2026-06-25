@@ -100,6 +100,7 @@ export function PublicLayout({ children, path }: LayoutProps) {
           <AppLink to="/vancouver">Vancouver discovery</AppLink>
           <AppLink to="/for-businesses/submit">Submit a business</AppLink>
           <AppLink to="/for-businesses/pricing">Partner packages</AppLink>
+          <AppLink to="/for-businesses/partner-preview">Partner preview</AppLink>
           <AppLink to="/vancouver/missions">City missions</AppLink>
           <AppLink to="/planner">Planner</AppLink>
           <AppLink to="/editorial-standards">Editorial standards</AppLink>

@@ -57,6 +57,14 @@ export function SubmitBusinessPage({ data, onSubmitBusiness }: SubmitBusinessPag
             Early access note: this request is saved in this browser while CityAtlas finishes live
             business intake. Nothing is billed, published, or contacted from this form.
           </p>
+          <div className="hero-actions">
+            <AppLink className="button secondary" to="/for-businesses/partner-preview">
+              See partner preview
+            </AppLink>
+            <AppLink className="button secondary" to="/for-businesses/pricing">
+              Compare packages
+            </AppLink>
+          </div>
         </div>
         <SafeModeNotice />
       </section>
@@ -200,6 +208,9 @@ export function SubmitBusinessPage({ data, onSubmitBusiness }: SubmitBusinessPag
           </div>
           <AppLink className="text-link" to="/for-businesses/pricing">
             Back to packages <ArrowRightIcon />
+          </AppLink>
+          <AppLink className="text-link" to="/for-businesses/partner-preview">
+            See partner preview <ArrowRightIcon />
           </AppLink>
         </aside>
       </section>

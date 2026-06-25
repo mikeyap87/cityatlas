@@ -116,6 +116,14 @@ export function getRouteMeta(
       type: "website",
     };
   }
+  if (path === "/for-businesses/partner-preview") {
+    return {
+      title: "CityAtlas Partner Preview For Local Businesses",
+      description:
+        "A clear CityAtlas partner preview explaining the free review, complimentary hosted meal or service ask, example feature format, and optional paid package path for Vancouver and Greater Vancouver businesses.",
+      type: "website",
+    };
+  }
   if (path === "/about") {
     return {
       title: "About CityAtlas | Vancouver Local Discovery",
@@ -415,6 +423,24 @@ const pricingFaqEntries = [
   },
 ];
 
+const partnerPreviewFaqEntries = [
+  {
+    question: "Is the first CityAtlas partner step paid?",
+    answer:
+      "No. The first step is a free fit review and preview conversation. Paid packages can be discussed later, but checkout is not active and payment is not required for first review.",
+  },
+  {
+    question: "What does CityAtlas ask for if the preview is a fit?",
+    answer:
+      "If both sides want to move ahead, the normal first partnership ask is a complimentary hosted meal, service, visit, walkthrough, or offering for Michael and one guest so the feature can be built from real experience.",
+  },
+  {
+    question: "Does CityAtlas guarantee traffic or bookings?",
+    answer:
+      "No. CityAtlas can explain a clearer route, guide, or service angle, but it does not guarantee traffic, rankings, bookings, or automatic publication.",
+  },
+];
+
 export function buildJsonLd(
   path: string,
   data: CityAtlasData,
@@ -710,6 +736,52 @@ export function buildJsonLd(
         "@type": "FAQPage",
         "@id": `${baseUrl}/for-businesses/pricing#faq`,
         mainEntity: pricingFaqEntries.map((entry) => ({
+          "@type": "Question",
+          name: entry.question,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: entry.answer,
+          },
+        })),
+      },
+    );
+  }
+
+  if (path === "/for-businesses/partner-preview") {
+    graph.push(
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${baseUrl}/for-businesses/partner-preview#breadcrumbs`,
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "CityAtlas",
+            item: `${baseUrl}/`,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Partner Preview",
+            item: `${baseUrl}/for-businesses/partner-preview`,
+          },
+        ],
+      },
+      {
+        "@type": "WebPage",
+        "@id": `${baseUrl}/for-businesses/partner-preview#webpage`,
+        url: `${baseUrl}/for-businesses/partner-preview`,
+        name: "CityAtlas Partner Preview For Local Businesses",
+        description: meta.description,
+        about: {
+          "@type": "Thing",
+          name: "Local business partner preview",
+        },
+      },
+      {
+        "@type": "FAQPage",
+        "@id": `${baseUrl}/for-businesses/partner-preview#faq`,
+        mainEntity: partnerPreviewFaqEntries.map((entry) => ({
           "@type": "Question",
           name: entry.question,
           acceptedAnswer: {

@@ -68,6 +68,7 @@ Protected operations and submission routes stay out of search.
 - `/toronto/guides/how-to-build-a-toronto-weekend-route-without-crossing-the-city-all-day`
 - `/vancouver/missions` - saveable city routes
 - `/for-businesses/pricing` - business visibility packages with review-first billing
+- `/for-businesses/partner-preview` - business partner preview explaining free review, hosted experience, and optional package path
 - `/editorial-standards` - public source policy, correction path, and removal-review route
 - `/terms` - current public terms
 - `/privacy` - current public privacy and data posture

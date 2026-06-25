@@ -35,6 +35,9 @@ export function PricingPage({ data }: PricingPageProps) {
             <AppLink className="button secondary" to="/editorial-standards">
               Review standards
             </AppLink>
+            <AppLink className="button secondary" to="/for-businesses/partner-preview">
+              Partner preview
+            </AppLink>
           </div>
         </div>
         <SafeModeNotice />
@@ -157,6 +160,14 @@ export function PricingPage({ data }: PricingPageProps) {
               It means clearer guide placement, better route fit, source-backed starter context,
               mission sponsorship angles, and stronger city-facing presentation. It does not mean
               traffic guarantees, fake rankings, or automatic publication.
+            </p>
+          </article>
+          <article className="source-panel conversion-panel">
+            <h2>What does CityAtlas need from a partner first?</h2>
+            <p>
+              The first yes is not payment. If the preview is a fit, CityAtlas asks for a
+              complimentary hosted meal, service, visit, or offering for Michael and one guest so
+              the feature can be accurate.
             </p>
           </article>
         </div>

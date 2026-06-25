@@ -208,6 +208,22 @@ async function runDesktopFlow(browser) {
     };
   });
 
+  await runStep(steps, "desktop partner preview render", async () => {
+    await page.goto(`${baseUrl}/for-businesses/partner-preview`, { waitUntil: "networkidle" });
+    await page.getByRole("heading", { level: 1, name: /What CityAtlas needs from a local partner/i }).waitFor();
+    const bodyText = await page.locator("body").innerText();
+    ensure(
+      /complimentary hosted meal, service, visit, or offering/i.test(bodyText),
+      "Partner preview did not explain the complimentary hosted experience ask.",
+    );
+    ensure(/No pressure, no traffic promises, no fake approval/i.test(bodyText), "Partner preview did not render the honesty section.");
+
+    return {
+      route: "/for-businesses/partner-preview",
+      screenshot: await saveScreenshot(page, "desktop-partner-preview.png"),
+    };
+  });
+
   await runStep(steps, "desktop private preview render", async () => {
     await page.goto(`${baseUrl}/private-preview/date-night`, { waitUntil: "networkidle" });
     await page.getByRole("heading", { level: 1, name: /Vancouver Date Night route preview/i }).waitFor();
@@ -387,6 +403,21 @@ async function runMobileFlow(browser) {
     return {
       route: "/for-businesses/submit",
       screenshot: await saveScreenshot(page, "mobile-business-submit.png"),
+    };
+  });
+
+  await runStep(steps, "mobile partner preview render", async () => {
+    await page.goto(`${baseUrl}/for-businesses/partner-preview`, { waitUntil: "networkidle" });
+    await page.getByRole("heading", { level: 1, name: /What CityAtlas needs from a local partner/i }).waitFor();
+    const bodyText = await page.locator("body").innerText();
+    ensure(
+      /complimentary hosted meal, service, visit, or offering/i.test(bodyText),
+      "Mobile partner preview did not explain the complimentary hosted experience ask.",
+    );
+
+    return {
+      route: "/for-businesses/partner-preview",
+      screenshot: await saveScreenshot(page, "mobile-partner-preview.png"),
     };
   });
 

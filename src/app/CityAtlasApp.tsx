@@ -10,6 +10,7 @@ import {
   siteConfig,
 } from "../config/site";
 import { AdminConsole } from "../features/admin/AdminConsole";
+import { PartnerPreviewPage } from "../features/business/PartnerPreviewPage";
 import { PricingPage } from "../features/business/PricingPage";
 import { SubmitBusinessPage } from "../features/business/SubmitBusinessPage";
 import { PrivacyPage, TermsPage } from "../features/legal/LegalPages";
@@ -217,6 +218,9 @@ export function CityAtlasApp() {
     }
     if (path === "/for-businesses/pricing") {
       return <PricingPage data={data} />;
+    }
+    if (path === "/for-businesses/partner-preview") {
+      return <PartnerPreviewPage data={data} onTrack={actions.trackEvent} />;
     }
     if (path === "/for-businesses/submit") {
       return <SubmitBusinessPage data={data} onSubmitBusiness={actions.addBusinessSubmission} />;

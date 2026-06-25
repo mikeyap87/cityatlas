@@ -196,6 +196,13 @@ const checks = [
     expectedItemCountLabel: "packages",
     minFaqQuestions: 3,
   },
+  {
+    path: "/for-businesses/partner-preview",
+    label: "Business partner preview page",
+    requiredTypes: ["BreadcrumbList", "WebPage", "FAQPage"],
+    expectedRobots: "index",
+    minFaqQuestions: 3,
+  },
   ...guideChecks,
   ...sourceBackedChecks,
   ...routingGuideChecks,

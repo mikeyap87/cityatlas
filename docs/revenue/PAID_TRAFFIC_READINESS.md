@@ -33,7 +33,7 @@ Keep these as three separate decisions:
 - Tiny paid-traffic test: allowed only as a small request-first test into reviewed business requests. Judge it on qualified request quality, campaign attribution, and whether the owner can follow up manually.
 - Local CRO attribution hardening: prepared and locally proven in the current clean CRO release lane, but not deployed yet. It needs exact production-deploy approval and hosted proof before the live site depends on it.
 - Local route-map CRO hardening: prepared and locally proven across direct route pages, route chooser pages, desktop, and mobile, including suggested route windows and per-stop duration guidance, but not yet hosted on the approved domain from this lane.
-- Google Maps embedded previews: code-ready and verifier-ready, but not provider-ready. The normal `Open route in Google Maps` links require no Google API key; the optional on-page iframe previews require a restricted Maps Embed API key, and Google Cloud access for `univenturestudio@gmail.com` is currently blocked until 2-step verification is completed.
+- Google Maps embedded previews: code-ready and verifier-ready, but not provider-ready. The normal `Open route in Google Maps` links require no Google API key; the optional on-page iframe previews require a restricted Maps Embed API key. Google account 2-step verification is now complete and a clean `CityAtlas` Google Cloud project exists at project id `cityatlas-501120`, but Maps Embed API enablement is currently blocked by Google's card/free-trial verification step.
 - Real City Partner checkout proof: a separate live-money proof. It should not be treated as done just because the pricing page shows Stripe links or because the checkout page opens.
 
 Do not combine those decisions in one claim. CityAtlas can be locally ready for a request-first paid-traffic packet while still needing an approved release for the latest attribution hardening and a separate real checkout proof before self-serve charging claims.
@@ -62,7 +62,7 @@ Do not combine those decisions in one claim. CityAtlas can be locally ready for 
 - Qualified-request quality is still unproven with real business traffic.
 - The latest campaign-context improvement is proven locally but not deployed yet.
 - The latest route-map CRO improvement is proven locally but not deployed yet.
-- On-page embedded Google map previews are not live yet. Google Cloud is blocked by 2-step verification on `univenturestudio@gmail.com`, so the restricted production Maps Embed API key has not been created, installed in Vercel, or hosted-smoked.
+- On-page embedded Google map previews are not live yet. Google Cloud now has the clean `CityAtlas` project, but Maps Embed API enablement is blocked by Google's card/free-trial verification step, so the restricted production Maps Embed API key has not been created, installed in Vercel, or hosted-smoked.
 - Hosted route-map proof still needs to pass after an approved deploy before paid traffic should depend on this new route UX.
 - The latest hosted analytics proof did not observe direct Google Analytics collect requests, so provider-side conversion receipt remains unverified before scaling spend.
 - Direct self-serve revenue is still unproven because the checkout handoff is now live, but a real successful City Partner checkout has not been proven yet.
@@ -104,8 +104,8 @@ This is the smallest honest paid-traffic launch packet:
 
 This is optional for the tiny request-first paid test because the current Google Maps directions links already work without an API key. It is required only before claiming embedded on-page Google route previews are live.
 
-1. Finish Google account 2-step verification for `univenturestudio@gmail.com`.
-2. In Google Cloud, use the CityAtlas/Univenture project or create a clean CityAtlas web project.
+1. Start from the clean Google Cloud `CityAtlas` project at project id `cityatlas-501120`.
+2. Complete Google's card/free-trial verification only if the owner approves that account step.
 3. Enable Maps Embed API only for this use case.
 4. Create a browser-visible API key and restrict it to the exact CityAtlas web referrers, including `https://city.univenturestudio.com/*` and the approved Vercel preview domains used for release proof.
 5. Restrict the same key to Maps Embed API only.

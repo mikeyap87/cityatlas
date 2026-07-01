@@ -10,14 +10,16 @@ Optional embedded on-page Google route previews are code-ready but not live. The
 
 ## Current Blocker
 
-Chrome was opened to Google Cloud with `univenturestudio@gmail.com`. Google Cloud access is blocked until 2-step verification is completed for that account. No Maps Embed API key was created, copied, installed, or deployed.
+Chrome was opened to Google Cloud with `univenturestudio@gmail.com`. Google account 2-step verification is complete, and a clean Google Cloud `CityAtlas` project now exists at project id `cityatlas-501120`.
+
+The remaining blocker is Google's card/free-trial verification step. The Maps Embed API enable flow redirected to "Verify your card to get started." No terms were accepted, no card or billing details were entered, and no Maps Embed API key was created, copied, installed, or deployed.
 
 Do not claim embedded on-page Google maps are live until this is resolved and hosted proof passes.
 
 ## Exact Setup Checklist
 
-1. Complete Google account 2-step verification for `univenturestudio@gmail.com`.
-2. Open Google Cloud Console and use a clean CityAtlas/Univenture web project.
+1. Use the clean Google Cloud `CityAtlas` project at project id `cityatlas-501120`.
+2. Complete Google's card/free-trial verification only after owner approval.
 3. Enable Maps Embed API only.
 4. Create a browser-visible API key.
 5. Add website application restrictions for:

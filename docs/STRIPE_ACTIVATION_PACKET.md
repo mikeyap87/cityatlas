@@ -1,71 +1,89 @@
-# Stripe Activation Packet
+# CityAtlas Stripe Activation Packet
 
-Date: 2026-06-14
+Date: 2026-06-25
+Re-anchored: 2026-07-01
 
-## Current State
+This packet is intentionally narrow. It now preserves the exact live Stripe payment-link truth, the env values that must stay wired, the first real checkout proof still required, and what remains out of scope.
 
-Stripe is not active in CityAtlas. The app has package framing, but no Stripe SDK, checkout route, payment link, subscription creation, invoice creation, or webhook handling.
+## 1) The Two Exact Live Stripe Payment Links That Must Exist
 
-## Recommended Stripe Model
+No third paid link is needed in this batch. `Community Listing` stays free and review-first.
 
-Use Stripe Billing with Checkout Sessions for subscriptions.
+- `CityAtlas City Partner`
+  - Stripe account: `acct_1TWOnaI27jKwwm3H`
+  - live product: `prod_UlpKqAPmxKrw1A`
+  - live recurring price: `price_1TmLDBI27jKwwm3H1gUFgwU6`
+  - expected offer shown to the buyer: `$49.00 CAD / month`
+  - live payment link: `https://buy.stripe.com/28EaEXazm3Vc9J27KJcAo01`
 
-Why:
+- `CityAtlas Signature Partner`
+  - Stripe account: `acct_1TWOnaI27jKwwm3H`
+  - live product: `prod_UlsHzdgsuSlgll`
+  - live recurring price: `price_1TmLHII27jKwwm3HVtE0CtqB`
+  - expected offer shown to the buyer: `$149.00 CAD / month`
+  - live payment link: `https://buy.stripe.com/dRmfZhfTG0J01cw4yxcAo00`
 
-- CityAtlas is a recurring local-business visibility product.
-- Stripe Billing handles renewals, retries, dunning, and subscription state.
-- Checkout avoids building custom card handling.
-- Customer Portal can later manage upgrades, cancellations, and payment methods.
+Local public-checkout verification from this lane confirmed the first link renders `CityAtlas City Partner` and the second renders `CityAtlas Signature Partner`. In a US-locale browser, Stripe currently shows a localized USD amount first with a visible CAD toggle, but the links map to the correct CityAtlas packages above.
 
-Accepted planner guide: `iguide_61UrTo5VgsUwF5Cth41I27jKwwm3H`
+## 2) Historical Dashboard Steps Used To Create Them
 
-Chosen path:
+1. Sign in to the live Univenture Stripe dashboard for account `acct_1TWOnaI27jKwwm3H`.
+2. Stay in live mode, not test mode.
+3. Open `https://dashboard.stripe.com/acct_1TWOnaI27jKwwm3H/payment-links`.
+4. Click `Create payment link`.
+5. In `Find or add a product...`, choose the existing product `CityAtlas City Partner`.
+6. From its existing price choices, select `$49.00 CAD / month` for live price `price_1TmLDBI27jKwwm3H1gUFgwU6`.
+7. Do not create a new product. Do not choose a USD price. Do not use any test-mode object.
+8. Click `Create link`.
+9. Copy the resulting live `buy.stripe.com/...` URL and save it as the `City Partner` payment link.
+10. Repeat steps 4 through 9 for `CityAtlas Signature Partner`, selecting `$149.00 CAD / month` for live price `price_1TmLHII27jKwwm3HVtE0CtqB`.
 
-- Web subscription product.
-- Fixed monthly prices, not usage-based or seat-based.
-- Stripe-hosted Checkout for first paid activation.
-- Stripe-hosted Customer Portal later for self-service changes.
-- Stripe automatic payment recovery defaults.
-- No live checkout links, invoices, subscriptions, or payment acceptance in this batch.
+If an extension popup or extra Chrome UI is sitting on the Stripe page, dismiss that first, then continue the same steps above.
 
-## Draft Product Catalog
+## 3) The Exact Three Local Env Values To Wire Afterward
 
-Use `stripe/products.review.json` as the local review manifest. Do not create these in Stripe until approved.
+```bash
+VITE_CITYATLAS_ENABLE_LIVE_PAYMENTS=true
+VITE_STRIPE_CITY_PARTNER_PAYMENT_LINK=https://buy.stripe.com/28EaEXazm3Vc9J27KJcAo01
+VITE_STRIPE_SIGNATURE_PARTNER_PAYMENT_LINK=https://buy.stripe.com/dRmfZhfTG0J01cw4yxcAo00
+```
 
-| Product | Price | Billing | Purpose |
-| --- | ---: | --- | --- |
-| CityAtlas Community Listing | $0 | Free/manual | Basic review queue and source metadata |
-| CityAtlas City Partner | $49/month | Monthly subscription | First paid package to validate |
-| CityAtlas Signature Partner | $149/month | Monthly subscription | Premium anchor package |
+With those three values wired, the local proof command should pass:
 
-## Required Before Creating Stripe Objects
+```bash
+npm run qa:payments:handoff
+```
 
-1. Owner approves package names and prices.
-2. Owner approves fulfillment promise.
-3. Owner approves refund/cancellation policy.
-4. Owner approves support process and response SLA.
-5. Owner approves whether Stripe objects are test-mode first or live-mode.
-6. Terms/privacy are reviewed.
-7. First proof sprint has at least 2 to 3 meaningful package yeses or strong hosted-collaboration intent.
-8. `npm run replies:analyze` has produced 2 to 3 qualified package-demand or hosted-collaboration signals.
-9. `docs/revenue/DATE_NIGHT_REVENUE_PROOF_LOOP.md` is updated with the logged demand signal and confidence level.
+The hosted proof command should also pass once the live site is actually serving the Stripe checkout CTAs:
 
-## Recommended First Activation
+```bash
+npm run qa:payments:hosted
+```
 
-Start with test-mode Stripe objects only:
+Hosted proof from this lane passes. The 2026-07-01 proof shows the public pricing page serving `Start City Partner checkout` and `Start Signature checkout` on `https://city.univenturestudio.com/for-businesses/pricing`, while still keeping City Partner, Signature, and general request-first paths visible beside checkout.
 
-- Product: `CityAtlas City Partner`
-- Price: `$49/month`
-- Checkout mode: subscription
-- Payment collection: test mode
-- Fulfillment: manual founder review and monthly visibility snapshot
+## 4) The One First Checkout Proof Still Required
 
-Only after test-mode proof should live-mode payment links or Checkout be enabled.
+This proof is not the same thing as a tiny request-first paid-traffic test. It is a live payment proof and needs explicit owner approval before the checkout is completed.
 
-## Approval Needed
+Complete one real live `CityAtlas City Partner` checkout after the three env values above are wired.
 
-This affects money/account state. It may create billing objects, checkout links, or subscription surfaces in Stripe. The rollback is to archive/deactivate test objects or disable payment links before sharing.
+The minimum honest proof is:
 
-Approval sentence:
+1. Start from a CityAtlas paid surface that opens the live Stripe-hosted checkout handoff.
+2. Confirm Stripe shows the correct live `CityAtlas City Partner` offer at `$49.00 CAD / month`.
+3. Complete the checkout successfully in live mode.
+4. Confirm Stripe created the live customer and live subscription against price `price_1TmLDBI27jKwwm3H1gUFgwU6`.
 
-`Approved: create CityAtlas Stripe test-mode products and prices from stripe/products.review.json only; do not enable live payment acceptance or publish checkout links yet.`
+Only after that first proof should CityAtlas be treated as honestly charge-ready for the paid handoff.
+
+## 5) What Remains Out Of Scope
+
+- any custom in-app checkout backend
+- Stripe webhooks
+- invoice automation
+- Stripe customer portal work
+- automated fulfillment or onboarding after payment
+- broader public claims of mature self-serve billing beyond the first live proof
+- future US-city pricing or currency rollout work
+- any deploy, push, provider write, or public claim from this local-only lane

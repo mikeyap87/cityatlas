@@ -1,8 +1,8 @@
 # CityAtlas Readiness Progress
 
-Generated: 2026-06-22T04:00:57.400Z
+Generated: 2026-07-01T05:45:20.427Z
 
-Average module progress: 90%
+Average module progress: 92%
 
 ## SEO Content Machine Proof
 
@@ -21,17 +21,19 @@ Average module progress: 90%
 | Date Night proof sprint | 96% | Wedge, candidate queue, private preview, proof docs, generated 10-prospect packet, contact-path research, shadow outreach ranking, first six owner-approved manual direct-email sends, live-send ledger, and reply response kit. | Reply evidence, bounce/wrong-contact review, held contact-path confirmation, and any separately approved follow-up batch. | Monitor Gmail for replies and bounces, log outcomes in /admin, then run npm run replies:analyze before approving any follow-up or second batch. |
 | Founder CRM | 93% | Candidate scoring, source links, route angles, contact-path confidence tags, shadow send/no-send roles, reply tracker with bounce logging, sent-ledger artifact, first manual send statuses in the admin seed state, and response templates. | Real reply history, objection clustering, bounce handling, follow-up reminders, and held contact confirmation. | Use the admin reply tracker or CSV template as replies arrive, then run npm run replies:analyze. |
 | AI Brain | 92% | Local command engine, QA checks, saved Brain Runs, readiness report, hosted-domain proof awareness, contact-readiness checks, package-demand signal checks, shadow-mode outreach decisioning, post-send monitoring state, and bounce/wrong-contact repair recommendations. | Real reply-based learning, outcome comparison against owner picks, provider-backed summaries after approval. | Compare the generated shadow ranking against logged reply outcomes after the first manual batch. |
-| Revenue system | 76% | Package framing, draft terms/privacy, Stripe product manifest, payment gate, accepted Stripe Billing/Checkout plan, Date Night revenue proof loop, and reply-summary command. | Demand proof, refund policy, Stripe test-mode object creation, checkout proof. | Wait for 2 to 3 qualified package-demand signals in the reply summary before creating Stripe test-mode products. |
-| Launch infrastructure | 96% | Univenture folder, Vercel project, public alias, protected preview, hosted route flags, Cloudflare DNS, Vercel alias, HTTPS certificate, custom-domain smoke, and public crawlable robots release. | Production analytics/observability approval and ongoing crawl/index monitoring. | Keep admin/private-preview protected, monitor crawl behavior, and publish stronger source-backed pages. |
+| Revenue system | 92% | Package framing, draft terms/privacy, Stripe product manifest, accepted Stripe Billing/Checkout plan, live CAD pricing, confirmed live CityAtlas product and recurring price IDs, live Stripe-hosted payment links for both paid packages, local live-payment env wiring, env-gated payment-link handoff support on the public business funnel, local payment-handoff verification, hosted payment-handoff verification, public pricing-page checkout CTA cutover on the approved domain, local request-copy campaign-attribution proof, Date Night revenue proof loop, and reply-summary command. | Final refund policy, one real checkout proof, clean hosted proof after the latest local attribution hardening is released, and first real paid-click quality review. | Keep the tiny paid test request-first, prove one real City Partner checkout separately before self-serve charging claims, and rerun hosted proof after any approved release. |
+| Launch infrastructure | 96% | Univenture folder, Vercel project, public alias, protected preview, hosted route flags, Cloudflare DNS, Vercel alias, HTTPS certificate, custom-domain smoke, public crawlable robots release, and consent-gated hosted GA script/instrumentation proof. | Provider-side GA/Ads conversion receipt before scaling spend, clean release-lane proof before deploy, and ongoing crawl/index monitoring. | Keep admin/private-preview protected, rerun hosted analytics/payment proof after approved releases, and publish stronger source-backed pages. |
 | Data/source policy | 76% | Source policy, schema draft, privacy posture, fictional-data labels, source-backed proof packet, contact verification rules, official contact-path research, shadow-ranking guardrails, and lead-storage activation packet. | Approved provider, budget, import rights, correction/removal workflow, protected backend, hosted admin authentication. | Use the backend activation packet before approving Supabase/provider writes or durable lead storage. |
 
 ## Still Live-Blocked
 
-- Stripe product/price creation
+- first real live City Partner checkout proof
+- provider-side GA/Ads conversion receipt before scaling paid traffic
+- fresh clean release lane before any deploy or push
 - real provider import
 - additional customer outreach or follow-ups
 - public real-business publication
 
 ## Next Best Batch
 
-Use the first source-backed release packet for the local-ready first-time visitor and wellness queue, keep the second, Sunday, returning-visitor, and starter-pack queues isolated behind it, and leave hosted crawl/index claims unproven until a real deploy-and-smoke pass happens.
+Use a fresh release lane to carry the local attribution hardening through approved deploy proof, keep the first paid test tiny and request-first, and prove one real City Partner checkout separately before self-serve charging claims.

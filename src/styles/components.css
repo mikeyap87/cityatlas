@@ -233,6 +233,11 @@
   min-width: 0;
 }
 
+.home-mobile-hero-intro,
+.hero-mobile-image-caption {
+  display: none;
+}
+
 .hero-media {
   aspect-ratio: 2.34 / 1;
   border-radius: var(--radius-lg);
@@ -1174,6 +1179,51 @@
 
 .home-lane-card .query-card-hint {
   margin-top: 4px;
+}
+
+.featured-route-grid {
+  align-items: start;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.featured-route-card {
+  gap: 6px;
+  min-height: 0;
+  padding: 18px;
+}
+
+.featured-route-card-media {
+  aspect-ratio: 16 / 9;
+  background: rgba(202, 214, 207, 0.52);
+  border-radius: 14px;
+  margin-bottom: 4px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.featured-route-card-media img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.featured-route-card strong {
+  font-size: 0.96rem;
+  line-height: 1.22;
+}
+
+.featured-route-card p {
+  font-size: 0.84rem;
+  line-height: 1.42;
+  margin-top: 4px;
+}
+
+.featured-route-card .query-card-kicker,
+.featured-route-card .query-card-hint {
+  margin: 0;
 }
 
 .pricing-packages-section {
@@ -2238,18 +2288,18 @@
 }
 
 .city-hero-secondary h1,
-.source-backed-hero h1 {
+.official-source-hero h1 {
   max-width: 12.8ch;
 }
 
 .secondary-city-hero-tags,
-.source-backed-hero-tags {
+.official-source-hero-tags {
   gap: 8px;
   margin-top: 12px;
 }
 
 .secondary-city-summary-card,
-.source-backed-hero .starter-hero-side {
+.official-source-hero .starter-hero-side {
   align-self: start;
 }
 
@@ -2374,6 +2424,10 @@
   margin-top: 16px;
 }
 
+.guide-library-hero-copy {
+  gap: 14px;
+}
+
 .guide-library-side-stack {
   display: grid;
   gap: 12px;
@@ -2408,6 +2462,14 @@
   display: grid;
   gap: 8px;
   padding: 16px;
+}
+
+.guide-library-intro-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 4px;
 }
 
 .guide-library-intro-card-safe {
@@ -3607,8 +3669,86 @@
   color: var(--ink);
 }
 
+.pricing-choice-actions {
+  display: grid;
+  gap: 8px;
+  margin-top: auto;
+}
+
 .pricing-choice-card .button {
   margin-top: auto;
+}
+
+.pricing-choice-actions .button {
+  margin-top: 0;
+}
+
+.partner-preview-hero h1 {
+  max-width: 15ch;
+}
+
+.partner-step-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.partner-step-card {
+  display: grid;
+  gap: 8px;
+  min-height: 100%;
+  padding: 16px;
+}
+
+.partner-step-card > span {
+  align-items: center;
+  background: rgba(10, 94, 168, 0.08);
+  border: 1px solid rgba(10, 94, 168, 0.12);
+  border-radius: 999px;
+  color: var(--blue);
+  display: inline-flex;
+  font-size: 0.78rem;
+  font-weight: 860;
+  height: 30px;
+  justify-content: center;
+  width: 30px;
+}
+
+.partner-step-card strong {
+  font-size: 1rem;
+  line-height: 1.22;
+}
+
+.partner-step-card p,
+.partner-feature-block p {
+  margin: 0;
+}
+
+.partner-preview-example-section {
+  align-items: stretch;
+}
+
+.partner-preview-example-card {
+  min-height: 100%;
+}
+
+.partner-feature-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.partner-feature-block {
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+}
+
+.partner-feature-block h2 {
+  font-size: 1.1rem;
+  line-height: 1.12;
+  margin: 0;
+}
+
+.partner-preview-cta-band {
+  margin-top: 38px;
 }
 
 .guide-routing-card {
@@ -3667,6 +3807,20 @@
   display: grid;
   gap: 10px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.submission-helper-row {
+  align-items: center;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: auto 1fr;
+  margin-top: 12px;
+}
+
+.submission-helper-feedback {
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.42;
 }
 
 .submission-action-note {
@@ -5141,6 +5295,17 @@
   justify-content: flex-end;
 }
 
+.analytics-consent-privacy-link {
+  color: var(--ink);
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.analytics-consent-privacy-link:hover {
+  text-decoration: underline;
+}
+
 .footer-action-row {
   display: flex;
   flex-wrap: wrap;
@@ -5250,6 +5415,14 @@
   display: grid;
   gap: 12px;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.guide-fit-card {
+  align-content: start;
+}
+
+.guide-fit-card .tag-cloud {
+  margin-top: 4px;
 }
 
 .guide-router-grid {
@@ -5458,10 +5631,18 @@
 }
 
 .query-card-hint {
+  align-items: center;
   color: var(--blue);
+  display: inline-flex;
   font-size: 0.8rem;
   font-weight: 760;
+  gap: 8px;
   margin-top: 8px;
+}
+
+.query-card-hint svg {
+  height: 16px;
+  width: 16px;
 }
 
 .query-card-actions {

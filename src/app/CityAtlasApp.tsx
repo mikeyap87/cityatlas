@@ -27,6 +27,7 @@ function lazyNamed<TModule extends Record<string, unknown>>(
 
 const loadPricingPage = () => import("../features/business/PricingPage");
 const loadSubmitBusinessPage = () => import("../features/business/SubmitBusinessPage");
+const loadBusinessSupportPages = () => import("../features/business/BusinessSupportPages");
 const loadLegalPages = () => import("../features/legal/LegalPages");
 const loadAboutPage = () => import("../features/public/AboutPage");
 const loadBusinessPage = () => import("../features/public/BusinessPage");
@@ -47,6 +48,8 @@ const loadDateNightPreviewPage = buildFlags.hostedPrivatePreviewArtifacts
 
 const PricingPage = lazyNamed(loadPricingPage, "PricingPage");
 const SubmitBusinessPage = lazyNamed(loadSubmitBusinessPage, "SubmitBusinessPage");
+const PartnerPreviewPage = lazyNamed(loadBusinessSupportPages, "PartnerPreviewPage");
+const BookCallPage = lazyNamed(loadBusinessSupportPages, "BookCallPage");
 const PrivacyPage = lazyNamed(loadLegalPages, "PrivacyPage");
 const TermsPage = lazyNamed(loadLegalPages, "TermsPage");
 const AboutPage = lazyNamed(loadAboutPage, "AboutPage");
@@ -297,6 +300,12 @@ export function CityAtlasApp() {
           onTrack={actions.trackEvent}
         />
       );
+    }
+    if (path === "/for-businesses/partner-preview") {
+      return <PartnerPreviewPage onTrack={actions.trackEvent} />;
+    }
+    if (path === "/for-businesses/book-call") {
+      return <BookCallPage onTrack={actions.trackEvent} />;
     }
     if (path === "/private-preview/date-night") {
       if (!canRenderPrivatePreviewExperience()) {

@@ -1,5 +1,10 @@
 import { useEffect } from "react";
-import { siteConfig } from "../../config/site";
+import {
+  getPartnerPackageCheckoutLabel,
+  getPartnerPackageCheckoutUrl,
+  hasPartnerPackageCheckout,
+  siteConfig,
+} from "../../config/site";
 import type { CityAtlasData, PackageId } from "../../types";
 import { AppLink } from "../../components/Link";
 import { ArrowRightIcon, CheckIcon, LockIcon, ShieldIcon } from "../../components/Icons";
@@ -120,6 +125,13 @@ export function PricingPage({ data, onTrack }: PricingPageProps) {
     });
   }
 
+  function trackCheckoutClick(location: string, packageId: PackageId) {
+    onTrack("business_package_checkout_clicked", {
+      location,
+      packageId,
+    });
+  }
+
   return (
     <>
       <section className="pricing-hero pricing-hero-compact">
@@ -229,13 +241,26 @@ export function PricingPage({ data, onTrack }: PricingPageProps) {
               <p className="pricing-choice-note">
                 <strong>Best when:</strong> {getPackageBestFit(plan.name, plan.id)}
               </p>
-              <AppLink
-                className={plan.highlighted ? "button primary wide" : "button secondary wide"}
-                onClick={() => trackRequestClick("pricing_choice_card", plan.id)}
-                to={`/for-businesses/submit?package=${plan.id}`}
-              >
-                {getPackageCtaLabel(plan.id)}
-              </AppLink>
+              <div className="pricing-choice-actions">
+                <AppLink
+                  className={plan.highlighted ? "button primary wide" : "button secondary wide"}
+                  onClick={() => trackRequestClick("pricing_choice_card", plan.id)}
+                  to={`/for-businesses/submit?package=${plan.id}`}
+                >
+                  {getPackageCtaLabel(plan.id)}
+                </AppLink>
+                {hasPartnerPackageCheckout(plan.id) ? (
+                  <a
+                    className="button secondary wide"
+                    href={getPartnerPackageCheckoutUrl(plan.id)}
+                    onClick={() => trackCheckoutClick("pricing_choice_card", plan.id)}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    {getPartnerPackageCheckoutLabel(plan.id)}
+                  </a>
+                ) : null}
+              </div>
             </article>
           ))}
         </div>

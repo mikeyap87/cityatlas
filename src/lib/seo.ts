@@ -56,6 +56,7 @@ export function getRobotsDirectives(path: string) {
     path.startsWith("/private-preview") ||
     path === "/planner" ||
     path === "/for-businesses/submit" ||
+    path === "/for-businesses/book-call" ||
     path === "/vancouver/events" ||
     path === "/vancouver/offers" ||
     path.startsWith("/vancouver/businesses/")
@@ -172,6 +173,24 @@ export function getRouteMeta(
       description:
         "Share a Vancouver business and the kind of help you want first. Requests from this form stay on the current device for now.",
       type: "website",
+    };
+  }
+  if (path === "/for-businesses/partner-preview") {
+    return {
+      title: "How A CityAtlas Business Feature Starts | CityAtlas",
+      description:
+        "See how CityAtlas starts business visibility requests with a fit review before public publication, payment, or larger package work.",
+      type: "website",
+      imagePath: siteConfig.media.business,
+    };
+  }
+  if (path === "/for-businesses/book-call") {
+    return {
+      title: "Request A Short CityAtlas Business Call | CityAtlas",
+      description:
+        "Ask for a short CityAtlas business call after sharing the business category, neighborhood, and one clear local visibility goal.",
+      type: "website",
+      imagePath: siteConfig.media.business,
     };
   }
   if (path === "/admin") {

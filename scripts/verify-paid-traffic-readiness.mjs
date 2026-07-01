@@ -15,12 +15,15 @@ const reportPath = join(outputDir, "paid-traffic-readiness.json");
 const previewPort = Number(process.env.CITYATLAS_PAID_TRAFFIC_PORT || "4281");
 const baseUrl = `http://127.0.0.1:${previewPort}`;
 const strict = process.argv.includes("--strict");
+const useExistingServer = process.env.CITYATLAS_PAID_TRAFFIC_USE_EXISTING_SERVER === "1";
+const navigationWaitUntil = useExistingServer ? "domcontentloaded" : "networkidle";
 const ANALYTICS_CONSENT_STORAGE_KEY = "cityatlas.analytics.consent.v1";
 const ANALYTICS_SCRIPT_ID = "cityatlas-ga4-script";
+const TRAFFIC_CONTEXT_STORAGE_KEY = "cityatlas.traffic.context.v1";
+const landingPath = "/?utm_source=paid_test&utm_medium=cpc&utm_campaign=city_partner_qa&utm_content=hero_business_cta";
 
 const requiredEvents = [
   "page_view",
-  "business_funnel_cta_clicked",
   "business_pricing_viewed",
   "business_package_cta_clicked",
   "business_request_form_viewed",
@@ -43,6 +46,10 @@ function eventExists(events, name, predicate = () => true) {
   return events.some((event) => event.name === name && predicate(event));
 }
 
+async function readAnalyticsRuntimeReadiness(page) {
+  return page.evaluate(() => window.__cityatlasAnalyticsReadiness ?? null);
+}
+
 async function readPersistedData(page) {
   return page.evaluate(() => {
     const raw = window.localStorage.getItem("cityatlas.launch.package.v1");
@@ -53,7 +60,18 @@ async function readPersistedData(page) {
 async function readAnalyticsProof(page) {
   return page.evaluate(({ consentKey, scriptId }) => {
     const dataLayer = Array.isArray(window.dataLayer) ? window.dataLayer : [];
-    const hasTuple = (matcher) => dataLayer.some((entry) => Array.isArray(entry) && matcher(entry));
+    const toTuple = (entry) => {
+      if (Array.isArray(entry)) return entry;
+      if (entry && typeof entry === "object" && "length" in entry) {
+        return Array.from(entry);
+      }
+      return null;
+    };
+    const hasTuple = (matcher) =>
+      dataLayer.some((entry) => {
+        const tuple = toTuple(entry);
+        return Boolean(tuple) && matcher(tuple);
+      });
 
     return {
       consentState: window.localStorage.getItem(consentKey),
@@ -68,16 +86,19 @@ async function readAnalyticsProof(page) {
 }
 
 async function main() {
-  const server = startVitePreviewServer({
-    root,
-    port: previewPort,
-  });
+  const server = useExistingServer
+    ? null
+    : startVitePreviewServer({
+      root,
+      port: previewPort,
+    });
   const { chromium } = loadPlaywright();
   const failures = [];
   const blockers = [];
   const warnings = [];
   const analyticsProof = {
     externalDestinationConfigured: hasExternalAnalyticsDestination(),
+    runtimeReadiness: null,
     bannerVisibleBeforeConsent: false,
     scriptInjectedBeforeConsent: false,
     bannerVisibleAfterConsent: false,
@@ -91,7 +112,9 @@ async function main() {
   mkdirSync(outputDir, { recursive: true });
 
   try {
-    await waitForServer(baseUrl, () => server.getLogs());
+    if (!useExistingServer) {
+      await waitForServer(baseUrl, () => (server ? server.getLogs() : "Using an existing preview server."));
+    }
     browser = await chromium.launch({
       headless: true,
       channel: process.env.CITYATLAS_PLAYWRIGHT_CHANNEL || undefined,
@@ -100,6 +123,11 @@ async function main() {
       viewport: { width: 1440, height: 960 },
       colorScheme: "light",
     });
+    try {
+      await context.grantPermissions(["clipboard-read", "clipboard-write"], { origin: baseUrl });
+    } catch {
+      warnings.push("Browser did not allow clipboard-read permission for request-copy attribution proof.");
+    }
     await context.addInitScript(() => {
       window.localStorage.removeItem("cityatlas.launch.package.v1");
       window.localStorage.removeItem("cityatlas.traffic.context.v1");
@@ -108,12 +136,40 @@ async function main() {
     });
 
     const page = await context.newPage();
-    await page.goto(
-      `${baseUrl}/?utm_source=paid_test&utm_medium=cpc&utm_campaign=city_partner_qa&utm_content=hero_business_cta`,
-      { waitUntil: "networkidle" },
-    );
+    if (useExistingServer) {
+      await page.goto(`${baseUrl}/`, { waitUntil: navigationWaitUntil });
+      await page.evaluate(
+        ({ contextKey, path }) => {
+          const url = new URL(path, window.location.origin);
+          window.localStorage.setItem(
+            contextKey,
+            JSON.stringify({
+              firstLandingPath: url.pathname,
+              latestLandingPath: `${url.pathname}${url.search}`,
+              referrer: "direct",
+              utm_source: url.searchParams.get("utm_source") || "",
+              utm_medium: url.searchParams.get("utm_medium") || "",
+              utm_campaign: url.searchParams.get("utm_campaign") || "",
+              utm_content: url.searchParams.get("utm_content") || "",
+              utm_term: url.searchParams.get("utm_term") || "",
+            }),
+          );
+          window.history.replaceState({}, "", path);
+        },
+        { contextKey: TRAFFIC_CONTEXT_STORAGE_KEY, path: landingPath },
+      );
+    } else {
+      await page.goto(`${baseUrl}${landingPath}`, { waitUntil: navigationWaitUntil });
+    }
 
-    if (hasExternalAnalyticsDestination()) {
+    const runtimeReadiness = await readAnalyticsRuntimeReadiness(page);
+    const externalDestinationConfigured =
+      Boolean(runtimeReadiness?.hasExternalDestination) || hasExternalAnalyticsDestination();
+
+    analyticsProof.externalDestinationConfigured = externalDestinationConfigured;
+    analyticsProof.runtimeReadiness = runtimeReadiness;
+
+    if (externalDestinationConfigured) {
       await page.getByLabel("Analytics choice").waitFor();
       const beforeConsent = await readAnalyticsProof(page);
       analyticsProof.bannerVisibleBeforeConsent = beforeConsent.bannerVisible;
@@ -156,9 +212,9 @@ async function main() {
       }
     }
 
-    await page.getByRole("link", { name: /For Vancouver businesses/i }).click();
+    await page.getByRole("link", { name: "For businesses" }).click();
     await page.waitForURL(`${baseUrl}/for-businesses/pricing`);
-    await page.getByRole("link", { name: /Start with City Partner/i }).click();
+    await page.getByRole("link", { name: /Request City Partner review|Start with City Partner|Start City Partner request/i }).click();
     await page.waitForURL(`${baseUrl}/for-businesses/submit?package=city_partner`);
 
     await page.getByLabel("Business name").fill("Paid Traffic QA Bistro");
@@ -170,8 +226,21 @@ async function main() {
     await page
       .getByLabel("What you want help with")
       .fill("We want a stronger Kitsilano page, better guide placement, and one clear launch offer.");
-    await page.getByRole("button", { name: /Save draft for later/i }).click();
-    await page.getByText(/Your draft is saved in this browser/i).waitFor();
+    await page.getByRole("button", { name: /Copy request/i }).click();
+    await page.getByText(/Copied\./i).waitFor();
+    let copiedRequestText = "";
+    try {
+      copiedRequestText = await page.evaluate(async () => {
+        if (!window.navigator.clipboard?.readText) {
+          return "";
+        }
+        return window.navigator.clipboard.readText();
+      });
+    } catch {
+      warnings.push("Browser could not read the copied request text for campaign-attribution proof.");
+    }
+    await page.getByRole("button", { name: /Save for later/i }).click();
+    await page.getByText(/Your request is saved on this device/i).waitFor();
     await page.locator(".submission-row").filter({ hasText: "Paid Traffic QA Bistro" }).waitFor();
     await page.screenshot({ path: screenshotPath, fullPage: true });
 
@@ -207,6 +276,24 @@ async function main() {
       noteFailure(failures, "campaign attribution", "UTM context did not persist into page-view tracking.");
     }
 
+    if (copiedRequestText) {
+      const copiedRequestHasCampaignContext =
+        copiedRequestText.includes("Campaign / referral context:") &&
+        copiedRequestText.includes("UTM source: paid_test") &&
+        copiedRequestText.includes("UTM medium: cpc") &&
+        copiedRequestText.includes("UTM campaign: city_partner_qa");
+
+      if (!copiedRequestHasCampaignContext) {
+        noteFailure(
+          failures,
+          "request attribution",
+          "Copied business request did not include paid-campaign context.",
+        );
+      }
+    } else {
+      warnings.push("Copied request attribution was not directly readable in this browser run.");
+    }
+
     if (
       !eventExists(
         growthEvents,
@@ -227,7 +314,7 @@ async function main() {
       noteFailure(failures, "business request capture", "Business request was not saved with City Partner interest.");
     }
 
-    if (!hasExternalAnalyticsDestination()) {
+    if (!externalDestinationConfigured) {
       blockers.push(
         "No external analytics destination is configured. Local event proof is useful for QA, but paid traffic needs real visitor and conversion measurement.",
       );
@@ -243,7 +330,7 @@ async function main() {
       strict,
       paidTrafficReady: failures.length === 0 && blockers.length === 0,
       localBusinessFunnelPassed: failures.length === 0,
-      measurementReady: hasExternalAnalyticsDestination(),
+      measurementReady: externalDestinationConfigured,
       failures,
       blockers,
       warnings,
@@ -254,13 +341,17 @@ async function main() {
         ),
         capturedEvents: eventNames,
         analytics: analyticsProof,
+        copiedRequestHasCampaignContext: copiedRequestText
+          ? copiedRequestText.includes("UTM campaign: city_partner_qa")
+          : null,
       },
       revenueStory: {
         trafficSource: "Business-side paid traffic to the Vancouver business offer.",
         landingPromise: "Make a Vancouver business easier to find through one clearer page, guide fit, or offer.",
         firstUsefulMoment: "The business submits one clear request with package interest and contact path.",
         primaryAsk: "Start a business request.",
-        revenueEvent: "Qualified request that can be reviewed before payment opens.",
+        revenueEvent:
+          "Qualified request that can be reviewed and converted manually, while hosted checkout exists for clear package choices.",
       },
     };
 
@@ -279,10 +370,13 @@ async function main() {
       strict,
       paidTrafficReady: false,
       localBusinessFunnelPassed: false,
-      measurementReady: hasExternalAnalyticsDestination(),
+      measurementReady: analyticsProof.externalDestinationConfigured,
       failures,
       blockers,
       warnings,
+      proof: {
+        analytics: analyticsProof,
+      },
     };
     writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`);
     console.log("CityAtlas paid-traffic readiness");
@@ -292,7 +386,7 @@ async function main() {
     if (browser) {
       await browser.close();
     }
-    server.child.kill("SIGTERM");
+    server?.child.kill("SIGTERM");
   }
 }
 

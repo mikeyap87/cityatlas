@@ -404,6 +404,29 @@ async function runDesktopFlow(browser) {
     };
   });
 
+  await runStep(steps, "desktop partner preview render", async () => {
+    await page.goto(`${baseUrl}/for-businesses/partner-preview`, { waitUntil: navigationWaitUntil });
+    await page.getByRole("heading", {
+      level: 1,
+      name: /How a CityAtlas business feature starts/i,
+    }).waitFor();
+    const bodyText = await page.locator("body").innerText();
+    ensure(
+      /Review before publication|No instant public profile/i.test(bodyText),
+      "Partner preview did not render the request-first honesty boundary.",
+    );
+    const requestHref = await page.getByRole("link", { name: /Start business request/i }).first().getAttribute("href");
+    ensure(
+      Boolean(requestHref && requestHref.includes("/for-businesses/submit")),
+      `Partner preview should link back to the business request form. Got "${requestHref}".`,
+    );
+
+    return {
+      route: "/for-businesses/partner-preview",
+      screenshot: await saveScreenshot(page, "desktop-partner-preview.png"),
+    };
+  });
+
   await runStep(steps, "desktop terms render", async () => {
     await page.goto(`${baseUrl}/terms`, { waitUntil: navigationWaitUntil });
     await page.getByRole("heading", { level: 1, name: /CityAtlas terms for the public site/i }).waitFor();
@@ -447,8 +470,8 @@ async function runDesktopFlow(browser) {
     await page.getByLabel("Contact name").fill("Jordan");
     await page.getByLabel("Email").fill("hello@smoke-bistro.example");
     await page.getByLabel("What you want help with").fill("Smoke test request for local visibility help.");
-    await page.getByRole("button", { name: /Save draft for later/i }).click();
-    await page.getByText(/Your draft is saved in this browser/i).waitFor();
+    await page.getByRole("button", { name: /Save for later/i }).click();
+    await page.getByText(/Your request is saved on this device/i).waitFor();
     await page.locator(".submission-row").filter({ hasText: businessName }).waitFor();
 
     return {
@@ -733,7 +756,7 @@ async function runMobileFlow(browser) {
   await runStep(steps, "mobile business request render", async () => {
     await page.goto(`${baseUrl}/for-businesses/submit`, { waitUntil: navigationWaitUntil });
     await page.getByRole("heading", { level: 1, name: /Tell CityAtlas what should improve first/i }).waitFor();
-    await page.getByRole("button", { name: /Open email draft/i }).waitFor();
+    await page.getByRole("button", { name: /Email this request/i }).waitFor();
 
     return {
       route: "/for-businesses/submit",
@@ -755,6 +778,20 @@ async function runMobileFlow(browser) {
       route: "/for-businesses/pricing",
       packageCards,
       screenshot: await saveScreenshot(page, "mobile-business-pricing.png"),
+    };
+  });
+
+  await runStep(steps, "mobile partner preview render", async () => {
+    await page.goto(`${baseUrl}/for-businesses/partner-preview`, { waitUntil: navigationWaitUntil });
+    await page.getByRole("heading", {
+      level: 1,
+      name: /How a CityAtlas business feature starts/i,
+    }).waitFor();
+    await page.getByRole("link", { name: /Start business request/i }).first().waitFor();
+
+    return {
+      route: "/for-businesses/partner-preview",
+      screenshot: await saveScreenshot(page, "mobile-partner-preview.png"),
     };
   });
 

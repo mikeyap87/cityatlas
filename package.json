@@ -50,6 +50,8 @@
     "qa:smoke:local": "node scripts/verify-local-product-smoke.mjs",
     "qa:paid-traffic": "node scripts/verify-paid-traffic-readiness.mjs",
     "qa:paid-traffic:strict": "node scripts/verify-paid-traffic-readiness.mjs --strict",
+    "qa:payments:handoff": "node scripts/verify-live-payment-handoff.mjs",
+    "qa:payments:hosted": "node scripts/verify-hosted-payment-handoff.mjs",
     "qa:planner:summary": "node --experimental-strip-types --experimental-specifier-resolution=node scripts/verify-planner-save-summary.mjs",
     "seo:proof": "node --experimental-strip-types scripts/verify-seo-content-machine.mjs",
     "seo:structure:proof": "node --experimental-strip-types scripts/verify-seo-structure.mjs",

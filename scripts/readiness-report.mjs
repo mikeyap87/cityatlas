@@ -71,17 +71,17 @@ const modules = [
   },
   {
     name: "Revenue system",
-    progress: 76,
-    done: "Package framing, draft terms/privacy, Stripe product manifest, payment gate, accepted Stripe Billing/Checkout plan, Date Night revenue proof loop, and reply-summary command.",
-    remains: "Demand proof, refund policy, Stripe test-mode object creation, checkout proof.",
-    next: "Wait for 2 to 3 qualified package-demand signals in the reply summary before creating Stripe test-mode products.",
+    progress: 92,
+    done: "Package framing, draft terms/privacy, Stripe product manifest, accepted Stripe Billing/Checkout plan, live CAD pricing, confirmed live CityAtlas product and recurring price IDs, live Stripe-hosted payment links for both paid packages, local live-payment env wiring, env-gated payment-link handoff support on the public business funnel, local payment-handoff verification, hosted payment-handoff verification, public pricing-page checkout CTA cutover on the approved domain, local request-copy campaign-attribution proof, Date Night revenue proof loop, and reply-summary command.",
+    remains: "Final refund policy, one real checkout proof, clean hosted proof after the latest local attribution hardening is released, and first real paid-click quality review.",
+    next: "Keep the tiny paid test request-first, prove one real City Partner checkout separately before self-serve charging claims, and rerun hosted proof after any approved release.",
   },
   {
     name: "Launch infrastructure",
     progress: 96,
-    done: "Univenture folder, Vercel project, public alias, protected preview, hosted route flags, Cloudflare DNS, Vercel alias, HTTPS certificate, custom-domain smoke, and public crawlable robots release.",
-    remains: "Production analytics/observability approval and ongoing crawl/index monitoring.",
-    next: "Keep admin/private-preview protected, monitor crawl behavior, and publish stronger source-backed pages.",
+    done: "Univenture folder, Vercel project, public alias, protected preview, hosted route flags, Cloudflare DNS, Vercel alias, HTTPS certificate, custom-domain smoke, public crawlable robots release, and consent-gated hosted GA script/instrumentation proof.",
+    remains: "Provider-side GA/Ads conversion receipt before scaling spend, clean release-lane proof before deploy, and ongoing crawl/index monitoring.",
+    next: "Keep admin/private-preview protected, rerun hosted analytics/payment proof after approved releases, and publish stronger source-backed pages.",
   },
   {
     name: "Data/source policy",
@@ -105,6 +105,9 @@ const report = {
     privatePreview: has("src/features/private/DateNightPreviewPage.tsx"),
     aiBrain: has("src/lib/aiBrain.ts") && src.app.includes("onSaveBrainRun"),
     stripeManifest: has("stripe/products.review.json"),
+    paymentHandoffVerification: has("scripts/verify-live-payment-handoff.mjs"),
+    hostedPaymentHandoffVerification: has("scripts/verify-hosted-payment-handoff.mjs") &&
+      has("output/qa/hosted-payment-handoff.json"),
     proofSprintPacket: has("docs/proof-sprints/DATE_NIGHT_10_PROSPECT_PACKET.md") &&
       has("output/proof-sprints/date-night-vancouver-10-prospect-packet.json"),
     proofSprintContactResearch: has("docs/proof-sprints/DATE_NIGHT_CONTACT_PATHS_RESEARCH.md") &&
@@ -135,14 +138,16 @@ const report = {
     sourcePolicy: has("docs/REAL_WORLD_SOURCE_POLICY.md") && has("supabase/schema.sql"),
   },
   liveBlocked: [
-    "Stripe product/price creation",
+    "first real live City Partner checkout proof",
+    "provider-side GA/Ads conversion receipt before scaling paid traffic",
+    "fresh clean release lane before any deploy or push",
     "real provider import",
     "additional customer outreach or follow-ups",
     "public real-business publication",
   ],
   nextBestBatch:
     seoProof?.passed === true
-      ? "Use the first source-backed release packet for the local-ready first-time visitor and wellness queue, keep the second, Sunday, returning-visitor, and starter-pack queues isolated behind it, and leave hosted crawl/index claims unproven until a real deploy-and-smoke pass happens."
+      ? "Use a fresh release lane to carry the local attribution hardening through approved deploy proof, keep the first paid test tiny and request-first, and prove one real City Partner checkout separately before self-serve charging claims."
       : "Fix the local SEO content-machine proof first, then keep expanding only with source-backed destination pages that official public sources can honestly support.",
 };
 

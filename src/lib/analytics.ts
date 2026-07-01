@@ -1,305 +1,387 @@
-type AnalyticsDetail = Record<string, string | number | boolean>;
-type AnalyticsConsentState = "pending" | "granted" | "denied";
+export type AnalyticsConsentState = "pending" | "granted" | "denied";
+export type AnalyticsDetail = Record<string, string | number | boolean>;
 
-const TRAFFIC_CONTEXT_STORAGE_KEY = "cityatlas.traffic.context.v1";
-const ANALYTICS_DEBUG_STORAGE_KEY = "cityatlas.analytics.debug.v1";
-const ANALYTICS_CONSENT_STORAGE_KEY = "cityatlas.analytics.consent.v1";
-const ANALYTICS_SCRIPT_ID = "cityatlas-ga4-script";
+export interface TrackProductEventOptions {
+  deliverOnNextPage?: boolean;
+}
 
-const campaignParamNames = [
-  "utm_source",
-  "utm_medium",
-  "utm_campaign",
-  "utm_content",
-  "utm_term",
-  "gclid",
-  "fbclid",
-  "msclkid",
-] as const;
+interface AnalyticsReadiness {
+  provider: "ga4";
+  hasExternalDestination: boolean;
+  measurementIdConfigured: boolean;
+}
 
-const runtimeEnv = ((import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env ??
-  {}) as Record<string, string | undefined>;
+interface AnalyticsState {
+  appliedConsent: AnalyticsConsentState;
+  configuredMeasurementId: string;
+  defaultConsentSet: boolean;
+  scriptInjected: boolean;
+}
+
+interface PendingNavigationAnalyticsEvent {
+  name: string;
+  detail: AnalyticsDetail;
+}
+
+interface TrafficContextState extends AnalyticsDetail {
+  firstLandingPath: string;
+  latestLandingPath: string;
+  referrer: string;
+}
 
 declare global {
   interface Window {
+    __cityatlasAnalyticsReadiness?: AnalyticsReadiness;
+    __cityatlasAnalyticsState?: AnalyticsState;
     dataLayer?: unknown[];
     gtag?: (...args: unknown[]) => void;
-    __cityatlasAnalyticsState?: {
-      appliedConsent: AnalyticsConsentState;
-      configuredMeasurementId: string;
-      defaultConsentSet: boolean;
-      scriptInjected: boolean;
-    };
+    google_tag_manager?: Record<string, unknown>;
   }
 }
 
-function cleanValue(value: string | null) {
-  return value?.trim() || "";
-}
+const runtimeEnv = ((import.meta as ImportMeta & {
+  env?: Record<string, string | undefined>;
+}).env ?? {}) as Record<string, string | undefined>;
 
-function readStoredTrafficContext(): AnalyticsDetail {
-  if (typeof window === "undefined") return {};
+const DEFAULT_GA_MEASUREMENT_ID = "G-43N3DKZYRL";
+const ANALYTICS_SCRIPT_ID = "cityatlas-ga4-script";
+const ANALYTICS_CONSENT_STORAGE_KEY = "cityatlas.analytics.consent.v1";
+const ANALYTICS_DEBUG_STORAGE_KEY = "cityatlas.analytics.debug.v1";
+const TRAFFIC_CONTEXT_STORAGE_KEY = "cityatlas.traffic.context.v1";
+const PENDING_NAVIGATION_ANALYTICS_STORAGE_KEY = "cityatlas.analytics.pending-navigation.v1";
 
-  try {
-    const stored = window.localStorage.getItem(TRAFFIC_CONTEXT_STORAGE_KEY);
-    if (!stored) return {};
-    return JSON.parse(stored) as AnalyticsDetail;
-  } catch {
-    return {};
-  }
-}
-
-function writeStoredTrafficContext(context: AnalyticsDetail) {
-  if (typeof window === "undefined" || Object.keys(context).length === 0) return;
-
-  window.localStorage.setItem(TRAFFIC_CONTEXT_STORAGE_KEY, JSON.stringify(context));
+function canUseDom() {
+  return typeof window !== "undefined" && typeof document !== "undefined";
 }
 
 function getMeasurementId() {
-  return runtimeEnv.VITE_GA_MEASUREMENT_ID || runtimeEnv.VITE_ANALYTICS_ID || "";
+  return (
+    runtimeEnv.VITE_GA_MEASUREMENT_ID?.trim() ||
+    runtimeEnv.VITE_ANALYTICS_ID?.trim() ||
+    DEFAULT_GA_MEASUREMENT_ID
+  );
 }
 
-function readStoredConsentState(): AnalyticsConsentState {
-  if (typeof window === "undefined") return "pending";
+function getProvider() {
+  const configuredProvider = runtimeEnv.VITE_CITYATLAS_ANALYTICS_PROVIDER?.trim();
+  if (configuredProvider) {
+    return configuredProvider;
+  }
 
-  const stored = window.localStorage.getItem(ANALYTICS_CONSENT_STORAGE_KEY);
-  return stored === "granted" || stored === "denied" ? stored : "pending";
+  return getMeasurementId() ? "ga4" : "";
 }
 
-function writeStoredConsentState(value: AnalyticsConsentState) {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(ANALYTICS_CONSENT_STORAGE_KEY, value);
+function getStorage() {
+  if (!canUseDom()) return null;
+
+  try {
+    return window.localStorage;
+  } catch {
+    return null;
+  }
 }
 
-export function captureTrafficContext(path = typeof window !== "undefined" ? window.location.pathname : "") {
-  if (typeof window === "undefined") return {};
+function readJson<T>(key: string): T | null {
+  const storage = getStorage();
+  if (!storage) return null;
 
-  const params = new URLSearchParams(window.location.search);
-  const storedContext = readStoredTrafficContext();
-  const campaignContext = campaignParamNames.reduce<AnalyticsDetail>((context, paramName) => {
-    const value = cleanValue(params.get(paramName));
-    if (value) {
-      context[paramName] = value;
+  try {
+    const raw = storage.getItem(key);
+    return raw ? (JSON.parse(raw) as T) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeJson(key: string, value: unknown) {
+  const storage = getStorage();
+  if (!storage) return;
+
+  try {
+    storage.setItem(key, JSON.stringify(value));
+  } catch {
+    // Ignore local storage write failures so analytics never blocks the UI.
+  }
+}
+
+function removeStorageItem(key: string) {
+  const storage = getStorage();
+  if (!storage) return;
+
+  try {
+    storage.removeItem(key);
+  } catch {
+    // Ignore storage remove failures.
+  }
+}
+
+function buildAnalyticsReadiness(): AnalyticsReadiness {
+  return {
+    provider: "ga4",
+    hasExternalDestination: getProvider() === "ga4" && Boolean(getMeasurementId()),
+    measurementIdConfigured: Boolean(getMeasurementId()),
+  };
+}
+
+function setRuntimeReadiness(readiness: AnalyticsReadiness) {
+  if (canUseDom()) {
+    window.__cityatlasAnalyticsReadiness = readiness;
+  }
+  return readiness;
+}
+
+function readRuntimeState(): AnalyticsState {
+  const current = canUseDom() ? window.__cityatlasAnalyticsState : undefined;
+  return (
+    current ?? {
+      appliedConsent: getAnalyticsConsentState(),
+      configuredMeasurementId: getMeasurementId(),
+      defaultConsentSet: false,
+      scriptInjected: false,
     }
-    return context;
-  }, {});
-
-  if (Object.keys(campaignContext).length === 0) {
-    return storedContext;
-  }
-
-  const nextContext: AnalyticsDetail = {
-    ...storedContext,
-    ...campaignContext,
-    firstLandingPath: String(storedContext.firstLandingPath || path || "/"),
-    latestLandingPath: `${path || "/"}${window.location.search}`,
-    referrer: cleanValue(document.referrer) || String(storedContext.referrer || "direct"),
-  };
-  writeStoredTrafficContext(nextContext);
-  return nextContext;
+  );
 }
 
-export function getTrafficContext() {
-  return captureTrafficContext();
-}
+function writeRuntimeState(next: Partial<AnalyticsState>) {
+  if (!canUseDom()) return;
 
-function getAnalyticsProvider() {
-  const explicitProvider = runtimeEnv.VITE_CITYATLAS_ANALYTICS_PROVIDER;
-  if (explicitProvider) return explicitProvider;
-  if (runtimeEnv.VITE_GA_MEASUREMENT_ID || runtimeEnv.VITE_ANALYTICS_ID) return "ga4";
-  return "local_only";
-}
-
-export function getAnalyticsReadiness() {
-  const provider = getAnalyticsProvider();
-  const hasMeasurementId = Boolean(getMeasurementId());
-  const hasExternalDestination = provider !== "local_only" && hasMeasurementId;
-
-  return {
-    provider,
-    hasExternalDestination,
-    measurementIdConfigured: hasMeasurementId,
+  window.__cityatlasAnalyticsState = {
+    ...readRuntimeState(),
+    ...next,
   };
 }
 
-function getConsentUpdatePayload(consent: Exclude<AnalyticsConsentState, "pending">) {
-  if (consent === "granted") {
-    return {
-      analytics_storage: "granted",
-      ad_storage: "denied",
-      ad_user_data: "denied",
-      ad_personalization: "denied",
-    };
-  }
+function ensureDataLayer() {
+  if (!canUseDom()) return;
 
-  return {
-    analytics_storage: "denied",
-    ad_storage: "denied",
-    ad_user_data: "denied",
-    ad_personalization: "denied",
-  };
-}
-
-export function ensureAnalyticsSetup(options: { allowScriptInjection?: boolean } = {}) {
-  if (typeof window === "undefined") return false;
-
-  const readiness = getAnalyticsReadiness();
-  const measurementId = getMeasurementId();
-  if (!readiness.hasExternalDestination || !measurementId) {
-    return false;
-  }
-
-  const analyticsState = window.__cityatlasAnalyticsState ?? {
-    appliedConsent: "pending" as AnalyticsConsentState,
-    configuredMeasurementId: "",
-    defaultConsentSet: false,
-    scriptInjected: false,
-  };
-
-  const allowScriptInjection = options.allowScriptInjection ?? true;
-  if (!analyticsState.scriptInjected && !allowScriptInjection) {
-    window.__cityatlasAnalyticsState = analyticsState;
-    return false;
-  }
-
-  window.dataLayer = window.dataLayer ?? [];
+  window.dataLayer = Array.isArray(window.dataLayer) ? window.dataLayer : [];
   if (typeof window.gtag !== "function") {
     window.gtag = (...args: unknown[]) => {
-      window.dataLayer?.push(args);
+      window.dataLayer?.push(Array.from(args));
     };
   }
+}
 
-  if (!analyticsState.defaultConsentSet) {
-    window.gtag("consent", "default", {
-      analytics_storage: "denied",
-      ad_storage: "denied",
-      ad_user_data: "denied",
-      ad_personalization: "denied",
-      wait_for_update: 500,
-    });
-    analyticsState.defaultConsentSet = true;
+function pushAnalyticsTuple(...args: unknown[]) {
+  if (!canUseDom()) return;
+  ensureDataLayer();
+  window.gtag?.(...args);
+}
+
+function injectAnalyticsScript() {
+  if (!canUseDom()) return false;
+
+  const measurementId = getMeasurementId();
+  if (!measurementId) return false;
+
+  let script = document.getElementById(ANALYTICS_SCRIPT_ID) as HTMLScriptElement | null;
+  if (!script) {
+    script = document.createElement("script");
+    script.id = ANALYTICS_SCRIPT_ID;
+    script.async = true;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+    document.head.appendChild(script);
   }
 
-  if (analyticsState.configuredMeasurementId !== measurementId) {
-    window.gtag("js", new Date());
-    window.gtag("config", measurementId, {
-      send_page_view: false,
-      anonymize_ip: true,
-    });
-    analyticsState.configuredMeasurementId = measurementId;
-  }
-
-  if (!analyticsState.scriptInjected) {
-    let script = document.getElementById(ANALYTICS_SCRIPT_ID) as HTMLScriptElement | null;
-    if (!script) {
-      script = document.createElement("script");
-      script.id = ANALYTICS_SCRIPT_ID;
-      script.async = true;
-      script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(measurementId)}`;
-      document.head.appendChild(script);
-    }
-    analyticsState.scriptInjected = true;
-  }
-
-  window.__cityatlasAnalyticsState = analyticsState;
   return true;
 }
 
-function syncAnalyticsConsentMode(consent: AnalyticsConsentState) {
-  if (typeof window === "undefined" || consent === "pending") return;
+function readTrafficContextState() {
+  return readJson<TrafficContextState>(TRAFFIC_CONTEXT_STORAGE_KEY);
+}
 
-  const allowScriptInjection =
-    consent === "granted" || Boolean(window.__cityatlasAnalyticsState?.scriptInjected);
-  if (!ensureAnalyticsSetup({ allowScriptInjection }) || typeof window.gtag !== "function") return;
+function writeTrafficContextState(state: TrafficContextState) {
+  writeJson(TRAFFIC_CONTEXT_STORAGE_KEY, state);
+}
 
-  const analyticsState = window.__cityatlasAnalyticsState;
-  if (analyticsState?.appliedConsent === consent) return;
+function getCurrentTrafficContext(): TrafficContextState {
+  const existing = readTrafficContextState();
+  if (!canUseDom()) {
+    return (
+      existing ?? {
+        firstLandingPath: "/",
+        latestLandingPath: "/",
+        referrer: "direct",
+      }
+    );
+  }
 
-  window.gtag("consent", "update", getConsentUpdatePayload(consent));
-  if (analyticsState) {
-    analyticsState.appliedConsent = consent;
-    window.__cityatlasAnalyticsState = analyticsState;
+  const url = new URL(window.location.href);
+  const next: TrafficContextState = {
+    ...(existing ?? {
+      firstLandingPath: url.pathname,
+      latestLandingPath: url.pathname,
+      referrer: document.referrer ? new URL(document.referrer, url.origin).pathname : "direct",
+    }),
+    latestLandingPath: `${url.pathname}${url.search}`,
+  };
+
+  const utmKeys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"] as const;
+  for (const key of utmKeys) {
+    const value = url.searchParams.get(key);
+    if (value) {
+      next[key] = value;
+    }
+  }
+
+  if (!next.firstLandingPath) {
+    next.firstLandingPath = url.pathname;
+  }
+
+  if (!next.referrer) {
+    next.referrer = document.referrer ? new URL(document.referrer, url.origin).pathname : "direct";
+  }
+
+  writeTrafficContextState(next);
+  return next;
+}
+
+function appendDebugEvent(name: string, detail: AnalyticsDetail) {
+  const entries = readJson<Array<{ name: string; detail: AnalyticsDetail; createdAt: string }>>(
+    ANALYTICS_DEBUG_STORAGE_KEY,
+  ) ?? [];
+
+  entries.unshift({
+    name,
+    detail,
+    createdAt: new Date().toISOString(),
+  });
+  writeJson(ANALYTICS_DEBUG_STORAGE_KEY, entries.slice(0, 40));
+}
+
+function writePendingNavigationEvent(event: PendingNavigationAnalyticsEvent) {
+  writeJson(PENDING_NAVIGATION_ANALYTICS_STORAGE_KEY, event);
+}
+
+export function consumePendingNavigationEvent() {
+  const event = readJson<PendingNavigationAnalyticsEvent>(PENDING_NAVIGATION_ANALYTICS_STORAGE_KEY);
+  if (!event) return null;
+  removeStorageItem(PENDING_NAVIGATION_ANALYTICS_STORAGE_KEY);
+  return event;
+}
+
+function configureGrantedConsent(path?: string, includePageView = false) {
+  if (!canUseDom()) return;
+
+  const readiness = getAnalyticsReadiness();
+  if (!readiness.hasExternalDestination) {
+    writeRuntimeState({
+      appliedConsent: "granted",
+      configuredMeasurementId: getMeasurementId(),
+    });
+    return;
+  }
+
+  ensureDataLayer();
+  const injected = injectAnalyticsScript();
+  const measurementId = getMeasurementId();
+
+  const state = readRuntimeState();
+  if (!state.defaultConsentSet) {
+    pushAnalyticsTuple("js", new Date());
+    pushAnalyticsTuple("consent", "default", {
+      analytics_storage: "denied",
+      ad_storage: "denied",
+    });
+  }
+
+  pushAnalyticsTuple("consent", "update", {
+    analytics_storage: "granted",
+    ad_storage: "denied",
+  });
+  pushAnalyticsTuple("config", measurementId, {
+    anonymize_ip: true,
+  });
+
+  writeRuntimeState({
+    appliedConsent: "granted",
+    configuredMeasurementId: measurementId,
+    defaultConsentSet: true,
+    scriptInjected: injected,
+  });
+
+  if (includePageView) {
+    const nextPath = path || (canUseDom() ? window.location.pathname : "/");
+    trackProductEvent("page_view", nextPath, getTrafficContext());
   }
 }
 
-export function getAnalyticsConsentState() {
-  return readStoredConsentState();
+function restoreAnalyticsFromStoredConsent() {
+  const consent = getAnalyticsConsentState();
+  setRuntimeReadiness(buildAnalyticsReadiness());
+  writeRuntimeState({
+    appliedConsent: consent,
+    configuredMeasurementId: getMeasurementId(),
+  });
+
+  if (consent === "granted") {
+    configureGrantedConsent(canUseDom() ? window.location.pathname : "/", false);
+  }
+}
+
+export function getAnalyticsReadiness() {
+  return setRuntimeReadiness(buildAnalyticsReadiness());
+}
+
+export function getAnalyticsConsentState(): AnalyticsConsentState {
+  const storage = getStorage();
+  if (!storage) return "pending";
+  const value = storage.getItem(ANALYTICS_CONSENT_STORAGE_KEY);
+  if (value === "granted" || value === "denied") {
+    return value;
+  }
+  return "pending";
 }
 
 export function setAnalyticsConsentState(
-  consent: Exclude<AnalyticsConsentState, "pending">,
-  options: { path?: string; includePageView?: boolean } = {},
+  next: Exclude<AnalyticsConsentState, "pending">,
+  options: { includePageView?: boolean; path?: string } = {},
 ) {
-  writeStoredConsentState(consent);
-  syncAnalyticsConsentMode(consent);
+  const storage = getStorage();
+  storage?.setItem(ANALYTICS_CONSENT_STORAGE_KEY, next);
 
-  if (
-    consent === "granted" &&
-    options.includePageView &&
-    options.path &&
-    typeof window !== "undefined" &&
-    typeof window.gtag === "function"
-  ) {
-    window.gtag("event", "page_view", {
-      page_path: options.path,
-      ...getTrafficContext(),
-    });
-  }
-}
-
-function writeDebugEvent(event: { name: string; path: string; detail: AnalyticsDetail }) {
-  if (typeof window === "undefined") return;
-
-  try {
-    const stored = window.localStorage.getItem(ANALYTICS_DEBUG_STORAGE_KEY);
-    const events = stored ? (JSON.parse(stored) as unknown[]) : [];
-    window.localStorage.setItem(
-      ANALYTICS_DEBUG_STORAGE_KEY,
-      JSON.stringify([{ ...event, createdAt: new Date().toISOString() }, ...events].slice(0, 100)),
-    );
-  } catch {
-    // Debug analytics should never break the public path.
-  }
-}
-
-export function trackProductEvent(name: string, path: string, detail: AnalyticsDetail = {}) {
-  const readiness = getAnalyticsReadiness();
-  const event = {
-    name,
-    path,
-    detail: {
-      ...getTrafficContext(),
-      ...detail,
-    },
-  };
-
-  writeDebugEvent(event);
-
-  if (typeof window === "undefined" || !readiness.hasExternalDestination) {
+  if (next === "granted") {
+    configureGrantedConsent(options.path, options.includePageView ?? false);
     return;
   }
 
-  const consent = readStoredConsentState();
-  if (consent !== "granted") {
-    syncAnalyticsConsentMode(consent);
-    return;
-  }
-
-  ensureAnalyticsSetup({ allowScriptInjection: true });
-  syncAnalyticsConsentMode(consent);
-
-  if (typeof window.gtag === "function") {
-    window.gtag("event", name, {
-      page_path: path,
-      ...event.detail,
-    });
-    return;
-  }
-
-  window.dataLayer = window.dataLayer ?? [];
-  window.dataLayer.push({
-    event: name,
-    page_path: path,
-    ...event.detail,
+  writeRuntimeState({
+    appliedConsent: "denied",
   });
 }
+
+export function getTrafficContext(): AnalyticsDetail {
+  return getCurrentTrafficContext();
+}
+
+export function trackProductEvent(
+  name: string,
+  path: string,
+  detail: AnalyticsDetail = {},
+  options: TrackProductEventOptions = {},
+) {
+  appendDebugEvent(name, detail);
+
+  if (options.deliverOnNextPage) {
+    writePendingNavigationEvent({ name, detail });
+    return;
+  }
+
+  if (getAnalyticsConsentState() !== "granted") {
+    return;
+  }
+
+  const readiness = getAnalyticsReadiness();
+  if (!readiness.hasExternalDestination) {
+    return;
+  }
+
+  configureGrantedConsent(path, false);
+  pushAnalyticsTuple("event", name, {
+    page_path: path,
+    anonymize_ip: true,
+    ...detail,
+  });
+}
+
+restoreAnalyticsFromStoredConsent();

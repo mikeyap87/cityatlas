@@ -1,3 +1,5 @@
+import type { PackageId } from "../types";
+
 export function resolvePublicAssetPath(path: string) {
   if (typeof window !== "undefined" && window.location.protocol === "file:" && path.startsWith("/")) {
     return `.${path}`;
@@ -25,6 +27,10 @@ export const siteConfig = {
     planner: resolvePublicAssetPath("/assets/places-generated/commercial-drive-generated.jpg"),
     waterfront: resolvePublicAssetPath("/assets/places-generated/kitsilano-beach-generated.jpg"),
     wellness: resolvePublicAssetPath("/assets/places-generated/queen-elizabeth-park-generated.jpg"),
+    hostingGuests: resolvePublicAssetPath("/assets/places-generated/vancouver-hosting-guests-generated.png"),
+    weekend: resolvePublicAssetPath("/assets/places-generated/vancouver-weekend-route-generated.png"),
+    lowEffort: resolvePublicAssetPath("/assets/places-generated/vancouver-low-effort-day-generated.png"),
+    wellnessReset: resolvePublicAssetPath("/assets/places-generated/vancouver-wellness-reset-generated.png"),
   },
   gatedActions: [
     "Domain purchase",
@@ -49,6 +55,43 @@ export const envFlags = {
   hostedAdmin: runtimeEnv.VITE_CITYATLAS_ENABLE_HOSTED_ADMIN === "true",
   hostedPrivatePreview: runtimeEnv.VITE_CITYATLAS_ENABLE_HOSTED_PRIVATE_PREVIEW === "true",
 };
+
+const stripePaymentLinks = {
+  city_partner: runtimeEnv.VITE_STRIPE_CITY_PARTNER_PAYMENT_LINK?.trim() || "",
+  signature_partner: runtimeEnv.VITE_STRIPE_SIGNATURE_PARTNER_PAYMENT_LINK?.trim() || "",
+} as const;
+
+export function getPartnerPackageCheckoutUrl(packageId: PackageId) {
+  if (packageId === "city_partner") {
+    return stripePaymentLinks.city_partner || undefined;
+  }
+
+  if (packageId === "signature_partner") {
+    return stripePaymentLinks.signature_partner || undefined;
+  }
+
+  return undefined;
+}
+
+export function hasPartnerPackageCheckout(packageId: PackageId) {
+  if (packageId === "community") {
+    return false;
+  }
+
+  return envFlags.livePayments && Boolean(getPartnerPackageCheckoutUrl(packageId));
+}
+
+export function getPartnerPackageCheckoutLabel(packageId: PackageId) {
+  if (packageId === "city_partner") {
+    return "Start City Partner checkout";
+  }
+
+  if (packageId === "signature_partner") {
+    return "Start Signature checkout";
+  }
+
+  return "Start checkout";
+}
 
 export const buildFlags = {
   hostedAdminArtifacts: isDevBuild || envFlags.hostedAdmin,

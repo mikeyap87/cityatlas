@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import {
   blockedPhrases,
   publicSeedBlockedRules,
+  renderedOnlyBlockedPhrases,
 } from "./public-copy-safety-rules.mjs";
 import {
   loadPlaywright,
@@ -105,7 +106,7 @@ async function main() {
             visibleTextLength: visibleText.length,
           });
 
-          for (const rule of blockedPhrases) {
+          for (const rule of [...blockedPhrases, ...renderedOnlyBlockedPhrases]) {
             let searchIndex = lowered.indexOf(rule.phrase);
             while (searchIndex !== -1) {
               findings.push({
@@ -154,6 +155,7 @@ async function main() {
     checkedRouteCount: routes.length,
     checkedRoutes: routes,
     blockedPhraseCount: blockedPhrases.length,
+    renderedOnlyBlockedPhraseCount: renderedOnlyBlockedPhrases.length,
     renderedBlockedPhraseCount: publicSeedBlockedRules.length,
     routeReports,
     failureCount: failures.length,

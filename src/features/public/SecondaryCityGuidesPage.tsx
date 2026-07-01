@@ -94,8 +94,8 @@ export function SecondaryCityGuidesPage({
             </AppLink>
           ))}
           <AppLink className="query-card query-card-link" to="/editorial-standards">
-            <strong>Editorial standards</strong>
-            <p>Review the source rules, correction process, and claim limits before using a smaller CityAtlas city page as planning input.</p>
+            <strong>How updates work</strong>
+            <p>See how CityAtlas handles corrections, outdated details, and page-change requests.</p>
           </AppLink>
         </div>
       </section>

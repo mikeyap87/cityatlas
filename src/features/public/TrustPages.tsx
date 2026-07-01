@@ -52,7 +52,7 @@ function SourceBackedReferenceCard({
         ) : (
           <div className="source-reference-media-fallback-note" aria-hidden="true">
             <span><ShieldIcon /> Official site</span>
-            <span><MapIcon /> Photo not added yet</span>
+            <span><MapIcon /> Place image coming soon</span>
           </div>
         )}
         <div className="source-reference-media-copy">
@@ -93,7 +93,7 @@ function SourceBackedReferenceCard({
         </small>
         <details className="source-reference-proof">
           <summary className="source-reference-proof-summary">
-            <strong>What this page checked</strong>
+            <strong>Details to confirm</strong>
             <span>Open</span>
           </summary>
           <div className="source-reference-proof-body">
@@ -204,6 +204,8 @@ function simplifyCollectionCopy(value: string) {
     .replace(/official-source page/gi, "local place")
     .replace(/official-source entry/gi, "place here")
     .replace(/official-source/gi, "official")
+    .replace(/official public-source notes/gi, "direct site links")
+    .replace(/official source notes/gi, "direct site links")
     .replace(/official source notes/gi, "official site links")
     .replace(/starter pages live/gi, "starting pages live")
     .replace(/starter pages/gi, "starting pages")
@@ -226,7 +228,8 @@ function simplifyCollectionCopy(value: string) {
     .replace(/anchor(s)?/gi, "place$1")
     .replace(/keeps the claim limits visible/gi, "stays clear about what is checked")
     .replace(/claim limits visible/gi, "keeps the page honest about what it knows")
-    .replace(/visible claim boundaries/gi, "clear claim limits")
+    .replace(/visible claim boundaries/gi, "details to confirm")
+    .replace(/clear claim limits/gi, "details to confirm")
     .replace(/visible source discipline/gi, "clear source rules")
     .replace(/source discipline/gi, "source rules")
     .replace(/route role/gi, "why it belongs in this kind of plan")
@@ -693,7 +696,11 @@ export function SourceBackedCollectionPage({
     sourceBackedCollectionMeta[collection].path,
     collection,
   );
-  const starterHelpBullets = content.helpBullets.slice(0, 3);
+  const starterHelpBullets = [
+    "Use these as starting points, not a ranked list.",
+    "Check live hours, bookings, tickets, and access on the place's own site before you go.",
+    "Use Report an issue if something looks outdated.",
+  ];
   const heroVisual = getSourceBackedCollectionVisual(collection);
   const collectionMeta = sourceBackedCollectionMeta[collection];
 
@@ -705,7 +712,7 @@ export function SourceBackedCollectionPage({
           <h1>{simplifyCollectionHeroTitle(content.heroTitle)}</h1>
           <p>
             Use this page when you want a smaller set of real places before you open a fuller
-            guide. Each place links to an official site, explains why it fits, and includes a way
+            guide. Each place links to its own site, explains why it fits, and includes a way
             to report a mistake.
           </p>
           <div className="hero-actions">
@@ -713,19 +720,19 @@ export function SourceBackedCollectionPage({
               {simplifyCollectionCopy(content.primaryCtaLabel)} <ArrowRightIcon />
             </AppLink>
             <AppLink className="button secondary" to="/editorial-standards">
-              Editorial standards
+              How updates work
             </AppLink>
           </div>
           <div className="tag-cloud official-source-hero-tags">
             <span>{starters.length} places</span>
-            <span>Official links</span>
+            <span>Direct site links</span>
             <span>Start with one place</span>
             <span>Report a mistake</span>
           </div>
           <div className="city-hero-support-grid">
             <article className="city-hero-support-card">
-              <strong>{starters.length} places checked</strong>
-              <p>Each place links to an official site and includes a way to report a mistake.</p>
+              <strong>{starters.length} places to compare</strong>
+              <p>Each place links to its own site and includes a way to report a mistake.</p>
             </article>
             <article className="city-hero-support-card">
               <strong>Open one place first</strong>
@@ -733,7 +740,7 @@ export function SourceBackedCollectionPage({
             </article>
             <article className="city-hero-support-card wide">
               <strong>Confirm the last details before you go</strong>
-              <p>Hours, tickets, and availability can change, so use CityAtlas to narrow the choice and the official site to confirm the last details.</p>
+              <p>Hours, tickets, and availability can change, so use CityAtlas to narrow the choice and the place's own site to confirm the last details.</p>
             </article>
           </div>
         </div>
@@ -763,7 +770,7 @@ export function SourceBackedCollectionPage({
         <SectionHeader
           label="Local places"
           title="Local places to open first"
-          copy="Open one strong local place with official links first, then switch to the fuller guide only if you still need more context."
+          copy="Open one strong local place first, then switch to the fuller guide only if you still need more context."
         />
         <div className="card-grid two">
           {starters.map((reference) => (
@@ -778,7 +785,7 @@ export function SourceBackedCollectionPage({
           <h2>How to read this page</h2>
           <ul className="plain-list compact">
             {starterHelpBullets.map((bullet) => (
-              <li key={bullet}>{simplifyCollectionCopy(bullet)}</li>
+              <li key={bullet}>{bullet}</li>
             ))}
           </ul>
         </div>
@@ -944,7 +951,7 @@ export function EditorialStandardsPage() {
           </div>
           <div className="tag-cloud pricing-tag-cloud">
             <span>Official links first</span>
-            <span>Claim limits stay visible</span>
+            <span>Clear details to confirm</span>
             <span>Public correction path</span>
           </div>
         </div>
@@ -998,7 +1005,7 @@ export function EditorialStandardsPage() {
       <div className="legal-grid">
         <article className="source-panel">
           <MapIcon />
-          <h2>What CityAtlas will not publish</h2>
+          <h2>What CityAtlas leaves out</h2>
           <p>
             Unsupported ratings, scraped images, broad "best of" claims, live availability claims,
             private contact data, and broad real-business directories do not belong on the public
@@ -1016,7 +1023,7 @@ export function EditorialStandardsPage() {
         </article>
 
         <article className="source-panel">
-          <h2>Claim limits</h2>
+          <h2>Detail boundaries</h2>
           <p>
             Public pages should stay neutral about quality, rankings, popularity, safety,
             pricing, or availability unless those details are clearly supported by an approved

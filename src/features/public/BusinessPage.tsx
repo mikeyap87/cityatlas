@@ -76,11 +76,11 @@ export function BusinessPage({ business, data }: BusinessPageProps) {
     .filter((source): source is SourceRecord => Boolean(source));
   const exampleOnly = isExampleBusiness(business);
   const businessPageLabel = getBusinessExampleLabel(business);
-  const heroStatusLabel = exampleOnly ? "Sample page" : "Source-backed page";
-  const proofBannerTitle = exampleOnly ? "What is live on this page" : "What CityAtlas checked";
+  const heroStatusLabel = exampleOnly ? "Sample page" : "Local place page";
+  const proofBannerTitle = exampleOnly ? "What is live on this page" : "Details to check";
   const proofBannerCopy = exampleOnly
     ? "The page shape is live now. Official hours, booking details, and offer terms are added only after a real business check."
-    : "CityAtlas checked the official source, contact path, and venue details first. Confirm live hours, menus, prices, and reservation availability on the official site before you go.";
+    : "Use this page to choose the place, then confirm live hours, menus, prices, and reservation availability on the business site before you go.";
   const heroHighlights = business.bestFor.slice(0, 3);
   const quickFacts = [
     { label: "Type", value: business.category },

@@ -17,8 +17,11 @@ export function simplifyPublicSurfaceText(value: string) {
       .replace(/source-backed entry/gi, "place on this page")
       .replace(/source-backed/gi, "official link")
       .replace(/official-source/gi, "official")
-      .replace(/visible claim boundaries/gi, "clear claim limits")
-      .replace(/claim limits visible/gi, "clear about what is checked")
+      .replace(/official public-source notes/gi, "direct site links")
+      .replace(/official source notes/gi, "direct site links")
+      .replace(/visible claim boundaries/gi, "details to confirm")
+      .replace(/claim limits visible/gi, "clear next steps")
+      .replace(/clear claim limits/gi, "details to confirm")
       .replace(
         /public correction or removal path/gi,
         "public way to report a mistake or ask for a change",
@@ -208,9 +211,12 @@ export function simplifyGuideDisplayText(value: string) {
       .replace(/cross-city weekend checklist/gi, "packed weekend checklist")
       .replace(/source-backed/gi, "carefully sourced")
       .replace(/official-source/gi, "official")
+      .replace(/official public-source notes/gi, "direct site links")
+      .replace(/official source notes/gi, "direct site links")
       .replace(/source discipline/gi, "source rules")
-      .replace(/visible claim boundaries/gi, "clear claim limits")
-      .replace(/claim limits visible/gi, "stays clear about what is checked")
+      .replace(/visible claim boundaries/gi, "details to confirm")
+      .replace(/claim limits visible/gi, "clear next steps")
+      .replace(/clear claim limits/gi, "details to confirm")
       .replace(
         /public correction or removal path/gi,
         "public way to report a mistake or request a change",
@@ -252,6 +258,9 @@ export function simplifyGuideCategoryLabel(value: string) {
 export function simplifyMissionDisplayText(value: string) {
   return tidyCopy(
     simplifyGuideDisplayText(value)
+      .replace(/without pretending the whole ([^.]+?) layer is fully sourced yet/gi, "while keeping the $1 plan simple")
+      .replace(/without pretending [^.]+?\./gi, ".")
+      .replace(/without pretending [^.]+?$/gi, "")
       .replace(/offer preview/gi, "offer example")
       .replace(/\bA easy\b/gi, "An easy")
       .replace(/\bthis route\b/gi, "this plan")

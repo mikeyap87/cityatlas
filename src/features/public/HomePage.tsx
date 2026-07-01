@@ -226,7 +226,7 @@ const trustedStartingPointLinks = [
   {
     path: "/vancouver/date-night-starters",
     label: "Date night",
-    detail: "Dinner-first evening anchors with official links.",
+    detail: "Dinner-first evening plans with direct site links.",
   },
   {
     path: "/vancouver/rainy-day-starters",
@@ -805,8 +805,8 @@ export function HomePage({ data, onNewsletter: _onNewsletter, onTrack, onSaveMis
       <section className="section-block">
         <SectionHeader
           label="Browse by situation"
-          title={`${sourceBackedWedgeCount} source-backed Vancouver starts are ready now`}
-          copy="Open the page that matches the kind of day first. Each start keeps the claims narrow, uses official source links, and stays easy to correct."
+          title={`${sourceBackedWedgeCount} Vancouver starting pages are ready now`}
+          copy="Open the page that matches the kind of day. Each one gives you a short list, a clear next step, and direct links for the details you may want to confirm."
           action={<StatusPill tone="green">{localPlacePageLabel}</StatusPill>}
         />
         <div className="guide-index-grid route-moment-grid">
@@ -880,8 +880,8 @@ export function HomePage({ data, onNewsletter: _onNewsletter, onTrack, onSaveMis
           <div className="source-panel">
             <SectionHeader
               label="Local places"
-              title="Real Vancouver places with official links"
-              copy="When CityAtlas names a specific place, it links to the official site and stays clear about what it confirmed."
+              title="Vancouver places to open when you need a real stop"
+              copy="Each place has a direct site link, a quick fit note, and a simple way to flag outdated details."
               action={<StatusPill tone="green">{localPlacePageLabel}</StatusPill>}
             />
             <div className="tag-cloud">
@@ -957,7 +957,7 @@ export function HomePage({ data, onNewsletter: _onNewsletter, onTrack, onSaveMis
             label="For Vancouver businesses"
             title="Want your business to show up more clearly?"
             copy={copy.partnerCopy}
-            action={<StatusPill tone="green">Request review first</StatusPill>}
+            action={<StatusPill tone="green">Start with a request</StatusPill>}
           />
           <div className="source-panel">
             <p>
@@ -999,16 +999,16 @@ export function HomePage({ data, onNewsletter: _onNewsletter, onTrack, onSaveMis
         <article className="trust-card trust-card-rules">
           <ShieldIcon />
           <div className="card-topline">
-            <strong>What CityAtlas will not pretend</strong>
-            <StatusPill tone="green">Trust first</StatusPill>
+            <strong>How CityAtlas keeps pages useful</strong>
+            <StatusPill tone="green">Clear details</StatusPill>
           </div>
           <p>
-            The site is built to stay useful without pretending it already knows more than it does.
+            CityAtlas keeps plans simple, points to live details, and makes updates easy to request.
           </p>
           <ul className="plain-list compact trust-rule-list">
-            <li>No traffic, ranking, or booking claims without proof.</li>
-            <li>No public business profile until facts are checked.</li>
-            <li>No offer or event claims unless the page can support them clearly.</li>
+            <li>Clear starting points before long lists.</li>
+            <li>Direct site links for live hours, bookings, and details.</li>
+            <li>An easy correction path when something changes.</li>
           </ul>
         </article>
         <article className="newsletter-card newsletter-card-wide">

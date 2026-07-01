@@ -105,6 +105,41 @@ export const blockedPhrases = [
   },
 ];
 
+export const renderedOnlyBlockedPhrases = [
+  {
+    phrase: "source-backed",
+    reason: "Rendered public pages should use customer-facing planning language, not proof-lane language.",
+  },
+  {
+    phrase: "official-source",
+    reason: "Rendered public pages should use direct site links or place details, not proof-lane shorthand.",
+  },
+  {
+    phrase: "official source notes",
+    reason: "Rendered public pages should use direct site links or place details, not proof-lane shorthand.",
+  },
+  {
+    phrase: "without pretending",
+    reason: "Rendered public pages should sound useful and confident, not like an internal audit note.",
+  },
+  {
+    phrase: "claim limits",
+    reason: "Rendered public pages should describe what customers can do next, not internal claim controls.",
+  },
+  {
+    phrase: "source discipline",
+    reason: "Rendered public pages should describe direct site links and updates, not internal source controls.",
+  },
+  {
+    phrase: "source-owner",
+    reason: "Rendered public pages should not expose source-tracking shorthand.",
+  },
+  {
+    phrase: "source-date",
+    reason: "Rendered public pages should not expose source-tracking shorthand.",
+  },
+];
+
 export const publicSeedSections = new Set([
   "businesses",
   "events",

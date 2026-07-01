@@ -30,8 +30,8 @@ function getBusinessStatusLabel(business: Business) {
 
 export function BusinessCard({ business }: { business: Business }) {
   const exampleOnly = isExampleBusiness(business);
-  const pageLabel = exampleOnly ? "Sample page" : "Source-backed page";
-  const toplineDetail = business.priceTier ?? (exampleOnly ? "Preview only" : "Official source checked");
+  const pageLabel = exampleOnly ? "Sample page" : "Local place page";
+  const toplineDetail = business.priceTier ?? (exampleOnly ? "Preview only" : "Direct site link");
 
   return (
     <article className="content-card business-card">
@@ -108,7 +108,7 @@ export function OfferCard({
   const mediaTitle = business?.name ?? "CityAtlas offer preview";
   const mediaDetail = business
     ? previewContext
-      ? "Source-backed page example"
+      ? "Local place page example"
       : "Offer preview context"
     : "Preview only";
 

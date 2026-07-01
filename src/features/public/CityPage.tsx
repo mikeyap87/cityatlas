@@ -137,8 +137,8 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
       wide: true,
     },
     {
-      title: `${sourceBackedPlaceCount} places with official links`,
-      copy: "Real Vancouver places with official links and a public correction path.",
+      title: `${sourceBackedPlaceCount} local place pages`,
+      copy: "Vancouver places with direct site links and a simple way to flag outdated details.",
     },
     {
       title: neighborhoodGuideCount > 0 ? `${neighborhoodGuideCount} neighborhood guides` : "Neighborhood-first",
@@ -152,7 +152,7 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
     {
       path: "/vancouver/date-night-starters",
       label: "Date night",
-      detail: "Real evening anchors with official site links.",
+      detail: "Dinner-first evening starts with direct site links.",
     },
     {
       path: "/vancouver/rainy-day-starters",
@@ -307,7 +307,7 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
                 <strong>Search places or jump straight into a strong starting page</strong>
                 <p>Search the current place list, or open the page that already fits the day.</p>
               </div>
-              <StatusPill tone="blue">{sourceBackedPlaceCount} places with official links</StatusPill>
+              <StatusPill tone="blue">{sourceBackedPlaceCount} local pages</StatusPill>
             </div>
             <div className="city-search-panel">
               <SearchIcon />
@@ -384,14 +384,14 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
               label="Local places ready now"
               title="Open the local places that are ready now"
               copy="Start with the strongest local places here, then open a guide only if the day still needs more."
-              action={<StatusPill tone="green">{sourceBackedPlaceCount} places with official links</StatusPill>}
+              action={<StatusPill tone="green">{sourceBackedPlaceCount} local pages</StatusPill>}
             />
           </div>
           <div className="source-panel">
             <p>
-              These pages stay focused on purpose. They link straight to official venue sources,
+              These pages stay focused on purpose. They link straight to the place's own site,
               explain what kind of plan each place fits, and make it easy to report a mistake when
-              needed.
+              something changes.
             </p>
             <div className="guide-index-grid">
               {featuredPlacePageIndexLinks.map((item) => (
@@ -426,9 +426,9 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
 
       <section className="section-block">
         <SectionHeader
-          title="Source-backed Vancouver business pages"
-          copy={`${businesses.length} Vancouver business pages now use real venue names, actual venue photos, and the official path to re-check details before you visit.`}
-          action={<StatusPill tone="green">Source-backed pages</StatusPill>}
+          title="Vancouver business pages"
+          copy={`${businesses.length} Vancouver business pages now use real venue names, actual venue photos, and direct links to confirm details before you visit.`}
+          action={<StatusPill tone="green">Local place pages</StatusPill>}
         />
         <div className="card-grid three">
           {businesses.map((business) => (

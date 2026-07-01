@@ -223,20 +223,76 @@ const homeResultKindLabels: Record<HomeSearchKind, string> = {
 };
 
 const trustedStartingPointLinks = [
-  { path: "/vancouver/date-night-starters", label: "Date night" },
-  { path: "/vancouver/rainy-day-starters", label: "Rainy day" },
-  { path: "/vancouver/first-evening-starters", label: "First evening" },
-  { path: "/vancouver/first-time-visitor-starters", label: "First visit" },
-  { path: "/vancouver/garden-day-starters", label: "Garden day" },
-  { path: "/vancouver/kitsilano-scenic-starters", label: "Kitsilano" },
-  { path: "/vancouver/west-side-daytime-starters", label: "West-side day" },
-  { path: "/vancouver/false-creek-culture-starters", label: "False Creek" },
-  { path: "/vancouver/ubc-discovery-starters", label: "UBC day" },
-  { path: "/vancouver/returning-visitor-starters", label: "Returning visit" },
-  { path: "/vancouver/out-of-town-guest-starters", label: "Hosting guests" },
-  { path: "/vancouver/weekend-route-starters", label: "Weekend plan" },
-  { path: "/vancouver/sunday-starters", label: "Sunday plan" },
-  { path: "/vancouver/wellness-reset-starters", label: "Wellness reset" },
+  {
+    path: "/vancouver/date-night-starters",
+    label: "Date night",
+    detail: "Dinner-first evening anchors with official links.",
+  },
+  {
+    path: "/vancouver/rainy-day-starters",
+    label: "Rainy day",
+    detail: "Indoor-friendly starts for weather shifts.",
+  },
+  {
+    path: "/vancouver/first-evening-starters",
+    label: "First evening",
+    detail: "Short first-night starts for visitors or guests.",
+  },
+  {
+    path: "/vancouver/first-time-visitor-starters",
+    label: "First visit",
+    detail: "Choose the right first impression before building the day.",
+  },
+  {
+    path: "/vancouver/garden-day-starters",
+    label: "Garden day",
+    detail: "Garden and conservatory starts for a slower day.",
+  },
+  {
+    path: "/vancouver/kitsilano-scenic-starters",
+    label: "Kitsilano",
+    detail: "Waterfront and west-side starts for a slower pace.",
+  },
+  {
+    path: "/vancouver/west-side-daytime-starters",
+    label: "West-side day",
+    detail: "Beach, campus, and quieter daytime starts.",
+  },
+  {
+    path: "/vancouver/false-creek-culture-starters",
+    label: "False Creek",
+    detail: "Culture and waterfront starts for compact afternoons.",
+  },
+  {
+    path: "/vancouver/ubc-discovery-starters",
+    label: "UBC day",
+    detail: "Campus, museum, and garden starts near Point Grey.",
+  },
+  {
+    path: "/vancouver/returning-visitor-starters",
+    label: "Returning visit",
+    detail: "Second-look starts when the obvious first visit is done.",
+  },
+  {
+    path: "/vancouver/out-of-town-guest-starters",
+    label: "Hosting guests",
+    detail: "Crowd-pleasing starts for friends or family in town.",
+  },
+  {
+    path: "/vancouver/weekend-route-starters",
+    label: "Weekend plan",
+    detail: "Compact weekend starts without crossing the city all day.",
+  },
+  {
+    path: "/vancouver/sunday-starters",
+    label: "Sunday plan",
+    detail: "Low-effort Sunday anchors with calmer pacing.",
+  },
+  {
+    path: "/vancouver/wellness-reset-starters",
+    label: "Wellness reset",
+    detail: "Recovery-minded starts for calmer Vancouver days.",
+  },
 ] as const;
 
 const homePlanningLanes = [
@@ -743,6 +799,23 @@ export function HomePage({ data, onNewsletter: _onNewsletter, onTrack, onSaveMis
           <AppLink className="button secondary" to={nextBestAction.secondaryPath}>
             {nextBestAction.secondaryLabel}
           </AppLink>
+        </div>
+      </section>
+
+      <section className="section-block">
+        <SectionHeader
+          label="Browse by situation"
+          title={`${sourceBackedWedgeCount} source-backed Vancouver starts are ready now`}
+          copy="Open the page that matches the kind of day first. Each start keeps the claims narrow, uses official source links, and stays easy to correct."
+          action={<StatusPill tone="green">{localPlacePageLabel}</StatusPill>}
+        />
+        <div className="guide-index-grid route-moment-grid">
+          {trustedStartingPointLinks.map((link) => (
+            <AppLink className="guide-index-card route-moment-card" key={link.path} to={link.path}>
+              <strong>{link.label}</strong>
+              <span>{link.detail}</span>
+            </AppLink>
+          ))}
         </div>
       </section>
 

@@ -170,9 +170,34 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
       detail: "Choose the best first impression before building the day.",
     },
     {
+      path: "/vancouver/garden-day-starters",
+      label: "Garden day",
+      detail: "Garden and conservatory starts for a slower day.",
+    },
+    {
       path: "/vancouver/kitsilano-scenic-starters",
       label: "Kitsilano",
       detail: "Waterfront and west-side starts for a slower pace.",
+    },
+    {
+      path: "/vancouver/west-side-daytime-starters",
+      label: "West-side day",
+      detail: "Beach, campus, and quieter daytime starts.",
+    },
+    {
+      path: "/vancouver/false-creek-culture-starters",
+      label: "False Creek",
+      detail: "Culture and waterfront starts for compact afternoons.",
+    },
+    {
+      path: "/vancouver/ubc-discovery-starters",
+      label: "UBC day",
+      detail: "Campus, museum, and garden starts near Point Grey.",
+    },
+    {
+      path: "/vancouver/returning-visitor-starters",
+      label: "Returning visit",
+      detail: "Second-look starts when the obvious first visit is done.",
     },
     {
       path: "/vancouver/weekend-route-starters",
@@ -185,6 +210,11 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
       detail: "Easy crowd-pleasing starts for visiting friends or family.",
     },
     {
+      path: "/vancouver/sunday-starters",
+      label: "Sunday plan",
+      detail: "Low-effort Sunday anchors with calmer pacing.",
+    },
+    {
       path: "/vancouver/wellness-reset-starters",
       label: "Wellness reset",
       detail: "Recovery-minded starts for calmer Vancouver days.",
@@ -195,7 +225,7 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
       detail: "Open this when you still need help choosing the first page.",
     },
   ];
-  const featuredPlacePageIndexLinks = placePageIndexLinks.slice(0, 6);
+  const featuredPlacePageIndexLinks = placePageIndexLinks;
   const featuredGuideSlugs = [
     "where-should-a-first-time-vancouver-visitor-start",
     "mount-pleasant-local-discovery-starter-guide-for-casual-vancouver-plans",

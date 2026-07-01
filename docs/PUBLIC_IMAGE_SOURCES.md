@@ -9,6 +9,12 @@ This file records the public image sources and image-generation inputs currently
 - The public app now describes these visuals as illustrated scenes or illustrated place views, not documentary photos.
 - The older official-source place images under `public/assets/places/` still stay in the repo as source-reference material and proof context for factual coverage, correction paths, and future refreshes.
 
+## Active Route Visual Layer
+
+| Label | Asset path | Generation note |
+| --- | --- | --- |
+| Vancouver Date Night route hero | `public/assets/routes-generated/vancouver-date-night-route-hero-v2.jpg` | Generated with built-in `image_gen` on 2026-07-01 as a broad Vancouver evening-route mood image. It should be described as an illustrated/editorial route scene, not a literal photo of any listed business or exact street. |
+
 ## Existing Public Business Photos
 
 | Label | Asset path | Source page |
@@ -52,6 +58,7 @@ This file records the public image sources and image-generation inputs currently
 
 - Business photos under `public/assets/businesses/` are public-source venue images already saved in the repo.
 - Active place visuals under `public/assets/places-generated/` are generated editorial-style illustrations inspired by the real places above.
+- Active route visuals under `public/assets/routes-generated/` are generated editorial-style scenes for route mood and planning context.
 - Reference place photos under `public/assets/places/` are pulled from official city, venue, or district pages listed above.
 - Most place photos can be downloaded directly by script. City of Vancouver and Vancouver Public Library files that returned direct-fetch `403` were instead captured from those same official public pages through the in-app browser asset bundle and then saved locally.
 - Shared public hero and fallback surfaces now reuse the generated place-image layer, while the official place photos above remain the source-reference record for the underlying location choices.

@@ -20,6 +20,10 @@ const venueVisualLibrary = {
   miku: resolvePublicAssetPath("/assets/businesses/miku-waterfront-dining-room.png"),
 } as const;
 
+const routeVisualLibrary = {
+  dateNight: resolvePublicAssetPath("/assets/routes-generated/vancouver-date-night-route-hero-v2.jpg"),
+} as const;
+
 const placeVisualLibrary = {
   artGalleryOfOntario: resolvePublicAssetPath("/assets/places-generated/art-gallery-of-ontario-generated.jpg"),
   beatyBiodiversityMuseum: resolvePublicAssetPath("/assets/places-generated/beaty-biodiversity-museum-generated.jpg"),
@@ -83,7 +87,7 @@ const placeholderSceneAssets = new Set([
 ]);
 
 const sourceBackedCollectionVisuals: Record<SourceBackedPlaceReference["collection"], string> = {
-  vancouver_date_night_starters: venueVisualLibrary.labattoir,
+  vancouver_date_night_starters: routeVisualLibrary.dateNight,
   vancouver_rainy_day_starters: placeVisualLibrary.vancouverArtGallery,
   vancouver_first_evening_starters: placeVisualLibrary.stanleyPark,
   vancouver_first_time_visitor_starters: placeVisualLibrary.gastown,
@@ -102,7 +106,7 @@ const sourceBackedCollectionVisuals: Record<SourceBackedPlaceReference["collecti
 };
 
 const guideVisualOverrides: Partial<Record<Guide["slug"], string>> = {
-  "how-to-plan-a-vancouver-date-night-without-crossing-the-city-twice": venueVisualLibrary.labattoir,
+  "how-to-plan-a-vancouver-date-night-without-crossing-the-city-twice": routeVisualLibrary.dateNight,
   "rainy-day-vancouver-plan-coffee-walk-and-reset": placeVisualLibrary.vancouverPublicLibraryCentral,
   "vancouver-wellness-experiences-to-review": placeVisualLibrary.queenElizabethPark,
   "how-to-pick-a-work-friendly-vancouver-cafe": visualLibrary.coffee,
@@ -118,8 +122,8 @@ const guideVisualOverrides: Partial<Record<Guide["slug"], string>> = {
   "cityatlas-guide-roundup-which-vancouver-route-should-you-open-by-situation": placeVisualLibrary.gastown,
   "which-low-friction-vancouver-route-should-you-open-today": placeVisualLibrary.vancouverPublicLibraryCentral,
   "how-to-choose-between-gastown-mount-pleasant-and-kitsilano-for-a-vancouver-evening": placeVisualLibrary.gastown,
-  "which-vancouver-neighborhood-fits-a-low-pressure-first-date": venueVisualLibrary.kissaTanto,
-  "how-to-plan-a-two-stop-vancouver-night-without-transit-drag": venueVisualLibrary.labattoir,
+  "which-vancouver-neighborhood-fits-a-low-pressure-first-date": routeVisualLibrary.dateNight,
+  "how-to-plan-a-two-stop-vancouver-night-without-transit-drag": routeVisualLibrary.dateNight,
   "gastown-evening-guide-when-to-choose-it-and-how-to-keep-the-plan-compact": placeVisualLibrary.gastown,
   "mount-pleasant-local-discovery-starter-guide-for-casual-vancouver-plans": venueVisualLibrary.publishedOnMain,
   "kitsilano-scenic-route-starter-guide-for-slower-vancouver-evenings": placeVisualLibrary.kitsilanoBeach,

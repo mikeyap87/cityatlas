@@ -71,17 +71,17 @@ const modules = [
   },
   {
     name: "Revenue system",
-    progress: 76,
-    done: "Package framing, draft terms/privacy, Stripe product manifest, payment gate, accepted Stripe Billing/Checkout plan, Date Night revenue proof loop, and reply-summary command.",
-    remains: "Demand proof, refund policy, Stripe test-mode object creation, checkout proof.",
-    next: "Wait for 2 to 3 qualified package-demand signals in the reply summary before creating Stripe test-mode products.",
+    progress: 88,
+    done: "Package framing, draft terms/privacy, Stripe product manifest, accepted Stripe-hosted payment-link plan, guarded City Partner and Signature Partner checkout handoff, Date Night revenue proof loop, and reply-summary command.",
+    remains: "One owner-controlled successful City Partner checkout proof, refund/cancellation policy confirmation, Stripe dashboard receipt review, and fulfillment handoff review.",
+    next: "Use the paid-traffic readiness packet for a tiny request-first paid test, then complete one real City Partner checkout proof before calling the product fully charge-ready or self-serve verified.",
   },
   {
     name: "Launch infrastructure",
-    progress: 96,
-    done: "Univenture folder, Vercel project, public alias, protected preview, hosted route flags, Cloudflare DNS, Vercel alias, HTTPS certificate, custom-domain smoke, and public crawlable robots release.",
-    remains: "Production analytics/observability approval and ongoing crawl/index monitoring.",
-    next: "Keep admin/private-preview protected, monitor crawl behavior, and publish stronger source-backed pages.",
+    progress: 98,
+    done: "Univenture folder, Vercel project, public alias, protected preview, hosted route flags, Cloudflare DNS, Vercel alias, HTTPS certificate, custom-domain smoke, public crawlable robots release, production corrective deploy proof, and consent-gated GA4 handoff.",
+    remains: "Real ad-platform conversion evidence, ongoing crawl/index monitoring, and one real checkout proof.",
+    next: "Run the tiny paid-traffic test with request-first copy, UTM discipline, and strict stop rules; keep admin/private-preview protected.",
   },
   {
     name: "Data/source policy",
@@ -135,14 +135,15 @@ const report = {
     sourcePolicy: has("docs/REAL_WORLD_SOURCE_POLICY.md") && has("supabase/schema.sql"),
   },
   liveBlocked: [
-    "Stripe product/price creation",
+    "agent-run real payment completion or Stripe account mutation",
+    "paid ad spend",
     "real provider import",
     "additional customer outreach or follow-ups",
     "public real-business publication",
   ],
   nextBestBatch:
     seoProof?.passed === true
-      ? "Use the first source-backed release packet for the local-ready first-time visitor and wellness queue, keep the second, Sunday, returning-visitor, and starter-pack queues isolated behind it, and leave hosted crawl/index claims unproven until a real deploy-and-smoke pass happens."
+      ? "Run one tightly capped request-first paid-traffic test into the reviewed business request and Stripe-hosted checkout handoff, then complete one owner-controlled City Partner checkout proof before calling CityAtlas fully charge-ready or self-serve verified."
       : "Fix the local SEO content-machine proof first, then keep expanding only with source-backed destination pages that official public sources can honestly support.",
 };
 

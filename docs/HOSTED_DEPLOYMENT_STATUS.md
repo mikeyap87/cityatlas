@@ -1,6 +1,6 @@
 # Hosted Deployment Status
 
-Date: 2026-06-17
+Date: 2026-07-01
 
 ## Vercel
 
@@ -9,8 +9,8 @@ Date: 2026-06-17
 - Project ID: `prj_BWFVXVkasM6b3yybiuPHCJFk5fCV`
 - Public production alias: `https://cityatlas-one.vercel.app`
 - Custom Univenture alias: `https://city.univenturestudio.com`
-- Latest production deployment: `dpl_EH4ZGfu6TxX1Erg6dARaNuBGJv7y`
-- Latest production deployment URL: `https://cityatlas-rcpxa1sng-michael-yaps-projects-92932836.vercel.app`
+- Latest production deployment: `dpl_Ac5mv3D731WmWuQzqMas9Z6wqMU8`
+- Latest production deployment URL: `https://cityatlas-qi49qife6-michael-yaps-projects-92932836.vercel.app`
 
 ## Protection State
 
@@ -19,7 +19,7 @@ Date: 2026-06-17
 - Hosted `/admin` renders the protected operations-route notice because `VITE_CITYATLAS_ENABLE_HOSTED_ADMIN=false`.
 - Hosted `/private-preview/date-night` renders the protected route notice because `VITE_CITYATLAS_ENABLE_HOSTED_PRIVATE_PREVIEW=false`.
 - Hosted `/planner` and `/for-businesses/submit` stay noindex even though the public app is crawlable.
-- Live payments, real provider imports, and automated outreach were deployed as disabled.
+- Live Stripe-hosted Payment Link handoff is enabled only for the guarded City Partner and Signature Partner links. Real provider imports and automated outreach remain disabled.
 
 ## Custom Domain
 
@@ -45,6 +45,12 @@ Certificate: cert_u3pbkyalMfT35DtAZryQRPMe
 ```
 
 The custom domain is resolving normally and serving the latest production deployment.
+
+## 2026-07-01 Corrective Route And Revenue Recovery
+
+The July 1 recovery redeployed the newer CityAtlas route base after an earlier production deployment had shipped from an older branch. The corrected production build restores the current `/for-businesses/partner-preview`, `/for-businesses/pricing`, and `/for-businesses/submit` surfaces, adds guarded Stripe-hosted checkout CTAs for the paid packages, and adds consent-gated GA4 measurement for a tiny paid-traffic test.
+
+This recovery does not prove a real customer payment. One successful owner-controlled City Partner checkout is still required before CityAtlas can be called fully charge-ready or fully self-serve verified.
 
 ## Public Indexing Release
 
@@ -96,6 +102,12 @@ The next live follow-through on 2026-06-15 updated the homepage Google verificat
 
 ## Verified
 
+- Production deploy `dpl_Ac5mv3D731WmWuQzqMas9Z6wqMU8` completed successfully and aliases include `https://city.univenturestudio.com`.
+- `curl https://city.univenturestudio.com/` returned the July 1 asset build with `/assets/index-BOdI0lK4.js` and `/assets/index-CvwLPMnD.css`.
+- Hosted browser proof on `https://city.univenturestudio.com/for-businesses/pricing` confirmed the package page, honesty boundary, City Partner checkout link, Signature checkout link, consent banner, no GA script before consent, and GA4 activation after consent.
+- Hosted browser proof confirmed `/for-businesses/partner-preview` renders `What CityAtlas needs from a local partner`.
+- Hosted browser proof confirmed `/for-businesses/submit` renders `Start a CityAtlas business request`.
+- Read-only Stripe link checks returned `HTTP/2 200` for the City Partner and Signature Partner Payment Links.
 - Production deploy `dpl_EH4ZGfu6TxX1Erg6dARaNuBGJv7y` completed successfully and now serves the public aliases.
 - `curl -I https://city.univenturestudio.com/` returned `HTTP/2 200` after the 2026-06-17 deploy with `last-modified: Wed, 17 Jun 2026 06:46:43 GMT`.
 - `npm run seo:smoke:first -- --base-url https://city.univenturestudio.com` passed on 2026-06-17 after the standalone-repo direct deploy and re-verified the hosted first-time-visitor and wellness routes, protected noindex routes, `sitemap.xml`, and `llms.txt`.
@@ -156,6 +168,8 @@ The next live follow-through on 2026-06-15 updated the homepage Google verificat
 
 ## Still Missing On The Approved Domain
 
+- One real successful City Partner checkout proof is still missing.
+- Ad-platform conversion proof is still missing because no ad spend has been started.
 - `npm run seo:smoke:toronto -- --base-url https://city.univenturestudio.com` failed on 2026-06-16.
 - Hosted `/toronto/guides`, `/toronto/first-time-visitor-starters`, `/toronto/weekend-route-starters`, `/toronto/guides/where-should-a-first-time-toronto-visitor-start`, and `/toronto/guides/how-to-build-a-toronto-weekend-route-without-crossing-the-city-all-day` currently return the Vancouver homepage shell instead of the Toronto pilot surface.
 - Hosted `sitemap.xml` and hosted `llms.txt` do not yet include the Toronto pilot routes.

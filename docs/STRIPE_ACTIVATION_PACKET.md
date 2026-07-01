@@ -1,14 +1,21 @@
 # Stripe Activation Packet
 
-Date: 2026-06-14
+Date: 2026-07-01
 
 ## Current State
 
-Stripe is not active in CityAtlas. The app has package framing, but no Stripe SDK, checkout route, payment link, subscription creation, invoice creation, or webhook handling.
+Stripe-hosted Payment Links are active in CityAtlas for the paid business packages. The app does not contain a Stripe SDK, custom checkout route, Checkout Session API call, subscription creation logic, invoice automation, webhook handling, or customer portal.
+
+Verified live handoff:
+
+- City Partner: `https://buy.stripe.com/28EaEXazm3Vc9J27KJcAo01`
+- Signature Partner: `https://buy.stripe.com/dRmfZhfTG0J01cw4yxcAo00`
+
+The checkout handoff is guarded by environment variables and visible only when live payments are explicitly enabled.
 
 ## Recommended Stripe Model
 
-Use Stripe Billing with Checkout Sessions for subscriptions.
+Use Stripe-hosted Payment Links for the first request-first paid-traffic test. Move to Stripe Billing with custom Checkout Sessions only after real checkout proof and fulfillment operations are clear.
 
 Why:
 
@@ -23,14 +30,14 @@ Chosen path:
 
 - Web subscription product.
 - Fixed monthly prices, not usage-based or seat-based.
-- Stripe-hosted Checkout for first paid activation.
-- Stripe-hosted Customer Portal later for self-service changes.
+- Stripe-hosted Payment Links for first paid activation.
+- Stripe-hosted Customer Portal later for self-service changes if subscriptions need customer self-service.
 - Stripe automatic payment recovery defaults.
-- No live checkout links, invoices, subscriptions, or payment acceptance in this batch.
+- No custom in-app card handling, invoices, subscription-state syncing, or webhook automation in this batch.
 
 ## Draft Product Catalog
 
-Use `stripe/products.review.json` as the local review manifest. Do not create these in Stripe until approved.
+Use `stripe/products.review.json` as the local review manifest. Do not create, edit, or archive Stripe objects without a separate owner-approved Stripe account action.
 
 | Product | Price | Billing | Purpose |
 | --- | ---: | --- | --- |
@@ -38,34 +45,32 @@ Use `stripe/products.review.json` as the local review manifest. Do not create th
 | CityAtlas City Partner | $49/month | Monthly subscription | First paid package to validate |
 | CityAtlas Signature Partner | $149/month | Monthly subscription | Premium anchor package |
 
-## Required Before Creating Stripe Objects
+## Required Before Calling This Fully Charge-Ready
 
-1. Owner approves package names and prices.
-2. Owner approves fulfillment promise.
-3. Owner approves refund/cancellation policy.
-4. Owner approves support process and response SLA.
-5. Owner approves whether Stripe objects are test-mode first or live-mode.
-6. Terms/privacy are reviewed.
-7. First proof sprint has at least 2 to 3 meaningful package yeses or strong hosted-collaboration intent.
-8. `npm run replies:analyze` has produced 2 to 3 qualified package-demand or hosted-collaboration signals.
-9. `docs/revenue/DATE_NIGHT_REVENUE_PROOF_LOOP.md` is updated with the logged demand signal and confidence level.
+1. Owner completes one real City Partner checkout from the live site.
+2. Stripe dashboard shows the successful payment, customer, amount, and package.
+3. The receipt/customer email path is reviewed.
+4. The owner confirms refund/cancellation policy and support response expectations.
+5. The fulfillment handoff is recorded: what happens after payment, who reviews the business, and what the customer is told.
+6. Terms/privacy are reviewed for live payment acceptance.
+7. The result is logged in `docs/revenue/PAID_TRAFFIC_READINESS.md` or a follow-on proof packet.
 
 ## Recommended First Activation
 
-Start with test-mode Stripe objects only:
+Start with the live Payment Links already configured, but keep the first campaign request-first and small:
 
 - Product: `CityAtlas City Partner`
 - Price: `$49/month`
-- Checkout mode: subscription
-- Payment collection: test mode
+- Checkout mode: Stripe-hosted Payment Link
+- Payment collection: live, owner-controlled proof first
 - Fulfillment: manual founder review and monthly visibility snapshot
 
-Only after test-mode proof should live-mode payment links or Checkout be enabled.
+Only after one successful real checkout should CityAtlas be called fully charge-ready or self-serve verified.
 
 ## Approval Needed
 
-This affects money/account state. It may create billing objects, checkout links, or subscription surfaces in Stripe. The rollback is to archive/deactivate test objects or disable payment links before sharing.
+This affects money/account state. Changing prices, creating new links, editing Stripe products, refunding payments, or completing a payment as the agent remains approval-gated. The rollback is to disable the live-payment environment flag, remove the Payment Link environment variables, or archive/deactivate the Stripe links in Stripe.
 
 Approval sentence:
 
-`Approved: create CityAtlas Stripe test-mode products and prices from stripe/products.review.json only; do not enable live payment acceptance or publish checkout links yet.`
+`Approved: complete one owner-controlled CityAtlas City Partner checkout from the live site, record the Stripe proof, and do not start paid ad spend until the proof result is logged.`

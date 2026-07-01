@@ -540,3 +540,24 @@
     text-align: left;
   }
 }
+
+@media (max-width: 860px) {
+  .analytics-consent-banner {
+    bottom: 12px;
+    gap: 10px;
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+
+  .analytics-consent-actions {
+    display: grid;
+    gap: 8px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    justify-content: stretch;
+  }
+
+  .analytics-consent-actions .button {
+    min-height: 44px;
+    width: 100%;
+  }
+}

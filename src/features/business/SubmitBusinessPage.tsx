@@ -3,6 +3,11 @@ import type { BusinessSubmission, CityAtlasData, PackageId } from "../../types";
 import { AppLink } from "../../components/Link";
 import { ArrowRightIcon, LockIcon, StoreIcon } from "../../components/Icons";
 import { EmptyState, SafeModeNotice, SectionHeader, StatusPill } from "../../components/UI";
+import {
+  getPartnerPackageCheckoutLabel,
+  getPartnerPackageCheckoutUrl,
+  hasPartnerPackageCheckout,
+} from "../../config/site";
 
 interface SubmitBusinessPageProps {
   data: CityAtlasData;
@@ -46,6 +51,12 @@ export function SubmitBusinessPage({ data, onSubmitBusiness }: SubmitBusinessPag
       return list;
     }, [])
     .slice(0, 5);
+  const savedCheckoutUrl = saved?.packageInterest
+    ? getPartnerPackageCheckoutUrl(saved.packageInterest)
+    : undefined;
+  const canCheckoutSavedPackage = Boolean(
+    saved?.packageInterest && hasPartnerPackageCheckout(saved.packageInterest) && savedCheckoutUrl,
+  );
 
   return (
     <>
@@ -55,7 +66,8 @@ export function SubmitBusinessPage({ data, onSubmitBusiness }: SubmitBusinessPag
           <h1>Start a CityAtlas business request</h1>
           <p>
             Early access note: this request is saved in this browser while CityAtlas finishes live
-            business intake. Nothing is billed, published, or contacted from this form.
+            business intake. Nothing is billed, published, or contacted from this form. Paid checkout
+            opens only from a separate Stripe-hosted link when it is available.
           </p>
           <div className="hero-actions">
             <AppLink className="button secondary" to="/for-businesses/partner-preview">
@@ -187,6 +199,12 @@ export function SubmitBusinessPage({ data, onSubmitBusiness }: SubmitBusinessPag
               Nothing goes live from this form. CityAtlas uses it to review fit, facts, and next
               steps before any profile, perk, or package is confirmed.
             </p>
+            {canCheckoutSavedPackage && saved?.packageInterest && savedCheckoutUrl ? (
+              <a className="button primary wide" href={savedCheckoutUrl}>
+                {getPartnerPackageCheckoutLabel(saved.packageInterest)}
+                <ArrowRightIcon />
+              </a>
+            ) : null}
           </div>
           <div className="source-panel">
             <StoreIcon />

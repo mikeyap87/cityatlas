@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { siteConfig } from "../config/site";
+import { AnalyticsConsentBanner } from "./AnalyticsConsent";
 import { AppLink } from "./Link";
 import { CityAtlasMarkIcon, SearchIcon } from "./Icons";
 
@@ -64,6 +65,7 @@ export function PublicLayout({ children, path }: LayoutProps) {
       </header>
 
       <main>{children}</main>
+      <AnalyticsConsentBanner path={path} />
 
       <footer className="site-footer">
         <div>

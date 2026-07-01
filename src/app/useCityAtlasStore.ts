@@ -33,6 +33,7 @@ import {
   resetCityAtlasData,
   saveCityAtlasData,
 } from "../lib/storage";
+import { getTrafficContext, trackProductEvent } from "../lib/analytics";
 
 export function useCityAtlasStore() {
   const [data, setData] = useState<CityAtlasData>(() => loadCityAtlasData());
@@ -67,10 +68,16 @@ export function useCityAtlasStore() {
         return lead;
       },
       trackEvent(name: string, detail: Record<string, string | number | boolean> = {}) {
+        const path = window.location.pathname;
+        const enrichedDetail = {
+          ...getTrafficContext(),
+          ...detail,
+        };
+        trackProductEvent(name, path, enrichedDetail);
         setData((current) => ({
           ...current,
           growthEvents: [
-            createGrowthEvent(name, window.location.pathname, detail),
+            createGrowthEvent(name, path, enrichedDetail),
             ...current.growthEvents,
           ].slice(0, 200),
         }));

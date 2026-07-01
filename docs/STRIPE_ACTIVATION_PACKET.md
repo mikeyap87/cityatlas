@@ -1,76 +1,89 @@
-# Stripe Activation Packet
+# CityAtlas Stripe Activation Packet
 
-Date: 2026-07-01
+Date: 2026-06-25
+Re-anchored: 2026-07-01
 
-## Current State
+This packet is intentionally narrow. It now preserves the exact live Stripe payment-link truth, the env values that must stay wired, the first real checkout proof still required, and what remains out of scope.
 
-Stripe-hosted Payment Links are active in CityAtlas for the paid business packages. The app does not contain a Stripe SDK, custom checkout route, Checkout Session API call, subscription creation logic, invoice automation, webhook handling, or customer portal.
+## 1) The Two Exact Live Stripe Payment Links That Must Exist
 
-Verified live handoff:
+No third paid link is needed in this batch. `Community Listing` stays free and review-first.
 
-- City Partner: `https://buy.stripe.com/28EaEXazm3Vc9J27KJcAo01`
-- Signature Partner: `https://buy.stripe.com/dRmfZhfTG0J01cw4yxcAo00`
+- `CityAtlas City Partner`
+  - Stripe account: `acct_1TWOnaI27jKwwm3H`
+  - live product: `prod_UlpKqAPmxKrw1A`
+  - live recurring price: `price_1TmLDBI27jKwwm3H1gUFgwU6`
+  - expected offer shown to the buyer: `$49.00 CAD / month`
+  - live payment link: `https://buy.stripe.com/28EaEXazm3Vc9J27KJcAo01`
 
-The checkout handoff is guarded by environment variables and visible only when live payments are explicitly enabled.
+- `CityAtlas Signature Partner`
+  - Stripe account: `acct_1TWOnaI27jKwwm3H`
+  - live product: `prod_UlsHzdgsuSlgll`
+  - live recurring price: `price_1TmLHII27jKwwm3HVtE0CtqB`
+  - expected offer shown to the buyer: `$149.00 CAD / month`
+  - live payment link: `https://buy.stripe.com/dRmfZhfTG0J01cw4yxcAo00`
 
-## Recommended Stripe Model
+Local public-checkout verification from this lane confirmed the first link renders `CityAtlas City Partner` and the second renders `CityAtlas Signature Partner`. In a US-locale browser, Stripe currently shows a localized USD amount first with a visible CAD toggle, but the links map to the correct CityAtlas packages above.
 
-Use Stripe-hosted Payment Links for the first request-first paid-traffic test. Move to Stripe Billing with custom Checkout Sessions only after real checkout proof and fulfillment operations are clear.
+## 2) Historical Dashboard Steps Used To Create Them
 
-Why:
+1. Sign in to the live Univenture Stripe dashboard for account `acct_1TWOnaI27jKwwm3H`.
+2. Stay in live mode, not test mode.
+3. Open `https://dashboard.stripe.com/acct_1TWOnaI27jKwwm3H/payment-links`.
+4. Click `Create payment link`.
+5. In `Find or add a product...`, choose the existing product `CityAtlas City Partner`.
+6. From its existing price choices, select `$49.00 CAD / month` for live price `price_1TmLDBI27jKwwm3H1gUFgwU6`.
+7. Do not create a new product. Do not choose a USD price. Do not use any test-mode object.
+8. Click `Create link`.
+9. Copy the resulting live `buy.stripe.com/...` URL and save it as the `City Partner` payment link.
+10. Repeat steps 4 through 9 for `CityAtlas Signature Partner`, selecting `$149.00 CAD / month` for live price `price_1TmLHII27jKwwm3HVtE0CtqB`.
 
-- CityAtlas is a recurring local-business visibility product.
-- Stripe Billing handles renewals, retries, dunning, and subscription state.
-- Checkout avoids building custom card handling.
-- Customer Portal can later manage upgrades, cancellations, and payment methods.
+If an extension popup or extra Chrome UI is sitting on the Stripe page, dismiss that first, then continue the same steps above.
 
-Accepted planner guide: `iguide_61UrTo5VgsUwF5Cth41I27jKwwm3H`
+## 3) The Exact Three Local Env Values To Wire Afterward
 
-Chosen path:
+```bash
+VITE_CITYATLAS_ENABLE_LIVE_PAYMENTS=true
+VITE_STRIPE_CITY_PARTNER_PAYMENT_LINK=https://buy.stripe.com/28EaEXazm3Vc9J27KJcAo01
+VITE_STRIPE_SIGNATURE_PARTNER_PAYMENT_LINK=https://buy.stripe.com/dRmfZhfTG0J01cw4yxcAo00
+```
 
-- Web subscription product.
-- Fixed monthly prices, not usage-based or seat-based.
-- Stripe-hosted Payment Links for first paid activation.
-- Stripe-hosted Customer Portal later for self-service changes if subscriptions need customer self-service.
-- Stripe automatic payment recovery defaults.
-- No custom in-app card handling, invoices, subscription-state syncing, or webhook automation in this batch.
+With those three values wired, the local proof command should pass:
 
-## Draft Product Catalog
+```bash
+npm run qa:payments:handoff
+```
 
-Use `stripe/products.review.json` as the local review manifest. Do not create, edit, or archive Stripe objects without a separate owner-approved Stripe account action.
+The hosted proof command should also pass once the live site is actually serving the Stripe checkout CTAs:
 
-| Product | Price | Billing | Purpose |
-| --- | ---: | --- | --- |
-| CityAtlas Community Listing | $0 | Free/manual | Basic review queue and source metadata |
-| CityAtlas City Partner | $49/month | Monthly subscription | First paid package to validate |
-| CityAtlas Signature Partner | $149/month | Monthly subscription | Premium anchor package |
+```bash
+npm run qa:payments:hosted
+```
 
-## Required Before Calling This Fully Charge-Ready
+Hosted proof from this lane passes. The 2026-07-01 proof shows the public pricing page serving `Start City Partner checkout` and `Start Signature checkout` on `https://city.univenturestudio.com/for-businesses/pricing`, while still keeping City Partner, Signature, and general request-first paths visible beside checkout.
 
-1. Owner completes one real City Partner checkout from the live site.
-2. Stripe dashboard shows the successful payment, customer, amount, and package.
-3. The receipt/customer email path is reviewed.
-4. The owner confirms refund/cancellation policy and support response expectations.
-5. The fulfillment handoff is recorded: what happens after payment, who reviews the business, and what the customer is told.
-6. Terms/privacy are reviewed for live payment acceptance.
-7. The result is logged in `docs/revenue/PAID_TRAFFIC_READINESS.md` or a follow-on proof packet.
+## 4) The One First Checkout Proof Still Required
 
-## Recommended First Activation
+This proof is not the same thing as a tiny request-first paid-traffic test. It is a live payment proof and needs explicit owner approval before the checkout is completed.
 
-Start with the live Payment Links already configured, but keep the first campaign request-first and small:
+Complete one real live `CityAtlas City Partner` checkout after the three env values above are wired.
 
-- Product: `CityAtlas City Partner`
-- Price: `$49/month`
-- Checkout mode: Stripe-hosted Payment Link
-- Payment collection: live, owner-controlled proof first
-- Fulfillment: manual founder review and monthly visibility snapshot
+The minimum honest proof is:
 
-Only after one successful real checkout should CityAtlas be called fully charge-ready or self-serve verified.
+1. Start from a CityAtlas paid surface that opens the live Stripe-hosted checkout handoff.
+2. Confirm Stripe shows the correct live `CityAtlas City Partner` offer at `$49.00 CAD / month`.
+3. Complete the checkout successfully in live mode.
+4. Confirm Stripe created the live customer and live subscription against price `price_1TmLDBI27jKwwm3H1gUFgwU6`.
 
-## Approval Needed
+Only after that first proof should CityAtlas be treated as honestly charge-ready for the paid handoff.
 
-This affects money/account state. Changing prices, creating new links, editing Stripe products, refunding payments, or completing a payment as the agent remains approval-gated. The rollback is to disable the live-payment environment flag, remove the Payment Link environment variables, or archive/deactivate the Stripe links in Stripe.
+## 5) What Remains Out Of Scope
 
-Approval sentence:
-
-`Approved: complete one owner-controlled CityAtlas City Partner checkout from the live site, record the Stripe proof, and do not start paid ad spend until the proof result is logged.`
+- any custom in-app checkout backend
+- Stripe webhooks
+- invoice automation
+- Stripe customer portal work
+- automated fulfillment or onboarding after payment
+- broader public claims of mature self-serve billing beyond the first live proof
+- future US-city pricing or currency rollout work
+- any deploy, push, provider write, or public claim from this local-only lane

@@ -1,10 +1,11 @@
 import { useMemo, useState } from "react";
-import type { CityAtlasData, CityMission } from "../../types";
+import type { CityAtlasData, CityMission, Guide } from "../../types";
 import { siteConfig } from "../../config/site";
 import { AppLink } from "../../components/Link";
 import { BusinessCard, EventCard, GuideCard, MissionCard, OfferCard } from "../../components/Cards";
-import { SearchIcon } from "../../components/Icons";
-import { SectionHeader, StatusPill } from "../../components/UI";
+import { ArrowRightIcon, SearchIcon } from "../../components/Icons";
+import { HeroMediaCard, SectionHeader, StatusPill } from "../../components/UI";
+import { getOfferDisplayBusiness } from "../../lib/offers";
 import { getSourceBackedPlaces } from "../../lib/sourceBackedCollections";
 import { VancouverBusinessCoverageSection } from "./VancouverBusinessCoverageSection";
 
@@ -71,6 +72,140 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
     data,
     "vancouver_wellness_reset_starters",
   );
+  const sourceBackedPlaceCount =
+    sourceBackedDateNightStarters.length +
+    sourceBackedRainyDayStarters.length +
+    sourceBackedFirstEveningStarters.length +
+    sourceBackedFirstTimeVisitorStarters.length +
+    sourceBackedGardenDayStarters.length +
+    sourceBackedKitsilanoScenicStarters.length +
+    sourceBackedWestSideDaytimeStarters.length +
+    sourceBackedFalseCreekCultureStarters.length +
+    sourceBackedUbcDiscoveryStarters.length +
+    sourceBackedReturningVisitorStarters.length +
+    sourceBackedOutOfTownGuestStarters.length +
+    sourceBackedWeekendRouteStarters.length +
+    sourceBackedSundayStarters.length +
+    sourceBackedWellnessResetStarters.length;
+  const cityHeroQuickStarts = [
+    {
+      label: "First visit",
+      detail: "Downtown, scenic, or west-side first stop",
+      to: "/vancouver/first-time-visitor-starters",
+    },
+    {
+      label: "Weekend plan",
+      detail: "One easy shape without crossing the city",
+      to: "/vancouver/weekend-route-starters",
+    },
+    {
+      label: "Rainy day",
+      detail: "Indoor-friendly Vancouver starters",
+      to: "/vancouver/rainy-day-starters",
+    },
+    {
+      label: "Kitsilano",
+      detail: "Slower waterfront and west-side flow",
+      to: "/vancouver/kitsilano-scenic-starters",
+    },
+    {
+      label: "Hosting guests",
+      detail: "Easy crowd-pleasing path for visitors",
+      to: "/vancouver/out-of-town-guest-starters",
+    },
+    {
+      label: "Wellness reset",
+      detail: "Lower-key recovery and reset plans",
+      to: "/vancouver/wellness-reset-starters",
+    },
+  ];
+  const neighborhoodGuideCount =
+    (neighborhoodStarterGuides.length > 0 ? neighborhoodStarterGuides : neighborhoodGuides).slice(
+      0,
+      4,
+    ).length;
+  const cityHeroSignals = [
+    {
+      title: "Choose the area before the exact place",
+      copy:
+        "Use the guides to choose the right part of Vancouver first, then open a local place once the day narrows.",
+      wide: true,
+    },
+    {
+      title: `${sourceBackedPlaceCount} places with official links`,
+      copy: "Real Vancouver places with official links and a public correction path.",
+    },
+    {
+      title: neighborhoodGuideCount > 0 ? `${neighborhoodGuideCount} neighborhood guides` : "Neighborhood-first",
+      copy:
+        neighborhoodGuideCount > 0
+          ? "Gastown, Mount Pleasant, Kitsilano, and similar pages help narrow the city faster."
+          : "Choose the right part of Vancouver before comparing individual stops.",
+    },
+  ];
+  const placePageIndexLinks = [
+    {
+      path: "/vancouver/date-night-starters",
+      label: "Date night",
+      detail: "Real evening anchors with official site links.",
+    },
+    {
+      path: "/vancouver/rainy-day-starters",
+      label: "Rainy day",
+      detail: "Indoor-friendly Vancouver starts for weather shifts.",
+    },
+    {
+      path: "/vancouver/first-evening-starters",
+      label: "First evening",
+      detail: "Short first-night options for visitors or guests.",
+    },
+    {
+      path: "/vancouver/first-time-visitor-starters",
+      label: "First visit",
+      detail: "Choose the best first impression before building the day.",
+    },
+    {
+      path: "/vancouver/kitsilano-scenic-starters",
+      label: "Kitsilano",
+      detail: "Waterfront and west-side starts for a slower pace.",
+    },
+    {
+      path: "/vancouver/weekend-route-starters",
+      label: "Weekend plan",
+      detail: "Compact weekend starts without crossing the city all day.",
+    },
+    {
+      path: "/vancouver/out-of-town-guest-starters",
+      label: "Hosting guests",
+      detail: "Easy crowd-pleasing starts for visiting friends or family.",
+    },
+    {
+      path: "/vancouver/wellness-reset-starters",
+      label: "Wellness reset",
+      detail: "Recovery-minded starts for calmer Vancouver days.",
+    },
+    {
+      path: "/vancouver/guides/vancouver-itinerary-starter-pack-which-cityatlas-page-should-you-open-first",
+      label: "Starter guide",
+      detail: "Open this when you still need help choosing the first page.",
+    },
+  ];
+  const featuredPlacePageIndexLinks = placePageIndexLinks.slice(0, 6);
+  const featuredGuideSlugs = [
+    "where-should-a-first-time-vancouver-visitor-start",
+    "mount-pleasant-local-discovery-starter-guide-for-casual-vancouver-plans",
+    "where-should-you-start-a-vancouver-garden-and-conservatory-day",
+    "where-should-you-start-a-false-creek-vancouver-culture-afternoon",
+  ];
+  const featuredCityGuides = [
+    ...featuredGuideSlugs
+      .map((slug) => cityGuides.find((guide) => guide.slug === slug))
+      .filter((guide): guide is Guide => Boolean(guide)),
+    ...cityGuides.filter((guide) => !featuredGuideSlugs.includes(guide.slug)),
+  ].slice(0, 4);
+  const featuredEvents = data.events.slice(0, 2);
+  const featuredOffers = data.offers.slice(0, 2);
+  const featuredMissions = data.cityMissions.slice(0, 2);
 
   const businesses = useMemo(() => {
     return data.businesses.filter((business) => {
@@ -90,43 +225,98 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
 
   return (
     <>
-      <section className="city-hero">
-        <div>
+      <section className="city-hero city-hero-explore">
+        <div className="city-hero-copy">
           <p className="section-label">{siteConfig.city}</p>
-          <h1>Explore Vancouver with routes, guides, and local planning logic</h1>
+          <h1>Find the right Vancouver start first</h1>
           <p>
-            Search places, events, offers, and guides. CityAtlas is designed to help people choose
-            a better next move, not just browse a pile of city listings. Today the clearest public
-            coverage lives in the source-backed guides and starter pages, while the wider Vancouver
-            business map is being surfaced through route-first coverage.
+            Start here when you know the kind of day you want, but not the exact place yet.
+            CityAtlas helps you choose the right area, guide, or local place before the tab
+            pile gets noisy.
           </p>
-        </div>
-        <div className="city-search-panel">
-          <SearchIcon />
-          <input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search cafes, wellness, date night..."
-            aria-label="Search CityAtlas"
-          />
-          <select
-            value={category}
-            onChange={(event) => setCategory(event.target.value)}
-            aria-label="Filter category"
-          >
-            {categories.map((item) => (
-              <option key={item}>{item}</option>
+          <div className="hero-actions">
+            <AppLink className="button primary" to="/vancouver/guides">
+              Open Vancouver guides
+            </AppLink>
+            <AppLink
+              className="button secondary"
+              to="/vancouver/guides/vancouver-itinerary-starter-pack-which-cityatlas-page-should-you-open-first"
+            >
+              Open the start-here guide
+            </AppLink>
+          </div>
+          <div className="city-hero-support-grid">
+            {cityHeroSignals.map((item) => (
+              <article
+                className={item.wide ? "city-hero-support-card wide" : "city-hero-support-card"}
+                key={item.title}
+              >
+                <strong>{item.title}</strong>
+                <p>{item.copy}</p>
+              </article>
             ))}
-          </select>
+          </div>
+        </div>
+        <div className="starter-hero-side city-hero-side">
+          <HeroMediaCard
+            image={siteConfig.media.city}
+            alt="Illustrated shoreline scene inspired by English Bay Beach in Vancouver"
+            eyebrow="Start with Vancouver"
+            title="Choose the right part of the city before the options pile up"
+            copy="Start with the area, weather, or visitor pace first. Then open the exact place once the day feels narrower."
+            className="hero-media-compact"
+          />
+          <aside className="city-search-card">
+            <div className="city-search-header">
+              <div>
+                <strong>Search places or jump straight into a strong starting page</strong>
+                <p>Search the current place list, or open the page that already fits the day.</p>
+              </div>
+              <StatusPill tone="blue">{sourceBackedPlaceCount} places with official links</StatusPill>
+            </div>
+            <div className="city-search-panel">
+              <SearchIcon />
+              <input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search cafes, services, wellness, date night..."
+                aria-label="Search CityAtlas"
+              />
+              <select
+                value={category}
+                onChange={(event) => setCategory(event.target.value)}
+                aria-label="Filter category"
+              >
+                {categories.map((item) => (
+                  <option key={item}>{item}</option>
+                ))}
+              </select>
+            </div>
+            <div className="city-search-secondary">
+              <p className="city-search-secondary-label">Strong starting pages</p>
+              <div className="city-search-secondary-links">
+                {cityHeroQuickStarts.map((item) => (
+                  <AppLink
+                    className="city-search-secondary-link city-search-quick-link"
+                    key={item.to}
+                    to={item.to}
+                  >
+                    <strong>{item.label}</strong>
+                    <span>{item.detail}</span>
+                  </AppLink>
+                ))}
+              </div>
+            </div>
+          </aside>
         </div>
       </section>
 
       {neighborhoodGuides.length > 0 ? (
         <section className="section-block">
           <SectionHeader
-            label="Neighborhood starters"
-            title="Choose the right area before you browse place pages"
-            copy="CityAtlas is strongest when it helps someone choose the right part of Vancouver first, then decide what kind of route belongs there. The current starter trio covers Gastown, Mount Pleasant, and Kitsilano."
+            label="Neighborhood starting points"
+            title="Choose the right area before you browse places"
+            copy="CityAtlas works best when it helps someone choose the right part of Vancouver first, then decide what kind of plan belongs there. The current trio covers Gastown, Mount Pleasant, and Kitsilano."
             action={<StatusPill tone="blue">Neighborhood guides</StatusPill>}
           />
           <div className="card-grid two">
@@ -156,112 +346,54 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
         <section className="split-section">
           <div className="source-panel">
             <SectionHeader
-              label="Official-source starters"
-              title="Source-backed starters for real Vancouver anchors"
-              copy="If you want CityAtlas pages that name real Vancouver anchors today, start with the official-source starter pages before fuller public business pages."
-              action={
-                <StatusPill tone="green">
-                  {sourceBackedDateNightStarters.length +
-                    sourceBackedRainyDayStarters.length +
-                    sourceBackedFirstEveningStarters.length +
-                    sourceBackedFirstTimeVisitorStarters.length +
-                    sourceBackedGardenDayStarters.length +
-                    sourceBackedKitsilanoScenicStarters.length +
-                    sourceBackedWestSideDaytimeStarters.length +
-                    sourceBackedFalseCreekCultureStarters.length +
-                    sourceBackedUbcDiscoveryStarters.length +
-                    sourceBackedReturningVisitorStarters.length +
-                    sourceBackedOutOfTownGuestStarters.length +
-                    sourceBackedWeekendRouteStarters.length +
-                    sourceBackedSundayStarters.length +
-                    sourceBackedWellnessResetStarters.length}{" "}
-                  source-backed entries
-                </StatusPill>
-              }
+              label="Local places ready now"
+              title="Open the local places that are ready now"
+              copy="Start with the strongest local places here, then open a guide only if the day still needs more."
+              action={<StatusPill tone="green">{sourceBackedPlaceCount} places with official links</StatusPill>}
             />
           </div>
           <div className="source-panel">
             <p>
-              This public layer is intentionally narrow. It links straight to official venue
-              sources, explains route fit, and points people toward the correction path instead of
-              pretending the whole Vancouver directory is already verified.
+              These pages stay focused on purpose. They link straight to official venue sources,
+              explain what kind of plan each place fits, and make it easy to report a mistake when
+              needed.
             </p>
-            <div className="hero-actions">
-              <AppLink className="button primary" to="/vancouver/date-night-starters">
-                Open date-night starters
-              </AppLink>
-              <AppLink className="button secondary" to="/vancouver/rainy-day-starters">
-                Open rainy-day starters
-              </AppLink>
-              <AppLink className="button secondary" to="/vancouver/first-evening-starters">
-                Open first-evening starters
-              </AppLink>
-              <AppLink className="button secondary" to="/vancouver/first-time-visitor-starters">
-                Open first-time visitor starters
-              </AppLink>
-              <AppLink className="button secondary" to="/vancouver/garden-day-starters">
-                Open garden day starters
-              </AppLink>
-              <AppLink className="button secondary" to="/vancouver/kitsilano-scenic-starters">
-                Open Kitsilano scenic starters
-              </AppLink>
-              <AppLink className="button secondary" to="/vancouver/west-side-daytime-starters">
-                Open west-side daytime starters
-              </AppLink>
-              <AppLink className="button secondary" to="/vancouver/false-creek-culture-starters">
-                Open False Creek culture starters
-              </AppLink>
-              <AppLink className="button secondary" to="/vancouver/ubc-discovery-starters">
-                Open UBC discovery starters
-              </AppLink>
-              <AppLink className="button secondary" to="/vancouver/returning-visitor-starters">
-                Open returning-visitor starters
-              </AppLink>
-              <AppLink className="button secondary" to="/vancouver/out-of-town-guest-starters">
-                Open out-of-town guest starters
-              </AppLink>
-              <AppLink className="button secondary" to="/vancouver/weekend-route-starters">
-                Open weekend route starters
-              </AppLink>
-              <AppLink className="button secondary" to="/vancouver/sunday-starters">
-                Open Sunday starters
-              </AppLink>
-              <AppLink className="button secondary" to="/vancouver/wellness-reset-starters">
-                Open wellness reset starters
-              </AppLink>
+            <div className="guide-index-grid">
+              {featuredPlacePageIndexLinks.map((item) => (
+                <AppLink className="guide-index-card" key={item.path} to={item.path}>
+                  <strong>{item.label}</strong>
+                  <span>{item.detail}</span>
+                </AppLink>
+              ))}
+            </div>
+            <div className="tag-cloud place-page-tag-cloud">
               <AppLink
-                className="button secondary"
-                to="/vancouver/guides/vancouver-itinerary-starter-pack-which-cityatlas-page-should-you-open-first"
-              >
-                Open starter pack guide
-              </AppLink>
-              <AppLink
-                className="button secondary"
+                className="button primary"
                 to="/vancouver/guides/cityatlas-guide-roundup-which-vancouver-route-should-you-open-by-situation"
               >
-                Open guide roundup
+                Browse by situation
               </AppLink>
               <AppLink
                 className="button secondary"
                 to="/vancouver/guides/which-low-friction-vancouver-route-should-you-open-today"
               >
-                Open low-friction guide
+                Easier-day guide
               </AppLink>
               <AppLink className="button secondary" to="/editorial-standards">
-                Review standards
+                Editorial standards
               </AppLink>
             </div>
           </div>
         </section>
       ) : null}
 
-      <VancouverBusinessCoverageSection data={data} variant="city" />
+      <VancouverBusinessCoverageSection variant="city" />
 
       <section className="section-block">
         <SectionHeader
-          title={`${businesses.length} current business page examples`}
-          copy="These example cards show how fuller reviewed Vancouver business pages can look once facts, media, and participation details are stronger."
-          action={<StatusPill tone="amber">Example pages</StatusPill>}
+          title="Source-backed Vancouver business pages"
+          copy={`${businesses.length} Vancouver business pages now use real venue names, actual venue photos, and the official path to re-check details before you visit.`}
+          action={<StatusPill tone="green">Source-backed pages</StatusPill>}
         />
         <div className="card-grid three">
           {businesses.map((business) => (
@@ -272,12 +404,12 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
 
       <section className="section-block">
         <SectionHeader
-          title="City missions"
-          copy="Short saveable routes help CityAtlas move from browsing into a clearer next step."
-          action={<StatusPill tone="blue">{data.cityMissions.length} routes</StatusPill>}
+          title="Saved plans worth reopening"
+          copy="Short saveable plans help CityAtlas move from browsing into a clearer next step."
+          action={<AppLink className="text-link" to="/vancouver/missions">View all saved plans <ArrowRightIcon /></AppLink>}
         />
         <div className="card-grid three">
-          {data.cityMissions.map((mission) => (
+          {featuredMissions.map((mission) => (
             <MissionCard
               mission={mission}
               savedItems={data.savedItems}
@@ -290,23 +422,28 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
 
       <section className="split-section">
         <div>
-          <SectionHeader title="Event examples" copy="These example cards show how CityAtlas can package event coverage. Confirm live details with hosts or official sources." />
+          <SectionHeader
+            title="Events"
+            copy="These event cards stay easy to scan. Open the full events page when the day needs timing-based options."
+            action={<AppLink className="text-link" to="/vancouver/events">See all events <ArrowRightIcon /></AppLink>}
+          />
           <div className="stacked-list">
-            {data.events.map((event) => (
+            {featuredEvents.map((event) => (
               <EventCard event={event} key={event.id} />
             ))}
           </div>
         </div>
         <div>
           <SectionHeader
-            title="Perk examples"
-            copy="These example cards show how CityAtlas can package partner perks once the business confirms the details and redemption rules."
+            title="Offer ideas"
+            copy="These offer ideas show how a simple local offer can read once timing and redemption rules are clear."
+            action={<AppLink className="text-link" to="/vancouver/offers">See all offers <ArrowRightIcon /></AppLink>}
           />
           <div className="stacked-list">
-            {data.offers.map((offer) => (
+            {featuredOffers.map((offer) => (
               <OfferCard
                 offer={offer}
-                business={data.businesses.find((business) => business.id === offer.businessId)}
+                business={getOfferDisplayBusiness(offer, data.businesses)}
                 key={offer.id}
               />
             ))}
@@ -315,9 +452,13 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
       </section>
 
       <section className="section-block">
-        <SectionHeader title="Guides" copy="Editorial pages connect city questions to neighborhood fit, route logic, and clearer next steps." />
+        <SectionHeader
+          title="More Vancouver guides"
+          copy="Guide pages connect city questions to neighborhood choice, planning context, and clearer next steps."
+          action={<AppLink className="text-link" to="/vancouver/guides">Open all guides <ArrowRightIcon /></AppLink>}
+        />
         <div className="card-grid two">
-          {cityGuides.map((guide) => (
+          {featuredCityGuides.map((guide) => (
             <GuideCard guide={guide} key={guide.id} />
           ))}
         </div>

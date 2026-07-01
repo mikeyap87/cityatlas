@@ -1,6 +1,6 @@
 # Hosted Deployment Status
 
-Date: 2026-07-01
+Date: 2026-06-17
 
 ## Vercel
 
@@ -9,8 +9,16 @@ Date: 2026-07-01
 - Project ID: `prj_BWFVXVkasM6b3yybiuPHCJFk5fCV`
 - Public production alias: `https://cityatlas-one.vercel.app`
 - Custom Univenture alias: `https://city.univenturestudio.com`
-- Latest production deployment: `dpl_Ac5mv3D731WmWuQzqMas9Z6wqMU8`
-- Latest production deployment URL: `https://cityatlas-qi49qife6-michael-yaps-projects-92932836.vercel.app`
+- Latest production deployment: `dpl_FjB8fUnP5ZhzueTvLfN2XWQ5sKRd`
+- Latest production deployment URL: `https://cityatlas-699zdvfn9-michael-yaps-projects-92932836.vercel.app`
+
+## GitHub Release Path
+
+- Repository: `https://github.com/mikeyap87/cityatlas`
+- Remote-backed baseline now exists on `origin/main`.
+- The current release lane `codex/vancouver-release-lane` is pushed and tracks `origin/codex/vancouver-release-lane`.
+- The live production deploy on 2026-06-17 came from `codex/vancouver-release-lane` commit `36cda30`.
+- `origin/codex/vancouver-release-lane` is ahead of `origin/main`, so the release lane is the safest rollback base until a later merge updates `main`.
 
 ## Protection State
 
@@ -19,7 +27,7 @@ Date: 2026-07-01
 - Hosted `/admin` renders the protected operations-route notice because `VITE_CITYATLAS_ENABLE_HOSTED_ADMIN=false`.
 - Hosted `/private-preview/date-night` renders the protected route notice because `VITE_CITYATLAS_ENABLE_HOSTED_PRIVATE_PREVIEW=false`.
 - Hosted `/planner` and `/for-businesses/submit` stay noindex even though the public app is crawlable.
-- Live Stripe-hosted Payment Link handoff is enabled only for the guarded City Partner and Signature Partner links. Real provider imports and automated outreach remain disabled.
+- Live payments, real provider imports, and automated outreach were deployed as disabled.
 
 ## Custom Domain
 
@@ -45,12 +53,6 @@ Certificate: cert_u3pbkyalMfT35DtAZryQRPMe
 ```
 
 The custom domain is resolving normally and serving the latest production deployment.
-
-## 2026-07-01 Corrective Route And Revenue Recovery
-
-The July 1 recovery redeployed the newer CityAtlas route base after an earlier production deployment had shipped from an older branch. The corrected production build restores the current `/for-businesses/partner-preview`, `/for-businesses/pricing`, and `/for-businesses/submit` surfaces, adds guarded Stripe-hosted checkout CTAs for the paid packages, and adds consent-gated GA4 measurement for a tiny paid-traffic test.
-
-This recovery does not prove a real customer payment. One successful owner-controlled City Partner checkout is still required before CityAtlas can be called fully charge-ready or fully self-serve verified.
 
 ## Public Indexing Release
 
@@ -96,18 +98,24 @@ The next production follow-through on 2026-06-16 removed internal-style wording 
 
 The next production follow-through on 2026-06-17 deployed the current Vancouver business-coverage and public-copy batch directly from the newly isolated standalone CityAtlas repo after the local branch passed build, growth verification, smoke, and SEO proof. This release kept the same public crawl posture while preserving protected `/admin` and `/private-preview/date-night` routes behind hosted guard screens.
 
+## 2026-06-17 Search Console And Toronto Follow-Through
+
+The next live follow-through on 2026-06-17 kept the same approved public domain, used the verified `Univenture Studio (univenturestudio@gmail.com)` Search Console property, and confirmed three material changes in live truth: the Search Console overview still shows processing and `0` total web search clicks, the submitted sitemap refreshed successfully on the same day with `51` discovered pages, and the previously blocked Toronto pilot routes now pass the hosted smoke profile on the approved domain. The live starter-pack routing guide was also inspected and added to Google's priority crawl queue after URL inspection showed `Discovered - currently not indexed`.
+
+## 2026-06-17 Homepage UX And Visual Cleanup
+
+The latest production follow-through on 2026-06-17 deployed the homepage cleanup batch: a clickable Vancouver route map, working homepage search routing, simpler public copy, refreshed pricing presentation, and new city-specific card artwork including the corrected Kits Beach rope-flow visual. This release kept the same crawlable robots posture and the same hosted guard screens for `/admin` and `/private-preview/date-night`.
+
 ## 2026-06-15 Search Console Reverification
 
 The next live follow-through on 2026-06-15 updated the homepage Google verification token, deployed production build `dpl_2qdDJJDwypndVaW6W7rY4CxvoE87`, verified the `https://city.univenturestudio.com/` URL-prefix property in Search Console under the `Univenture Studio (univenturestudio@gmail.com)` Google account, confirmed the already-submitted sitemap state, and added two high-value guide URLs to Google's priority crawl queue.
 
 ## Verified
 
-- Production deploy `dpl_Ac5mv3D731WmWuQzqMas9Z6wqMU8` completed successfully and aliases include `https://city.univenturestudio.com`.
-- `curl https://city.univenturestudio.com/` returned the July 1 asset build with `/assets/index-BOdI0lK4.js` and `/assets/index-CvwLPMnD.css`.
-- Hosted browser proof on `https://city.univenturestudio.com/for-businesses/pricing` confirmed the package page, honesty boundary, City Partner checkout link, Signature checkout link, consent banner, no GA script before consent, and GA4 activation after consent.
-- Hosted browser proof confirmed `/for-businesses/partner-preview` renders `What CityAtlas needs from a local partner`.
-- Hosted browser proof confirmed `/for-businesses/submit` renders `Start a CityAtlas business request`.
-- Read-only Stripe link checks returned `HTTP/2 200` for the City Partner and Signature Partner Payment Links.
+- Production deploy `dpl_FjB8fUnP5ZhzueTvLfN2XWQ5sKRd` completed successfully and now serves the public aliases.
+- `curl -I https://city.univenturestudio.com/` returned `HTTP/2 200` after the 2026-06-17 homepage cleanup deploy with `last-modified: Wed, 17 Jun 2026 19:00:50 GMT`.
+- `curl -I https://cityatlas-one.vercel.app/` returned `HTTP/2 200` after the 2026-06-17 homepage cleanup deploy with the same `last-modified: Wed, 17 Jun 2026 19:00:50 GMT`.
+- Headless Chrome rendered `https://city.univenturestudio.com/`, confirmed the homepage hero heading, opened the clickable Kitsilano map stop, and used the homepage search to open `/vancouver/guides/two-hour-vancouver-visitor-loop-for-a-first-evening`.
 - Production deploy `dpl_EH4ZGfu6TxX1Erg6dARaNuBGJv7y` completed successfully and now serves the public aliases.
 - `curl -I https://city.univenturestudio.com/` returned `HTTP/2 200` after the 2026-06-17 deploy with `last-modified: Wed, 17 Jun 2026 06:46:43 GMT`.
 - `npm run seo:smoke:first -- --base-url https://city.univenturestudio.com` passed on 2026-06-17 after the standalone-repo direct deploy and re-verified the hosted first-time-visitor and wellness routes, protected noindex routes, `sitemap.xml`, and `llms.txt`.
@@ -133,6 +141,9 @@ The next live follow-through on 2026-06-15 updated the homepage Google verificat
 - Google Search Console verified the `https://city.univenturestudio.com/` property on 2026-06-15 using the homepage HTML tag method in the `Univenture Studio (univenturestudio@gmail.com)` account.
 - Google Search Console accepted `https://city.univenturestudio.com/sitemap.xml`, then updated the submitted-sitemaps table to `Success` with `46` discovered pages and `0` discovered videos.
 - Google Search Console URL Inspection showed `https://city.univenturestudio.com/vancouver/guides/vancouver-wellness-experiences-to-review` and `https://city.univenturestudio.com/vancouver/guides/how-to-host-an-out-of-town-guest-in-vancouver` as `Discovered - currently not indexed`, then accepted `Request indexing` for both URLs and added them to Google's priority crawl queue.
+- Google Search Console overview on 2026-06-17 still showed `0 total web search clicks` and `Processing data, please check again in a day or so` for Indexing, so the property remains live but young.
+- Google Search Console accepted a fresh resubmission of `https://city.univenturestudio.com/sitemap.xml` on 2026-06-17, then updated the submitted-sitemaps table to `Success` with `51` discovered pages and `0` discovered videos.
+- Google Search Console URL Inspection showed `https://city.univenturestudio.com/vancouver/guides/vancouver-itinerary-starter-pack-which-cityatlas-page-should-you-open-first` as `Page is not indexed: Discovered - currently not indexed`, then accepted `Request indexing` and added it to Google's priority crawl queue.
 - Production deploy `dpl_C9pg5MdqK6sFDSrFef8J4JoQd1vp` completed successfully and now serves the public aliases.
 - `curl -sS https://city.univenturestudio.com/dfbba41189418b47c2cfad7c3ade83be.txt` returned the matching live IndexNow key.
 - `npm run seo:indexnow:submit -- --base-url https://city.univenturestudio.com` returned `202 Accepted` from `https://www.bing.com/indexnow` for the 46-URL live submission batch.
@@ -163,17 +174,16 @@ The next live follow-through on 2026-06-15 updated the homepage Google verificat
 - Headless Chrome rendered `https://city.univenturestudio.com/vancouver/guides/rainy-day-vancouver-plan-coffee-walk-and-reset` locally before deploy and showed the embedded rainy-day source-backed section plus the updated proof note and rail link.
 - In-app browser rendered `https://city.univenturestudio.com/vancouver/first-evening-starters` and showed the first-evening source-backed hero, official-source cards, and correction-path links.
 - In-app browser rendered `https://city.univenturestudio.com/vancouver/guides/two-hour-vancouver-visitor-loop-for-a-first-evening` and showed the embedded first-evening source-backed section, updated proof note, and first-evening rail link.
+- `npm run seo:smoke:toronto -- --base-url https://city.univenturestudio.com` passed on 2026-06-17 and verified the hosted Toronto guide hub, both Toronto starter pages, both Toronto guide pages, protected noindex routes, `sitemap.xml`, and `llms.txt`.
+- Headless Chrome rendered `https://city.univenturestudio.com/toronto/first-time-visitor-starters` on 2026-06-17 and showed the Toronto first-time visitor source-backed surface instead of the Vancouver fallback shell.
 - In-app browser rendered `https://city.univenturestudio.com/admin` and showed `Launch console is protected before hosted sharing.`
 - Headless Chrome rendered `https://city.univenturestudio.com/admin` and showed `Launch console is protected before hosted sharing.` plus `Live payments, imports, outreach, and public claims remain disabled.`
 
 ## Still Missing On The Approved Domain
 
-- One real successful City Partner checkout proof is still missing.
-- Ad-platform conversion proof is still missing because no ad spend has been started.
-- `npm run seo:smoke:toronto -- --base-url https://city.univenturestudio.com` failed on 2026-06-16.
-- Hosted `/toronto/guides`, `/toronto/first-time-visitor-starters`, `/toronto/weekend-route-starters`, `/toronto/guides/where-should-a-first-time-toronto-visitor-start`, and `/toronto/guides/how-to-build-a-toronto-weekend-route-without-crossing-the-city-all-day` currently return the Vancouver homepage shell instead of the Toronto pilot surface.
-- Hosted `sitemap.xml` and hosted `llms.txt` do not yet include the Toronto pilot routes.
-- Toronto remains local-only proof for now, not approved hosted proof.
+- Search Console overview data for Performance and Indexing is still processing, so live Google movement is not yet visible in the property.
+- The newly live Toronto pilot URLs have hosted-render proof, but their current Google indexing state has not yet been manually inspected route-by-route inside Search Console.
+- Live ranking movement is still unproven.
 
 ## Rollback
 

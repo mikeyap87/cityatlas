@@ -3,8 +3,9 @@ Allow: /
 Disallow: /admin
 Disallow: /private-preview/
 Disallow: /for-businesses/submit
+Disallow: /for-businesses/book-call
 
 # Public indexing is enabled for the guide and discovery surface.
-# Keep protected operations and submission flows out of search.
+# Keep protected operations, submission flows, and support request flows out of search.
 
 Sitemap: https://city.univenturestudio.com/sitemap.xml

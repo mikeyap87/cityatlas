@@ -59,11 +59,11 @@ export interface Business extends AuditFields {
   fullDescription: string;
   highlights: string[];
   bestFor: string[];
-  priceTier: "$" | "$$" | "$$$" | "$$$$";
-  rating: number;
-  reviewCount: number;
-  openNow: boolean;
-  hoursToday: string;
+  priceTier?: "$" | "$$" | "$$$" | "$$$$";
+  rating?: number;
+  reviewCount?: number;
+  openNow?: boolean;
+  hoursToday?: string;
   featured: boolean;
   claimedStatus: "unclaimed" | "claim_pending" | "claimed";
   partnerFitScore: number;
@@ -96,7 +96,8 @@ export interface EventItem extends AuditFields {
 
 export interface Offer extends AuditFields {
   id: string;
-  businessId: string;
+  businessId?: string;
+  previewBusinessId?: string;
   title: string;
   description: string;
   redemptionInstructions: string;
@@ -258,7 +259,7 @@ export interface NewsletterLead {
 
 export interface SavedItem {
   id: string;
-  itemType: "business" | "event" | "guide";
+  itemType: "business" | "event" | "guide" | "offer";
   itemId: string;
   label: string;
   createdAt: string;
@@ -378,6 +379,52 @@ export interface BusinessProspect {
   supervisedLiveReviewRequestedAt?: string;
   importBatchId?: string;
   lastUpdatedAt: string;
+}
+
+export interface BusinessInventoryRecord {
+  inventoryId: string;
+  sourceSystem: string;
+  sourceScope: string;
+  sourceRecordId: string;
+  licenseYear: string;
+  licenseStatus: string;
+  businessName: string;
+  businessTradeName: string;
+  businessType: string;
+  businessSubtype: string;
+  categoryPrimary: string;
+  categorySecondary: string;
+  cuisine: string;
+  cityName: string;
+  municipality: string;
+  sourceCityRaw: string;
+  localArea: string;
+  streetAddress: string;
+  postalCode: string;
+  latitude: string;
+  longitude: string;
+  website: string;
+  menuUrl: string;
+  publicContactPath: string;
+  publicContactType: string;
+  email: string;
+  phone: string;
+  officialSourceUrl: string;
+  osmSourceUrl: string;
+  verificationStatus: string;
+  contactReadiness: string;
+  outreachPriority: string;
+  notes: string;
+  lastVerifiedDate: string;
+}
+
+export interface BusinessInventorySummary {
+  generatedAt: string;
+  recordCount: number;
+  byBusinessType: Record<string, number>;
+  byLocalArea: Record<string, number>;
+  byCity: Record<string, number>;
+  sourceScope: string;
 }
 
 export interface ProofCandidate {

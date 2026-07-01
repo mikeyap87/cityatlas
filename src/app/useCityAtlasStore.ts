@@ -11,36 +11,108 @@ import type {
   PackageId,
   SavedItem,
 } from "../types";
-import { mergeBusinessProspects } from "../lib/cityGrowth";
-import {
-  buildBusinessReplyBridgeReplayDraft,
-  buildBusinessReplyLogDraftFromMirrorEntry,
-  compactBusinessProtectedInboundMirrorEntries,
-  inferBusinessProspectOutreachStatus,
-} from "../lib/businessInboundPreview";
+import { buildFlags, canRenderAdminExperience } from "../config/site";
 import {
   audit,
+  createBrainRun,
   createBusinessProspectAuditSummary,
   createBusinessReplyBridgeReplayRecord,
   createBusinessReplyLog,
-  createBrainRun,
+  createEmptyCityAtlasData,
   createBusinessSubmission,
   createGrowthEvent,
   createManualReplyLog,
   createNewsletterLead,
   createSavedItem,
   loadCityAtlasData,
+  loadCityAtlasGrowthData,
   resetCityAtlasData,
   saveCityAtlasData,
 } from "../lib/storage";
 import { getTrafficContext, trackProductEvent } from "../lib/analytics";
 
-export function useCityAtlasStore() {
-  const [data, setData] = useState<CityAtlasData>(() => loadCityAtlasData());
+let cityGrowthModulePromise: Promise<typeof import("../lib/cityGrowth")> | null = null;
+let businessInboundPreviewModulePromise: Promise<typeof import("../lib/businessInboundPreview")> | null =
+  null;
+
+const loadCityGrowthModule: () => Promise<typeof import("../lib/cityGrowth")> =
+  buildFlags.hostedAdminArtifacts
+    ? () => {
+        cityGrowthModulePromise ??= import("../lib/cityGrowth");
+        return cityGrowthModulePromise;
+      }
+    : async () => {
+        throw new Error("Protected CityAtlas admin artifacts are disabled in this build.");
+      };
+
+const loadBusinessInboundPreviewModule: () => Promise<typeof import("../lib/businessInboundPreview")> =
+  buildFlags.hostedAdminArtifacts
+    ? () => {
+        businessInboundPreviewModulePromise ??= import("../lib/businessInboundPreview");
+        return businessInboundPreviewModulePromise;
+      }
+    : async () => {
+        throw new Error("Protected CityAtlas admin artifacts are disabled in this build.");
+      };
+
+function shouldLoadGrowthData(pathname: string) {
+  return pathname === "/admin" && buildFlags.hostedAdminArtifacts && canRenderAdminExperience();
+}
+
+export function useCityAtlasStore(pathname: string) {
+  const [data, setData] = useState<CityAtlasData>(() => createEmptyCityAtlasData());
+  const [hydrated, setHydrated] = useState(false);
+  const [growthHydrated, setGrowthHydrated] = useState(() => !shouldLoadGrowthData(pathname));
 
   useEffect(() => {
+    let cancelled = false;
+    const includeGrowthData = shouldLoadGrowthData(pathname);
+
+    void loadCityAtlasData({ includeGrowthData })
+      .then((nextData) => {
+        if (cancelled) return;
+        setData(nextData);
+        setHydrated(true);
+        setGrowthHydrated(includeGrowthData);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setHydrated(true);
+        setGrowthHydrated(includeGrowthData);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated || growthHydrated || !shouldLoadGrowthData(pathname)) return;
+    let cancelled = false;
+
+    void loadCityAtlasGrowthData({
+      businessProspects: data.businessProspects,
+      businessInboundMirror: data.businessInboundMirror,
+    })
+      .then((growthData) => {
+        if (cancelled) return;
+        setData((current) => ({ ...current, ...growthData }));
+        setGrowthHydrated(true);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setGrowthHydrated(true);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [data.businessInboundMirror, data.businessProspects, growthHydrated, hydrated, pathname]);
+
+  useEffect(() => {
+    if (!hydrated) return;
     saveCityAtlasData(data);
-  }, [data]);
+  }, [data, hydrated]);
 
   const actions = useMemo(
     () => ({
@@ -125,14 +197,18 @@ export function useCityAtlasStore() {
       },
       saveMission(mission: CityMission) {
         setData((current) => {
-          const additions = mission.steps
-            .filter(
-              (step) =>
-                !current.savedItems.some(
-                  (item) => item.itemType === step.itemType && item.itemId === step.itemId,
-                ),
-            )
-            .map((step) => createSavedItem(step.itemType, step.itemId, step.label));
+          const existingPairs = new Set(
+            current.savedItems.map((item) => `${item.itemType}:${item.itemId}`),
+          );
+          const additions = mission.steps.reduce<SavedItem[]>((list, step) => {
+            const pairKey = `${step.itemType}:${step.itemId}`;
+            if (existingPairs.has(pairKey)) {
+              return list;
+            }
+            existingPairs.add(pairKey);
+            list.push(createSavedItem(step.itemType, step.itemId, step.label));
+            return list;
+          }, []);
 
           return {
             ...current,
@@ -188,8 +264,12 @@ export function useCityAtlasStore() {
         }));
         return submission;
       },
-      addBusinessProspects(prospects: BusinessProspect[], sourceLabel = "manual research import") {
+      async addBusinessProspects(
+        prospects: BusinessProspect[],
+        sourceLabel = "manual research import",
+      ) {
         if (prospects.length === 0) return 0;
+        const { mergeBusinessProspects } = await loadCityGrowthModule();
         let importedCount = 0;
         setData((current) => {
           const merged = mergeBusinessProspects(current.businessProspects, prospects);
@@ -258,8 +338,10 @@ export function useCityAtlasStore() {
         });
         return created;
       },
-      saveBusinessInboundMirror(entries: BusinessInboundMirrorEntry[]) {
+      async saveBusinessInboundMirror(entries: BusinessInboundMirrorEntry[]) {
         if (entries.length === 0) return 0;
+        const { compactBusinessProtectedInboundMirrorEntries } =
+          await loadBusinessInboundPreviewModule();
         let savedCount = 0;
         setData((current) => {
           const existingFingerprints = new Set(
@@ -296,7 +378,12 @@ export function useCityAtlasStore() {
         });
         return savedCount;
       },
-      replayBusinessReplyBridgeEntry(entryId: string) {
+      async replayBusinessReplyBridgeEntry(entryId: string) {
+        const {
+          buildBusinessReplyBridgeReplayDraft,
+          buildBusinessReplyLogDraftFromMirrorEntry,
+          inferBusinessProspectOutreachStatus,
+        } = await loadBusinessInboundPreviewModule();
         let created: BusinessReplyLog | undefined;
         setData((current) => {
           const entry = current.businessInboundMirror.find((item) => item.id === entryId);
@@ -538,5 +625,5 @@ export function useCityAtlasStore() {
     [],
   );
 
-  return { data, actions };
+  return { data, actions, hydrated, growthHydrated };
 }

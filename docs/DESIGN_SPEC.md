@@ -2,7 +2,7 @@
 
 ## Concept Asset
 
-`public/design/launch-product-concept.png`
+`docs/design/launch-product-concept.png`
 
 Generated with the built-in image generation tool as a high-fidelity UI reference for the fresh launch package.
 

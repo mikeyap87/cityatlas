@@ -42,7 +42,7 @@ Fallback Vercel alias:
 - Public Vancouver itinerary starter-pack guide for choosing the right CityAtlas page first, now hosted and smoke-verified on the approved domain.
 - Public Vancouver guide-roundup page for choosing the strongest CityAtlas route by situation, now hosted and smoke-verified on the approved domain.
 - Public source-backed Vancouver wellness reset starter page plus upgraded wellness guide with official-source framing and correction path.
-- Local-ready Toronto first-time visitor starter page plus matching destination-choice guide, plus a Toronto weekend-route starter page plus matching compact-weekend guide, as the first non-Vancouver preview cluster, now threaded into the public internal-link architecture while still pending hosted proof on the approved domain.
+- Public Toronto first-time visitor starter page plus matching destination-choice guide, plus a Toronto weekend-route starter page plus matching compact-weekend guide, now live on the approved domain as the first non-Vancouver CityAtlas preview cluster and threaded into the public internal-link architecture.
 - Local-ready Kitsilano scenic route starter guide, completing the Gastown, Mount Pleasant, and Kitsilano destination-page trio for neighborhood-intent Vancouver queries.
 - Business pricing/package page with payment acceptance disabled.
 - Business submission flow that stores requests locally only.
@@ -82,7 +82,7 @@ Fallback Vercel alias:
 - Local editorial machine docs for query mapping, source-backed wedge templating, hook scoring, and content release gating.
 - Public `llms.txt` and sitemap aligned to the crawlable release and current guide library.
 - Lazyweb design research artifact under `.lazyweb/design-research/cityatlas-missions-2026-06-14/`.
-- Generated visual concept and hero media under `public/`.
+- Runtime hero and business media under `public/assets/`, with design and QA reference images stored under `docs/design/` and `docs/visual_references/`.
 - Pre-domain launch docs and live-risk approval gates.
 
 ## What Is Intentionally Excluded
@@ -92,7 +92,7 @@ Fallback Vercel alias:
 - Cloudflare DNS is live for `city.univenturestudio.com`, and public routes are now crawlable while admin/private routes stay blocked.
 - No Stripe SDK, checkout, invoices, payment links, or subscription creation.
 - No real provider imports.
-- No automated email or outreach sending.
+- No in-app automated email or outreach rail is active. A separate owner-approved Codex heartbeat is now scheduled to send up to 40 reviewed Vancouver restaurant emails plus up to 20 reviewed Vancouver service-business emails per day from the connected Gmail account starting June 22, 2026 at 2:05 PM PDT, with separate live send ledgers suppressing re-sends. That heartbeat now also sends a plain-English owner summary email after each run.
 - No automatic scraping or paid EXA discovery runs are triggered by the app itself.
 - Optional future EXA discovery remains discovery-only. It is not a send rail and does not unlock outreach by itself.
 - No live webhook, inbox connector, CRM sync, or automated business follow-up is active from the new reply rail.
@@ -114,7 +114,7 @@ Fallback Vercel alias:
 - The live public package now includes `/vancouver/guides/vancouver-itinerary-starter-pack-which-cityatlas-page-should-you-open-first`, which routes people into the existing guide and source-backed library and is now hosted and smoke-verified on the approved domain.
 - The live public package now includes `/vancouver/guides/cityatlas-guide-roundup-which-vancouver-route-should-you-open-by-situation`, which routes readers to the strongest existing CityAtlas route family and is now hosted and smoke-verified on the approved domain.
 - The live public package now includes `/vancouver/wellness-reset-starters` and the upgraded `/vancouver/guides/vancouver-wellness-experiences-to-review`, both running on the approved domain with the same source-backed pattern.
-- The Toronto pilot routes `/toronto/guides`, `/toronto/first-time-visitor-starters`, `/toronto/weekend-route-starters`, `/toronto/guides/where-should-a-first-time-toronto-visitor-start`, and `/toronto/guides/how-to-build-a-toronto-weekend-route-without-crossing-the-city-all-day` remain local-only truth for now. Hosted smoke on June 16, 2026 showed the approved domain still falling back to the Vancouver shell for `/toronto/*`, with Toronto still missing from hosted `sitemap.xml` and hosted `llms.txt`.
+- The Toronto pilot routes `/toronto/guides`, `/toronto/first-time-visitor-starters`, `/toronto/weekend-route-starters`, `/toronto/guides/where-should-a-first-time-toronto-visitor-start`, and `/toronto/guides/how-to-build-a-toronto-weekend-route-without-crossing-the-city-all-day` now render real Toronto content on the approved domain. A June 17, 2026 Search Console refresh also shows the live sitemap re-read successfully with `51` discovered pages, and the live starter-pack guide was added to Google's priority crawl queue after URL inspection showed it as `Discovered - currently not indexed`.
 - Public indexing is live on the approved Univenture domain, but real-business publication remains gated until source policy and verified content are approved.
 
 ## Setup
@@ -135,6 +135,17 @@ Open `http://127.0.0.1:5178/`.
 - `npm run readiness` - regenerate `docs/READINESS_PROGRESS.md` and `output/readiness/latest.json`.
 - `npm run growth:verify` - verify the city-rollout machine, Vancouver business-prospect floor, and import-preview guardrails.
 - `npm run growth:packets` - regenerate the owner-facing Vancouver business machine packet, Vancouver first-batch packet, multi-city rollout readiness packet, EXA discovery approval packet, Vancouver outreach-prep packet, follow-on city outreach ladder packet, city rollout operator packet, and the local email-ready, promotion-candidate, first-batch, review-queue, plus rehearsal-overlay exports with current batch-lane, donor/source-lane, and next-step truth.
+- `npm run growth:service:inventory` - rebuild the official Vancouver service-business inventory for beauty, repair, fitness, and vehicle-service categories, plus the matching `/admin` operator files.
+- `npm run growth:service:research-batch` - cut a small official Vancouver service-business research batch for manual or Outscraper contact enrichment.
+- `npm run growth:service:research-batch:all` - cut the full current official Vancouver service-business research batch.
+- `npm run growth:service:outscraper-enrich` - run the paid Outscraper service-business enrichment lane on the current small service research batch, producing enriched rows plus review files.
+- `npm run growth:service:outscraper-enrich:all` - run the paid Outscraper service-business enrichment lane across the full current official Vancouver service batch.
+- `npm run growth:service:review-exports` - split the current reviewed service enrichment batch into email-candidate, contact-path, and manual-review artifacts plus import-ready CSVs.
+- `npm run growth:service:review-exports:all` - rebuild those reviewed service export artifacts for the full current official Vancouver service batch.
+- `npm run growth:service:sync-seeds` - regenerate the reviewed Vancouver service-business donor layer, blending the current local CityAtlas queue with the latest service enrichment review files when they exist.
+- `npm run growth:service:sync-seeds:all` - rebuild the reviewed Vancouver service-business donor layer from the full current official service enrichment batch.
+- `npm run growth:service:send-packet` - rebuild the Vancouver service-business email-ready send packet plus the current owner-review-ready counts.
+- `npm run growth:service:daily-send-window -- --limit=20` - cut the current reviewed Vancouver service-business daily Gmail send manifest without widening beyond the first 20 owner-review-ready rows.
 - `npm run growth:sync:all` - refresh the Rooms Vancouver email-ready donor layer, the wider Rooms Vancouver review donor layer, the Rooms multi-city donor layer, the Roam public-business-wave donor layer, and the Roam city-sourcing donor layer in one local pass.
 - `npm run growth:sync:rooms:vancouver` - regenerate the local Rooms-to-CityAtlas Vancouver business donor seed file from the reviewed Rooms host-space packet.
 - `npm run growth:sync:rooms:vancouver:review` - regenerate the wider local Rooms-to-CityAtlas Vancouver review donor layer, keeping contact-form-ready and research-only rows honest.
@@ -144,6 +155,8 @@ Open `http://127.0.0.1:5178/`.
 - `npm run growth:sync:roam:business-wave` - regenerate the saved Roam public-business-wave donor layer so CityAtlas can absorb official-contact wellness/service businesses from reusable provider-discovery fixtures.
 - `npm run growth:sync:roam:cities` - regenerate the Roam city-sourcing donor seed layer for the wider shared-city rollout map by merging all qualifying local preview artifacts per city, normalizing donor titles, and filtering obvious non-business plus beauty/salon noise.
 - `npm run qa:smoke:local` - run repeatable Playwright smoke checks across the built local product surface for homepage, city navigation, planner, business request, admin, and private-preview flows on desktop and mobile; writes `output/qa/local-product-smoke.json`.
+- `npm run qa:paid-traffic` - run the local paid-traffic business-funnel proof from campaign landing to package interest and saved request; writes `output/qa/paid-traffic-readiness.json` and keeps paid-traffic blockers explicit.
+- `npm run qa:paid-traffic:strict` - same proof, but fails while analytics or hosted proof blockers remain.
 - `npm run seo:proof` - verify the local CityAtlas content machine, crawl-file coverage, and source-backed route integrity; writes `output/seo/local-content-machine-proof.json`.
 - `npm run seo:structure:proof` - verify route metadata, robots directives, breadcrumbs, hub JSON-LD, guide FAQ schema, and source-backed collection structure on key CityAtlas routes; writes `output/seo/local-structure-proof.json`.
 - `npm run seo:copy:proof` - verify that checked public, business, legal, route-shell, metadata, and experiment source files do not leak blocked internal/operator language; writes `output/seo/public-copy-safety-proof.json`.
@@ -168,6 +181,14 @@ Optional future discovery/sending-prep env vars:
 - `EXA_API_KEY=`
 - `CITYATLAS_OUTREACH_MAILING_ADDRESS=`
 
+Optional future analytics env vars:
+
+- `VITE_CITYATLAS_ANALYTICS_PROVIDER=`
+- `VITE_GA_MEASUREMENT_ID=`
+- `VITE_ANALYTICS_ID=`
+
+If these are configured and the site is redeployed, CityAtlas now shows a consent choice before loading external analytics.
+
 ## Live-Risk Gates
 
 See [docs/LAUNCH_GATES.md](docs/LAUNCH_GATES.md). A simple "yes" is not enough for live-risk actions. The owner should approve the exact action, provider/account, scope, rollback path, and spend/customer impact.
@@ -180,7 +201,7 @@ Use these locally:
 - `/?variant=founding-partner`
 - `/?variant=weekend-atlas`
 
-Variant exposure is stored locally in browser storage. No third-party analytics provider is connected.
+Variant exposure and business-funnel events are stored locally in browser storage. No third-party analytics provider is connected until the analytics env vars are approved, configured, and redeployed. When they are present, the public site waits for visitor consent before loading external analytics.
 
 ## City Missions
 

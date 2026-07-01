@@ -1,6 +1,13 @@
 import type { Business, CityMission, EventItem, Guide, Offer, SavedItem } from "../types";
 import { getGuidePath } from "../lib/cityPaths";
 import { formatDate } from "../lib/format";
+import {
+  simplifyGuideCategoryLabel,
+  simplifyGuideDisplayText,
+  simplifyMissionDisplayText,
+} from "../lib/publicCopy";
+import { isOfferBusinessPreviewContext } from "../lib/offers";
+import { getBusinessVisual, getEventVisual, getGuideVisual } from "../lib/visuals";
 import { ArrowRightIcon, CalendarIcon, MapIcon, ShieldIcon, SparkIcon, StoreIcon } from "./Icons";
 import { AppLink } from "./Link";
 import { StatusPill } from "./UI";
@@ -9,24 +16,55 @@ function getCitySlug(value: string) {
   return value.trim().toLowerCase().replace(/\s+/g, "-");
 }
 
+function isExampleBusiness(business: Business) {
+  return business.trustLevel === "fictional_seed";
+}
+
+function getBusinessStatusLabel(business: Business) {
+  if (typeof business.openNow === "boolean") {
+    return business.openNow ? "Open now" : "Closed now";
+  }
+
+  return "Check official hours";
+}
+
 export function BusinessCard({ business }: { business: Business }) {
+  const exampleOnly = isExampleBusiness(business);
+  const pageLabel = exampleOnly ? "Sample page" : "Source-backed page";
+  const toplineDetail = business.priceTier ?? (exampleOnly ? "Preview only" : "Official source checked");
+
   return (
     <article className="content-card business-card">
-      <img src={business.heroImage} alt="" loading="lazy" />
+      <div className="business-card-media">
+        <img
+          src={getBusinessVisual(business)}
+          alt={`${business.name} venue photo`}
+          decoding="async"
+          loading="lazy"
+        />
+        <div className="business-card-media-copy">
+          <span>{business.neighborhood}</span>
+          <strong>{business.bestFor[0] ?? business.category}</strong>
+        </div>
+      </div>
       <div className="card-body">
         <div className="card-topline">
-          <StatusPill tone="blue">Business page example</StatusPill>
-          <span>{business.priceTier}</span>
+          <StatusPill tone={exampleOnly ? "blue" : "green"}>{pageLabel}</StatusPill>
+          <span>{toplineDetail}</span>
         </div>
         <h3>{business.name}</h3>
         <p>{business.shortDescription}</p>
         <div className="card-meta">
+          {business.bestFor.slice(0, 2).map((item) => (
+            <span key={item}>{item}</span>
+          ))}
+        </div>
+        <div className="business-card-footer">
           <span>{business.category}</span>
-          <span>{business.neighborhood}</span>
-          <span>{business.openNow ? "Open now" : "Closed now"}</span>
+          <span>{getBusinessStatusLabel(business)}</span>
         </div>
         <AppLink className="card-link" to={`/${getCitySlug(business.city)}/businesses/${business.slug}`}>
-          View page
+          Open page <ArrowRightIcon />
         </AppLink>
       </div>
     </article>
@@ -36,7 +74,12 @@ export function BusinessCard({ business }: { business: Business }) {
 export function EventCard({ event }: { event: EventItem }) {
   return (
     <article className="content-card compact-card">
-      <img src={event.image} alt="" loading="lazy" />
+      <img
+        src={getEventVisual(event)}
+        alt={`Supporting image for ${event.title}`}
+        decoding="async"
+        loading="lazy"
+      />
       <div className="card-body">
         <div className="card-icon-line">
           <CalendarIcon />
@@ -47,7 +90,7 @@ export function EventCard({ event }: { event: EventItem }) {
         <div className="card-meta">
           <span>{event.neighborhood}</span>
           <span>{event.priceLabel}</span>
-          <span>{event.capacity} capacity</span>
+          <span>{event.capacity} spots</span>
         </div>
       </div>
     </article>
@@ -61,15 +104,40 @@ export function OfferCard({
   offer: Offer;
   business?: Business;
 }) {
+  const previewContext = isOfferBusinessPreviewContext(offer, business);
+  const mediaTitle = business?.name ?? "CityAtlas offer preview";
+  const mediaDetail = business
+    ? previewContext
+      ? "Source-backed page example"
+      : "Offer preview context"
+    : "Preview only";
+
   return (
     <article className="content-card offer-card">
+      <div className="business-card-media offer-card-media">
+        <img
+          src={business ? getBusinessVisual(business) : "/assets/places-generated/granville-island-public-market-generated.jpg"}
+          alt={business ? `${business.name} venue photo` : "Illustrated Vancouver offer preview scene"}
+          decoding="async"
+          loading="lazy"
+        />
+        <div className="business-card-media-copy offer-card-media-copy">
+          <span>{business?.neighborhood ?? "Vancouver"}</span>
+          <strong>{mediaTitle}</strong>
+          <p>{mediaDetail}</p>
+        </div>
+      </div>
       <div className="offer-card-inner">
-        <StatusPill tone="amber">Offer example</StatusPill>
+        <div className="card-topline">
+          <StatusPill tone="amber">Offer preview</StatusPill>
+          <span>{previewContext ? "Page example only" : "Terms still need review"}</span>
+        </div>
         <h3>{offer.title}</h3>
         <p>{offer.description}</p>
         <div className="card-meta">
-          <span>{business?.name ?? "Partner pending"}</span>
+          <span>{business ? (previewContext ? `${business.name} page example` : business.name) : "Business to confirm"}</span>
           <span>Ends {formatDate(offer.endDate)}</span>
+          <span>Illustrative cap {offer.maxClaims}</span>
         </div>
         <small>{offer.redemptionInstructions}</small>
       </div>
@@ -78,20 +146,65 @@ export function OfferCard({
 }
 
 export function GuideCard({ guide }: { guide: Guide }) {
+  const guideTitle = simplifyGuideDisplayText(guide.title);
+  const guideExcerpt = simplifyGuideDisplayText(guide.excerpt);
+
   return (
     <article className="content-card guide-card">
-      <img src={guide.image} alt="" loading="lazy" />
+      <img
+        src={getGuideVisual(guide)}
+        alt={`Supporting guide image for ${guideTitle}`}
+        decoding="async"
+        loading="lazy"
+      />
       <div className="card-body">
         <div className="card-icon-line">
           <MapIcon />
           <span>{guide.readMinutes} min read</span>
         </div>
-        <h3>{guide.title}</h3>
-        <p>{guide.excerpt}</p>
+        <h3>{guideTitle}</h3>
+        <p>{guideExcerpt}</p>
         <div className="card-meta">
-          <span>{guide.category}</span>
+          <span>{simplifyGuideCategoryLabel(guide.category)}</span>
           <span>{guide.neighborhood}</span>
-          <span>{guide.sponsored ? "Sponsored" : "Editorial"}</span>
+          {guide.sponsored ? <span>Partner feature</span> : null}
+        </div>
+        <AppLink className="card-link" to={getGuidePath(guide)}>
+          Read guide <ArrowRightIcon />
+        </AppLink>
+      </div>
+    </article>
+  );
+}
+
+export function GuideCompactCard({
+  guide,
+  variant = "default",
+}: {
+  guide: Guide;
+  variant?: "default" | "tight";
+}) {
+  const guideTitle = simplifyGuideDisplayText(guide.title);
+  const guideExcerpt = simplifyGuideDisplayText(guide.excerpt);
+
+  return (
+    <article className={`compact-guide-card${variant === "tight" ? " tight" : ""}`}>
+      <img
+        src={getGuideVisual(guide)}
+        alt={`Supporting guide image for ${guideTitle}`}
+        decoding="async"
+        loading="lazy"
+      />
+      <div className="compact-guide-card-body">
+        <div className="card-icon-line">
+          <MapIcon />
+          <span>{guide.readMinutes} min read</span>
+        </div>
+        <strong>{guideTitle}</strong>
+        <p>{guideExcerpt}</p>
+        <div className="card-meta compact-guide-meta">
+          <span>{simplifyGuideCategoryLabel(guide.category)}</span>
+          <span>{guide.neighborhood}</span>
         </div>
         <AppLink className="card-link" to={getGuidePath(guide)}>
           Read guide
@@ -126,8 +239,8 @@ export function MissionCard({
         <StatusPill tone={mission.featured ? "blue" : "muted"}>{mission.theme}</StatusPill>
         <span>{mission.timeBox}</span>
       </div>
-      <h3>{mission.title}</h3>
-      <p>{mission.hook}</p>
+      <h3>{simplifyMissionDisplayText(mission.title)}</h3>
+      <p>{simplifyMissionDisplayText(mission.hook)}</p>
       <div className="mission-progress">
         <span style={{ width: `${progress}%` }} />
       </div>
@@ -139,18 +252,18 @@ export function MissionCard({
         {mission.steps.map((step, index) => (
           <li key={`${mission.id}-${step.itemType}-${step.itemId}-${index}`}>
             <SparkIcon />
-            <span>{step.label}</span>
+            <span>{simplifyMissionDisplayText(step.label)}</span>
           </li>
         ))}
       </ol>
       <div className="mission-actions">
         {onSaveMission ? (
           <button className="button primary" type="button" onClick={() => onSaveMission(mission)}>
-            Save route
+            Save plan
           </button>
         ) : null}
         <AppLink className="text-link" to="/vancouver/missions">
-          View missions <ArrowRightIcon />
+          View saved plans <ArrowRightIcon />
         </AppLink>
       </div>
     </article>
@@ -161,11 +274,13 @@ export function TrustCard() {
   return (
     <article className="trust-card">
       <ShieldIcon />
-      <strong>Trust-first public publishing</strong>
+      <div className="card-topline">
+        <strong>How CityAtlas checks a page</strong>
+        <StatusPill tone="blue">Clear labels</StatusPill>
+      </div>
       <p>
-        CityAtlas separates source-backed starter pages, route guides, business-submitted updates,
-        and the broader discovery layer so public pages stay clear about what is verified and what
-        is still expanding carefully.
+        CityAtlas labels guides, local places, and business requests so you can tell what links to
+        official sources, what is saved locally, and what still needs more checking.
       </p>
     </article>
   );

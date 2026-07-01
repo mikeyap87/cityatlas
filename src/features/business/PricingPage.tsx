@@ -1,241 +1,344 @@
-import type { CityAtlasData, PackageId } from "../../types";
-import { AppLink } from "../../components/Link";
-import { ArrowRightIcon, CheckIcon, LockIcon, ShieldIcon } from "../../components/Icons";
-import { SafeModeNotice, SectionHeader, StatusPill } from "../../components/UI";
+import { useEffect } from "react";
 import {
   getPartnerPackageCheckoutLabel,
   getPartnerPackageCheckoutUrl,
   hasPartnerPackageCheckout,
+  siteConfig,
 } from "../../config/site";
+import type { CityAtlasData, PackageId } from "../../types";
+import { AppLink } from "../../components/Link";
+import { ArrowRightIcon, CheckIcon, LockIcon, ShieldIcon } from "../../components/Icons";
+import { HeroMediaCard, SectionHeader, StatusPill } from "../../components/UI";
 
 interface PricingPageProps {
   data: CityAtlasData;
+  onTrack: (name: string, detail?: Record<string, string | number | boolean>) => void;
 }
 
-function getPaymentStateLabel(packageId: PackageId, paymentState: string) {
-  if (hasPartnerPackageCheckout(packageId)) {
-    return "Stripe-hosted checkout available";
+function getPackageLead(packageId: PackageId) {
+  if (packageId === "community") {
+    return "Lightest start";
   }
-
-  if (paymentState === "disabled_until_launch_approval") {
-    return "Checkout opens after review";
+  if (packageId === "city_partner") {
+    return "Best starting point";
   }
-  return "Review request first";
+  return "Hands-on support";
 }
 
-export function PricingPage({ data }: PricingPageProps) {
-  const hasAnyCheckout = data.packages.some((plan) => hasPartnerPackageCheckout(plan.id));
+function getPackageCtaLabel(packageId: PackageId) {
+  if (packageId === "community") {
+    return "Start with Community Listing";
+  }
+  if (packageId === "city_partner") {
+    return "Start with City Partner";
+  }
+  return "Start with Signature Partner";
+}
+
+function getPackageDecisionTitle(packageId: PackageId) {
+  if (packageId === "community") {
+    return "Get reviewed and on file first";
+  }
+  if (packageId === "city_partner") {
+    return "Get a stronger page and guide fit";
+  }
+  return "Get hands-on visibility support";
+}
+
+function getPackageDecisionCopy(packageId: PackageId) {
+  if (packageId === "community") {
+    return "Best when you want CityAtlas to review the business, keep the request ready, and decide later if paid help is worth it.";
+  }
+  if (packageId === "city_partner") {
+    return "Best when you already know the business should show up more clearly and you want the strongest first paid package.";
+  }
+  return "Best when the business already needs deeper page work, offer shaping, and a more involved local growth push.";
+}
+
+function getPackageBestFit(planName: string, packageId: PackageId) {
+  if (packageId === "city_partner") {
+    return "Restaurants, cafes, wellness businesses, repair shops, cleaners, mobile services, and experience operators that need a stronger first paid push.";
+  }
+  if (packageId === "signature_partner") {
+    return "Businesses ready for a hands-on page, offer, and local growth package after the first review is clear.";
+  }
+  if (packageId === "community") {
+    return "Businesses that want a request on file before choosing paid help.";
+  }
+  return planName;
+}
+
+const pricingFirstSteps = [
+  "Share the one thing that needs help first: a page, guide fit, or offer.",
+  "CityAtlas reviews the fit before any billing opens.",
+  "Start with the smallest useful package, not the biggest one.",
+];
+
+const pricingHonestyRules = [
+  "No traffic promises or ranking guarantees.",
+  "No instant checkout before the fit is reviewed.",
+  "No public profile until facts are checked.",
+  "No automated outreach until compliance is checked.",
+];
+
+const pricingQuestions = [
+  {
+    title: "Do I pay before CityAtlas reviews the fit?",
+    copy:
+      "CityAtlas starts with a business request, checks whether a page, guide, or offer is the right first move, and only opens payment when the scope is clear.",
+  },
+  {
+    title: "Which businesses should start here?",
+    copy:
+      "Start here when the business wants clearer neighborhood visibility, better guide placement, stronger service positioning, a simpler offer, or a cleaner city-facing story.",
+  },
+  {
+    title: "What does CityAtlas mean by local visibility?",
+    copy:
+      "It means clearer guide placement, better neighborhood choice, stronger city-facing presentation, and a simpler way for people to find the right business at the right moment.",
+  },
+];
+
+const pricingFitTags = [
+  "Restaurants",
+  "Cafes",
+  "Wellness",
+  "Repair",
+  "Cleaning",
+  "Mobile services",
+  "Classes",
+  "Experiences",
+];
+
+export function PricingPage({ data, onTrack }: PricingPageProps) {
+  useEffect(() => {
+    onTrack("business_pricing_viewed", {
+      packageCount: data.packages.length,
+      highlightedPackage: data.packages.find((plan) => plan.highlighted)?.id ?? "none",
+    });
+  }, [data.packages, onTrack]);
+
+  function trackRequestClick(location: string, packageId: PackageId | "none" = "none") {
+    onTrack("business_package_cta_clicked", {
+      location,
+      packageId,
+    });
+  }
+
+  function trackCheckoutClick(location: string, packageId: PackageId) {
+    onTrack("business_package_checkout_clicked", {
+      location,
+      packageId,
+    });
+  }
 
   return (
     <>
-      <section className="pricing-hero">
+      <section className="pricing-hero pricing-hero-compact">
         <div>
           <p className="section-label">For businesses</p>
-          <h1>Choose the CityAtlas package that fits your Vancouver visibility problem</h1>
+          <h1>Choose the right first CityAtlas package for your Vancouver business</h1>
           <p>
-            Use this page when a Vancouver business wants clearer guide placement, source-backed
-            city visibility, mission sponsorship angles, or a cleaner local growth story.
-            CityAtlas starts with a review step, then opens billing only after fit, scope, and
-            terms are clear.
+            Tell CityAtlas what needs help first, get a fit review, and only pay for the level of
+            help that actually moves the business forward.
           </p>
           <div className="hero-actions">
-            <AppLink className="button primary" to="/for-businesses/submit">
-              Request review
+            <AppLink
+              className="button primary"
+              onClick={() => trackRequestClick("hero")}
+              to="/for-businesses/submit"
+            >
+              Start a business request
               <ArrowRightIcon />
             </AppLink>
             <AppLink className="button secondary" to="/editorial-standards">
-              Review standards
-            </AppLink>
-            <AppLink className="button secondary" to="/for-businesses/partner-preview">
-              Partner preview
+              See trust rules
             </AppLink>
           </div>
+          <div className="tag-cloud pricing-tag-cloud">
+            <span>Starts at $0 / month</span>
+            <span>Review before payment</span>
+            <span>Restaurants + service businesses</span>
+          </div>
+          <article className="source-panel business-hero-note-card business-hero-note-card-safe pricing-hero-summary-card">
+            <strong>Most businesses should start with City Partner or lighter.</strong>
+            <p>
+              Community Listing is the review-only option. City Partner is the strongest first paid
+              fit for most businesses. Signature Partner is for the cases where the bigger lift is
+              already obvious before payment opens.
+            </p>
+          </article>
         </div>
-        <SafeModeNotice />
-      </section>
-
-      <section className="section-block">
-        <SectionHeader
-          title={hasAnyCheckout ? "Choose the right review path before checkout" : "See the package structure before checkout opens"}
-          copy={
-            hasAnyCheckout
-              ? "These packages stay review-first. Stripe-hosted checkout can open for paid packages, but payment does not promise publication, placement, traffic, or automatic approval."
-              : "These packages show the service structure. Checkout, payment links, and subscriptions open only after review, scope confirmation, and clear terms."
-          }
-          action={<StatusPill tone={hasAnyCheckout ? "green" : "amber"}>{hasAnyCheckout ? "Checkout link live" : "Review first"}</StatusPill>}
-        />
-        <div className="pricing-grid">
-          {data.packages.map((plan) => {
-            const checkoutUrl = getPartnerPackageCheckoutUrl(plan.id);
-            const checkoutEnabled = hasPartnerPackageCheckout(plan.id) && checkoutUrl;
-
-            return (
-              <article
-                className={plan.highlighted ? "pricing-card highlighted" : "pricing-card"}
-                id={`package-${plan.id}`}
-                key={plan.id}
-              >
-                {plan.highlighted ? <span className="plan-flag">Most useful first test</span> : null}
-                <h2>{plan.name}</h2>
-                <strong>{plan.priceLabel}</strong>
-                <p>{plan.description}</p>
-                <p><strong>Best first fit:</strong> {plan.bestFor}</p>
-                <ul>
-                  {plan.features.map((feature) => (
-                    <li key={feature}>
-                      <CheckIcon />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                <div className="payment-locked">
-                  {checkoutEnabled ? <CheckIcon /> : <LockIcon />}
-                  <span>{getPaymentStateLabel(plan.id, plan.paymentState)}</span>
-                </div>
-                {checkoutEnabled ? (
-                  <>
-                    <a className="button primary wide" href={checkoutUrl}>
-                      {getPartnerPackageCheckoutLabel(plan.id)}
-                      <ArrowRightIcon />
-                    </a>
-                    <AppLink className="button secondary wide" to={`/for-businesses/submit?package=${plan.id}`}>
-                      Send details first
-                    </AppLink>
-                  </>
-                ) : (
-                  <AppLink className="button secondary wide" to={`/for-businesses/submit?package=${plan.id}`}>
-                    Request review
-                  </AppLink>
-                )}
-              </article>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="section-block">
-        <SectionHeader
-          label="Best first ask"
-          title="Choose the right visibility request before you ask for a package"
-          copy="CityAtlas is strongest when a business names the real local-visibility problem first: guide placement, route sponsorship, trust review, or a stronger business profile."
-          action={<StatusPill tone="blue">Trust-first business routing</StatusPill>}
-        />
-        <div className="guide-query-grid">
-          <AppLink className="query-card query-card-link" to="/vancouver/guides">
-            <strong>Need guide placement and neighborhood fit?</strong>
-            <p>Open the guide library when the real problem is showing up in the right Vancouver route or destination cluster.</p>
-          </AppLink>
-          <AppLink className="query-card query-card-link" to="/vancouver/missions">
-            <strong>Need a sponsor-ready route or shareable city plan?</strong>
-            <p>Use missions when the business needs a sponsor-ready route, creator visit shape, or a shareable city plan.</p>
-          </AppLink>
-          <AppLink className="query-card query-card-link" to="/editorial-standards">
-            <strong>Need the trust rules first?</strong>
-            <p>Review this before asking for live publication, because CityAtlas keeps source, claim, and correction boundaries visible.</p>
-          </AppLink>
-          <AppLink className="query-card query-card-link" to="/for-businesses/submit">
-            <strong>Ready for review?</strong>
-            <p>Go straight to review request when the business already knows it wants a CityAtlas page, package, or clearer local growth plan.</p>
-          </AppLink>
+        <div className="pricing-hero-side">
+          <HeroMediaCard
+            image={siteConfig.media.business}
+            alt="Illustrated market scene inspired by Granville Island Public Market in Vancouver"
+            eyebrow="For local businesses"
+            title="Start with one clear business need"
+            copy="CityAtlas works best when a business starts with one useful page, one stronger guide fit, or one simple offer people can understand fast."
+          />
         </div>
       </section>
 
       <section className="split-section">
-        <div className="source-panel conversion-panel">
-          <h2>What a CityAtlas partner gets in the first 7 days</h2>
-          <ul className="conversion-list">
-            <li><CheckIcon /> Premium page outline with source and review status.</li>
-            <li><CheckIcon /> Category or neighborhood guide placement review.</li>
-            <li><CheckIcon /> Offer or event module prepared for confirmation.</li>
-            <li><CheckIcon /> AI visibility snapshot for the business.</li>
-            <li><CheckIcon /> Creator visit brief when the business is a strong fit.</li>
+        <div className="source-panel conversion-panel pricing-intro-panel">
+          <div className="card-topline">
+            <strong>What happens first</strong>
+            <StatusPill tone="amber">Request first</StatusPill>
+          </div>
+          <ul className="plain-list compact pricing-step-list">
+            {pricingFirstSteps.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
           </ul>
         </div>
-        <div className="source-panel conversion-panel">
-          <h2>Objections we handle before billing</h2>
-          <ul className="conversion-list">
-            <li><LockIcon /> No traffic promises until analytics prove demand.</li>
-            <li><LockIcon /> No live payment until terms and refund policy are approved.</li>
-            <li><LockIcon /> No public profile until business facts are verified.</li>
-            <li><LockIcon /> No automated outreach until compliance is reviewed.</li>
-            <li><LockIcon /> No health, event, or offer claims without extra review.</li>
-          </ul>
+        <article className="source-panel conversion-panel pricing-mini-card pricing-fit-panel">
+          <strong>Good fit for</strong>
+          <p>
+            Best for restaurants, cafes, wellness businesses, repair shops, cleaners, mobile or
+            home-service operators, classes, and experience operators that want clearer
+            neighborhood visibility, stronger guide fit, or one offer people can understand fast.
+          </p>
+          <div className="tag-cloud pricing-fit-tag-cloud">
+            {pricingFitTags.map((tag) => (
+              <span key={tag}>{tag}</span>
+            ))}
+          </div>
+          <p className="pricing-fit-note">
+            If the offer, facts, or neighborhood angle still are not clear yet, the honest next
+            move is to keep the request in review before billing opens.
+          </p>
+        </article>
+      </section>
+
+      <section className="section-block">
+        <SectionHeader
+          label="Choose once"
+          title="Choose your starting level in one pass"
+          copy="All three options start with the same request. The difference is how much help CityAtlas adds after the review."
+        />
+        <div className="card-grid three pricing-choice-grid">
+          {data.packages.map((plan) => (
+            <article
+              className={plan.highlighted ? "source-panel conversion-panel pricing-choice-card highlighted" : "source-panel conversion-panel pricing-choice-card"}
+              key={`chooser-${plan.id}`}
+            >
+              <span className="query-card-kicker">{getPackageLead(plan.id)}</span>
+              <h2>{getPackageDecisionTitle(plan.id)}</h2>
+              <p>{getPackageDecisionCopy(plan.id)}</p>
+              <div className="pricing-choice-meta">
+                <strong>{plan.name}</strong>
+                <span>{plan.priceLabel}</span>
+              </div>
+              <ul className="conversion-list pricing-choice-feature-list">
+                {plan.features.slice(0, 3).map((feature) => (
+                  <li key={`${plan.id}-${feature}`}>
+                    <CheckIcon />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="pricing-choice-note">
+                <strong>Best when:</strong> {getPackageBestFit(plan.name, plan.id)}
+              </p>
+              <div className="pricing-choice-actions">
+                <AppLink
+                  className={plan.highlighted ? "button primary wide" : "button secondary wide"}
+                  onClick={() => trackRequestClick("pricing_choice_card", plan.id)}
+                  to={`/for-businesses/submit?package=${plan.id}`}
+                >
+                  {getPackageCtaLabel(plan.id)}
+                </AppLink>
+                {hasPartnerPackageCheckout(plan.id) ? (
+                  <a
+                    className="button secondary wide"
+                    href={getPartnerPackageCheckoutUrl(plan.id)}
+                    onClick={() => trackCheckoutClick("pricing_choice_card", plan.id)}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    {getPartnerPackageCheckoutLabel(plan.id)}
+                  </a>
+                ) : null}
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="section-block">
+        <SectionHeader
+          label="Still deciding"
+          title="Still unsure? Start the request and let CityAtlas point you to the smaller package first"
+          copy="If two packages both seem plausible, start the request. CityAtlas should only point you higher when the lighter option clearly will not do the job."
+        />
+        <div className="split-section business-next-step-row">
+          <article className="business-guidance-card">
+            <ShieldIcon />
+            <span className="query-card-kicker">Best next move</span>
+            <strong>Share the real problem, then let CityAtlas point you to the smallest useful next step</strong>
+            <p>
+              That is the fastest path when the business wants a clearer page, better guide
+              placement, or one simple offer worth shaping.
+            </p>
+            <div className="hero-actions">
+              <AppLink
+                className="button primary"
+                onClick={() => trackRequestClick("best_next_move")}
+                to="/for-businesses/submit"
+              >
+                Start the request <ArrowRightIcon />
+              </AppLink>
+              <AppLink className="button secondary" to="/editorial-standards">
+                Review trust rules
+              </AppLink>
+            </div>
+          </article>
+          <article className="source-panel conversion-panel pricing-mini-card">
+            <strong>What stays honest</strong>
+            <ul className="conversion-list">
+              {pricingHonestyRules.map((rule) => (
+                <li key={rule}>
+                  <LockIcon />
+                  <span>{rule}</span>
+                </li>
+              ))}
+            </ul>
+          </article>
         </div>
       </section>
 
       <section className="section-block">
         <SectionHeader
           label="Questions"
-          title="What businesses usually need to know first"
-          copy="These are the answers CityAtlas should be able to say clearly before checkout opens, a listing goes live, or a package promise is made."
+          title="What businesses usually ask before anything goes live"
+          copy="These answers should feel clear before billing opens or a public page goes live."
         />
         <div className="card-grid three">
-          <article className="source-panel conversion-panel">
-            <h2>What happens before a business is ever charged?</h2>
-            <p>
-              CityAtlas starts with a local review request, verifies whether the business is a fit
-              for guides or route surfaces, and waits to open checkout until terms, refund policy,
-              and clear demand say the package is worth activating.
-            </p>
-          </article>
-          <article className="source-panel conversion-panel">
-            <h2>When should a business request review now?</h2>
-            <p>
-              Request review when the business already knows it needs better neighborhood visibility,
-              guide placement, offer packaging, or a clearer city-facing story and is comfortable
-              with a careful review-first step instead of instant self-serve billing.
-            </p>
-          </article>
-          <article className="source-panel conversion-panel">
-            <h2>What does CityAtlas mean by local visibility?</h2>
-            <p>
-              It means clearer guide placement, better route fit, source-backed starter context,
-              mission sponsorship angles, and stronger city-facing presentation. It does not mean
-              traffic guarantees, fake rankings, or automatic publication.
-            </p>
-          </article>
-          <article className="source-panel conversion-panel">
-            <h2>What does CityAtlas need from a partner first?</h2>
-            <p>
-              The first yes is not payment. If the preview is a fit, CityAtlas asks for a
-              complimentary hosted meal, service, visit, or offering for Michael and one guest so
-              the feature can be accurate.
-            </p>
-          </article>
+          {pricingQuestions.map((question) => (
+            <article className="source-panel conversion-panel" key={question.title}>
+              <h2>{question.title}</h2>
+              <p>{question.copy}</p>
+            </article>
+          ))}
         </div>
       </section>
 
       <section className="cta-band">
         <ShieldIcon />
         <div>
-          <h2>Best first monetization path</h2>
+          <h2>Start the request before you decide on payment</h2>
           <p>
-            Use this page for early partner conversations first. When checkout is available, keep
-            the payment decision tied to fit, scope, and a clear business request.
+            CityAtlas reviews the fit first, then points you to the smallest useful package.
           </p>
         </div>
-        <AppLink className="button primary" to="/for-businesses/submit">
-          Create review request <ArrowRightIcon />
+        <AppLink
+          className="button primary"
+          onClick={() => trackRequestClick("bottom_cta")}
+          to="/for-businesses/submit"
+        >
+          Start a business request <ArrowRightIcon />
         </AppLink>
-      </section>
-
-      <section className="split-section">
-        <div className="source-panel">
-          <ShieldIcon />
-          <h2>What happens after request</h2>
-          <p>
-            Requests stay private to this form and can be reviewed for fit, facts, and next
-            steps before anything is published.
-          </p>
-        </div>
-        <div className="source-panel">
-          <LockIcon />
-          <h2>What is intentionally excluded</h2>
-          <p>
-            No checkout, no invoices, no automated email, no provider imports, and no public
-            publication of real business claims before review.
-          </p>
-        </div>
       </section>
     </>
   );

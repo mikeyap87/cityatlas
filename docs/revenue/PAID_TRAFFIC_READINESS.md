@@ -1,84 +1,123 @@
 # CityAtlas Paid Traffic Readiness
 
-Date: 2026-07-01
+Generated: 2026-07-01
 
-## Plain-English Verdict
+Status: `request_first_paid_traffic_locally_ready_hosted_checkout_verified_checkout_not_fully_verified`
 
-CityAtlas is ready for a tiny request-first paid-traffic test into reviewed business requests.
+## Revenue Story
 
-It is not yet fully charge-ready or fully self-serve verified because one real successful City Partner checkout has not been completed and reviewed.
+- Traffic source: business-side paid traffic for Vancouver operators.
+- Landing promise: make a Vancouver business easier to find through one clearer page, guide fit, or offer.
+- First useful moment: the business submits one clear request with package interest and a contact path.
+- Primary ask: start a business request.
+- Revenue event: qualified request that can be reviewed and converted manually, even though the paid partner plans now also have a live hosted-checkout handoff for clear package choices.
 
-## Verified
+## Current Verdict
 
-- Production domain: `https://city.univenturestudio.com`
-- Current production deployment: `dpl_Ac5mv3D731WmWuQzqMas9Z6wqMU8`
-- Corrected deployment URL: `https://cityatlas-qi49qife6-michael-yaps-projects-92932836.vercel.app`
-- Vercel aliases include `https://city.univenturestudio.com`.
-- The live homepage serves the final July 1 asset build.
-- Hosted browser proof passed for `/for-businesses/pricing`, `/for-businesses/partner-preview`, and `/for-businesses/submit`.
-- Pricing shows the reviewed package surface and the visible honesty boundary that payment does not promise publication, placement, traffic, or automatic approval.
-- City Partner checkout link is visible on production and points to `https://buy.stripe.com/28EaEXazm3Vc9J27KJcAo01`.
-- Signature Partner checkout link is visible on production and points to `https://buy.stripe.com/dRmfZhfTG0J01cw4yxcAo00`.
-- Both Stripe-hosted links returned `HTTP/2 200` in a read-only header check.
-- GA4 is configured for production and only loads after visitor consent.
-- Before analytics consent, the GA script is not injected.
-- After analytics consent, the GA script is injected and the runtime state reports consent as granted.
-- Local proof passed: `npm run build`, `npm run qa:smoke:local`, and `npm run seo:structure:proof`.
+CityAtlas is now honest for a small request-first paid-traffic test into reviewed business requests.
 
-## Not Verified Yet
+As of July 1, 2026, the local production build, local desktop/mobile smoke pass, and local paid-traffic verifier are green. The local request path now also adds campaign/referral context to the copied or email-ready business request, and the verifier proved the copied request includes the paid-test UTM context.
 
-- No real successful City Partner checkout has been completed in this lane.
-- No Stripe dashboard receipt, customer record, successful payment record, or customer email receipt has been reviewed after a real checkout.
-- No refund, cancellation, dunning, customer portal, webhook, or subscription lifecycle behavior has been proven.
-- No ad spend has been started.
-- No ad-platform conversion pixel, audience, campaign, or billing setup has been changed by Codex.
-- No automated outreach, provider import, CRM sync, or public real-business publication has been activated.
+The live domain was also re-checked directly for hosted payment handoff. The hosted pricing page still shows the live City Partner and Signature Partner Stripe checkout links beside the City Partner, Signature, and general request-first paths.
+
+The latest hosted analytics proof is narrower: the live site shows the consent banner before opt-in, loads the GA script only after consent, uses measurement ID `G-43N3DKZYRL`, and records the business-funnel events in CityAtlas browser-side proof state. This latest headless run did not observe a direct Google Analytics `/g/collect` request, so provider-side GA/Ads receipt remains unverified before scaling spend.
+
+What is still not fully verified is direct self-serve charging. The live Stripe-hosted checkout links are visible and open, but one real successful City Partner checkout is still missing, so it is not yet honest to call CityAtlas fully charge-ready for public self-serve billing.
+
+## Launch Packet Boundary
+
+Keep these as three separate decisions:
+
+- Tiny paid-traffic test: allowed only as a small request-first test into reviewed business requests. Judge it on qualified request quality, campaign attribution, and whether the owner can follow up manually.
+- Local CRO attribution hardening: prepared and locally proven, but not deployed from this lane. It should go through a fresh clean release lane before the live site depends on it.
+- Real City Partner checkout proof: a separate live-money proof. It should not be treated as done just because the pricing page shows Stripe links or because the checkout page opens.
+
+Do not combine those decisions in one claim. CityAtlas can be locally ready for a request-first paid-traffic packet while still needing an approved release for the latest attribution hardening and a separate real checkout proof before self-serve charging claims.
+
+## What Is Ready
+
+- The business pricing page keeps the reviewed-request path clear and also exposes the live Stripe-hosted checkout handoff for City Partner and Signature Partner when the package choice is already clear.
+- The package cards route into the business request form with package interest preserved.
+- The request form creates a local business submission, can open an email draft, and now offers a copy fallback if `mailto:` does not open cleanly.
+- Campaign context is captured from UTM parameters and attached to local growth events.
+- Business-funnel CTAs now emit local events for pricing views, package clicks, form views, saved requests, and email-draft intent.
+- A fresh local smoke pass on 2026-07-01 passed desktop and mobile homepage, city, guides, business detail, planner, pricing, partner-preview, and business-request flows.
+- A fresh local paid-traffic proof on 2026-07-01 passed the request-first funnel through `business_request_saved_for_later` with `measurementReady: true`, `localBusinessFunnelPassed: true`, and `copiedRequestHasCampaignContext: true`.
+- A fresh hosted analytics proof on 2026-07-01 confirmed consent-gated GA script loading, measurement ID `G-43N3DKZYRL`, and hosted browser-side business-funnel event state. Direct GA collect-network proof was not observed in that run.
+- The hosted pricing page still shows the live City Partner and Signature Partner Stripe handoff links beside the request-first review path.
+- The live pricing page rendered successfully on `city.univenturestudio.com` during the July 1 hosted payment-handoff pass, with request-first review paths still visible beside checkout.
+- `npm run qa:paid-traffic` runs a browser proof for the paid-traffic business path and writes `output/qa/paid-traffic-readiness.json`.
+
+## Remaining Caution
+
+- Qualified-request quality is still unproven with real business traffic.
+- The latest campaign-context improvement is proven locally but not deployed from this lane.
+- The latest hosted analytics proof did not observe direct Google Analytics collect requests, so provider-side conversion receipt remains unverified before scaling spend.
+- Direct self-serve revenue is still unproven because the checkout handoff is now live, but a real successful City Partner checkout has not been proven yet.
+- The Stripe-hosted checkout pages open, but no no-charge provider-side success proof exists for the final payment-confirmation state.
+- The local repo still contains old backup folders and build-output clutter that should be cleaned in a separate repo-health pass, even though the current local build and smoke commands are working again.
+- In this continuation lane, `git status` could not produce a clean worktree read because the local Git object database reports a missing tree object. Use a repaired clone or fresh release lane before any deploy, push, or release-branch cleanliness claim.
+
+## Minimum Before Launching A Tiny Paid Test
+
+1. Keep the first paid test small and judge it on qualified-request quality, not raw click volume.
+2. Use the request-first offer, not a fake instant-purchase promise.
+3. Keep the live landing focused on reviewed business requests first, with checkout as a secondary path only when package fit is already clear.
+4. Prefer deploying the local campaign-context hardening through a fresh clean release lane before spend starts.
+5. Rerun hosted pricing/payment proof and hosted analytics proof after any approved release.
+6. Treat missing provider-side GA/Ads receipt as a reason not to scale until account-side receipt is confirmed.
+
+## Minimum Before Self-Serve Charging Claims
+
+1. Prove one real live City Partner checkout.
+2. Confirm Stripe created the live customer and subscription against the expected City Partner price.
+3. Confirm the buyer follow-up path is clear.
+4. Only then call the hosted City Partner handoff charge-ready.
 
 ## Tiny Request-First Paid Test Checklist
 
-Use this only for a very small paid test. The campaign should ask businesses to request review first, not imply guaranteed publication or placement.
+This is the smallest honest paid-traffic launch packet:
 
-1. Use one ad angle only: local Vancouver visibility, reviewed manually.
-2. Send traffic to `https://city.univenturestudio.com/for-businesses/pricing`.
-3. Add UTMs to every ad URL:
-   - `utm_source`
-   - `utm_medium`
-   - `utm_campaign`
-   - `utm_content`
-4. Keep the budget deliberately tiny until a request or checkout signal exists.
-5. Do not claim guaranteed listing, guaranteed traffic, guaranteed approval, or automated publication.
-6. Watch for:
-   - pricing-page visits
-   - analytics-consent rate
-   - business-request submissions
-   - checkout clicks
-   - Stripe successful payment proof
-7. Stop or revise if traffic clicks but no one reaches the business-request or checkout step after the first small batch.
+1. Use the request-first business offer, not a self-serve checkout promise.
+2. Send traffic to the live business path on `city.univenturestudio.com`.
+3. Confirm the landing route, pricing route, partner-preview route, and business-request form still render before spend starts.
+4. Confirm consent-based GA4 setup is active and the request-first path records `page_view`, `business_pricing_viewed`, `business_package_cta_clicked`, `business_request_form_viewed`, `business_submission_saved`, and `business_request_saved_for_later` in CityAtlas proof state.
+5. Confirm provider-side GA/Ads receipt before scaling beyond the tiny test.
+6. Keep the first budget deliberately small.
+7. Review every submitted business request manually before any public listing, paid package recommendation, or follow-up.
+8. Stop the test if requests are low-fit, attribution is missing, or the owner cannot review/respond manually.
 
 ## Real City Partner Checkout Proof Checklist
 
-This is separate from paid traffic. It proves the money path, not the ad path.
+This is separate from the paid-traffic test:
 
-1. Owner opens the live pricing page.
-2. Owner clicks `Start City Partner checkout`.
-3. Owner completes one real City Partner checkout.
-4. Owner confirms Stripe shows:
-   - successful payment
-   - correct package
-   - correct amount
-   - customer email
-   - receipt path
-5. Owner confirms the post-payment customer expectation is acceptable.
-6. Record the proof result before calling CityAtlas fully charge-ready.
+1. Start from a live CityAtlas paid surface that opens the hosted City Partner checkout link.
+2. Confirm Stripe shows `CityAtlas City Partner` at `$49.00 CAD / month`.
+3. Complete one real live checkout only after owner approval for the live payment.
+4. Confirm Stripe created the live customer and live subscription against `price_1TmLDBI27jKwwm3H1gUFgwU6`.
+5. Confirm the manual follow-up path is clear for the buyer.
+6. Only then describe the hosted City Partner handoff as charge-ready. Do not imply custom billing, automatic fulfillment, portal access, or instant publication.
 
-## Stop Boundaries
+## Proof Command
 
-Codex must stop before:
+```bash
+npm run qa:paid-traffic
+```
 
-- starting live ad spend
-- changing Stripe account objects
-- completing a real checkout
-- refunding or canceling a payment
-- sending real outreach or follow-ups
-- importing provider data
-- publishing real-business claims beyond the reviewed public copy
+If a managed shell blocks the verifier from starting its own preview server, use the exact direct proof lane below after `npm run preview` is already serving `http://127.0.0.1:4178/`:
+
+```bash
+CITYATLAS_PAID_TRAFFIC_PORT=4178 CITYATLAS_PAID_TRAFFIC_USE_EXISTING_SERVER=1 npm run qa:paid-traffic
+```
+
+Use strict mode only when the site is expected to be fully paid-traffic ready:
+
+```bash
+npm run qa:paid-traffic:strict
+```
+
+Strict mode should fail while hosted proof, provider-side analytics receipt, or other live-spend gates are blocked.
+
+## Next Best Move
+
+Use a fresh clean release lane to carry the local campaign-context hardening through an approved deploy, rerun hosted proof, then start only a tiny request-first paid test. Keep the real City Partner checkout proof as a separate live-money approval step.

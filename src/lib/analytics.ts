@@ -43,7 +43,7 @@ const runtimeEnv = ((import.meta as ImportMeta & {
   env?: Record<string, string | undefined>;
 }).env ?? {}) as Record<string, string | undefined>;
 
-const DEFAULT_GA_MEASUREMENT_ID = "";
+const DEFAULT_GA_MEASUREMENT_ID = "G-43N3DKZYRL";
 const ANALYTICS_SCRIPT_ID = "cityatlas-ga4-script";
 const ANALYTICS_CONSENT_STORAGE_KEY = "cityatlas.analytics.consent.v1";
 const ANALYTICS_DEBUG_STORAGE_KEY = "cityatlas.analytics.debug.v1";

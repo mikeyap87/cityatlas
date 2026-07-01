@@ -31,26 +31,10 @@ Approval required:
 - refund policy
 - terms/customer agreement
 - Stripe account
-- Payment Link changes
-- real checkout proof
-- refund/cancellation action
-- customer portal, webhook, invoice, or subscription automation
+- test mode proof
+- live mode cutover
 
-CityAtlas now has guarded Stripe-hosted Payment Links for the City Partner and Signature Partner packages. It still contains no Stripe SDK, custom Checkout Session API route, invoice creation, webhook handling, customer portal, or subscription lifecycle automation. One real successful City Partner checkout is still required before calling the product fully charge-ready.
-
-## Paid Ad Spend
-
-Approval required:
-
-- platform and account
-- budget cap
-- campaign objective
-- target audience
-- landing URL and UTM structure
-- stop rule
-- daily owner review window
-
-The app is ready for a tiny request-first paid-traffic test, but Codex must not start ad spend.
+This package intentionally contains no Stripe SDK, checkout route, payment link execution, invoice creation, or subscription creation.
 
 ## Real Business Data
 

@@ -103,6 +103,11 @@ Generated from local repo truth by `npm run growth:packets`.
 ## Local Exports Ready Now
 
 - `output/growth/vancouver-email-ready-prospects.csv` contains the current local Vancouver direct-email queue with batch lane, source lane, stage, and score for review-only outreach prep.
+- `output/growth/vancouver-restaurant-email-ready-prospects.csv` contains the current local Vancouver restaurant and hospitality direct-email subset for founder review, including rows already sent in the first proof sprint and the unsent restaurant queue.
+- `output/growth/vancouver-restaurant-contact-research-batch-001-email-candidate-review.csv` contains the newly reviewed first 100 official-Vancouver restaurant rows whose business-domain-style emails still need manual owner review before they enter any outreach lane.
+- `output/growth/vancouver-restaurant-contact-research-batch-001-contact-path-review.csv` contains the newly reviewed first 100 official-Vancouver restaurant rows that have usable public websites or contact paths but still are not clean direct-email rows.
+- `output/growth/vancouver-restaurant-contact-research-batch-001-email-candidate-review-import.csv` and `output/growth/vancouver-restaurant-contact-research-batch-001-contact-path-review-import.csv` are local admin-import-ready CSVs for bringing those reviewed restaurant rows into the no-send CityAtlas queue without another provider call.
+- `output/growth/vancouver-service-email-ready-prospects.csv` contains the current local Vancouver service subset for founder review. Today this lane is wellness and mobile-service heavy, not yet a complete auto-repair or cleaning queue.
 - `output/growth/vancouver-promotion-candidates.csv` contains the current local Vancouver non-email partner rows ranked by the next manual step that could move them closer to rehearsal.
 - `output/growth/vancouver-contact-path-review-prospects.csv` contains the current local Vancouver contact-form and official-path review queue with confidence, source route, and no-submit notes.
 - `output/growth/vancouver-needs-research-prospects.csv` contains the current local Vancouver rows that still need better public contact research before any rehearsal.
@@ -156,4 +161,3 @@ Generated from local repo truth by `npm run growth:packets`.
 1. Keep widening Vancouver email-ready density only where it strengthens the source-backed public city surface or the exact first manual packet.
 2. Use the exported CSVs to clean owner-review scope before any later outreach activation work is even proposed.
 3. Keep follow-on cities in queue-building mode until one non-Vancouver wedge earns a real source-backed collection starter.
-

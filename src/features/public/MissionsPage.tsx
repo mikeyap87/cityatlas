@@ -2,7 +2,9 @@ import type { CityAtlasData, CityMission, SavedItem } from "../../types";
 import { MissionCard } from "../../components/Cards";
 import { AppLink } from "../../components/Link";
 import { ArrowRightIcon, CheckIcon, MapIcon, ShieldIcon, SparkIcon } from "../../components/Icons";
-import { SectionHeader, StatusPill } from "../../components/UI";
+import { siteConfig } from "../../config/site";
+import { HeroMediaCard, SectionHeader, StatusPill } from "../../components/UI";
+import { simplifyMissionDisplayText } from "../../lib/publicCopy";
 
 interface MissionsPageProps {
   data: CityAtlasData;
@@ -35,8 +37,8 @@ function MissionRoute({
       <div className="mission-route-header">
         <div>
           <p className="section-label">{mission.theme}</p>
-          <h2>{mission.title}</h2>
-          <p>{mission.routeSummary}</p>
+          <h2>{simplifyMissionDisplayText(mission.title)}</h2>
+          <p>{simplifyMissionDisplayText(mission.routeSummary)}</p>
         </div>
         <div className="mission-route-score">
           <strong>{progress}%</strong>
@@ -49,9 +51,9 @@ function MissionRoute({
           <li className={stepIsSaved(step, savedItems) ? "saved" : ""} key={`${mission.id}-${step.itemId}-${index}`}>
             <span>{index + 1}</span>
             <div>
-              <strong>{step.label}</strong>
+              <strong>{simplifyMissionDisplayText(step.label)}</strong>
               <small>{step.time} - {step.neighborhood}</small>
-              <p>{step.note}</p>
+              <p>{simplifyMissionDisplayText(step.note)}</p>
             </div>
             <StatusPill tone={stepIsSaved(step, savedItems) ? "green" : "muted"}>
               {stepIsSaved(step, savedItems) ? "saved" : step.itemType}
@@ -63,15 +65,15 @@ function MissionRoute({
       <div className="mission-reward">
         <SparkIcon />
         <div>
-          <strong>{mission.reward}</strong>
-          <p>{mission.sharePrompt}</p>
-          <small>{mission.sponsorAngle}</small>
+          <strong>{simplifyMissionDisplayText(mission.reward)}</strong>
+          <p>{simplifyMissionDisplayText(mission.sharePrompt)}</p>
+          <small>{simplifyMissionDisplayText(mission.sponsorAngle)}</small>
         </div>
       </div>
 
       <div className="hero-actions">
         <button className="button primary" type="button" onClick={() => onSaveMission(mission)}>
-          Save full mission
+          Save full plan
         </button>
         <AppLink className="button secondary" to="/planner">
           Open planner <ArrowRightIcon />
@@ -86,68 +88,85 @@ export function MissionsPage({ data, onSaveMission }: MissionsPageProps) {
     <>
       <section className="city-hero mission-hero">
         <div>
-          <p className="section-label">City missions</p>
-          <h1>What is a CityAtlas mission? A saveable Vancouver route you can actually reuse.</h1>
+          <p className="section-label">Saved plans</p>
+          <h1>Save the Vancouver plan that already works</h1>
           <p>
-            Use missions when the Vancouver question is already clear and the next step is saving,
-            sharing, or tightening one route instead of reopening the whole city. Missions turn
-            answer-first guides, starter pages, and route ideas into a concrete plan with one clear
-            next move.
+            Use saved plans once the kind of day is already clear and the next step is keeping,
+            sharing, or tightening one route instead of reopening the whole city.
           </p>
+          <div className="hero-actions">
+            <AppLink
+              className="button primary"
+              to="/vancouver/guides/cityatlas-guide-roundup-which-vancouver-route-should-you-open-by-situation"
+            >
+              Start with a guide <ArrowRightIcon />
+            </AppLink>
+            <AppLink className="button secondary" to="/planner">
+              Open planner
+            </AppLink>
+          </div>
+          <article className="source-panel business-hero-note-card business-hero-note-card-safe pricing-hero-summary-card">
+            <strong>Saved plans work best after one guide or place already fits.</strong>
+            <p>
+              Start with the clearest route, then save it so you can reuse it, tighten it, and
+              share it later without reopening the whole city.
+            </p>
+          </article>
         </div>
-        <div className="source-panel">
-          <MapIcon />
-          <h2>Why this spreads</h2>
-          <p>
-            A mission is easier to reuse than a directory. It gives locals and visitors one compact
-            Vancouver plan, gives businesses a future sponsor shape, and gives CityAtlas a clearer
-            route-planner unit than generic browse-only discovery.
-          </p>
+        <div className="starter-hero-side">
+          <HeroMediaCard
+            image={siteConfig.media.missions}
+            alt="Illustrated park scene inspired by Stanley Park in Vancouver"
+            eyebrow="Saved plans"
+            title="Keep one Vancouver route worth coming back to"
+            copy="Saved plans help you keep a good route, tighten it later, and share it without reopening every page."
+            className="hero-media-compact"
+          />
         </div>
       </section>
 
       <section className="section-block">
         <SectionHeader
           label="Best first move"
-          title="Open the right route input before you save a mission"
-          copy="Missions work best after the pace, visitor situation, or route shape is already clearer. These pages help someone choose the right CityAtlas path first."
-          action={<StatusPill tone="blue">Choose your route first</StatusPill>}
+          title="Choose a guide first, then save the plan"
+          copy="Saved plans work best after the pace, visitor situation, or plan shape is already clearer. These pages help someone choose the right guide or place first."
+          action={<StatusPill tone="blue">Choose your guide first</StatusPill>}
         />
         <div className="guide-query-grid">
           <AppLink
             className="query-card query-card-link"
             to="/vancouver/guides/vancouver-itinerary-starter-pack-which-cityatlas-page-should-you-open-first"
           >
-            <strong>Starter-pack guide</strong>
-            <p>Open this when the first problem is still which CityAtlas page should shape the day at all.</p>
+            <strong>Where to start guide</strong>
+            <p>Open this when the first problem is still which guide should shape the day at all.</p>
           </AppLink>
           <AppLink
             className="query-card query-card-link"
             to="/vancouver/guides/cityatlas-guide-roundup-which-vancouver-route-should-you-open-by-situation"
           >
-            <strong>Guide roundup</strong>
-            <p>Use this when weather, visitor type, or neighborhood fit should decide the mission shape first.</p>
+            <strong>Browse by situation</strong>
+            <p>Use this when weather, visitor type, or neighborhood choice should decide the plan first.</p>
           </AppLink>
           <AppLink
             className="query-card query-card-link"
             to="/vancouver/guides/which-low-friction-vancouver-route-should-you-open-today"
           >
-            <strong>Low-friction route chooser</strong>
-            <p>Choose this when the mission needs to stay easier, calmer, or more compact before anything gets saved.</p>
+            <strong>Easy plan chooser</strong>
+            <p>Choose this when the day needs to stay easier, calmer, or more compact before anything gets saved.</p>
           </AppLink>
           <AppLink className="query-card query-card-link" to="/planner">
             <strong>Planner</strong>
-            <p>Move here when the route is already clear and the next step is saving or rearranging the plan.</p>
+            <p>Move here when the plan is already clear and the next step is saving or rearranging it.</p>
           </AppLink>
         </div>
       </section>
 
       <section className="section-block">
         <SectionHeader
-          label="Mission library"
-          title="Three reusable Vancouver routes"
-          copy="These routes show how CityAtlas turns guides and starter pages into saved Vancouver plans while broader city coverage keeps growing carefully."
-          action={<StatusPill tone="amber">Current route set</StatusPill>}
+          label="Saved plan library"
+          title="Three reusable Vancouver plans"
+          copy="These plans show how CityAtlas turns guides and local places into saved Vancouver plans."
+          action={<StatusPill tone="amber">Saved plans today</StatusPill>}
         />
         <div className="card-grid three">
           {data.cityMissions.map((mission) => (
@@ -163,8 +182,8 @@ export function MissionsPage({ data, onSaveMission }: MissionsPageProps) {
 
       <section className="mission-routes section-block">
         <SectionHeader
-          title="How a route helps"
-          copy="Each mission shows what a local user would do and where a business could fit naturally later."
+          title="How a saved plan helps"
+          copy="Each saved plan shows what a local user would do and where a business could show up naturally later."
         />
         <div className="mission-route-grid">
           {data.cityMissions.map((mission) => (
@@ -180,19 +199,19 @@ export function MissionsPage({ data, onSaveMission }: MissionsPageProps) {
 
       <section className="split-section">
         <div className="source-panel conversion-panel">
-          <h2>Who should use missions first?</h2>
+          <h2>Who should use saved plans first?</h2>
           <ul className="conversion-list">
-            <li><CheckIcon /> Locals who want one reusable Vancouver route instead of reopening every guide.</li>
-            <li><CheckIcon /> Visitors or hosts who already know the route type and need a cleaner saved plan.</li>
-            <li><CheckIcon /> Businesses evaluating whether CityAtlas can create a future sponsor-friendly city loop.</li>
+            <li><CheckIcon /> Locals who want one reusable Vancouver plan instead of reopening every guide.</li>
+            <li><CheckIcon /> Visitors or hosts who already know the kind of plan they want and need a cleaner saved version.</li>
+            <li><CheckIcon /> Businesses evaluating whether CityAtlas can create a future sponsor-friendly city plan.</li>
           </ul>
         </div>
         <div className="source-panel conversion-panel">
-          <h2>What missions are not</h2>
+          <h2>What saved plans are not</h2>
           <ul className="conversion-list">
             <li><ShieldIcon /> Not a claim that every place, offer, or event shown here is already part of a verified public directory.</li>
-            <li><ShieldIcon /> Not a promise that one route fits every mood, budget, or weather shift.</li>
-            <li><ShieldIcon /> Not a replacement for the editorial standards, starter pages, or answer-first guide layer.</li>
+            <li><ShieldIcon /> Not a promise that one plan fits every mood, budget, or weather shift.</li>
+            <li><ShieldIcon /> Not a replacement for the editorial standards, starting pages, or Vancouver guides.</li>
           </ul>
         </div>
       </section>
@@ -200,14 +219,14 @@ export function MissionsPage({ data, onSaveMission }: MissionsPageProps) {
       <section className="cta-band">
         <ShieldIcon />
         <div>
-          <h2>A route layer first, broader listings later</h2>
+          <h2>For businesses, clearer routes can become clearer pages later</h2>
           <p>
-            Missions show how CityAtlas can turn planning into reusable itineraries. As verified
-            business coverage expands, routes can become more specific.
+            Saved plans show the kind of route people actually want. Business packages are for
+            operators who want clearer pages, offers, or guide placement as coverage grows.
           </p>
         </div>
         <AppLink className="button primary" to="/for-businesses/pricing">
-          Partner packages <ArrowRightIcon />
+          See business packages <ArrowRightIcon />
         </AppLink>
       </section>
     </>

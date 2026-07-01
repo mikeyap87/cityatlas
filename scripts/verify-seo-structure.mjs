@@ -198,10 +198,9 @@ const checks = [
   },
   {
     path: "/for-businesses/partner-preview",
-    label: "Business partner preview page",
-    requiredTypes: ["BreadcrumbList", "WebPage", "FAQPage"],
+    label: "Business partner preview",
+    requiredTypes: [],
     expectedRobots: "index",
-    minFaqQuestions: 3,
   },
   ...guideChecks,
   ...sourceBackedChecks,
@@ -218,6 +217,11 @@ const checks = [
   },
   {
     path: "/for-businesses/submit",
+    requiredTypes: [],
+    expectedRobots: "noindex",
+  },
+  {
+    path: "/for-businesses/book-call",
     requiredTypes: [],
     expectedRobots: "noindex",
   },

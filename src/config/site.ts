@@ -1,8 +1,16 @@
 import type { PackageId } from "../types";
 
+export function resolvePublicAssetPath(path: string) {
+  if (typeof window !== "undefined" && window.location.protocol === "file:" && path.startsWith("/")) {
+    return `.${path}`;
+  }
+
+  return path;
+}
+
 export const siteConfig = {
   name: "CityAtlas",
-  tagline: "Vancouver Guides, Routes, And Local Discovery",
+  tagline: "Find the right part of Vancouver first",
   city: "Vancouver",
   citySlug: "vancouver",
   localUrl: "http://127.0.0.1:5178/",
@@ -10,11 +18,19 @@ export const siteConfig = {
   launchModeLabel: "Univenture private-launch package",
   contactEmail: "city@univenturestudio.com",
   media: {
-    hero: "/assets/vancouver-market-hero.png",
-    concept: "/design/launch-product-concept.png",
-    referenceHome: "/visual_references/01_homepage_public_site.png",
-    referenceComposite: "/visual_references/02_public_pages_and_admin_composite.png",
-    referenceDashboard: "/visual_references/03_ai_dashboards_owner_creator_mobile.png",
+    hero: resolvePublicAssetPath("/assets/places-generated/granville-island-public-market-hero-generated.jpg"),
+    about: resolvePublicAssetPath("/assets/places-generated/granville-island-public-market-hero-generated.jpg"),
+    business: resolvePublicAssetPath("/assets/places-generated/granville-island-public-market-generated.jpg"),
+    city: resolvePublicAssetPath("/assets/places-generated/english-bay-beach-generated.jpg"),
+    guides: resolvePublicAssetPath("/assets/places-generated/gastown-generated.jpg"),
+    missions: resolvePublicAssetPath("/assets/places-generated/stanley-park-generated.jpg"),
+    planner: resolvePublicAssetPath("/assets/places-generated/commercial-drive-generated.jpg"),
+    waterfront: resolvePublicAssetPath("/assets/places-generated/kitsilano-beach-generated.jpg"),
+    wellness: resolvePublicAssetPath("/assets/places-generated/queen-elizabeth-park-generated.jpg"),
+    hostingGuests: resolvePublicAssetPath("/assets/places-generated/vancouver-hosting-guests-generated.png"),
+    weekend: resolvePublicAssetPath("/assets/places-generated/vancouver-weekend-route-generated.png"),
+    lowEffort: resolvePublicAssetPath("/assets/places-generated/vancouver-low-effort-day-generated.png"),
+    wellnessReset: resolvePublicAssetPath("/assets/places-generated/vancouver-wellness-reset-generated.png"),
   },
   gatedActions: [
     "Domain purchase",
@@ -27,8 +43,10 @@ export const siteConfig = {
   ],
 };
 
-const runtimeEnv = ((import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env ??
-  {}) as Record<string, string | undefined>;
+const runtimeEnv = ((import.meta as ImportMeta & {
+  env?: { DEV?: boolean } & Record<string, string | undefined>;
+}).env ?? {}) as { DEV?: boolean } & Record<string, string | undefined>;
+const isDevBuild = runtimeEnv.DEV === true;
 
 export const envFlags = {
   livePayments: runtimeEnv.VITE_CITYATLAS_ENABLE_LIVE_PAYMENTS === "true",
@@ -75,6 +93,11 @@ export function getPartnerPackageCheckoutLabel(packageId: PackageId) {
   return "Start checkout";
 }
 
+export const buildFlags = {
+  hostedAdminArtifacts: isDevBuild || envFlags.hostedAdmin,
+  hostedPrivatePreviewArtifacts: isDevBuild || envFlags.hostedPrivatePreview,
+};
+
 export function isLocalPreviewRuntime() {
   if (typeof window === "undefined") return true;
   return ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
@@ -86,4 +109,13 @@ export function canShowHostedAdmin() {
 
 export function canShowHostedPrivatePreview() {
   return isLocalPreviewRuntime() || envFlags.hostedPrivatePreview;
+}
+
+export function canRenderAdminExperience() {
+  return buildFlags.hostedAdminArtifacts && (isDevBuild ? isLocalPreviewRuntime() : envFlags.hostedAdmin);
+}
+
+export function canRenderPrivatePreviewExperience() {
+  return buildFlags.hostedPrivatePreviewArtifacts
+    && (isDevBuild ? isLocalPreviewRuntime() : envFlags.hostedPrivatePreview);
 }

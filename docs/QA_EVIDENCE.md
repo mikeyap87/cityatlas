@@ -1,5 +1,20 @@
 # QA Evidence
 
+## 2026-07-01 Production Recovery And CRO Proof
+
+- Corrected production deployment: `dpl_Ac5mv3D731WmWuQzqMas9Z6wqMU8`.
+- Corrected deployment URL: `https://cityatlas-qi49qife6-michael-yaps-projects-92932836.vercel.app`.
+- Approved production domain: `https://city.univenturestudio.com`.
+- Vercel inspect confirmed the corrected deployment aliases include `https://city.univenturestudio.com`.
+- Live homepage HTML served the July 1 asset build: `/assets/index-BOdI0lK4.js` and `/assets/index-CvwLPMnD.css`.
+- Local proof passed before deploy: `npm run build`, `npm run qa:smoke:local`, and `npm run seo:structure:proof`.
+- Hosted browser proof passed for `/for-businesses/pricing`, `/for-businesses/partner-preview`, and `/for-businesses/submit`.
+- Hosted pricing proof confirmed the City Partner checkout link points to `https://buy.stripe.com/28EaEXazm3Vc9J27KJcAo01`.
+- Hosted pricing proof confirmed the Signature Partner checkout link points to `https://buy.stripe.com/dRmfZhfTG0J01cw4yxcAo00`.
+- Hosted analytics proof confirmed no GA4 script before consent and GA4 script injection after consent.
+- Read-only Stripe link checks returned `HTTP/2 200` for both live Payment Links.
+- Remaining proof gap: one real successful City Partner checkout has not been completed.
+
 ## Design Reference
 
 - Concept: `public/design/launch-product-concept.png`

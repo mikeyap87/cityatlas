@@ -4,7 +4,7 @@
 
 CityAtlas is a Univenture Studio local discovery and business-growth platform. The first market is Vancouver.
 
-The public product helps locals find places, events, offers, and guides. The business side helps local operators request founder-partner review, prepare feature pages, and eventually buy packages after live payment approval.
+The public product helps locals find places, events, offers, and guides. The business side helps local operators request founder-partner review, prepare feature pages, and use guarded Stripe-hosted checkout for approved paid packages.
 
 ## Who It Serves
 
@@ -38,7 +38,7 @@ The public product helps locals find places, events, offers, and guides. The bus
 - Public Vancouver guide-roundup page for routing people into the strongest CityAtlas route family by situation, now hosted and smoke-verified on the approved domain.
 - Public source-backed Vancouver wellness reset starters page and upgraded wellness guide with official-source framing and correction path.
 - Local-ready Toronto first-time visitor starter page and matching destination-choice guide, plus a Toronto weekend-route starter page and matching compact-weekend guide, as the first non-Vancouver preview cluster, now also threaded into the public homepage, guide-library, about-page, and footer internal-link architecture while still pending hosted proof on the approved domain.
-- Business pricing page with payment acceptance disabled.
+- Business pricing page with guarded Stripe-hosted City Partner and Signature Partner checkout links when live-payment environment variables are enabled.
 - Business submission flow with local-only storage.
 - Draft terms and privacy pages.
 - Public editorial standards and corrections page.
@@ -75,6 +75,7 @@ The public product helps locals find places, events, offers, and guides. The bus
 - Local growth events, adaptive next-best-action logic, and revenue experiment records.
 - Owner growth radar for translating research-backed product patterns into local, gated experiments.
 - Route-aware SEO metadata and crawl assets with public indexing on approved pages and noindex on protected routes.
+- Consent-gated GA4 analytics handoff for paid-traffic measurement without loading the GA script before visitor consent.
 - Root IndexNow key file plus local submission commands for faster participating-engine crawl refresh after public content releases.
 - Source-level and rendered public-copy safety proof so internal/operator language can be caught before it reaches crawlable surfaces.
 - Local query-map, hook-rubric, and release-checklist docs for repeatable editorial work.
@@ -100,7 +101,7 @@ The public product helps locals find places, events, offers, and guides. The bus
 - Most public business claims stay fictional or gated; the only live narrow exceptions are the source-backed date-night, rainy-day, and first-evening starter pages, which must link to official sources and the correction path.
 - The current hosted Vancouver ranking library now includes `/vancouver/first-time-visitor-starters`, `/vancouver/kitsilano-scenic-starters`, `/vancouver/west-side-daytime-starters`, `/vancouver/false-creek-culture-starters`, `/vancouver/ubc-discovery-starters`, `/vancouver/garden-day-starters`, `/vancouver/returning-visitor-starters`, `/vancouver/out-of-town-guest-starters`, `/vancouver/weekend-route-starters`, `/vancouver/sunday-starters`, `/vancouver/wellness-reset-starters`, `/vancouver/guides/vancouver-itinerary-starter-pack-which-cityatlas-page-should-you-open-first`, `/vancouver/guides/cityatlas-guide-roundup-which-vancouver-route-should-you-open-by-situation`, and `/vancouver/guides/which-low-friction-vancouver-route-should-you-open-today`, plus the matching destination-choice, neighborhood-starter, daytime-route, culture-afternoon, UBC-discovery, garden-day, returning-visitor, guest-hosting, weekend-planning, Sunday-planning, and wellness guide upgrades. The current still-local ranking candidate is the Toronto first-time visitor plus weekend-route pilot pair until hosted proof says otherwise.
 - Public routes are crawlable; `/admin`, `/private-preview/*`, `/planner`, and `/for-businesses/submit` stay noindex.
-- No Stripe/payment acceptance is active.
+- Live Stripe-hosted checkout links are active for City Partner and Signature Partner. No custom Stripe SDK, Checkout Session API, webhook, customer portal, invoice automation, or subscription lifecycle handling is active in the app.
 - No provider imports are active.
 - No automated outreach is active.
 - No live inbox webhook, Resend connector, CRM sync, or automated business follow-up is active.
@@ -110,7 +111,7 @@ The public product helps locals find places, events, offers, and guides. The bus
 - Vercel deploy is live at `https://cityatlas-one.vercel.app`.
 - Custom Univenture subdomain is live at `https://city.univenturestudio.com`.
 - Cloudflare DNS and the Vercel alias are configured and serving crawlable robots on the approved domain.
-- No Stripe product, price, payment link, subscription, or invoice has been created.
+- Stripe-hosted Payment Links resolve for the two paid packages. One real successful City Partner checkout is still missing, so CityAtlas is not yet fully charge-ready or self-serve verified.
 
 ## Local Run
 
@@ -142,14 +143,14 @@ Open `http://127.0.0.1:5178/`.
 23. Keep admin/private-preview hosted flags false unless protected sharing is explicitly approved.
 24. Approve a real-data sourcing policy.
 25. Monitor the first six manual proof-sprint emails and log every reply, bounce, wrong-contact redirect, or concern in `/admin`.
-26. Approve payment terms before enabling Stripe/payment links.
+26. Complete one owner-controlled City Partner checkout proof before calling CityAtlas fully charge-ready or self-serve verified.
 27. Keep noindex/private crawl settings only on founder and admin flows; do not widen crawl to protected routes.
 28. Validate City Missions with 5 to 10 real humans before building accounts or live sharing.
 29. Review the Founder CRM candidate queue before any private preview follow-up or second manual outreach batch.
 30. Approve exact private-preview route language before real business names leave local owner review.
 31. Log manual replies locally before any automation or live CRM integration.
 32. Run `npm run replies:analyze` after outcomes are logged.
-33. Use `docs/revenue/DATE_NIGHT_REVENUE_PROOF_LOOP.md` to decide whether package demand is strong enough for Stripe test-mode setup.
+33. Use `docs/revenue/PAID_TRAFFIC_READINESS.md` for the exact tiny request-first paid-test checklist and the separate real City Partner checkout proof checklist.
 34. Use saved AI Brain Runs to compare progress before and after the first manual founder proof loop.
 35. Follow `docs/brand/BRAND_GUIDE.md` for logo, favicon, and visual changes.
 36. Use `docs/backend/LEAD_STORAGE_ACTIVATION_PACKET.md` before any durable lead-storage/provider setup.

@@ -15,8 +15,9 @@ import {
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const distIndexPath = join(root, "dist/index.html");
 const previewPort = Number(process.env.CITYATLAS_RENDERED_ROUTE_MAP_PORT || "4382");
+const configuredBaseUrl = process.env.CITYATLAS_RENDERED_ROUTE_MAP_BASE_URL?.replace(/\/+$/u, "");
 const useExistingServer = process.env.CITYATLAS_RENDERED_ROUTE_MAP_USE_EXISTING_SERVER === "1";
-const baseUrl = `http://127.0.0.1:${previewPort}`;
+const baseUrl = configuredBaseUrl || `http://127.0.0.1:${previewPort}`;
 
 function getRouteMapPaths() {
   const collectionPaths = Object.values(sourceBackedCollectionMeta).map((meta) => meta.path);
@@ -44,6 +45,29 @@ async function stopPreviewServer(server) {
     child.kill("SIGKILL");
     await new Promise((resolve) => child.once("exit", resolve));
   }
+}
+
+async function waitForExternalBaseUrl(url, timeoutMs = 30_000) {
+  const startedAt = Date.now();
+  let lastError = "";
+
+  while (Date.now() - startedAt < timeoutMs) {
+    try {
+      const response = await fetch(url, { redirect: "manual" });
+      if (response.status < 500) {
+        return;
+      }
+      lastError = `HTTP ${response.status}`;
+    } catch (error) {
+      lastError = error instanceof Error ? error.message : String(error);
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  }
+
+  throw new Error(
+    `Base URL did not become ready at ${url} within ${timeoutMs}ms.${lastError ? ` Last error: ${lastError}` : ""}`,
+  );
 }
 
 function inspectMapsHref(href, route) {
@@ -85,6 +109,11 @@ async function inspectRoute(page, route, viewportName) {
   await page.goto(`${baseUrl}${route}`, { waitUntil: "networkidle" });
 
   const panel = page.locator(".route-map-panel");
+  try {
+    await panel.first().waitFor({ state: "attached", timeout: 5_000 });
+  } catch {
+    // Count below records the missing panel as a test failure with route context.
+  }
   const panelCount = await panel.count();
   const link = page.locator(".route-map-panel a[href^='https://www.google.com/maps/dir/']");
   const linkCount = await link.count();
@@ -137,13 +166,15 @@ async function main() {
   const routes = getRouteMapPaths();
   const failures = [];
   const reports = [];
-  const server = useExistingServer
+  const server = configuredBaseUrl || useExistingServer
     ? null
     : startVitePreviewServer({ root, port: previewPort, distIndexPath });
 
   try {
     if (server) {
       await waitForServer(baseUrl, () => server.getLogs());
+    } else {
+      await waitForExternalBaseUrl(baseUrl);
     }
 
     const { chromium } = loadPlaywright();

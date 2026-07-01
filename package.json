@@ -52,6 +52,7 @@
     "qa:paid-traffic:strict": "node scripts/verify-paid-traffic-readiness.mjs --strict",
     "qa:route-maps": "node --experimental-strip-types --experimental-specifier-resolution=node scripts/verify-route-map-links.mjs",
     "qa:route-maps:rendered": "node --experimental-strip-types --experimental-specifier-resolution=node scripts/verify-rendered-route-maps.mjs",
+    "qa:route-maps:hosted": "CITYATLAS_RENDERED_ROUTE_MAP_BASE_URL=https://city.univenturestudio.com node --experimental-strip-types --experimental-specifier-resolution=node scripts/verify-rendered-route-maps.mjs",
     "qa:payments:handoff": "node scripts/verify-live-payment-handoff.mjs",
     "qa:payments:hosted": "node scripts/verify-hosted-payment-handoff.mjs",
     "qa:planner:summary": "node --experimental-strip-types --experimental-specifier-resolution=node scripts/verify-planner-save-summary.mjs",

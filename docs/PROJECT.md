@@ -89,7 +89,7 @@ The public product helps locals find places, events, offers, and guides. The bus
 - Local source-backed wedge template plus hook and quality-gate readmes for repeatable editorial work.
 - Local `npm run seo:proof` verification for content counts, crawl-file coverage, and source-backed route integrity.
 - Local `npm run seo:structure:proof` verification for route metadata, robots directives, breadcrumbs, guide FAQ schema, and key hub JSON-LD coverage.
-- Local `npm run qa:route-maps` and `npm run qa:route-maps:rendered` verification for Google Maps route handoffs across route-backed starter and guide pages.
+- Local `npm run qa:route-maps` plus local/rendered `npm run qa:route-maps:rendered` verification for Google Maps route handoffs across route-backed starter and guide pages; after deploy, run `npm run qa:route-maps:hosted` against `city.univenturestudio.com`.
 - Guide library hub now groups the ranking surface into route-and-weather, visitor-and-host, weekend-and-reset, and neighborhood-intent clusters for stronger crawl and internal-link clarity.
 
 ## Stack

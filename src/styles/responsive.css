@@ -1250,6 +1250,32 @@
     max-width: none;
   }
 
+  .route-map-panel,
+  .route-map-panel-compact {
+    gap: 14px;
+    grid-template-columns: 1fr;
+    padding: 14px;
+  }
+
+  .route-map-copy h2 {
+    font-size: 1.36rem;
+    max-width: none;
+  }
+
+  .route-map-copy p {
+    font-size: 0.9rem;
+    max-width: 100%;
+  }
+
+  .route-map-action {
+    justify-self: stretch;
+  }
+
+  .route-map-preview iframe,
+  .route-map-static {
+    min-height: 246px;
+  }
+
   .guide-summary {
     font-size: 0.9rem;
   }

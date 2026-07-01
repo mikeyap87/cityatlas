@@ -2,6 +2,7 @@ import type { Business, CityAtlasData, EventItem, Guide } from "../../types";
 import { AppLink } from "../../components/Link";
 import { BusinessCard, EventCard, GuideCard } from "../../components/Cards";
 import { ArrowRightIcon, MapIcon, ShieldIcon } from "../../components/Icons";
+import { RouteMapPanel } from "../../components/RouteMapPanel";
 import { SectionHeader, StatusPill } from "../../components/UI";
 import {
   getGuideHeroVisual,
@@ -18,6 +19,7 @@ import {
   getSourceBackedPlaces,
   sourceBackedCollectionMeta,
 } from "../../lib/sourceBackedCollections";
+import { buildSourceBackedRouteMapStops } from "../../lib/routeMaps";
 
 interface GuideDetailPageProps {
   guide?: Guide;
@@ -236,12 +238,16 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
     )
     .slice(0, 2);
   const sourceBackedCollection = getSourceBackedCollectionForGuide(guide);
-  const sourceBackedGuidePlaces = sourceBackedCollection
-    ? getSourceBackedPlaces(data, sourceBackedCollection).slice(0, 2)
+  const sourceBackedRoutePlaces = sourceBackedCollection
+    ? getSourceBackedPlaces(data, sourceBackedCollection)
     : [];
+  const sourceBackedGuidePlaces = sourceBackedRoutePlaces.slice(0, 2);
   const sourceBackedGuideMeta = sourceBackedCollection
     ? sourceBackedCollectionMeta[sourceBackedCollection]
     : null;
+  const routeMapStops = sourceBackedCollection
+    ? buildSourceBackedRouteMapStops(sourceBackedRoutePlaces, sourceBackedCollection)
+    : [];
   const gateMeta = guideGateMeta[guide.gateDecision];
   const resolvedGuideHubPath = getGuideHubPath(guide);
   const guideVisual = getGuideHeroVisual(guide);
@@ -359,6 +365,14 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
             <p>{guideIntro}</p>
             <p>{guideBody}</p>
           </div>
+
+          <RouteMapPanel
+            campaign={`guide_${guide.slug}_route`}
+            compact
+            copy="Open the suggested stop order in Google Maps when you want the page to become a real-world route."
+            stops={routeMapStops}
+            title="Turn this guide into a route"
+          />
 
           {simplifiedSections.map((section, index) => (
             <details className="guide-section guide-section-toggle" key={section.heading} open={index === 0}>

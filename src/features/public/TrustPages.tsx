@@ -6,6 +6,7 @@ import type {
 } from "../../types";
 import { AppLink } from "../../components/Link";
 import { ArrowRightIcon, MapIcon, ShieldIcon, SparkIcon } from "../../components/Icons";
+import { RouteMapPanel } from "../../components/RouteMapPanel";
 import { SectionHeader, StatusPill } from "../../components/UI";
 import { siteConfig } from "../../config/site";
 import { getGuideCityName, getGuidePath } from "../../lib/cityPaths";
@@ -18,6 +19,7 @@ import {
   type SourceBackedCollectionId,
   sourceBackedCollectionMeta,
 } from "../../lib/sourceBackedCollections";
+import { buildSourceBackedRouteMapStops } from "../../lib/routeMaps";
 import {
   getSourceBackedCollectionVisual,
   hasSpecificSourceBackedPlaceVisual,
@@ -703,6 +705,7 @@ export function SourceBackedCollectionPage({
   ];
   const heroVisual = getSourceBackedCollectionVisual(collection);
   const collectionMeta = sourceBackedCollectionMeta[collection];
+  const routeMapStops = buildSourceBackedRouteMapStops(starters, collection);
 
   return (
     <>
@@ -765,6 +768,13 @@ export function SourceBackedCollectionPage({
           </div>
         </div>
       </section>
+
+      <RouteMapPanel
+        campaign={`${collection}_starter_route`}
+        copy="Open the suggested stop order in Google Maps, then adjust the walk, transit, or rideshare choice around your timing."
+        stops={routeMapStops}
+        title="See the route before you choose"
+      />
 
       <section className="section-block">
         <SectionHeader

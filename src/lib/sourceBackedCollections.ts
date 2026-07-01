@@ -235,7 +235,14 @@ export function getSourceBackedCollectionForGuide(guide: Guide): SourceBackedCol
     .join(" ")
     .toLowerCase();
 
-  if (haystack.includes("date night")) {
+  if (
+    haystack.includes("date night") ||
+    haystack.includes("first date") ||
+    haystack.includes("first-date") ||
+    (haystack.includes("two-stop") && haystack.includes("night")) ||
+    (haystack.includes("two stop") && haystack.includes("night")) ||
+    haystack.includes("gastown evening")
+  ) {
     return "vancouver_date_night_starters";
   }
 

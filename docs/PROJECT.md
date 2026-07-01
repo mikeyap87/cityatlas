@@ -40,6 +40,7 @@ The public product helps locals find places, events, offers, and guides. The bus
 - Public Vancouver guide-roundup page for routing people into the strongest CityAtlas route family by situation, now hosted and smoke-verified on the approved domain.
 - Public source-backed Vancouver wellness reset starters page and upgraded wellness guide with official-source framing and correction path.
 - Public Toronto first-time visitor starter page and matching destination-choice guide, plus a Toronto weekend-route starter page and matching compact-weekend guide, as the first non-Vancouver preview cluster, now also threaded into the public homepage, guide-library, about-page, and footer internal-link architecture and verified live on the approved domain.
+- Starter-route pages and route-backed guide pages now include a customer-facing Google Maps handoff with visible stop order, so readers can turn the planning page into a walkable map without requiring a new provider key.
 - Business pricing page with a review-first path plus a limited Stripe-hosted checkout handoff for the paid partner packages when the package choice is already clear, plus a public partner-preview page explaining the free review, hosted meal/service/offering ask, and optional paid path.
 - Public business fit-call page that keeps call booking honest by using an email-draft handoff, so a restaurant or service business can request a short fit call without pretending instant scheduler software is already live.
 - Business submission flow with local-only storage, email-draft handoff, and copy fallback, now worded for restaurants, wellness operators, and broader neighborhood service businesses.
@@ -88,6 +89,7 @@ The public product helps locals find places, events, offers, and guides. The bus
 - Local source-backed wedge template plus hook and quality-gate readmes for repeatable editorial work.
 - Local `npm run seo:proof` verification for content counts, crawl-file coverage, and source-backed route integrity.
 - Local `npm run seo:structure:proof` verification for route metadata, robots directives, breadcrumbs, guide FAQ schema, and key hub JSON-LD coverage.
+- Local `npm run qa:route-maps` and `npm run qa:route-maps:rendered` verification for Google Maps route handoffs across route-backed starter and guide pages.
 - Guide library hub now groups the ranking surface into route-and-weather, visitor-and-host, weekend-and-reset, and neighborhood-intent clusters for stronger crawl and internal-link clarity.
 
 ## Stack

@@ -5855,6 +5855,168 @@
   gap: 18px;
 }
 
+.route-map-panel {
+  align-items: stretch;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(246, 249, 251, 0.96));
+  border: 1px solid rgba(10, 94, 168, 0.12);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(0, 0.74fr) minmax(320px, 1fr);
+  margin: 18px auto 0;
+  max-width: var(--container);
+  overflow: hidden;
+  padding: 18px;
+  width: var(--container);
+}
+
+.guide-article .route-map-panel {
+  margin: 0;
+  max-width: none;
+  width: 100%;
+}
+
+.route-map-copy {
+  align-content: center;
+  display: grid;
+  gap: 12px;
+}
+
+.route-map-kicker {
+  align-items: center;
+  color: var(--blue);
+  display: inline-flex;
+  font-size: 0.78rem;
+  font-weight: 780;
+  gap: 8px;
+}
+
+.route-map-kicker svg {
+  height: 17px;
+  width: 17px;
+}
+
+.route-map-copy h2 {
+  font-size: clamp(1.36rem, 2vw, 2rem);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  max-width: 13ch;
+}
+
+.route-map-copy p {
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  max-width: 29rem;
+}
+
+.route-map-action {
+  justify-self: start;
+  margin-top: 4px;
+}
+
+.route-map-preview {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.route-map-preview iframe,
+.route-map-static {
+  border: 0;
+  border-radius: 14px;
+  min-height: 292px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.route-map-preview iframe {
+  display: block;
+}
+
+.route-map-static {
+  align-content: center;
+  background:
+    linear-gradient(135deg, rgba(230, 241, 249, 0.86), rgba(244, 248, 244, 0.92)),
+    repeating-linear-gradient(
+      0deg,
+      rgba(42, 61, 77, 0.06),
+      rgba(42, 61, 77, 0.06) 1px,
+      transparent 1px,
+      transparent 32px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(42, 61, 77, 0.05),
+      rgba(42, 61, 77, 0.05) 1px,
+      transparent 1px,
+      transparent 32px
+    );
+  display: grid;
+  padding: 16px;
+}
+
+.route-map-stop-list {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.route-map-stop-list li {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(10, 94, 168, 0.12);
+  border-radius: 12px;
+  box-shadow: 0 10px 28px rgba(28, 44, 59, 0.08);
+  display: grid;
+  gap: 10px;
+  grid-template-columns: auto minmax(0, 1fr);
+  padding: 10px;
+}
+
+.route-map-stop-list li > span {
+  align-items: center;
+  background: var(--blue);
+  border-radius: 999px;
+  color: #fff;
+  display: inline-flex;
+  font-size: 0.78rem;
+  font-weight: 780;
+  height: 28px;
+  justify-content: center;
+  width: 28px;
+}
+
+.route-map-stop-list strong {
+  display: block;
+  font-size: 0.92rem;
+  line-height: 1.18;
+}
+
+.route-map-stop-list small {
+  color: var(--muted);
+  display: block;
+  font-size: 0.78rem;
+  line-height: 1.3;
+  margin-top: 2px;
+}
+
+.route-map-note {
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.42;
+  margin: 0;
+}
+
+.route-map-panel-compact {
+  grid-template-columns: minmax(0, 0.7fr) minmax(260px, 1fr);
+  padding: 16px;
+}
+
 .guide-rail {
   align-self: start;
   position: sticky;

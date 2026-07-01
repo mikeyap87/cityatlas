@@ -14,7 +14,7 @@ import type {
   SavedItem,
 } from "../types";
 import { buildFlags } from "../config/site";
-import { shouldTreatProspectAsPartnerAnchor } from "./businessProspectRole";
+import { shouldTreatProspectAsPartnerAnchor } from "./businessProspectRole.ts";
 import { slugify } from "./format";
 
 const STORAGE_KEY = "cityatlas.launch.package.v1";

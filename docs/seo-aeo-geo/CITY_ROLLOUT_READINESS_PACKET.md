@@ -1,6 +1,6 @@
 # CityAtlas Multi-City Rollout Readiness Packet
 
-Updated: June 16, 2026
+Updated: July 1, 2026
 
 Generated from local repo truth by `npm run growth:packets`.
 
@@ -21,11 +21,11 @@ Generated from local repo truth by `npm run growth:packets`.
 
 - Vancouver status: `Prepared`
 - Vancouver progress: `100%`
-- Vancouver queue: `143` unique prospects
-- Vancouver partner-eligible rows: `124`
+- Vancouver queue: `2124` unique prospects
+- Vancouver partner-eligible rows: `2105`
 - Vancouver anchor-only rows: `19`
-- Vancouver contact-ready rows: `93`
-- Vancouver email-ready rows: `66`
+- Vancouver contact-ready rows: `2077`
+- Vancouver email-ready rows: `898`
 - Vancouver source-backed collections: `14`
 - Vancouver proof-batch selected count: `5`
 - Vancouver rehearsal-ready candidates: `5`
@@ -33,13 +33,17 @@ Generated from local repo truth by `npm run growth:packets`.
 
 ## Vancouver Source Lanes
 
-- Rooms host-space donor (official public source): `36` Vancouver rows
-- Rooms host-space review donor (official public source): `33` Vancouver rows
+- Vancouver restaurant review donor (contact-path review): `1157` Vancouver rows
+- Vancouver restaurant review donor (email candidate): `821` Vancouver rows
+- Rooms host-space review donor (official public source): `31` Vancouver rows
+- Rooms host-space donor (official public source): `27` Vancouver rows
 - Official City of Vancouver page: `11` Vancouver rows
 - Roam partner research donor (official site): `10` Vancouver rows
+- Official service review path: `9` Vancouver rows
 - Rooms host-space review donor (official site plus secondary public listing): `9` Vancouver rows
+- Official service review email: `8` Vancouver rows
 - Rooms host-space donor (official site plus secondary public listing): `8` Vancouver rows
-- Founder proof sprint queue: `6` Vancouver rows
+- Founder proof sprint queue: `5` Vancouver rows
 - Roam public business wave donor (official public contact): `5` Vancouver rows
 - Roam city-sourcing donor (public phone path): `3` Vancouver rows
 - Rooms Browserbase review donor (official public source): `2` Vancouver rows
@@ -48,9 +52,7 @@ Generated from local repo truth by `npm run growth:packets`.
 - Official centre website: `1` Vancouver rows
 - Official Commercial Drive site: `1` Vancouver rows
 - Official contact page: `1` Vancouver rows
-- Official Granville Island site: `1` Vancouver rows
 - Official GreenHeart TreeWalk page: `1` Vancouver rows
-- Official group bookings page: `1` Vancouver rows
 - Official hours and admission page: `1` Vancouver rows
 - Official hours and admissions page: `1` Vancouver rows
 - Official MOA visit page: `1` Vancouver rows
@@ -69,8 +71,8 @@ Generated from local repo truth by `npm run growth:packets`.
 
 - Status: `Prepared`
 - Progress: `100%`
-- Current queue: `26` unique, `22` partner-eligible, `16` contact-ready, `16` email-ready
-- Promotion-candidate rows: `6` non-email partner rows with a clear next manual step
+- Current queue: `26` unique, `21` partner-eligible, `16` contact-ready, `16` email-ready
+- Promotion-candidate rows: `5` non-email partner rows with a clear next manual step
 - Release threshold: 25 unique prospects, 10 partner-eligible rows, 10 contact-ready rows, 1 source-backed collection starter
 - Planned wedge: First-time visitor, weekend, and local-night routing
 - Why it belongs in the queue: Toronto is the cleanest second-city candidate shared across the existing Univenture city-rollout pattern.
@@ -137,7 +139,19 @@ Generated from local repo truth by `npm run growth:packets`.
 - Missing before it can count as locally prepared: 14 more unique prospects; 4 more partner-eligible rows; 4 more contact-ready rows; 1 more source-backed collection starter
 - Current next action: Keep building toward 20 unique prospects, 10 partner-eligible rows, and 10 contact-ready rows.
 
-### 7. Chicago
+### 7. Tokyo
+
+- Status: `Building`
+- Progress: `38%`
+- Current queue: `6` unique, `6` partner-eligible, `6` contact-ready, `2` email-ready
+- Promotion-candidate rows: `4` non-email partner rows with a clear next manual step
+- Release threshold: 20 unique prospects, 10 partner-eligible rows, 10 contact-ready rows, 1 source-backed collection starter
+- Planned wedge: District-fit planning for first evenings, food routes, and repeat visits
+- Why it belongs in the queue: Tokyo appears in both the Roam and Rooms expansion patterns and is a strong long-term CityAtlas route-choice city.
+- Missing before it can count as locally prepared: 14 more unique prospects; 4 more partner-eligible rows; 4 more contact-ready rows; 1 more source-backed collection starter
+- Current next action: Keep building toward 20 unique prospects, 10 partner-eligible rows, and 10 contact-ready rows.
+
+### 8. Chicago
 
 - Status: `Building`
 - Progress: `31%`
@@ -147,18 +161,6 @@ Generated from local repo truth by `npm run growth:packets`.
 - Planned wedge: Hotel, dinner, and executive-neighborhood routing
 - Why it belongs in the queue: Chicago is part of the Roam planned-city ladder and fits a practical North American expansion wave for CityAtlas once Vancouver proof is deeper.
 - Missing before it can count as locally prepared: 15 more unique prospects; 5 more partner-eligible rows; 5 more contact-ready rows; 1 more source-backed collection starter
-- Current next action: Keep building toward 20 unique prospects, 10 partner-eligible rows, and 10 contact-ready rows.
-
-### 8. Montreal
-
-- Status: `Building`
-- Progress: `25%`
-- Current queue: `4` unique, `4` partner-eligible, `4` contact-ready, `1` email-ready
-- Promotion-candidate rows: `3` non-email partner rows with a clear next manual step
-- Release threshold: 20 unique prospects, 10 partner-eligible rows, 10 contact-ready rows, 1 source-backed collection starter
-- Planned wedge: Culture, host-friendly, and slower route discovery
-- Why it belongs in the queue: Montreal is already part of the Roam early-access rollout and gives CityAtlas a strong culture-first expansion candidate.
-- Missing before it can count as locally prepared: 16 more unique prospects; 6 more partner-eligible rows; 6 more contact-ready rows; 1 more source-backed collection starter
 - Current next action: Keep building toward 20 unique prospects, 10 partner-eligible rows, and 10 contact-ready rows.
 
 ## Cities Still Missing Seed Rows
@@ -187,3 +189,11 @@ Generated from local repo truth by `npm run growth:packets`.
 3. Use the follow-on outreach ladder packet for exact 3 to 5 local rehearsal candidates per city instead of treating raw queue counts as enough.
 4. Keep the lower-seed later-wave cities in template and query-map mode until the first non-Vancouver city gets a real source-backed wedge packet.
 
+<!-- CURRENT_SHARED_MACHINE_TRUTH:START -->
+## Current Shared Machine Truth
+
+- Synced July 1, 2026 from current repo truth.
+- Current local machine truth: `41` useful pieces, `25` guides, `16` source-backed wedge collections, `80` source-backed anchors, and `16` mapped guide-to-collection links.
+- all `25` current guides now have at least one direct-path internal link into another CityAtlas page.
+- `npm run seo:structure:proof` currently passes across `40` key routes.
+<!-- CURRENT_SHARED_MACHINE_TRUTH:END -->

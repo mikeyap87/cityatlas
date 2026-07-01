@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { seedData } from "../src/data/seed.ts";
 import {
   getSourceBackedCollectionForGuide,
+  getSourceBackedCollectionForPath,
   sourceBackedCollectionMeta,
 } from "../src/lib/sourceBackedCollections.ts";
 import {
@@ -18,14 +19,69 @@ const previewPort = Number(process.env.CITYATLAS_RENDERED_ROUTE_MAP_PORT || "438
 const configuredBaseUrl = process.env.CITYATLAS_RENDERED_ROUTE_MAP_BASE_URL?.replace(/\/+$/u, "");
 const useExistingServer = process.env.CITYATLAS_RENDERED_ROUTE_MAP_USE_EXISTING_SERVER === "1";
 const baseUrl = configuredBaseUrl || `http://127.0.0.1:${previewPort}`;
+const compactReport = process.env.CITYATLAS_RENDERED_ROUTE_MAP_COMPACT === "1";
 
-function getRouteMapPaths() {
+function getGuidePath(guide) {
+  return `/${guide.citySlug ?? "vancouver"}/guides/${guide.slug}`;
+}
+
+function getCollectionForPath(path) {
+  const directCollection = getSourceBackedCollectionForPath(path);
+
+  if (directCollection) {
+    return directCollection;
+  }
+
+  const matchingGuide = seedData.guides.find((guide) => getGuidePath(guide) === path);
+
+  return matchingGuide ? getSourceBackedCollectionForGuide(matchingGuide) : null;
+}
+
+function getRouteMapOptionsForGuide(guide) {
+  const seenCollections = new Set();
+
+  return (guide.resourceLinks ?? [])
+    .map((link) => {
+      const collection = getCollectionForPath(link.path);
+
+      if (!collection || seenCollections.has(collection)) {
+        return null;
+      }
+
+      seenCollections.add(collection);
+
+      return {
+        collection,
+        path: link.path,
+      };
+    })
+    .filter(Boolean);
+}
+
+function getRouteMapEntries() {
   const collectionPaths = Object.values(sourceBackedCollectionMeta).map((meta) => meta.path);
   const guidePaths = seedData.guides
     .filter((guide) => Boolean(getSourceBackedCollectionForGuide(guide)))
-    .map((guide) => `/${guide.citySlug ?? "vancouver"}/guides/${guide.slug}`);
+    .map((guide) => getGuidePath(guide));
+  const directEntries = [...new Set([...collectionPaths, ...guidePaths])].map((path) => ({
+    path,
+    mode: "direct",
+    expectedLinkCount: 1,
+  }));
+  const chooserEntries = seedData.guides
+    .filter((guide) => !getSourceBackedCollectionForGuide(guide))
+    .map((guide) => ({
+      guide,
+      options: getRouteMapOptionsForGuide(guide),
+    }))
+    .filter((entry) => entry.options.length > 0)
+    .map(({ guide, options }) => ({
+      path: getGuidePath(guide),
+      mode: "options",
+      expectedLinkCount: Math.min(options.length, 6),
+    }));
 
-  return [...new Set([...collectionPaths, ...guidePaths])];
+  return [...directEntries, ...chooserEntries];
 }
 
 async function stopPreviewServer(server) {
@@ -105,19 +161,23 @@ function inspectMapsHref(href, route) {
   return failures;
 }
 
-async function inspectRoute(page, route, viewportName) {
-  await page.goto(`${baseUrl}${route}`, { waitUntil: "networkidle" });
+async function inspectRoute(page, entry, viewportName) {
+  await page.goto(`${baseUrl}${entry.path}`, { waitUntil: "networkidle" });
 
-  const panel = page.locator(".route-map-panel");
+  const panelSelector = entry.mode === "options" ? ".route-map-options-panel" : ".route-map-panel";
+  const panel = page.locator(panelSelector);
   try {
     await panel.first().waitFor({ state: "attached", timeout: 5_000 });
   } catch {
     // Count below records the missing panel as a test failure with route context.
   }
   const panelCount = await panel.count();
-  const link = page.locator(".route-map-panel a[href^='https://www.google.com/maps/dir/']");
-  const linkCount = await link.count();
-  const href = linkCount === 1 ? await link.first().getAttribute("href") : null;
+  const hrefs = await page.evaluate((selector) => {
+    return Array.from(
+      document.querySelectorAll(`${selector} a[href^="https://www.google.com/maps/dir/"]`),
+    ).map((link) => link.href);
+  }, panelSelector);
+  const linkCount = hrefs.length;
   const visibleText = panelCount === 1 ? await panel.first().innerText() : "";
   const layout = await page.evaluate(() => ({
     scrollWidth: document.documentElement.scrollWidth,
@@ -127,43 +187,47 @@ async function inspectRoute(page, route, viewportName) {
   const failures = [];
 
   if (panelCount !== 1) {
-    failures.push(`${route} (${viewportName}): expected 1 route map panel, found ${panelCount}`);
+    failures.push(`${entry.path} (${viewportName}): expected 1 route map panel, found ${panelCount}`);
   }
 
-  if (linkCount !== 1) {
-    failures.push(`${route} (${viewportName}): expected 1 Google Maps link, found ${linkCount}`);
+  if (linkCount !== entry.expectedLinkCount) {
+    failures.push(
+      `${entry.path} (${viewportName}): expected ${entry.expectedLinkCount} Google Maps link(s), found ${linkCount}`,
+    );
   }
 
   if (!visibleText.includes("Open in Google Maps")) {
-    failures.push(`${route} (${viewportName}): panel missing Google Maps action text`);
+    failures.push(`${entry.path} (${viewportName}): panel missing Google Maps action text`);
   }
 
   if (layout.scrollWidth > layout.viewportWidth + 1) {
     failures.push(
-      `${route} (${viewportName}): horizontal overflow ${layout.scrollWidth}px > ${layout.viewportWidth}px`,
+      `${entry.path} (${viewportName}): horizontal overflow ${layout.scrollWidth}px > ${layout.viewportWidth}px`,
     );
   }
 
-  const hrefFailures = inspectMapsHref(href, `${route} (${viewportName})`);
-  if (Array.isArray(hrefFailures)) {
-    failures.push(...hrefFailures);
-  } else {
-    failures.push(hrefFailures);
+  for (const [index, href] of hrefs.entries()) {
+    const hrefFailures = inspectMapsHref(href, `${entry.path} (${viewportName}) link ${index + 1}`);
+    if (Array.isArray(hrefFailures)) {
+      failures.push(...hrefFailures);
+    } else {
+      failures.push(hrefFailures);
+    }
   }
 
   return {
-    route,
+    route: entry.path,
+    mode: entry.mode,
     viewport: viewportName,
     panelCount,
     linkCount,
-    href,
     horizontalOverflow: layout.scrollWidth > layout.viewportWidth + 1,
     failures,
   };
 }
 
 async function main() {
-  const routes = getRouteMapPaths();
+  const entries = getRouteMapEntries();
   const failures = [];
   const reports = [];
   const server = configuredBaseUrl || useExistingServer
@@ -192,18 +256,18 @@ async function main() {
       const desktopPage = await desktopContext.newPage();
       const mobilePage = await mobileContext.newPage();
 
-      for (const route of routes) {
+      for (const entry of entries) {
         for (const [viewportName, page] of [
           ["desktop", desktopPage],
           ["mobile", mobilePage],
         ]) {
           try {
-            const report = await inspectRoute(page, route, viewportName);
+            const report = await inspectRoute(page, entry, viewportName);
             reports.push(report);
             failures.push(...report.failures);
           } catch (error) {
             failures.push(
-              `${route} (${viewportName}): ${error instanceof Error ? error.message : String(error)}`,
+              `${entry.path} (${viewportName}): ${error instanceof Error ? error.message : String(error)}`,
             );
           }
         }
@@ -221,18 +285,31 @@ async function main() {
   const report = {
     generatedAt: new Date().toISOString(),
     baseUrl,
-    routeCount: routes.length,
+    routeCount: entries.length,
+    directRouteCount: entries.filter((entry) => entry.mode === "direct").length,
+    routeChooserCount: entries.filter((entry) => entry.mode === "options").length,
     checkedViewports: ["desktop", "mobile"],
     failureCount: failures.length,
     failures,
     passed: failures.length === 0,
-    reports: reports.map(({ route, viewport, panelCount, linkCount, horizontalOverflow }) => ({
-      route,
-      viewport,
-      panelCount,
-      linkCount,
-      horizontalOverflow,
-    })),
+    ...(compactReport
+      ? {
+          reportSummary: {
+            checkedPages: reports.length,
+            directRoutePageChecks: reports.filter((entry) => entry.mode === "direct").length,
+            routeChooserPageChecks: reports.filter((entry) => entry.mode === "options").length,
+          },
+        }
+      : {
+          reports: reports.map(({ route, mode, viewport, panelCount, linkCount, horizontalOverflow }) => ({
+            route,
+            mode,
+            viewport,
+            panelCount,
+            linkCount,
+            horizontalOverflow,
+          })),
+        }),
   };
 
   console.log("CityAtlas rendered route-map proof");

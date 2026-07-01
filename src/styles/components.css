@@ -6017,6 +6017,85 @@
   padding: 16px;
 }
 
+.route-map-options-panel {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(10, 94, 168, 0.12);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+}
+
+.route-map-options-heading {
+  display: grid;
+  gap: 8px;
+}
+
+.route-map-options-heading h2 {
+  font-size: clamp(1.28rem, 1.8vw, 1.72rem);
+  letter-spacing: -0.02em;
+  line-height: 1.02;
+  max-width: 16ch;
+}
+
+.route-map-options-heading p {
+  color: var(--ink-soft);
+  font-size: 0.94rem;
+  line-height: 1.5;
+  max-width: 38rem;
+}
+
+.route-map-option-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.route-map-option-card {
+  background: linear-gradient(180deg, rgba(246, 249, 251, 0.96), rgba(255, 255, 255, 0.96));
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  display: grid;
+  gap: 14px;
+  padding: 14px;
+}
+
+.route-map-option-card strong {
+  display: block;
+  font-size: 0.98rem;
+  line-height: 1.18;
+  margin-bottom: 6px;
+}
+
+.route-map-option-card p {
+  color: var(--ink-soft);
+  font-size: 0.86rem;
+  line-height: 1.42;
+}
+
+.route-map-option-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.route-map-option-actions a {
+  align-items: center;
+  color: var(--blue);
+  display: inline-flex;
+  font-size: 0.82rem;
+  font-weight: 780;
+  gap: 7px;
+  text-decoration: none;
+}
+
+.route-map-option-actions svg {
+  height: 16px;
+  width: 16px;
+}
+
 .guide-rail {
   align-self: start;
   position: sticky;

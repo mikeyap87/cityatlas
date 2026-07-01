@@ -119,6 +119,14 @@ export const renderedOnlyBlockedPhrases = [
     reason: "Rendered public pages should use direct site links or place details, not proof-lane shorthand.",
   },
   {
+    phrase: "public-source",
+    reason: "Rendered public pages should use direct site links or real places, not proof-lane shorthand.",
+  },
+  {
+    phrase: "source notes",
+    reason: "Rendered public pages should use direct site links or details to confirm, not proof-lane shorthand.",
+  },
+  {
     phrase: "without pretending",
     reason: "Rendered public pages should sound useful and confident, not like an internal audit note.",
   },

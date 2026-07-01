@@ -1,6 +1,7 @@
 import { seedData } from "../src/data/seed.ts";
 import {
   getSourceBackedCollectionForGuide,
+  getSourceBackedCollectionForPath,
   getSourceBackedPlaces,
   sourceBackedCollectionMeta,
 } from "../src/lib/sourceBackedCollections.ts";
@@ -42,6 +43,43 @@ function inspectDirectionsUrl(url, expectedStopCount, label) {
   );
 }
 
+function getCollectionForPath(path) {
+  const directCollection = getSourceBackedCollectionForPath(path);
+
+  if (directCollection) {
+    return directCollection;
+  }
+
+  const matchingGuide = seedData.guides.find((guide) => {
+    const guidePath = `/${guide.citySlug ?? "vancouver"}/guides/${guide.slug}`;
+    return guidePath === path;
+  });
+
+  return matchingGuide ? getSourceBackedCollectionForGuide(matchingGuide) : null;
+}
+
+function getRouteMapOptionsForGuide(guide) {
+  const seenCollections = new Set();
+
+  return (guide.resourceLinks ?? [])
+    .map((link) => {
+      const collection = getCollectionForPath(link.path);
+
+      if (!collection || seenCollections.has(collection)) {
+        return null;
+      }
+
+      seenCollections.add(collection);
+
+      return {
+        collection,
+        label: link.title,
+        path: link.path,
+      };
+    })
+    .filter(Boolean);
+}
+
 for (const [collection, meta] of collectionEntries) {
   const places = getSourceBackedPlaces(seedData, collection);
   const stops = buildSourceBackedRouteMapStops(places, collection);
@@ -78,6 +116,31 @@ for (const { guide, collection } of routeGuides) {
   inspectDirectionsUrl(url, places.length, guide.slug);
 }
 
+const routeChooserGuides = seedData.guides
+  .filter((guide) => !getSourceBackedCollectionForGuide(guide))
+  .map((guide) => ({
+    guide,
+    options: getRouteMapOptionsForGuide(guide),
+  }))
+  .filter((entry) => entry.options.length > 0);
+
+for (const { guide, options } of routeChooserGuides) {
+  for (const option of options) {
+    const places = getSourceBackedPlaces(seedData, option.collection);
+    const stops = buildSourceBackedRouteMapStops(places, option.collection);
+    const url = buildGoogleMapsDirectionsUrl(stops, {
+      travelMode: "walking",
+      utmCampaign: `guide_${guide.slug}_${option.collection}_option`,
+    });
+
+    requirePass(
+      places.length >= 2,
+      `${guide.slug} -> ${option.label}: chooser route has fewer than two stops`,
+    );
+    inspectDirectionsUrl(url, places.length, `${guide.slug} -> ${option.label}`);
+  }
+}
+
 if (failures.length > 0) {
   console.error("Route map link verification failed:");
   for (const failure of failures) {
@@ -92,6 +155,11 @@ console.log(
       ok: true,
       sourceBackedCollections: collectionEntries.length,
       routeGuides: routeGuides.length,
+      routeChooserGuides: routeChooserGuides.length,
+      routeChooserOptions: routeChooserGuides.reduce(
+        (total, entry) => total + entry.options.length,
+        0,
+      ),
       mapsHost: "https://www.google.com/maps/dir/",
       defaultTravelMode: "walking",
     },

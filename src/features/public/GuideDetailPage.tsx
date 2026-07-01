@@ -2,7 +2,7 @@ import type { Business, CityAtlasData, EventItem, Guide } from "../../types";
 import { AppLink } from "../../components/Link";
 import { BusinessCard, EventCard, GuideCard } from "../../components/Cards";
 import { ArrowRightIcon, MapIcon, ShieldIcon } from "../../components/Icons";
-import { RouteMapPanel } from "../../components/RouteMapPanel";
+import { RouteMapOptionsPanel, RouteMapPanel } from "../../components/RouteMapPanel";
 import { SectionHeader, StatusPill } from "../../components/UI";
 import {
   getGuideHeroVisual,
@@ -16,10 +16,12 @@ import {
 } from "../../lib/cityPaths";
 import {
   getSourceBackedCollectionForGuide,
+  getSourceBackedCollectionForPath,
   getSourceBackedPlaces,
   sourceBackedCollectionMeta,
+  type SourceBackedCollectionId,
 } from "../../lib/sourceBackedCollections";
-import { buildSourceBackedRouteMapStops } from "../../lib/routeMaps";
+import { buildSourceBackedRouteMapStops, hasRouteMapStops } from "../../lib/routeMaps";
 
 interface GuideDetailPageProps {
   guide?: Guide;
@@ -63,6 +65,55 @@ function simplifyReferenceText(value: string) {
     .replace(/\bplan fit\b/gi, "best match")
     .replace(/  +/g, " ")
     .trim();
+}
+
+function getRouteMapCollectionForPath(path: string, data: CityAtlasData) {
+  const directCollection = getSourceBackedCollectionForPath(path);
+
+  if (directCollection) {
+    return directCollection;
+  }
+
+  const matchingGuide = data.guides.find((candidate) => getGuidePath(candidate) === path);
+
+  return matchingGuide ? getSourceBackedCollectionForGuide(matchingGuide) : null;
+}
+
+function buildRouteMapOptionsForGuide(
+  guide: Guide,
+  data: CityAtlasData,
+  links: NonNullable<Guide["resourceLinks"]>,
+) {
+  const seenCollections = new Set<SourceBackedCollectionId>();
+
+  return links
+    .map((link) => {
+      const collection = getRouteMapCollectionForPath(link.path, data);
+
+      if (!collection || seenCollections.has(collection)) {
+        return null;
+      }
+
+      seenCollections.add(collection);
+
+      const stops = buildSourceBackedRouteMapStops(
+        getSourceBackedPlaces(data, collection),
+        collection,
+      );
+
+      if (!hasRouteMapStops(stops)) {
+        return null;
+      }
+
+      return {
+        label: simplifyGuideDisplayText(link.title),
+        description: simplifyGuideDisplayText(link.description),
+        routePath: link.path,
+        stops,
+        campaign: `guide_${guide.slug}_${collection}_option`,
+      };
+    })
+    .filter((option): option is NonNullable<typeof option> => Boolean(option));
 }
 
 function GuideSourceBackedReferenceCard({
@@ -272,6 +323,9 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
     title: simplifyGuideDisplayText(link.title),
     description: simplifyGuideDisplayText(link.description),
   }));
+  const routeMapOptions = sourceBackedCollection
+    ? []
+    : buildRouteMapOptionsForGuide(guide, data, simplifiedResourceLinks);
   const simplifiedFaqs = guide.faqs.map((faq) => ({
     ...faq,
     question: simplifyGuideDisplayText(faq.question),
@@ -286,6 +340,17 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
         label: guide.ctaLabel,
         path: guide.ctaPath,
       };
+  const routeMapJump = sourceBackedCollection && hasRouteMapStops(routeMapStops)
+    ? {
+        href: "#route-map",
+        label: "See route map",
+      }
+    : routeMapOptions.length > 0
+      ? {
+          href: "#mapped-route-options",
+          label: "See mapped routes",
+        }
+      : null;
 
   return (
     <>
@@ -307,6 +372,11 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
               <AppLink className="button primary" to={guidePrimaryAction.path}>
                 {guidePrimaryAction.label} <ArrowRightIcon />
               </AppLink>
+              {routeMapJump ? (
+                <a className="text-link" href={routeMapJump.href}>
+                  {routeMapJump.label} <MapIcon />
+                </a>
+              ) : null}
               <AppLink className="text-link" to={resolvedGuideHubPath}>
                 See all guides <ArrowRightIcon />
               </AppLink>
@@ -366,13 +436,23 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
             <p>{guideBody}</p>
           </div>
 
-          <RouteMapPanel
-            campaign={`guide_${guide.slug}_route`}
-            compact
-            copy="Open the suggested stop order in Google Maps when you want the page to become a real-world route."
-            stops={routeMapStops}
-            title="Turn this guide into a route"
-          />
+          {sourceBackedCollection ? (
+            <RouteMapPanel
+              campaign={`guide_${guide.slug}_route`}
+              compact
+              copy="Open the suggested stop order in Google Maps when you want the page to become a real-world route."
+              id="route-map"
+              stops={routeMapStops}
+              title="Turn this guide into a route"
+            />
+          ) : (
+            <RouteMapOptionsPanel
+              copy="These linked pages already have stop orders. Pick the one that fits the day, then open it in Google Maps."
+              id="mapped-route-options"
+              options={routeMapOptions}
+              title="Choose a mapped route"
+            />
+          )}
 
           {simplifiedSections.map((section, index) => (
             <details className="guide-section guide-section-toggle" key={section.heading} open={index === 0}>

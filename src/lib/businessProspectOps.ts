@@ -1,5 +1,5 @@
 import type { BusinessProspect } from "../types";
-import { shouldTreatProspectAsPartnerAnchor } from "./businessProspectRole";
+import { shouldTreatProspectAsPartnerAnchor } from "./businessProspectRole.ts";
 
 type BusinessProspectRole =
   | "anchor_only"

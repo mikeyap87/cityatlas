@@ -46,3 +46,11 @@ This is the current no-send owner-review shortlist generated from the reviewed V
 2. Keep contact-path-only service rows blocked from live sending until a cleaner route is found.
 3. Expand into more auto, repair, cleaning, and home-service rows only if we add a fresh donor source beyond the current queue.
 
+<!-- CURRENT_SHARED_MACHINE_TRUTH:START -->
+## Current Shared Machine Truth
+
+- Synced July 1, 2026 from current repo truth.
+- Current local machine truth: `41` useful pieces, `25` guides, `16` source-backed wedge collections, `80` source-backed anchors, and `16` mapped guide-to-collection links.
+- all `25` current guides now have at least one direct-path internal link into another CityAtlas page.
+- `npm run seo:structure:proof` currently passes across `40` key routes.
+<!-- CURRENT_SHARED_MACHINE_TRUTH:END -->

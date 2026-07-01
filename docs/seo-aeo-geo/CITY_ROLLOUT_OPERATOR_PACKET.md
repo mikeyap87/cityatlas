@@ -1,6 +1,6 @@
 # CityAtlas City Rollout Operator Packet
 
-Updated: June 16, 2026
+Updated: July 1, 2026
 
 Generated from local repo truth by `npm run growth:packets`.
 
@@ -24,7 +24,7 @@ Generated from local repo truth by `npm run growth:packets`.
 - Shared pattern: Shared with Roam and Rooms
 - Current status: `Prepared` at `100%` progress
 - Queue truth: `26` unique · `16` contact-ready · `16` email-ready
-- Promotion candidates: `6` non-email partner rows
+- Promotion candidates: `5` non-email partner rows
 - Planned wedge: First-time visitor, weekend, and local-night routing
 - Missing before local-ready packaging: No local threshold gap remains.
 
@@ -73,7 +73,16 @@ Generated from local repo truth by `npm run growth:packets`.
 - Planned wedge: District-choice and culture-heavy route discovery
 - Missing before local-ready packaging: 14 more unique prospects; 4 more partner-eligible rows; 4 more contact-ready rows; 1 more source-backed collection starter
 
-### 7. Chicago
+### 7. Tokyo
+
+- Shared pattern: Shared with Roam and Rooms
+- Current status: `Building` at `38%` progress
+- Queue truth: `6` unique · `6` contact-ready · `2` email-ready
+- Promotion candidates: `4` non-email partner rows
+- Planned wedge: District-fit planning for first evenings, food routes, and repeat visits
+- Missing before local-ready packaging: 14 more unique prospects; 4 more partner-eligible rows; 4 more contact-ready rows; 1 more source-backed collection starter
+
+### 8. Chicago
 
 - Shared pattern: Shared with Roam only
 - Current status: `Building` at `31%` progress
@@ -81,15 +90,6 @@ Generated from local repo truth by `npm run growth:packets`.
 - Promotion candidates: `4` non-email partner rows
 - Planned wedge: Hotel, dinner, and executive-neighborhood routing
 - Missing before local-ready packaging: 15 more unique prospects; 5 more partner-eligible rows; 5 more contact-ready rows; 1 more source-backed collection starter
-
-### 8. Montreal
-
-- Shared pattern: Shared with Roam only
-- Current status: `Building` at `25%` progress
-- Queue truth: `4` unique · `4` contact-ready · `1` email-ready
-- Promotion candidates: `3` non-email partner rows
-- Planned wedge: Culture, host-friendly, and slower route discovery
-- Missing before local-ready packaging: 16 more unique prospects; 6 more partner-eligible rows; 6 more contact-ready rows; 1 more source-backed collection starter
 
 ## Borrowed Outreach Rehearsal Coverage
 
@@ -137,3 +137,11 @@ The reusable Roam public-business-wave donor layer adds official-contact wellnes
 2. Choose one of those cities for the first non-Vancouver source-backed collection starter instead of widening all cities at once.
 3. Use the same local-only operator packet and CSV export pattern for every new city so the rollout machine stays consistent.
 
+<!-- CURRENT_SHARED_MACHINE_TRUTH:START -->
+## Current Shared Machine Truth
+
+- Synced July 1, 2026 from current repo truth.
+- Current local machine truth: `41` useful pieces, `25` guides, `16` source-backed wedge collections, `80` source-backed anchors, and `16` mapped guide-to-collection links.
+- all `25` current guides now have at least one direct-path internal link into another CityAtlas page.
+- `npm run seo:structure:proof` currently passes across `40` key routes.
+<!-- CURRENT_SHARED_MACHINE_TRUTH:END -->

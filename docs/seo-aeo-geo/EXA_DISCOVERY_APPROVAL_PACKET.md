@@ -1,6 +1,6 @@
 # CityAtlas EXA Discovery Approval Packet
 
-Updated: June 16, 2026
+Updated: July 1, 2026
 
 Generated from local repo truth by `npm run growth:packets`.
 
@@ -19,10 +19,10 @@ EXA can help widen the local no-send queue, especially for Vancouver business de
 - `80` source-backed place anchors
 - `25` city targets remain in the reusable rollout map.
 - `25` seeded cities already have local queue coverage.
-- Vancouver currently has `143` unique rows, `93` contact-ready rows, and `66` email-ready rows.
-- Vancouver already has `58` non-email promotion candidates to clean up before a paid discovery batch needs to widen the queue.
+- Vancouver currently has `2124` unique rows, `2077` contact-ready rows, and `898` email-ready rows.
+- Vancouver already has `1207` non-email promotion candidates to clean up before a paid discovery batch needs to widen the queue.
 - The first CityAtlas business packet already has `5` selected targets and `5` rehearsal-ready candidates.
-- The current packet spans `5` business lanes across `2` donor/source lanes.
+- The current packet spans `5` business lanes across `3` donor/source lanes.
 - Owner inbox rehearsal remains `Owner inbox rehearsal is ready`.
 - Free donor sync already merges every qualifying Roam preview artifact per city, absorbs saved Roam public-business-wave fixtures where they exist, keeps the reviewed Rooms Vancouver email-ready layer, and adds the wider Rooms Vancouver review queue without promoting manual-review rows to send-ready.
 
@@ -45,10 +45,10 @@ The admin import lane already previews duplicates, warnings, and importable rows
 Current rehearsal packet businesses:
 
 - Alliance Francaise Vancouver: Cultural space / Venue and cultural partner (Rehearsal ready; Culture; Rooms venue donor seed)
-- Arcana Spirit Lounge: Restaurant / bar / Hospitality and hosted-visit partner (Rehearsal ready; Hospitality; Rooms venue donor seed)
+- Arcana Spirit Lounge: restaurants / Class 1 with liquor service (Rehearsal ready; Hospitality; CityAtlas donor business seed)
 - Auberge Vancouver Hotel: Hotel / Guest services partner (Rehearsal ready; Hotel Guest; Roam donor business seed)
-- Heritage Hall Vancouver: Event venue / Private-group and hosted-visit partner (Rehearsal ready; Event Group; Rooms venue donor seed)
-- d'Latibule Wellness: Wellness / Mobile massage and recovery partner (Rehearsal ready; Wellness; Roam donor business seed)
+- Commodore Ballroom: Live music venue / Class 2 with liquor service (Rehearsal ready; Event Group; CityAtlas donor business seed)
+- Angela T&Q Nails and Spa: Nail salon / Beauty and Wellness Centre (Rehearsal ready; Wellness; CityAtlas donor business seed)
 
 ### 1. Toronto
 
@@ -119,3 +119,11 @@ Current rehearsal packet businesses:
 2. If a paid discovery step becomes worth it, approve one city, one lane, one capped batch, and one local reviewer first.
 3. Treat the imported rows as research candidates only until CityAtlas re-verifies them on official sources and chooses a tiny next packet manually.
 
+<!-- CURRENT_SHARED_MACHINE_TRUTH:START -->
+## Current Shared Machine Truth
+
+- Synced July 1, 2026 from current repo truth.
+- Current local machine truth: `41` useful pieces, `25` guides, `16` source-backed wedge collections, `80` source-backed anchors, and `16` mapped guide-to-collection links.
+- all `25` current guides now have at least one direct-path internal link into another CityAtlas page.
+- `npm run seo:structure:proof` currently passes across `40` key routes.
+<!-- CURRENT_SHARED_MACHINE_TRUTH:END -->

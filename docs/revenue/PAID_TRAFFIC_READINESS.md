@@ -16,7 +16,9 @@ Status: `request_first_paid_traffic_locally_ready_hosted_checkout_verified_check
 
 CityAtlas is now honest for a small request-first paid-traffic test into reviewed business requests.
 
-As of July 1, 2026, the local production build, local desktop/mobile smoke pass, and local paid-traffic verifier are green. The local request path now also adds campaign/referral context to the copied or email-ready business request, and the verifier proved the copied request includes the paid-test UTM context.
+As of July 1, 2026, the local production build, local desktop/mobile smoke pass, local route-map verifier, rendered route-map verifier, rendered public-copy verifier, and local paid-traffic verifier are green. The local request path now also adds campaign/referral context to the copied or email-ready business request, and the verifier proved the copied request includes the paid-test UTM context.
+
+The latest local CRO route batch makes CityAtlas more useful for visitors before a paid test: direct route pages show a Google Maps handoff with visible stop order, route chooser pages show multiple mapped route options, and guide quick-answer cards now include route-map jump links so mobile users can reach the map path without hunting. This is local proof only until the batch is deployed and hosted route-map smoke passes.
 
 The live domain was also re-checked directly for hosted payment handoff. The hosted pricing page still shows the live City Partner and Signature Partner Stripe checkout links beside the City Partner, Signature, and general request-first paths.
 
@@ -29,7 +31,8 @@ What is still not fully verified is direct self-serve charging. The live Stripe-
 Keep these as three separate decisions:
 
 - Tiny paid-traffic test: allowed only as a small request-first test into reviewed business requests. Judge it on qualified request quality, campaign attribution, and whether the owner can follow up manually.
-- Local CRO attribution hardening: prepared and locally proven, but not deployed from this lane. It should go through a fresh clean release lane before the live site depends on it.
+- Local CRO attribution hardening: prepared and locally proven in the current clean CRO release lane, but not deployed yet. It needs exact production-deploy approval and hosted proof before the live site depends on it.
+- Local route-map CRO hardening: prepared and locally proven across direct route pages, route chooser pages, desktop, and mobile, but not yet hosted on the approved domain from this lane.
 - Real City Partner checkout proof: a separate live-money proof. It should not be treated as done just because the pricing page shows Stripe links or because the checkout page opens.
 
 Do not combine those decisions in one claim. CityAtlas can be locally ready for a request-first paid-traffic packet while still needing an approved release for the latest attribution hardening and a separate real checkout proof before self-serve charging claims.
@@ -42,6 +45,10 @@ Do not combine those decisions in one claim. CityAtlas can be locally ready for 
 - Campaign context is captured from UTM parameters and attached to local growth events.
 - Business-funnel CTAs now emit local events for pricing views, package clicks, form views, saved requests, and email-draft intent.
 - A fresh local smoke pass on 2026-07-01 passed desktop and mobile homepage, city, guides, business detail, planner, pricing, partner-preview, and business-request flows.
+- A fresh local route-map proof on 2026-07-01 passed `16` starter collections, `19` direct route guides, `6` route chooser guides, and `23` chooser option maps.
+- A fresh rendered route-map proof on 2026-07-01 passed `41` route surfaces across `82` desktop/mobile checks with zero failures.
+- A fresh in-app Browser pass on 2026-07-01 confirmed the Date Night Google Maps handoff, the route chooser mapped-option panel, the chooser-to-route handoff, and the mobile route-map jump links with no console errors or horizontal overflow.
+- A fresh rendered public-copy proof on 2026-07-01 passed `52` public routes with zero internal-copy findings.
 - A fresh local paid-traffic proof on 2026-07-01 passed the request-first funnel through `business_request_saved_for_later` with `measurementReady: true`, `localBusinessFunnelPassed: true`, and `copiedRequestHasCampaignContext: true`.
 - A fresh hosted analytics proof on 2026-07-01 confirmed consent-gated GA script loading, measurement ID `G-43N3DKZYRL`, and hosted browser-side business-funnel event state. Direct GA collect-network proof was not observed in that run.
 - The hosted pricing page still shows the live City Partner and Signature Partner Stripe handoff links beside the request-first review path.
@@ -51,19 +58,21 @@ Do not combine those decisions in one claim. CityAtlas can be locally ready for 
 ## Remaining Caution
 
 - Qualified-request quality is still unproven with real business traffic.
-- The latest campaign-context improvement is proven locally but not deployed from this lane.
+- The latest campaign-context improvement is proven locally but not deployed yet.
+- The latest route-map CRO improvement is proven locally but not deployed yet.
+- Hosted route-map proof still needs to pass after an approved deploy before paid traffic should depend on this new route UX.
 - The latest hosted analytics proof did not observe direct Google Analytics collect requests, so provider-side conversion receipt remains unverified before scaling spend.
 - Direct self-serve revenue is still unproven because the checkout handoff is now live, but a real successful City Partner checkout has not been proven yet.
 - The Stripe-hosted checkout pages open, but no no-charge provider-side success proof exists for the final payment-confirmation state.
 - The local repo still contains old backup folders and build-output clutter that should be cleaned in a separate repo-health pass, even though the current local build and smoke commands are working again.
-- In this continuation lane, `git status` could not produce a clean worktree read because the local Git object database reports a missing tree object. Use a repaired clone or fresh release lane before any deploy, push, or release-branch cleanliness claim.
+- The current CRO release lane builds and reads git status cleanly, but production deploy, push, live spend, and real payment proof remain approval-gated.
 
 ## Minimum Before Launching A Tiny Paid Test
 
 1. Keep the first paid test small and judge it on qualified-request quality, not raw click volume.
 2. Use the request-first offer, not a fake instant-purchase promise.
 3. Keep the live landing focused on reviewed business requests first, with checkout as a secondary path only when package fit is already clear.
-4. Prefer deploying the local campaign-context hardening through a fresh clean release lane before spend starts.
+4. Prefer deploying the local campaign-context and route-map hardening through the current clean CRO release lane before spend starts, then rerun hosted proof.
 5. Rerun hosted pricing/payment proof and hosted analytics proof after any approved release.
 6. Treat missing provider-side GA/Ads receipt as a reason not to scale until account-side receipt is confirmed.
 
@@ -81,11 +90,12 @@ This is the smallest honest paid-traffic launch packet:
 1. Use the request-first business offer, not a self-serve checkout promise.
 2. Send traffic to the live business path on `city.univenturestudio.com`.
 3. Confirm the landing route, pricing route, partner-preview route, and business-request form still render before spend starts.
-4. Confirm consent-based GA4 setup is active and the request-first path records `page_view`, `business_pricing_viewed`, `business_package_cta_clicked`, `business_request_form_viewed`, `business_submission_saved`, and `business_request_saved_for_later` in CityAtlas proof state.
-5. Confirm provider-side GA/Ads receipt before scaling beyond the tiny test.
-6. Keep the first budget deliberately small.
-7. Review every submitted business request manually before any public listing, paid package recommendation, or follow-up.
-8. Stop the test if requests are low-fit, attribution is missing, or the owner cannot review/respond manually.
+4. After the CRO route-map batch is deployed, confirm the live route pages still show Google Maps handoffs and the chooser pages still show mapped route options.
+5. Confirm consent-based GA4 setup is active and the request-first path records `page_view`, `business_pricing_viewed`, `business_package_cta_clicked`, `business_request_form_viewed`, `business_submission_saved`, and `business_request_saved_for_later` in CityAtlas proof state.
+6. Confirm provider-side GA/Ads receipt before scaling beyond the tiny test.
+7. Keep the first budget deliberately small.
+8. Review every submitted business request manually before any public listing, paid package recommendation, or follow-up.
+9. Stop the test if requests are low-fit, attribution is missing, or the owner cannot review/respond manually.
 
 ## Real City Partner Checkout Proof Checklist
 
@@ -104,6 +114,14 @@ This is separate from the paid-traffic test:
 npm run qa:paid-traffic
 ```
 
+Use these route-map proof commands before and after any deploy carrying the route UX:
+
+```bash
+npm run qa:route-maps
+npm run qa:route-maps:rendered:compact
+npm run qa:route-maps:hosted:compact
+```
+
 If a managed shell blocks the verifier from starting its own preview server, use the exact direct proof lane below after `npm run preview` is already serving `http://127.0.0.1:4178/`:
 
 ```bash
@@ -120,4 +138,4 @@ Strict mode should fail while hosted proof, provider-side analytics receipt, or 
 
 ## Next Best Move
 
-Use a fresh clean release lane to carry the local campaign-context hardening through an approved deploy, rerun hosted proof, then start only a tiny request-first paid test. Keep the real City Partner checkout proof as a separate live-money approval step.
+Use the current clean CRO release lane to carry the local campaign-context and route-map hardening through an explicitly approved deploy, rerun hosted proof, then start only a tiny request-first paid test. Keep the real City Partner checkout proof as a separate live-money approval step.

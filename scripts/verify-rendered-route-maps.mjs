@@ -179,6 +179,7 @@ async function inspectRoute(page, entry, viewportName) {
   }, panelSelector);
   const linkCount = hrefs.length;
   const visibleText = panelCount === 1 ? await panel.first().innerText() : "";
+  const normalizedVisibleText = visibleText.toLowerCase();
   const layout = await page.evaluate(() => ({
     scrollWidth: document.documentElement.scrollWidth,
     viewportWidth: window.innerWidth,
@@ -196,8 +197,26 @@ async function inspectRoute(page, entry, viewportName) {
     );
   }
 
-  if (!visibleText.includes("Open in Google Maps")) {
+  if (!normalizedVisibleText.includes("open route in google maps")) {
     failures.push(`${entry.path} (${viewportName}): panel missing Google Maps action text`);
+  }
+
+  if (entry.mode === "direct") {
+    for (const requiredText of ["plan window", "typical stop", "best mode", "route shape"]) {
+      if (!normalizedVisibleText.includes(requiredText)) {
+        failures.push(`${entry.path} (${viewportName}): direct panel missing ${requiredText}`);
+      }
+    }
+  }
+
+  if (entry.mode === "options") {
+    if (!normalizedVisibleText.includes("stops")) {
+      failures.push(`${entry.path} (${viewportName}): option panel missing stop-count metadata`);
+    }
+
+    if (!normalizedVisibleText.includes("hr")) {
+      failures.push(`${entry.path} (${viewportName}): option panel missing route-window metadata`);
+    }
   }
 
   if (layout.scrollWidth > layout.viewportWidth + 1) {

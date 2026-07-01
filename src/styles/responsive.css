@@ -1267,6 +1267,20 @@
     max-width: 100%;
   }
 
+  .route-map-glance {
+    grid-template-columns: 1fr;
+    max-width: 100%;
+  }
+
+  .route-map-glance div {
+    padding: 9px;
+  }
+
+  .route-map-mode-note {
+    font-size: 0.78rem;
+    max-width: 100%;
+  }
+
   .route-map-action {
     justify-self: stretch;
   }
@@ -1296,6 +1310,10 @@
 
   .route-map-option-card {
     padding: 12px;
+  }
+
+  .route-map-option-meta {
+    gap: 6px;
   }
 
   .route-map-option-actions {

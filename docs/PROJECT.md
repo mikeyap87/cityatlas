@@ -40,7 +40,7 @@ The public product helps locals find places, events, offers, and guides. The bus
 - Public Vancouver guide-roundup page for routing people into the strongest CityAtlas route family by situation, now hosted and smoke-verified on the approved domain.
 - Public source-backed Vancouver wellness reset starters page and upgraded wellness guide with official-source framing and correction path.
 - Public Toronto first-time visitor starter page and matching destination-choice guide, plus a Toronto weekend-route starter page and matching compact-weekend guide, as the first non-Vancouver preview cluster, now also threaded into the public homepage, guide-library, about-page, and footer internal-link architecture and verified live on the approved domain.
-- Starter-route pages and route-backed guide pages now include a customer-facing Google Maps handoff with visible stop order, so readers can turn the planning page into a walkable map without requiring a new provider key. Route chooser guide pages now also show mapped route options, and guide quick-answer cards include route-map jump links so the map path is easier to find on mobile.
+- Starter-route pages and route-backed guide pages now include a customer-facing Google Maps handoff with visible stop order, route-planning windows, typical stop durations, best-mode guidance, and route-shape labels, so readers can turn the planning page into a real-world route without requiring a new provider key. Route chooser guide pages now also show mapped route options with stop counts, route windows, and best-mode labels, and guide quick-answer cards include route-map jump links so the map path is easier to find on mobile.
 - Business pricing page with a review-first path plus a limited Stripe-hosted checkout handoff for the paid partner packages when the package choice is already clear, plus a public partner-preview page explaining the free review, hosted meal/service/offering ask, and optional paid path.
 - Public business fit-call page that keeps call booking honest by using an email-draft handoff, so a restaurant or service business can request a short fit call without pretending instant scheduler software is already live.
 - Business submission flow with local-only storage, email-draft handoff, and copy fallback, now worded for restaurants, wellness operators, and broader neighborhood service businesses.
@@ -89,7 +89,7 @@ The public product helps locals find places, events, offers, and guides. The bus
 - Local source-backed wedge template plus hook and quality-gate readmes for repeatable editorial work.
 - Local `npm run seo:proof` verification for content counts, crawl-file coverage, and source-backed route integrity.
 - Local `npm run seo:structure:proof` verification for route metadata, robots directives, breadcrumbs, guide FAQ schema, and key hub JSON-LD coverage.
-- Local `npm run qa:route-maps` plus local/rendered `npm run qa:route-maps:rendered:compact` verification for Google Maps route handoffs across route-backed starter pages, route-backed guide pages, and route chooser option panels; after an approved deploy, run `npm run qa:route-maps:hosted:compact` against `city.univenturestudio.com`.
+- Local `npm run qa:route-maps` plus local/rendered `npm run qa:route-maps:rendered:compact` verification for Google Maps route handoffs, route-planning duration labels, route-count metadata, route-backed starter pages, route-backed guide pages, and route chooser option panels; after an approved deploy, run `npm run qa:route-maps:hosted:compact` against `city.univenturestudio.com`.
 - Guide library hub now groups the ranking surface into route-and-weather, visitor-and-host, weekend-and-reset, and neighborhood-intent clusters for stronger crawl and internal-link clarity.
 
 ## Stack
@@ -123,6 +123,7 @@ The public product helps locals find places, events, offers, and guides. The bus
 - Historical hosted direct-browser proof on 2026-06-25 showed the consent banner before opt-in, `gtag` only after consent, the configured measurement ID `G-43N3DKZYRL`, business-funnel data-layer events through `business_request_saved_for_later`, and live requests to both `www.googletagmanager.com/gtag/js` and `www.google-analytics.com/g/collect` on the approved domain after consent.
 - The latest hosted analytics proof on 2026-07-01 is narrower: it confirmed consent-gated GA script loading, measurement ID `G-43N3DKZYRL`, screenshots for homepage/pricing/partner-preview/submit states, and CityAtlas browser-side business-funnel event proof, but did not observe a direct Google Analytics collect request in that headless run. Treat provider-side GA/Ads receipt as unverified before scaling paid traffic.
 - The business funnel is locally honest for a small request-first paid-traffic test into reviewed business requests, and the local request copy/email path now includes campaign/referral context. The latest route-map CRO batch is locally proven but not yet deployed from this lane; rerun hosted route-map, analytics, payment, and business-funnel proof after an approved deploy before live spend depends on it. The app can hand off paid plans to Stripe-hosted payment links when the live-payments flag and payment-link env vars are present, but no custom checkout backend, invoice flow, subscription webhook handling, or customer-portal flow is active yet.
+- Google Maps route links are intentionally API-key-free and open Google Maps directions with origin, destination, waypoints, and walking mode. Embedded on-page Google route previews are optional and gated behind `VITE_GOOGLE_MAPS_EMBED_API_KEY`; without the key the public UI falls back to the visible stop-order panel. The code and verifier are ready for Maps Embed API URLs, but Google Cloud access for `univenturestudio@gmail.com` is currently blocked by Google's 2-step verification requirement, so no restricted production embed key has been created or installed yet.
 - The Vancouver business machine now uses deduped prospect truth: repeated source-backed venues do not count as separate business rows, and the admin rollup separates partner-eligible coverage from anchor-only city guidance.
 - Manual outreach already sent and logged now includes the original six owner-approved Date Night proof-sprint emails plus the 22 owner-reviewed Vancouver restaurant emails sent from the connected Gmail account on 2026-06-22. The daily Codex heartbeat now stages both lanes together, capped at 40 reviewed restaurant sends plus 20 reviewed service-business sends per day unless the owner approves a higher limit.
 - Vercel deploy is live at `https://cityatlas-one.vercel.app`.
@@ -152,24 +153,25 @@ Open `http://127.0.0.1:5178/`.
 9. Use `npm run qa:smoke:local` after meaningful product-surface changes to keep homepage, city navigation, planner, business request, admin, and private-preview flows covered on desktop and mobile before claiming deeper local QA.
 10. Use `npm run qa:paid-traffic` before any paid-traffic discussion so campaign context, package intent, business-request capture, measurement blockers, and hosted-proof gaps stay explicit.
 11. Use the current clean CRO release lane plus the release safety standard before deploy, push, or live paid-spend activation; production deploy still requires exact owner approval and hosted proof afterward.
-12. Treat the Sunday, returning-visitor, Kitsilano scenic, west-side daytime, False Creek culture, UBC discovery, and garden-day source-backed packets as historical hosted-proof truth after the June 16, 2026 hosted smoke pass on `city.univenturestudio.com`, not as pending release queue.
-13. Treat the starter-pack, low-friction, and guide-roundup routing packets as historical hosted-proof truth after the June 16, 2026 browser-render smoke pass on `city.univenturestudio.com`.
-14. Use the Toronto first-time visitor plus weekend-route wedge pair as the strongest next non-Vancouver indexing-observation candidate now that the approved domain no longer falls back to the Vancouver shell for `/toronto/*` routes.
-15. Treat hosted `sitemap.xml` and hosted `llms.txt` coverage for `/toronto/guides`, `/toronto/first-time-visitor-starters`, `/toronto/weekend-route-starters`, `/toronto/guides/where-should-a-first-time-toronto-visitor-start`, and `/toronto/guides/how-to-build-a-toronto-weekend-route-without-crossing-the-city-all-day` as historical hosted-proof truth from the June 17 pass, then use Search Console inspection and ranking observation as the next live truth gap.
-16. Treat the Toronto pilot packet as hosted-proof crawl truth on `city.univenturestudio.com`, then use it for Search Console route checks, indexing requests, and next-city expansion planning instead of treating hosted behavior as the blocker.
-17. Revisit the work-friendly cafe wedge only if stronger official-source support appears for laptop, seating, access, and work-mode claims.
-18. Verify name/trademark risk before standalone domain purchase or brand lock.
-19. Keep admin/private-preview hosted flags false unless protected sharing is explicitly approved.
-20. Approve a real-data sourcing policy.
-21. Monitor every manual outreach batch already sent, and log each reply, bounce, wrong-contact redirect, or concern in `/admin` before any follow-up or wider send decision.
-22. Keep the hosted payment-link env vars wired, and verify one real City Partner checkout before treating CityAtlas as charge-ready.
-23. Keep noindex/private crawl settings only on founder and admin flows; do not widen crawl to protected routes.
-24. Validate City Missions with 5 to 10 real humans before building accounts or live sharing.
-25. Review the Founder CRM candidate queue before any private preview follow-up or second manual outreach batch.
-26. Approve exact private-preview route language before real business names leave local owner review.
-27. Log manual replies locally before any automation or live CRM integration.
-28. Run `npm run replies:analyze` after outcomes are logged.
-29. Use `docs/revenue/DATE_NIGHT_REVENUE_PROOF_LOOP.md` to decide whether package demand is strong enough for Stripe test-mode setup.
-30. Use saved AI Brain Runs to compare progress before and after the first manual founder proof loop.
-31. Follow `docs/brand/BRAND_GUIDE.md` for logo, favicon, and visual changes.
-32. Use `docs/backend/LEAD_STORAGE_ACTIVATION_PACKET.md` before any durable lead-storage/provider setup.
+12. For embedded route previews, finish Google account 2-step verification for `univenturestudio@gmail.com`, create a Maps Embed API key restricted to the CityAtlas domains and the Maps Embed API, wire `VITE_GOOGLE_MAPS_EMBED_API_KEY` only after restriction, then rerun local and hosted route-map proof. Do not claim embedded on-page Google maps are live until this passes.
+13. Treat the Sunday, returning-visitor, Kitsilano scenic, west-side daytime, False Creek culture, UBC discovery, and garden-day source-backed packets as historical hosted-proof truth after the June 16, 2026 hosted smoke pass on `city.univenturestudio.com`, not as pending release queue.
+14. Treat the starter-pack, low-friction, and guide-roundup routing packets as historical hosted-proof truth after the June 16, 2026 browser-render smoke pass on `city.univenturestudio.com`.
+15. Use the Toronto first-time visitor plus weekend-route wedge pair as the strongest next non-Vancouver indexing-observation candidate now that the approved domain no longer falls back to the Vancouver shell for `/toronto/*` routes.
+16. Treat hosted `sitemap.xml` and hosted `llms.txt` coverage for `/toronto/guides`, `/toronto/first-time-visitor-starters`, `/toronto/weekend-route-starters`, `/toronto/guides/where-should-a-first-time-toronto-visitor-start`, and `/toronto/guides/how-to-build-a-toronto-weekend-route-without-crossing-the-city-all-day` as historical hosted-proof truth from the June 17 pass, then use Search Console inspection and ranking observation as the next live truth gap.
+17. Treat the Toronto pilot packet as hosted-proof crawl truth on `city.univenturestudio.com`, then use it for Search Console route checks, indexing requests, and next-city expansion planning instead of treating hosted behavior as the blocker.
+18. Revisit the work-friendly cafe wedge only if stronger official-source support appears for laptop, seating, access, and work-mode claims.
+19. Verify name/trademark risk before standalone domain purchase or brand lock.
+20. Keep admin/private-preview hosted flags false unless protected sharing is explicitly approved.
+21. Approve a real-data sourcing policy.
+22. Monitor every manual outreach batch already sent, and log each reply, bounce, wrong-contact redirect, or concern in `/admin` before any follow-up or wider send decision.
+23. Keep the hosted payment-link env vars wired, and verify one real City Partner checkout before treating CityAtlas as charge-ready.
+24. Keep noindex/private crawl settings only on founder and admin flows; do not widen crawl to protected routes.
+25. Validate City Missions with 5 to 10 real humans before building accounts or live sharing.
+26. Review the Founder CRM candidate queue before any private preview follow-up or second manual outreach batch.
+27. Approve exact private-preview route language before real business names leave local owner review.
+28. Log manual replies locally before any automation or live CRM integration.
+29. Run `npm run replies:analyze` after outcomes are logged.
+30. Use `docs/revenue/DATE_NIGHT_REVENUE_PROOF_LOOP.md` to decide whether package demand is strong enough for Stripe test-mode setup.
+31. Use saved AI Brain Runs to compare progress before and after the first manual founder proof loop.
+32. Follow `docs/brand/BRAND_GUIDE.md` for logo, favicon, and visual changes.
+33. Use `docs/backend/LEAD_STORAGE_ACTIVATION_PACKET.md` before any durable lead-storage/provider setup.

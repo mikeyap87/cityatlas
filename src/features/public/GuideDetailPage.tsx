@@ -106,6 +106,7 @@ function buildRouteMapOptionsForGuide(
       }
 
       return {
+        collection,
         label: simplifyGuideDisplayText(link.title),
         description: simplifyGuideDisplayText(link.description),
         routePath: link.path,
@@ -439,6 +440,7 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
           {sourceBackedCollection ? (
             <RouteMapPanel
               campaign={`guide_${guide.slug}_route`}
+              collection={sourceBackedCollection}
               compact
               copy="Open the suggested stop order in Google Maps when you want the page to become a real-world route."
               id="route-map"

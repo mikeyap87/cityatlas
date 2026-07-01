@@ -18,7 +18,7 @@ CityAtlas is now honest for a small request-first paid-traffic test into reviewe
 
 As of July 1, 2026, the local production build, local desktop/mobile smoke pass, local route-map verifier, rendered route-map verifier, rendered public-copy verifier, and local paid-traffic verifier are green. The local request path now also adds campaign/referral context to the copied or email-ready business request, and the verifier proved the copied request includes the paid-test UTM context.
 
-The latest local CRO route batch makes CityAtlas more useful for visitors before a paid test: direct route pages show a Google Maps handoff with visible stop order, route chooser pages show multiple mapped route options, and guide quick-answer cards now include route-map jump links so mobile users can reach the map path without hunting. This is local proof only until the batch is deployed and hosted route-map smoke passes.
+The latest local CRO route batch makes CityAtlas more useful for visitors before a paid test: direct route pages show a Google Maps handoff, visible stop order, suggested route window, typical stop duration, best mode, and route-shape count. Route chooser pages show multiple mapped route options with stop counts and timing metadata, and guide quick-answer cards now include route-map jump links so mobile users can reach the map path without hunting. This is local proof only until the batch is deployed and hosted route-map smoke passes.
 
 The live domain was also re-checked directly for hosted payment handoff. The hosted pricing page still shows the live City Partner and Signature Partner Stripe checkout links beside the City Partner, Signature, and general request-first paths.
 
@@ -32,7 +32,8 @@ Keep these as three separate decisions:
 
 - Tiny paid-traffic test: allowed only as a small request-first test into reviewed business requests. Judge it on qualified request quality, campaign attribution, and whether the owner can follow up manually.
 - Local CRO attribution hardening: prepared and locally proven in the current clean CRO release lane, but not deployed yet. It needs exact production-deploy approval and hosted proof before the live site depends on it.
-- Local route-map CRO hardening: prepared and locally proven across direct route pages, route chooser pages, desktop, and mobile, but not yet hosted on the approved domain from this lane.
+- Local route-map CRO hardening: prepared and locally proven across direct route pages, route chooser pages, desktop, and mobile, including suggested route windows and per-stop duration guidance, but not yet hosted on the approved domain from this lane.
+- Google Maps embedded previews: code-ready and verifier-ready, but not provider-ready. The normal `Open route in Google Maps` links require no Google API key; the optional on-page iframe previews require a restricted Maps Embed API key, and Google Cloud access for `univenturestudio@gmail.com` is currently blocked until 2-step verification is completed.
 - Real City Partner checkout proof: a separate live-money proof. It should not be treated as done just because the pricing page shows Stripe links or because the checkout page opens.
 
 Do not combine those decisions in one claim. CityAtlas can be locally ready for a request-first paid-traffic packet while still needing an approved release for the latest attribution hardening and a separate real checkout proof before self-serve charging claims.
@@ -48,6 +49,7 @@ Do not combine those decisions in one claim. CityAtlas can be locally ready for 
 - A fresh local route-map proof on 2026-07-01 passed `16` starter collections, `19` direct route guides, `6` route chooser guides, and `23` chooser option maps.
 - A fresh rendered route-map proof on 2026-07-01 passed `41` route surfaces across `82` desktop/mobile checks with zero failures.
 - A fresh in-app Browser pass on 2026-07-01 confirmed the Date Night Google Maps handoff, the route chooser mapped-option panel, the chooser-to-route handoff, and the mobile route-map jump links with no console errors or horizontal overflow.
+- The optional Maps Embed API URL builder is locally verified with a fake key so URL shape, directions mode, origin, destination, waypoints, and mode can be tested without exposing a real key.
 - A fresh rendered public-copy proof on 2026-07-01 passed `52` public routes with zero internal-copy findings.
 - A fresh local paid-traffic proof on 2026-07-01 passed the request-first funnel through `business_request_saved_for_later` with `measurementReady: true`, `localBusinessFunnelPassed: true`, and `copiedRequestHasCampaignContext: true`.
 - A fresh hosted analytics proof on 2026-07-01 confirmed consent-gated GA script loading, measurement ID `G-43N3DKZYRL`, and hosted browser-side business-funnel event state. Direct GA collect-network proof was not observed in that run.
@@ -60,6 +62,7 @@ Do not combine those decisions in one claim. CityAtlas can be locally ready for 
 - Qualified-request quality is still unproven with real business traffic.
 - The latest campaign-context improvement is proven locally but not deployed yet.
 - The latest route-map CRO improvement is proven locally but not deployed yet.
+- On-page embedded Google map previews are not live yet. Google Cloud is blocked by 2-step verification on `univenturestudio@gmail.com`, so the restricted production Maps Embed API key has not been created, installed in Vercel, or hosted-smoked.
 - Hosted route-map proof still needs to pass after an approved deploy before paid traffic should depend on this new route UX.
 - The latest hosted analytics proof did not observe direct Google Analytics collect requests, so provider-side conversion receipt remains unverified before scaling spend.
 - Direct self-serve revenue is still unproven because the checkout handoff is now live, but a real successful City Partner checkout has not been proven yet.
@@ -90,12 +93,25 @@ This is the smallest honest paid-traffic launch packet:
 1. Use the request-first business offer, not a self-serve checkout promise.
 2. Send traffic to the live business path on `city.univenturestudio.com`.
 3. Confirm the landing route, pricing route, partner-preview route, and business-request form still render before spend starts.
-4. After the CRO route-map batch is deployed, confirm the live route pages still show Google Maps handoffs and the chooser pages still show mapped route options.
+4. After the CRO route-map batch is deployed, confirm the live route pages still show Google Maps handoffs, suggested route windows, typical stop durations, and chooser-page mapped options.
 5. Confirm consent-based GA4 setup is active and the request-first path records `page_view`, `business_pricing_viewed`, `business_package_cta_clicked`, `business_request_form_viewed`, `business_submission_saved`, and `business_request_saved_for_later` in CityAtlas proof state.
 6. Confirm provider-side GA/Ads receipt before scaling beyond the tiny test.
 7. Keep the first budget deliberately small.
 8. Review every submitted business request manually before any public listing, paid package recommendation, or follow-up.
 9. Stop the test if requests are low-fit, attribution is missing, or the owner cannot review/respond manually.
+
+## Google Maps Embed API Checklist
+
+This is optional for the tiny request-first paid test because the current Google Maps directions links already work without an API key. It is required only before claiming embedded on-page Google route previews are live.
+
+1. Finish Google account 2-step verification for `univenturestudio@gmail.com`.
+2. In Google Cloud, use the CityAtlas/Univenture project or create a clean CityAtlas web project.
+3. Enable Maps Embed API only for this use case.
+4. Create a browser-visible API key and restrict it to the exact CityAtlas web referrers, including `https://city.univenturestudio.com/*` and the approved Vercel preview domains used for release proof.
+5. Restrict the same key to Maps Embed API only.
+6. Add the key as `VITE_GOOGLE_MAPS_EMBED_API_KEY` in the intended local or Vercel environment.
+7. Rerun `npm run qa:route-maps`, `npm run qa:route-maps:rendered:compact`, and, after an approved deploy, `npm run qa:route-maps:hosted:compact`.
+8. Verify a live route page renders an iframe with `data-route-map-embed="google"` before saying embedded route maps are live.
 
 ## Real City Partner Checkout Proof Checklist
 

@@ -771,6 +771,7 @@ export function SourceBackedCollectionPage({
 
       <RouteMapPanel
         campaign={`${collection}_starter_route`}
+        collection={collection}
         copy="Open the suggested stop order in Google Maps, then adjust the walk, transit, or rideshare choice around your timing."
         stops={routeMapStops}
         title="See the route before you choose"

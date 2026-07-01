@@ -72,8 +72,8 @@ const modules = [
   {
     name: "Revenue system",
     progress: 92,
-    done: "Package framing, draft terms/privacy, Stripe product manifest, accepted Stripe Billing/Checkout plan, live CAD pricing, confirmed live CityAtlas product and recurring price IDs, live Stripe-hosted payment links for both paid packages, local live-payment env wiring, env-gated payment-link handoff support on the public business funnel, local payment-handoff verification, hosted payment-handoff verification, public pricing-page checkout CTA cutover on the approved domain, local request-copy campaign-attribution proof, Date Night revenue proof loop, and reply-summary command.",
-    remains: "Final refund policy, one real checkout proof, clean hosted proof after the latest local attribution hardening is released, and first real paid-click quality review.",
+    done: "Package framing, draft terms/privacy, Stripe product manifest, accepted Stripe Billing/Checkout plan, live CAD pricing, confirmed live CityAtlas product and recurring price IDs, live Stripe-hosted payment links for both paid packages, local live-payment env wiring, env-gated payment-link handoff support on the public business funnel, local payment-handoff verification, hosted payment-handoff verification, public pricing-page checkout CTA cutover on the approved domain, local request-copy campaign-attribution proof, route-map duration and Google Maps handoff proof, Date Night revenue proof loop, and reply-summary command.",
+    remains: "Final refund policy, one real checkout proof, clean hosted proof after the latest local attribution and route-map hardening is released, optional restricted Maps Embed API key setup after Google account 2-step verification, and first real paid-click quality review.",
     next: "Keep the tiny paid test request-first, prove one real City Partner checkout separately before self-serve charging claims, and rerun hosted proof after any approved release.",
   },
   {
@@ -140,6 +140,7 @@ const report = {
   liveBlocked: [
     "first real live City Partner checkout proof",
     "provider-side GA/Ads conversion receipt before scaling paid traffic",
+    "embedded Google route previews until Google Cloud 2-step verification and a restricted Maps Embed API key are complete",
     "fresh clean release lane before any deploy or push",
     "real provider import",
     "additional customer outreach or follow-ups",

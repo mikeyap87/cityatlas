@@ -20,6 +20,7 @@ const configuredBaseUrl = process.env.CITYATLAS_RENDERED_ROUTE_MAP_BASE_URL?.rep
 const useExistingServer = process.env.CITYATLAS_RENDERED_ROUTE_MAP_USE_EXISTING_SERVER === "1";
 const baseUrl = configuredBaseUrl || `http://127.0.0.1:${previewPort}`;
 const compactReport = process.env.CITYATLAS_RENDERED_ROUTE_MAP_COMPACT === "1";
+const expectGoogleEmbed = process.env.CITYATLAS_EXPECT_ROUTE_MAP_EMBED === "1";
 
 function getGuidePath(guide) {
   return `/${guide.citySlug ?? "vancouver"}/guides/${guide.slug}`;
@@ -180,6 +181,14 @@ async function inspectRoute(page, entry, viewportName) {
   const linkCount = hrefs.length;
   const visibleText = panelCount === 1 ? await panel.first().innerText() : "";
   const normalizedVisibleText = visibleText.toLowerCase();
+  const saveButtonCount =
+    panelCount === 1 ? await panel.first().locator(".route-map-save-action").count() : 0;
+  const googleEmbedCount =
+    panelCount === 1 ? await panel.first().locator('[data-route-map-embed="google"]').count() : 0;
+  const stopActionCount =
+    panelCount === 1 ? await panel.first().locator(".route-map-stop-action").count() : 0;
+  const skipReasonCount =
+    panelCount === 1 ? await panel.first().locator(".route-map-skip-reasons button").count() : 0;
   const layout = await page.evaluate(() => ({
     scrollWidth: document.documentElement.scrollWidth,
     viewportWidth: window.innerWidth,
@@ -205,6 +214,63 @@ async function inspectRoute(page, entry, viewportName) {
     for (const requiredText of ["plan window", "typical stop", "best mode", "route shape"]) {
       if (!normalizedVisibleText.includes(requiredText)) {
         failures.push(`${entry.path} (${viewportName}): direct panel missing ${requiredText}`);
+      }
+    }
+
+    for (const requiredText of ["progress", "save route", "visited", "skip"]) {
+      if (!normalizedVisibleText.includes(requiredText)) {
+        failures.push(`${entry.path} (${viewportName}): direct panel missing route utility text ${requiredText}`);
+      }
+    }
+
+    if (saveButtonCount !== 1) {
+      failures.push(`${entry.path} (${viewportName}): expected 1 route save button, found ${saveButtonCount}`);
+    }
+
+    if (stopActionCount < 4) {
+      failures.push(`${entry.path} (${viewportName}): expected stop progress actions, found ${stopActionCount}`);
+    }
+
+    if (expectGoogleEmbed && googleEmbedCount !== 1) {
+      failures.push(
+        `${entry.path} (${viewportName}): expected 1 Google route iframe, found ${googleEmbedCount}`,
+      );
+    }
+
+    if (panelCount === 1 && saveButtonCount === 1 && stopActionCount >= 2) {
+      const routePanel = panel.first();
+      const saveButton = routePanel.locator(".route-map-save-action").first();
+      const visitedButton = routePanel.locator(".route-map-stop-action", { hasText: "Visited" }).first();
+      const skipButton = routePanel.locator(".route-map-stop-action", { hasText: "Skip" }).first();
+
+      const savePressedBefore = await saveButton.getAttribute("aria-pressed");
+      await saveButton.click();
+      const savePressedAfter = await saveButton.getAttribute("aria-pressed");
+      if (savePressedBefore === savePressedAfter) {
+        failures.push(`${entry.path} (${viewportName}): route save button did not toggle`);
+      }
+
+      await visitedButton.click();
+      if ((await visitedButton.getAttribute("aria-pressed")) !== "true") {
+        failures.push(`${entry.path} (${viewportName}): visited button did not activate`);
+      }
+
+      await skipButton.click();
+      if ((await skipButton.getAttribute("aria-pressed")) !== "true") {
+        failures.push(`${entry.path} (${viewportName}): skip button did not activate`);
+      }
+
+      const visibleSkipReasonCount = await routePanel.locator(".route-map-skip-reasons button").count();
+      if (visibleSkipReasonCount < 5) {
+        failures.push(
+          `${entry.path} (${viewportName}): expected at least 5 skip reason buttons after skip, found ${visibleSkipReasonCount}`,
+        );
+      } else {
+        const firstReason = routePanel.locator(".route-map-skip-reasons button").first();
+        await firstReason.click();
+        if ((await firstReason.getAttribute("aria-pressed")) !== "true") {
+          failures.push(`${entry.path} (${viewportName}): skip reason did not activate`);
+        }
       }
     }
   }
@@ -240,6 +306,10 @@ async function inspectRoute(page, entry, viewportName) {
     viewport: viewportName,
     panelCount,
     linkCount,
+    googleEmbedCount,
+    saveButtonCount,
+    skipReasonCount,
+    stopActionCount,
     horizontalOverflow: layout.scrollWidth > layout.viewportWidth + 1,
     failures,
   };
@@ -308,6 +378,7 @@ async function main() {
     directRouteCount: entries.filter((entry) => entry.mode === "direct").length,
     routeChooserCount: entries.filter((entry) => entry.mode === "options").length,
     checkedViewports: ["desktop", "mobile"],
+    expectGoogleEmbed,
     failureCount: failures.length,
     failures,
     passed: failures.length === 0,
@@ -320,14 +391,29 @@ async function main() {
           },
         }
       : {
-          reports: reports.map(({ route, mode, viewport, panelCount, linkCount, horizontalOverflow }) => ({
-            route,
-            mode,
-            viewport,
-            panelCount,
-            linkCount,
-            horizontalOverflow,
-          })),
+          reports: reports.map(
+            ({
+              route,
+              mode,
+              viewport,
+              panelCount,
+              linkCount,
+              googleEmbedCount,
+              saveButtonCount,
+              stopActionCount,
+              horizontalOverflow,
+            }) => ({
+              route,
+              mode,
+              viewport,
+              panelCount,
+              linkCount,
+              googleEmbedCount,
+              saveButtonCount,
+              stopActionCount,
+              horizontalOverflow,
+            }),
+          ),
         }),
   };
 

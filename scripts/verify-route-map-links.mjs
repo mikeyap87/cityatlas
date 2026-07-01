@@ -12,6 +12,11 @@ import {
   getRoutePlanningEstimate,
   getRouteStopCountLabel,
 } from "../src/lib/routeMaps.ts";
+import {
+  buildRouteProgressKey,
+  buildRouteStopKey,
+  routeSkipReasons,
+} from "../src/lib/routeProgress.ts";
 
 const failures = [];
 const collectionEntries = Object.entries(sourceBackedCollectionMeta);
@@ -81,6 +86,23 @@ function inspectPlanning(collection, stops, label) {
   requirePass(/stop/.test(stopCountLabel), `${label}: missing stop-count label`);
 }
 
+function inspectProgressKeys(stops, label, campaign) {
+  const routeKey = buildRouteProgressKey({
+    campaign,
+    id: label,
+    stops,
+    title: label,
+  });
+  const stopKeys = stops.map((stop, index) => buildRouteStopKey(stop, index));
+
+  requirePass(routeKey.startsWith("route:"), `${label}: route progress key should be namespaced`);
+  requirePass(
+    stopKeys.length === new Set(stopKeys).size,
+    `${label}: route stop progress keys should be unique`,
+  );
+  requirePass(routeSkipReasons.length >= 5, `${label}: route skip reasons should cover common cases`);
+}
+
 function getCollectionForPath(path) {
   const directCollection = getSourceBackedCollectionForPath(path);
 
@@ -139,6 +161,7 @@ for (const [collection, meta] of collectionEntries) {
   inspectDirectionsUrl(url, places.length, meta.path);
   inspectEmbedUrl(embedUrl, places.length, meta.path);
   inspectPlanning(collection, stops, meta.path);
+  inspectProgressKeys(stops, meta.path, `${collection}_starter_route`);
 }
 
 const routeGuides = seedData.guides
@@ -164,6 +187,7 @@ for (const { guide, collection } of routeGuides) {
   inspectDirectionsUrl(url, places.length, guide.slug);
   inspectEmbedUrl(embedUrl, places.length, guide.slug);
   inspectPlanning(collection, stops, guide.slug);
+  inspectProgressKeys(stops, guide.slug, `guide_${guide.slug}_route`);
 }
 
 const routeChooserGuides = seedData.guides
@@ -194,6 +218,11 @@ for (const { guide, options } of routeChooserGuides) {
     inspectDirectionsUrl(url, places.length, `${guide.slug} -> ${option.label}`);
     inspectEmbedUrl(embedUrl, places.length, `${guide.slug} -> ${option.label}`);
     inspectPlanning(option.collection, stops, `${guide.slug} -> ${option.label}`);
+    inspectProgressKeys(
+      stops,
+      `${guide.slug} -> ${option.label}`,
+      `guide_${guide.slug}_${option.collection}_option`,
+    );
   }
 }
 
@@ -219,6 +248,8 @@ console.log(
       mapsHost: "https://www.google.com/maps/dir/",
       embedHost: "https://www.google.com/maps/embed/v1/directions",
       defaultTravelMode: "walking",
+      routeProgressStorage: "cityatlas.route.progress.v1",
+      routeSkipReasons: routeSkipReasons.length,
     },
     null,
     2,

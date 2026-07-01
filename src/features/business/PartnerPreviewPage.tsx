@@ -1,5 +1,10 @@
 import { useEffect } from "react";
-import { siteConfig } from "../../config/site";
+import {
+  getPartnerPackageCheckoutLabel,
+  getPartnerPackageCheckoutUrl,
+  hasPartnerPackageCheckout,
+  siteConfig,
+} from "../../config/site";
 import type { CityAtlasData } from "../../types";
 import { AppLink } from "../../components/Link";
 import { ArrowRightIcon, CheckIcon, LockIcon, MapIcon, ShieldIcon, SparkIcon, StoreIcon } from "../../components/Icons";
@@ -83,6 +88,9 @@ function getCityPartnerLabel(data: CityAtlasData) {
 }
 
 export function PartnerPreviewPage({ data, onTrack }: PartnerPreviewPageProps) {
+  const cityPartnerCheckoutUrl = getPartnerPackageCheckoutUrl("city_partner");
+  const canStartCityPartnerCheckout = hasPartnerPackageCheckout("city_partner") && cityPartnerCheckoutUrl;
+
   useEffect(() => {
     onTrack("business_partner_preview_viewed", {
       packageCount: data.packages.length,
@@ -221,10 +229,23 @@ export function PartnerPreviewPage({ data, onTrack }: PartnerPreviewPageProps) {
           <article className="source-panel conversion-panel">
             <LockIcon />
             <h2>{getCityPartnerLabel(data)}</h2>
-            <p>
-              Paid packages remain optional later. Checkout is not live, and payment should only
-              open after scope, terms, and fit are clear.
-            </p>
+            {canStartCityPartnerCheckout ? (
+              <>
+                <p>
+                  Paid packages remain optional. Stripe-hosted checkout is available for businesses
+                  that already understand the request-first scope and do not need traffic or
+                  publication guarantees.
+                </p>
+                <a className="text-link" href={cityPartnerCheckoutUrl}>
+                  {getPartnerPackageCheckoutLabel("city_partner")} <ArrowRightIcon />
+                </a>
+              </>
+            ) : (
+              <p>
+                Paid packages remain optional later. Checkout is not live, and payment should only
+                open after scope, terms, and fit are clear.
+              </p>
+            )}
           </article>
         </div>
       </section>

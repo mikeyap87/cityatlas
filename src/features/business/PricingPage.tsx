@@ -2,12 +2,21 @@ import type { CityAtlasData, PackageId } from "../../types";
 import { AppLink } from "../../components/Link";
 import { ArrowRightIcon, CheckIcon, LockIcon, ShieldIcon } from "../../components/Icons";
 import { SafeModeNotice, SectionHeader, StatusPill } from "../../components/UI";
+import {
+  getPartnerPackageCheckoutLabel,
+  getPartnerPackageCheckoutUrl,
+  hasPartnerPackageCheckout,
+} from "../../config/site";
 
 interface PricingPageProps {
   data: CityAtlasData;
 }
 
-function getPaymentStateLabel(paymentState: string) {
+function getPaymentStateLabel(packageId: PackageId, paymentState: string) {
+  if (hasPartnerPackageCheckout(packageId)) {
+    return "Stripe-hosted checkout available";
+  }
+
   if (paymentState === "disabled_until_launch_approval") {
     return "Checkout opens after review";
   }
@@ -15,6 +24,8 @@ function getPaymentStateLabel(paymentState: string) {
 }
 
 export function PricingPage({ data }: PricingPageProps) {
+  const hasAnyCheckout = data.packages.some((plan) => hasPartnerPackageCheckout(plan.id));
+
   return (
     <>
       <section className="pricing-hero">
@@ -45,39 +56,60 @@ export function PricingPage({ data }: PricingPageProps) {
 
       <section className="section-block">
         <SectionHeader
-          title="See the package structure before checkout opens"
-          copy="These packages show the service structure. Checkout, payment links, and subscriptions open only after review, scope confirmation, and clear terms."
-          action={<StatusPill tone="amber">Review first</StatusPill>}
+          title={hasAnyCheckout ? "Choose the right review path before checkout" : "See the package structure before checkout opens"}
+          copy={
+            hasAnyCheckout
+              ? "These packages stay review-first. Stripe-hosted checkout can open for paid packages, but payment does not promise publication, placement, traffic, or automatic approval."
+              : "These packages show the service structure. Checkout, payment links, and subscriptions open only after review, scope confirmation, and clear terms."
+          }
+          action={<StatusPill tone={hasAnyCheckout ? "green" : "amber"}>{hasAnyCheckout ? "Checkout link live" : "Review first"}</StatusPill>}
         />
         <div className="pricing-grid">
-          {data.packages.map((plan) => (
-            <article
-              className={plan.highlighted ? "pricing-card highlighted" : "pricing-card"}
-              id={`package-${plan.id}`}
-              key={plan.id}
-            >
-              {plan.highlighted ? <span className="plan-flag">Most useful first test</span> : null}
-              <h2>{plan.name}</h2>
-              <strong>{plan.priceLabel}</strong>
-              <p>{plan.description}</p>
-              <p><strong>Best first fit:</strong> {plan.bestFor}</p>
-              <ul>
-                {plan.features.map((feature) => (
-                  <li key={feature}>
-                    <CheckIcon />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              <div className="payment-locked">
-                <LockIcon />
-                <span>{getPaymentStateLabel(plan.paymentState)}</span>
-              </div>
-              <AppLink className="button secondary wide" to={`/for-businesses/submit?package=${plan.id}`}>
-                Request review
-              </AppLink>
-            </article>
-          ))}
+          {data.packages.map((plan) => {
+            const checkoutUrl = getPartnerPackageCheckoutUrl(plan.id);
+            const checkoutEnabled = hasPartnerPackageCheckout(plan.id) && checkoutUrl;
+
+            return (
+              <article
+                className={plan.highlighted ? "pricing-card highlighted" : "pricing-card"}
+                id={`package-${plan.id}`}
+                key={plan.id}
+              >
+                {plan.highlighted ? <span className="plan-flag">Most useful first test</span> : null}
+                <h2>{plan.name}</h2>
+                <strong>{plan.priceLabel}</strong>
+                <p>{plan.description}</p>
+                <p><strong>Best first fit:</strong> {plan.bestFor}</p>
+                <ul>
+                  {plan.features.map((feature) => (
+                    <li key={feature}>
+                      <CheckIcon />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="payment-locked">
+                  {checkoutEnabled ? <CheckIcon /> : <LockIcon />}
+                  <span>{getPaymentStateLabel(plan.id, plan.paymentState)}</span>
+                </div>
+                {checkoutEnabled ? (
+                  <>
+                    <a className="button primary wide" href={checkoutUrl}>
+                      {getPartnerPackageCheckoutLabel(plan.id)}
+                      <ArrowRightIcon />
+                    </a>
+                    <AppLink className="button secondary wide" to={`/for-businesses/submit?package=${plan.id}`}>
+                      Send details first
+                    </AppLink>
+                  </>
+                ) : (
+                  <AppLink className="button secondary wide" to={`/for-businesses/submit?package=${plan.id}`}>
+                    Request review
+                  </AppLink>
+                )}
+              </article>
+            );
+          })}
         </div>
       </section>
 
@@ -178,8 +210,8 @@ export function PricingPage({ data }: PricingPageProps) {
         <div>
           <h2>Best first monetization path</h2>
           <p>
-            Use this page for early partner conversations first. Open checkout only after clear
-            business demand is proven.
+            Use this page for early partner conversations first. When checkout is available, keep
+            the payment decision tied to fit, scope, and a clear business request.
           </p>
         </div>
         <AppLink className="button primary" to="/for-businesses/submit">

@@ -38,6 +38,7 @@ interface HomePageProps {
 
 type HomeSearchKind = "shortcut" | "guide" | "business" | "event" | "offer";
 type HeroPreviewId =
+  | "date-night"
   | "gastown"
   | "kits"
   | "mount-pleasant"
@@ -70,6 +71,18 @@ interface HeroPreview {
 }
 
 const heroPreviewLookup: Record<HeroPreviewId, HeroPreview> = {
+  "date-night": {
+    id: "date-night",
+    label: "Date night",
+    caption: "Dinner and one easy second stop",
+    detail: "Best when the plan should feel intentional, compact, and ready to share.",
+    path: "/vancouver/date-night-starters",
+    image: resolvePublicAssetPath("/assets/businesses/kissa-tanto-booth.webp"),
+    alt: "Cozy restaurant booth for a Vancouver date-night plan",
+    queryTerms: ["date night", "date", "dinner", "evening", "romantic", "first date"],
+    suggestionLabel: "Date night",
+    searchValue: "date night",
+  },
   gastown: {
     id: "gastown",
     label: "Gastown",
@@ -165,7 +178,7 @@ const heroMapStopIds = [
 
 const heroMapStops = heroMapStopIds.map((id) => heroPreviewLookup[id]);
 
-const heroSearchSuggestionIds = ["rainy-day", "gastown", "kits", "weekend-plan"] as const;
+const heroSearchSuggestionIds = ["date-night", "rainy-day", "gastown", "kits", "weekend-plan"] as const;
 
 const heroSearchSuggestions = heroSearchSuggestionIds.map((id) => {
   const preview = heroPreviewLookup[id];
@@ -179,6 +192,7 @@ const heroSearchSuggestions = heroSearchSuggestionIds.map((id) => {
 });
 
 const heroSearchShortcutIds = [
+  "date-night",
   "rainy-day",
   "weekend-plan",
   "gastown",
@@ -226,6 +240,12 @@ const trustedStartingPointLinks = [
 ] as const;
 
 const homePlanningLanes = [
+  {
+    title: "Date night",
+    description: "Open one compact evening plan with real local starting points.",
+    path: "/vancouver/date-night-starters",
+    hint: "Plan the night",
+  },
   {
     title: "First visit",
     description: "Choose the right part of Vancouver before a first trip gets overbuilt.",
@@ -729,7 +749,7 @@ export function HomePage({ data, onNewsletter: _onNewsletter, onTrack, onSaveMis
       <section className="section-block">
         <SectionHeader
           label="Start with one useful guide"
-          title="Three strong Vancouver guides to open first"
+          title="Strong Vancouver guides to open first"
           copy="Start with the guide that fits the day, then go deeper only if you still need more."
           action={<AppLink className="text-link" to="/vancouver/guides">Open all guides <ArrowRightIcon /></AppLink>}
         />

@@ -89,6 +89,11 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
     sourceBackedWellnessResetStarters.length;
   const cityHeroQuickStarts = [
     {
+      label: "Date night",
+      detail: "Dinner-first starts for a compact evening",
+      to: "/vancouver/date-night-starters",
+    },
+    {
       label: "First visit",
       detail: "Downtown, scenic, or west-side first stop",
       to: "/vancouver/first-time-visitor-starters",

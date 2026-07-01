@@ -1995,6 +1995,12 @@ export const seedData: CityAtlasData = {
             "Open this when the route needs one weekend shape instead of a scattered checklist.",
         },
         {
+          title: "Low-friction route chooser",
+          path: "/vancouver/guides/which-low-friction-vancouver-route-should-you-open-today",
+          description:
+            "Use this when the day needs to stay easy and the first decision is which simpler route type fits.",
+        },
+        {
           title: "Neighborhood chooser",
           path: "/vancouver/guides/how-to-choose-between-gastown-mount-pleasant-and-kitsilano-for-a-vancouver-evening",
           description:

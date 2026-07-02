@@ -183,6 +183,14 @@ async function inspectRoute(page, entry, viewportName) {
   const normalizedVisibleText = visibleText.toLowerCase();
   const saveButtonCount =
     panelCount === 1 ? await panel.first().locator(".route-map-save-action").count() : 0;
+  const shareButtonCount =
+    panelCount === 1 ? await panel.first().locator(".route-map-share-action").count() : 0;
+  const plannerControlCount =
+    panelCount === 1 ? await panel.first().locator('[data-testid="route-planner-controls"]').count() : 0;
+  const miniItineraryCount =
+    panelCount === 1 ? await panel.first().locator('[data-testid="route-mini-itinerary"]').count() : 0;
+  const businessCtaCount =
+    panelCount === 1 ? await panel.first().locator('[data-testid="route-business-cta"]').count() : 0;
   const googleEmbedCount =
     panelCount === 1 ? await panel.first().locator('[data-route-map-embed="google"]').count() : 0;
   const stopActionCount =
@@ -211,13 +219,23 @@ async function inspectRoute(page, entry, viewportName) {
   }
 
   if (entry.mode === "direct") {
-    for (const requiredText of ["plan window", "typical stop", "best mode", "route shape"]) {
+    for (const requiredText of ["plan window", "typical stop", "best mode", "selected route"]) {
       if (!normalizedVisibleText.includes(requiredText)) {
         failures.push(`${entry.path} (${viewportName}): direct panel missing ${requiredText}`);
       }
     }
 
-    for (const requiredText of ["progress", "save route", "visited", "skip"]) {
+    for (const requiredText of [
+      "plan length",
+      "travel mode",
+      "mini itinerary",
+      "copy route link",
+      "progress",
+      "save route",
+      "visited",
+      "skip",
+      "request route review",
+    ]) {
       if (!normalizedVisibleText.includes(requiredText)) {
         failures.push(`${entry.path} (${viewportName}): direct panel missing route utility text ${requiredText}`);
       }
@@ -225,6 +243,22 @@ async function inspectRoute(page, entry, viewportName) {
 
     if (saveButtonCount !== 1) {
       failures.push(`${entry.path} (${viewportName}): expected 1 route save button, found ${saveButtonCount}`);
+    }
+
+    if (shareButtonCount !== 1) {
+      failures.push(`${entry.path} (${viewportName}): expected 1 route share button, found ${shareButtonCount}`);
+    }
+
+    if (plannerControlCount !== 1) {
+      failures.push(`${entry.path} (${viewportName}): expected 1 route planner control set, found ${plannerControlCount}`);
+    }
+
+    if (miniItineraryCount !== 1) {
+      failures.push(`${entry.path} (${viewportName}): expected 1 mini itinerary, found ${miniItineraryCount}`);
+    }
+
+    if (businessCtaCount !== 1) {
+      failures.push(`${entry.path} (${viewportName}): expected 1 business route CTA, found ${businessCtaCount}`);
     }
 
     if (stopActionCount < 4) {
@@ -271,6 +305,11 @@ async function inspectRoute(page, entry, viewportName) {
         if ((await firstReason.getAttribute("aria-pressed")) !== "true") {
           failures.push(`${entry.path} (${viewportName}): skip reason did not activate`);
         }
+      }
+
+      const alternateLinkCount = await routePanel.locator(".route-map-alternates a").count();
+      if (alternateLinkCount < 1) {
+        failures.push(`${entry.path} (${viewportName}): expected alternate stop links after skip`);
       }
     }
   }

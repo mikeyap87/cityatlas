@@ -26,6 +26,10 @@ export interface RouteMapBuildOptions {
   utmCampaign?: string;
 }
 
+export interface RouteStopMapBuildOptions {
+  utmCampaign?: string;
+}
+
 const routePlanningEstimates: Partial<Record<SourceBackedCollectionId, RoutePlanningEstimate>> = {
   toronto_first_time_visitor_starters: {
     bestMode: "Walk + transit",
@@ -187,6 +191,25 @@ export function buildGoogleMapsDirectionsUrl(
 
   url.searchParams.set("utm_source", "cityatlas");
   url.searchParams.set("utm_campaign", options.utmCampaign ?? "route_map");
+
+  return url.toString();
+}
+
+export function buildGoogleMapsPlaceUrl(
+  stop: RouteMapStop,
+  options: RouteStopMapBuildOptions = {},
+) {
+  const query = cleanQueryPart(stop.query) || cleanQueryPart(stop.label);
+
+  if (!query) {
+    return null;
+  }
+
+  const url = new URL("https://www.google.com/maps/search/");
+  url.searchParams.set("api", "1");
+  url.searchParams.set("query", query);
+  url.searchParams.set("utm_source", "cityatlas");
+  url.searchParams.set("utm_campaign", options.utmCampaign ?? "route_stop");
 
   return url.toString();
 }

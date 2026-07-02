@@ -13,27 +13,33 @@ Do not add accounts before the next paid-traffic release. The highest-value, low
 
 ## What Is Locally Built Now
 
-- Route pages show route window, typical stop duration, best mode, route shape, and Google Maps handoff.
+- Route pages show route window, typical stop duration, best mode, selected route count, and Google Maps handoff.
 - Route pages can show an embedded Google route preview when a Maps Embed API key is present.
+- Visitors can choose plan length: 2 hours, half day, or easy pace.
+- Visitors can choose travel mode: walk, transit, drive, or bike.
+- Route pages show a mini itinerary with simple timing offsets.
+- Visitors can share route links that preserve plan length, travel mode, and the route-map anchor without sharing private saved progress.
+- If browser clipboard copy is blocked, visitors get a manual route-link field instead of a dead end.
 - Visitors can save a route on the device.
 - Visitors can mark stops as visited or skipped.
 - Visitors can record simple skip reasons: too far, closed, not the vibe, too expensive, already been.
+- Skipped stops show alternate place links.
+- Businesses can request review from the exact route where they want to be considered.
 
 This creates product value without collecting account data or pretending personalization is live.
 
 ## Best Next User Value
 
-- Add an alternate-stop picker for each skipped place.
-- Add mode-aware route views: walk, transit, bike, drive.
-- Add quick route fit labels: low effort, date night, visitor friendly, rainy day, budget friendly.
-- Add shareable route links that preserve the base route, not private user state.
 - Add opening-hours warnings only when the source is reliable.
-- Add a printable/shareable mini itinerary after route proof is hosted.
+- Add stronger alternate-stop pools by neighborhood, budget, weather, distance, and time of day.
+- Add quick route fit labels: low effort, date night, visitor friendly, rainy day, budget friendly.
+- Add official booking, call, menu, or ticket links only when source-backed.
+- Add a printable route summary after hosted proof is stable.
 
 ## Best Next Business Value
 
-- Let businesses request review from the exact route where they want to appear.
 - Show businesses which route category they may fit: date night, rainy day, wellness, visitor route, weekend route.
+- Let request-first businesses include their preferred route category and best-fit offer in the request flow.
 - Add sponsor/feature inventory only after real route demand appears.
 - Report aggregate, privacy-safe route interest once there is enough traffic.
 - Keep owner review before public placement, route replacement, or paid recommendation.

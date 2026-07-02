@@ -1267,6 +1267,17 @@
     max-width: 100%;
   }
 
+  .route-map-planner-controls,
+  .route-map-mini-itinerary,
+  .route-map-business-cta {
+    max-width: 100%;
+  }
+
+  .route-map-segmented-control,
+  .route-map-planner-controls > div:nth-child(2) .route-map-segmented-control {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .route-map-glance {
     grid-template-columns: 1fr;
     max-width: 100%;
@@ -1283,6 +1294,20 @@
 
   .route-map-action {
     justify-self: stretch;
+  }
+
+  .route-map-primary-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .route-map-primary-actions .button {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .route-map-mini-itinerary li {
+    grid-template-columns: 54px minmax(0, 1fr);
   }
 
   .route-map-preview iframe,

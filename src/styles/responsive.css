@@ -553,6 +553,16 @@
     grid-template-columns: 1fr;
   }
 
+  .pricing-hero-subactions {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .pricing-hero-subactions .text-link {
+    width: fit-content;
+  }
+
   .pricing-tag-cloud {
     display: grid;
     gap: 8px;
@@ -797,10 +807,14 @@
   .mini-pricing-row,
   .metrics-strip,
   .planner-stats,
+  .route-learning-grid,
+  .mission-utility-row,
   .adaptive-band,
   .card-grid.three,
   .card-grid.two,
   .split-section,
+  .mission-travel-mode-row,
+  .mission-map-layout,
   .pricing-grid,
   .partner-step-grid,
   .form-grid,
@@ -813,6 +827,15 @@
 
   .pricing-choice-grid {
     grid-template-columns: 1fr;
+  }
+
+  .request-prompt-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .request-prompt-chip {
+    text-align: left;
   }
 
   .section-block,
@@ -855,6 +878,14 @@
 
   .home-next-step-band .button.secondary {
     display: none;
+  }
+
+  .travel-mode-segment {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mission-map-frame {
+    height: 240px;
   }
 
   .business-gallery-strip {
@@ -1169,6 +1200,9 @@
   .preview-candidate-card,
   .preview-script-list li,
   .mission-route-header,
+  .mission-map-actions,
+  .saved-row,
+  .route-step-heading,
   .route-timeline li {
     grid-template-columns: 1fr;
   }
@@ -1250,102 +1284,6 @@
     max-width: none;
   }
 
-  .route-map-panel,
-  .route-map-panel-compact {
-    gap: 14px;
-    grid-template-columns: 1fr;
-    padding: 14px;
-  }
-
-  .route-map-copy h2 {
-    font-size: 1.36rem;
-    max-width: none;
-  }
-
-  .route-map-copy p {
-    font-size: 0.9rem;
-    max-width: 100%;
-  }
-
-  .route-map-planner-controls,
-  .route-map-mini-itinerary,
-  .route-map-business-cta {
-    max-width: 100%;
-  }
-
-  .route-map-segmented-control,
-  .route-map-planner-controls > div:nth-child(2) .route-map-segmented-control {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .route-map-glance {
-    grid-template-columns: 1fr;
-    max-width: 100%;
-  }
-
-  .route-map-glance div {
-    padding: 9px;
-  }
-
-  .route-map-mode-note {
-    font-size: 0.78rem;
-    max-width: 100%;
-  }
-
-  .route-map-action {
-    justify-self: stretch;
-  }
-
-  .route-map-primary-actions {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .route-map-primary-actions .button {
-    justify-content: center;
-    width: 100%;
-  }
-
-  .route-map-mini-itinerary li {
-    grid-template-columns: 54px minmax(0, 1fr);
-  }
-
-  .route-map-preview iframe,
-  .route-map-static {
-    min-height: 246px;
-  }
-
-  .route-map-options-panel {
-    padding: 14px;
-  }
-
-  .route-map-options-heading h2 {
-    font-size: 1.28rem;
-    max-width: none;
-  }
-
-  .route-map-options-heading p {
-    font-size: 0.9rem;
-    max-width: 100%;
-  }
-
-  .route-map-option-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .route-map-option-card {
-    padding: 12px;
-  }
-
-  .route-map-option-meta {
-    gap: 6px;
-  }
-
-  .route-map-option-actions {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
   .guide-summary {
     font-size: 0.9rem;
   }
@@ -1417,7 +1355,9 @@
   }
 
   .mission-actions,
-  .share-actions {
+  .share-actions,
+  .route-step-actions,
+  .mission-brief-metrics {
     align-items: stretch;
     flex-direction: column;
   }
@@ -1439,6 +1379,18 @@
   .mission-route-score {
     min-width: 0;
     text-align: left;
+  }
+
+  .mission-chip-cloud span,
+  .route-action-chip,
+  .route-status-chip {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .mission-map-actions .button,
+  .mission-map-actions .route-reset-button {
+    width: 100%;
   }
 }
 

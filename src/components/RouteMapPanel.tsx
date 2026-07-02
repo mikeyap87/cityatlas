@@ -92,6 +92,13 @@ const travelModeOptions: Array<{ id: GoogleMapsTravelMode; label: string }> = [
   { id: "bicycling", label: "Bike" },
 ];
 
+const GOOGLE_MAPS_EMBED_API_KEY =
+  import.meta.env.VITE_CITYATLAS_GOOGLE_MAPS_EMBED_API_KEY?.trim()
+  || import.meta.env.VITE_CITYATLAS_GOOGLE_MAPS_API_KEY?.trim()
+  || import.meta.env.VITE_GOOGLE_MAPS_EMBED_API_KEY?.trim()
+  || import.meta.env.VITE_GOOGLE_MAPS_API_KEY?.trim()
+  || "";
+
 function isRoutePlanId(value: string | null): value is RoutePlanId {
   return routePlanOptions.some((option) => option.id === value);
 }
@@ -339,7 +346,7 @@ export function RouteMapPanel({
   });
   const embedUrl = buildGoogleMapsEmbedUrl(
     routeStopsForMaps,
-    import.meta.env.VITE_GOOGLE_MAPS_EMBED_API_KEY,
+    GOOGLE_MAPS_EMBED_API_KEY,
     { travelMode: selectedTravelMode, utmCampaign: campaign },
   );
   const stopCountLabel = getRouteStopCountLabel(routeStopsForMaps);

@@ -1,5 +1,9 @@
 import { seedData } from "../src/data/seed.ts";
-import { simplifyGuideDisplayText } from "../src/lib/publicCopy.ts";
+import {
+  getMissionDirectionsUrl,
+  getMissionPlanState,
+  getTravelModeLabel,
+} from "../src/lib/missions.ts";
 
 function createSavedItem(itemType, itemId, label) {
   return {
@@ -32,33 +36,36 @@ function simulateMissionSave(data, missionId) {
 }
 
 function buildPlannerShareText(data, savedItems) {
-  const savedBusinesses = savedItems
-    .filter((item) => item.itemType === "business")
-    .map((item) => data.businesses.find((business) => business.id === item.itemId))
-    .filter(Boolean);
-  const savedEvents = savedItems
-    .filter((item) => item.itemType === "event")
-    .map((item) => data.events.find((event) => event.id === item.itemId))
-    .filter(Boolean);
-  const savedGuides = savedItems
-    .filter((item) => item.itemType === "guide")
-    .map((item) => data.guides.find((guide) => guide.id === item.itemId))
-    .filter(Boolean);
-  const savedOffers = savedItems
-    .filter((item) => item.itemType === "offer")
-    .map((item) => data.offers.find((offer) => offer.id === item.itemId))
-    .filter(Boolean);
+  const mission = data.cityMissions.find((item) => item.id === "mission-date-night");
+  if (!mission) {
+    throw new Error("mission-date-night is missing from seed data.");
+  }
 
-  return [
-    ...savedBusinesses.map((business) => `Visit ${business.name} in ${business.neighborhood}`),
-    ...savedEvents.map((event) => `Check ${event.title} on ${event.date}`),
-    ...savedGuides.map((guide) => `Read ${simplifyGuideDisplayText(guide.title)}`),
-    ...savedOffers.map((offer) => `Save ${offer.title}`),
-  ].join(" -> ");
+  const plan = getMissionPlanState(data, mission);
+  const directionsUrl = getMissionDirectionsUrl(data, mission, plan.travelMode);
+  const lines = [
+    `${mission.title} saved plan via CityAtlas`,
+    "",
+    "Stops:",
+    ...savedItems.map((item, index) => `${index + 1}. ${item.label}`),
+    "",
+    `Pace: ${getTravelModeLabel(plan.travelMode)}`,
+  ];
+
+  if (directionsUrl) {
+    lines.push(`Open route in Google Maps: ${directionsUrl}`);
+  }
+
+  lines.push("", mission.sharePrompt);
+  return lines.join("\n");
 }
 
 function main() {
   const data = JSON.parse(JSON.stringify(seedData));
+  const mission = data.cityMissions.find((item) => item.id === "mission-date-night");
+  if (!mission) {
+    throw new Error("mission-date-night is missing from seed data.");
+  }
   const savedItems = simulateMissionSave(data, "mission-date-night");
   const itineraryText = buildPlannerShareText(data, savedItems);
 
@@ -82,8 +89,13 @@ function main() {
     duplicateBusinessEntryCount: duplicateBusinessEntries.length,
     passed:
       duplicateBusinessEntries.length === 0 &&
-      itineraryText ===
-        "Visit Published on Main in Main Street -> Visit Kissa Tanto in Chinatown -> Read How To Plan A Vancouver Date Night Without Crossing The City Twice",
+      itineraryText.includes(`${mission.title} saved plan via CityAtlas`) &&
+      itineraryText.includes("1. Read the date-night guide") &&
+      itineraryText.includes("2. Dinner at Kissa Tanto") &&
+      itineraryText.includes("3. Second stop at L'Abattoir") &&
+      itineraryText.includes("Pace: Walk") &&
+      itineraryText.includes("Open route in Google Maps: https://www.google.com/maps/dir/?api=1") &&
+      itineraryText.includes("Want to try it with me this week?"),
   };
 
   console.log("CityAtlas planner save-summary proof");

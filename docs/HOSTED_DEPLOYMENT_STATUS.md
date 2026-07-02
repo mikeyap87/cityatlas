@@ -1,6 +1,6 @@
 # Hosted Deployment Status
 
-Date: 2026-06-17
+Date: 2026-07-02
 
 ## Vercel
 
@@ -9,16 +9,16 @@ Date: 2026-06-17
 - Project ID: `prj_BWFVXVkasM6b3yybiuPHCJFk5fCV`
 - Public production alias: `https://cityatlas-one.vercel.app`
 - Custom Univenture alias: `https://city.univenturestudio.com`
-- Latest production deployment: `dpl_FjB8fUnP5ZhzueTvLfN2XWQ5sKRd`
-- Latest production deployment URL: `https://cityatlas-699zdvfn9-michael-yaps-projects-92932836.vercel.app`
+- Current verified live production git base: `origin/codex/cityatlas-cro-release-20260701` at commit `17bb9bd`
+- Newest route-memory plus attribution hardening batch: proven locally on a fresh clean child lane only, not yet deployed from this state
 
 ## GitHub Release Path
 
 - Repository: `https://github.com/mikeyap87/cityatlas`
 - Remote-backed baseline now exists on `origin/main`.
-- The current release lane `codex/vancouver-release-lane` is pushed and tracks `origin/codex/vancouver-release-lane`.
-- The live production deploy on 2026-06-17 came from `codex/vancouver-release-lane` commit `36cda30`.
-- `origin/codex/vancouver-release-lane` is ahead of `origin/main`, so the release lane is the safest rollback base until a later merge updates `main`.
+- Historical `codex/vancouver-release-lane` notes below remain useful as June release history, but they are no longer the active production base.
+- The current verified live production base is `origin/codex/cityatlas-cro-release-20260701` at commit `17bb9bd`.
+- The safest next deploy path is a fresh clean child lane from that live base, followed by approved hosted smoke.
 
 ## Protection State
 

@@ -1,361 +1,193 @@
 import type {
+  AuditLog,
+  BrainRun,
+  BusinessInboundMirrorEntry,
   BusinessProspect,
   BusinessReplyBridgeReplayRecord,
   BusinessReplyLog,
-  BrainRun,
   BusinessSubmission,
-  BusinessInboundMirrorEntry,
+  CityMission,
   CityAtlasData,
   GrowthEvent,
-  LaunchGate,
   ManualReplyLog,
+  MissionPlanState,
   NewsletterLead,
-  PackageId,
   SavedItem,
+  TravelMode,
 } from "../types";
-import { buildFlags } from "../config/site";
-import { shouldTreatProspectAsPartnerAnchor } from "./businessProspectRole.ts";
-import { slugify } from "./format";
+import { seedData } from "../data/seed";
 
-const STORAGE_KEY = "cityatlas.launch.package.v1";
-const STORAGE_SCHEMA_VERSION = 2;
+const CITYATLAS_STORAGE_KEY = "cityatlas.launch.package.v1";
 
-interface CityAtlasPersistedData {
-  schemaVersion?: number;
-  launchGates?: Array<Pick<LaunchGate, "id" | "status">>;
-  submissions?: BusinessSubmission[];
-  newsletterLeads?: NewsletterLead[];
-  savedItems?: SavedItem[];
-  growthEvents?: GrowthEvent[];
-  revenueExperiments?: CityAtlasData["revenueExperiments"];
-  businessProspects?: BusinessProspect[];
-  manualReplyLogs?: ManualReplyLog[];
-  businessInboundMirror?: BusinessInboundMirrorEntry[];
-  businessReplyBridgeReplays?: BusinessReplyBridgeReplayRecord[];
-  businessReplyLogs?: BusinessReplyLog[];
-  brainRuns?: BrainRun[];
-  auditLogs?: CityAtlasData["auditLogs"];
-}
+const MUTABLE_KEYS: Array<keyof CityAtlasData> = [
+  "launchGates",
+  "submissions",
+  "newsletterLeads",
+  "savedItems",
+  "missionPlans",
+  "growthEvents",
+  "businessProspects",
+  "manualReplyLogs",
+  "businessInboundMirror",
+  "businessReplyBridgeReplays",
+  "businessReplyLogs",
+  "brainRuns",
+  "auditLogs",
+];
 
-const seedDataPromise = import("../data/seed").then(({ seedData }) => cloneData(seedData));
-let defaultBaseDataCache: CityAtlasData | null = null;
-let defaultFullDataCache: CityAtlasData | null = null;
+const GROWTH_ONLY_KEYS: Array<keyof CityAtlasData> = [
+  "businessProspects",
+  "manualReplyLogs",
+  "businessInboundMirror",
+  "businessReplyBridgeReplays",
+  "businessReplyLogs",
+  "brainRuns",
+  "auditLogs",
+];
 
-let cityGrowthModulePromise: Promise<typeof import("./cityGrowth")> | null = null;
-let businessInboundPreviewModulePromise: Promise<typeof import("./businessInboundPreview")> | null =
-  null;
-
-const loadCityGrowthModule: () => Promise<typeof import("./cityGrowth")> =
-  buildFlags.hostedAdminArtifacts
-    ? () => {
-        cityGrowthModulePromise ??= import("./cityGrowth");
-        return cityGrowthModulePromise;
-      }
-    : async () => {
-        throw new Error("Protected CityAtlas admin artifacts are disabled in this build.");
-      };
-
-const loadBusinessInboundPreviewModule: () => Promise<typeof import("./businessInboundPreview")> =
-  buildFlags.hostedAdminArtifacts
-    ? () => {
-        businessInboundPreviewModulePromise ??= import("./businessInboundPreview");
-        return businessInboundPreviewModulePromise;
-      }
-    : async () => {
-        throw new Error("Protected CityAtlas admin artifacts are disabled in this build.");
-      };
-
-function createId(prefix: string) {
-  return `${prefix}-${Date.now().toString(36)}-${Math.random()
-    .toString(36)
-    .slice(2, 8)}`;
-}
-
-function cloneData<T>(value: T): T {
-  return JSON.parse(JSON.stringify(value)) as T;
-}
-
-export function createEmptyCityAtlasData(): CityAtlasData {
-  return {
-    sources: [],
-    businesses: [],
-    events: [],
-    offers: [],
-    guides: [],
-    sourceBackedPlaces: [],
-    cityRolloutTargets: [],
-    cityMissions: [],
-    packages: [],
-    launchGates: [],
-    submissions: [],
-    newsletterLeads: [],
-    savedItems: [],
-    growthEvents: [],
-    revenueExperiments: [],
-    growthPlays: [],
-    proofSprints: [],
-    proofCandidates: [],
-    businessProspects: [],
-    manualReplyLogs: [],
-    businessInboundMirror: [],
-    businessReplyBridgeReplays: [],
-    businessReplyLogs: [],
-    brainRuns: [],
-    auditLogs: [],
-  };
-}
-
-async function buildBaseData(): Promise<CityAtlasData> {
-  const seed = await seedDataPromise;
-  const baseData = cloneData(seed);
-  defaultBaseDataCache = cloneData(baseData);
-  return baseData;
-}
-
-export async function loadCityAtlasGrowthData(
-  persisted: Pick<CityAtlasPersistedData, "businessInboundMirror" | "businessProspects"> = {},
-) {
-  if (!buildFlags.hostedAdminArtifacts) {
-    return {
-      cityRolloutTargets: [],
-      businessProspects: [],
-      businessInboundMirror: [],
-    };
+function cloneSeedData(): CityAtlasData {
+  if (typeof structuredClone === "function") {
+    return structuredClone(seedData);
   }
 
-  const seed = await seedDataPromise;
-  const [
-    { buildDefaultBusinessProspects, buildDefaultCityRolloutTargets, mergeBusinessProspects },
-    { compactBusinessProtectedInboundMirrorEntries },
-  ] = await Promise.all([loadCityGrowthModule(), loadBusinessInboundPreviewModule()]);
-  const cityRolloutTargets = buildDefaultCityRolloutTargets();
-  const businessProspects = mergeBusinessProspects(
-    buildDefaultBusinessProspects(seed),
-    persisted.businessProspects ?? [],
-  );
-  const businessInboundMirror = compactBusinessProtectedInboundMirrorEntries(
-    persisted.businessInboundMirror ?? [],
-  );
-
-  defaultFullDataCache = cloneData({
-    ...seed,
-    cityRolloutTargets,
-    businessProspects,
-    businessInboundMirror,
-  });
-
-  return {
-    cityRolloutTargets,
-    businessProspects,
-    businessInboundMirror,
-  };
+  return JSON.parse(JSON.stringify(seedData)) as CityAtlasData;
 }
 
-function readPersistedCityAtlasData() {
+function readStoredData() {
   if (typeof window === "undefined") return null;
-  const raw = window.localStorage.getItem(STORAGE_KEY);
-  if (!raw) return null;
+
   try {
-    return JSON.parse(raw) as Partial<CityAtlasData> & CityAtlasPersistedData;
+    const raw = window.localStorage.getItem(CITYATLAS_STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as Partial<CityAtlasData>) : null;
   } catch {
     return null;
   }
 }
 
-function buildPersistedCityAtlasData(
-  data: CityAtlasData,
-  existing: Partial<CityAtlasPersistedData> = {},
-): CityAtlasPersistedData {
-  return {
-    schemaVersion: STORAGE_SCHEMA_VERSION,
-    launchGates: data.launchGates.map((gate) => ({
-      id: gate.id,
-      status: gate.status,
-    })),
-    submissions: data.submissions,
-    newsletterLeads: data.newsletterLeads,
-    savedItems: data.savedItems,
-    growthEvents: data.growthEvents,
-    revenueExperiments: data.revenueExperiments,
-    businessProspects:
-      data.businessProspects.length > 0
-        ? data.businessProspects
-        : existing.businessProspects ?? [],
-    manualReplyLogs: data.manualReplyLogs,
-    businessInboundMirror: data.businessInboundMirror,
-    businessReplyBridgeReplays: data.businessReplyBridgeReplays,
-    businessReplyLogs: data.businessReplyLogs,
-    brainRuns: data.brainRuns,
-    auditLogs: data.auditLogs,
-  };
-}
-
-export async function loadCityAtlasData(
-  options: { includeGrowthData?: boolean } = {},
-): Promise<CityAtlasData> {
-  const includeGrowthData = options.includeGrowthData ?? false;
-  const parsed = readPersistedCityAtlasData();
-  const seed = await buildBaseData();
-  if (!parsed) {
-    if (!includeGrowthData) {
-      return seed;
-    }
-
-    const growthData = await loadCityAtlasGrowthData();
-    return {
-      ...seed,
-      ...growthData,
-    };
-  }
-
-  const growthData = includeGrowthData
-    ? await loadCityAtlasGrowthData({
-        businessProspects: parsed.businessProspects,
-        businessInboundMirror: parsed.businessInboundMirror,
-      })
-    : null;
-  const seedCandidates = new Map(seed.proofCandidates.map((candidate) => [candidate.id, candidate]));
-  const seedLaunchGates = new Map(seed.launchGates.map((gate) => [gate.id, gate]));
-  const parsedRevenueExperiments = parsed.revenueExperiments ?? [];
-  const mergedRevenueExperiments = [
-    ...seed.revenueExperiments.map(
-      (experiment) =>
-        parsedRevenueExperiments.find((item) => item.id === experiment.id) ?? experiment,
-    ),
-    ...parsedRevenueExperiments.filter(
-      (experiment) =>
-        !seed.revenueExperiments.some((seedExperiment) => seedExperiment.id === experiment.id),
-    ),
-  ];
-
-  return {
-    ...seed,
-    ...parsed,
-    sources: seed.sources,
-    businesses: seed.businesses,
-    events: seed.events,
-    offers: seed.offers,
-    guides: seed.guides,
-    sourceBackedPlaces: seed.sourceBackedPlaces,
-    cityRolloutTargets: growthData?.cityRolloutTargets ?? [],
-    cityMissions: seed.cityMissions,
-    packages: seed.packages,
-    launchGates: (parsed.launchGates ?? seed.launchGates).map((gate) => {
-      const seedGate = seedLaunchGates.get(gate.id);
-      return seedGate
-        ? {
-            ...seedGate,
-            status: gate.status,
-          }
-        : gate;
-    }),
-    submissions: parsed.submissions ?? [],
-    newsletterLeads: parsed.newsletterLeads ?? [],
-    savedItems: parsed.savedItems ?? [],
-    growthEvents: parsed.growthEvents ?? [],
-    revenueExperiments: mergedRevenueExperiments,
-    growthPlays: seed.growthPlays,
-    proofSprints: seed.proofSprints,
-    proofCandidates: (parsed.proofCandidates ?? seed.proofCandidates).map((candidate) => {
-      const seedCandidate = seedCandidates.get(candidate.id);
-      return {
-        ...(seedCandidate ?? {}),
-        ...candidate,
-        sourceUrl: seedCandidate?.sourceUrl ?? candidate.sourceUrl,
-        sourceStatus: seedCandidate?.sourceStatus ?? candidate.sourceStatus,
-        fitScore: seedCandidate?.fitScore ?? candidate.fitScore,
-        routeAngle: seedCandidate?.routeAngle ?? candidate.routeAngle,
-        contactPathType: seedCandidate?.contactPathType ?? candidate.contactPathType,
-        contactPath: seedCandidate?.contactPath ?? candidate.contactPath,
-        contactSourceUrl: seedCandidate?.contactSourceUrl ?? candidate.contactSourceUrl,
-        contactConfidence: seedCandidate?.contactConfidence ?? candidate.contactConfidence,
-        contactResearchNote:
-          seedCandidate?.contactResearchNote ?? candidate.contactResearchNote,
-        lastContactResearchAt:
-          seedCandidate?.lastContactResearchAt ?? candidate.lastContactResearchAt,
-        riskNotes: seedCandidate?.riskNotes ?? candidate.riskNotes,
-        nextStep: seedCandidate?.nextStep ?? candidate.nextStep,
-      };
-    }),
-    businessProspects: growthData?.businessProspects ?? parsed.businessProspects ?? [],
-    manualReplyLogs: parsed.manualReplyLogs ?? [],
-    businessInboundMirror: growthData?.businessInboundMirror ?? parsed.businessInboundMirror ?? [],
-    businessReplyBridgeReplays: parsed.businessReplyBridgeReplays ?? [],
-    businessReplyLogs: parsed.businessReplyLogs ?? [],
-    brainRuns: parsed.brainRuns ?? [],
-    auditLogs: parsed.auditLogs ?? [],
-  };
-}
-
-export function saveCityAtlasData(data: CityAtlasData) {
+function writeStoredData(data: CityAtlasData) {
   if (typeof window === "undefined") return;
-  const existing = readPersistedCityAtlasData();
-  window.localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(buildPersistedCityAtlasData(data, existing ?? {})),
-  );
+
+  try {
+    window.localStorage.setItem(CITYATLAS_STORAGE_KEY, JSON.stringify(data));
+  } catch {
+    // Ignore storage quota and serialization issues in local-only mode.
+  }
+}
+
+function mergeData(stored: Partial<CityAtlasData> | null) {
+  const base = cloneSeedData();
+  if (!stored) return base;
+
+  const next = { ...base } as CityAtlasData;
+  for (const key of MUTABLE_KEYS) {
+    const value = stored[key];
+    if (value !== undefined) {
+      ((next as unknown) as Record<string, unknown>)[key] = value as unknown;
+    }
+  }
+  return next;
+}
+
+function stripGrowthData(data: CityAtlasData) {
+  const next = { ...data } as CityAtlasData;
+  const emptySeed = (cloneSeedData() as unknown) as Record<string, unknown>;
+  for (const key of GROWTH_ONLY_KEYS) {
+    ((next as unknown) as Record<string, unknown>)[key] = emptySeed[key];
+  }
+  return next;
+}
+
+function createId(prefix: string) {
+  return `${prefix}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function nowIso() {
+  return new Date().toISOString();
+}
+
+function buildReferralCode(email: string) {
+  return email
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "")
+    .slice(0, 18) || "cityatlas";
+}
+
+export function createEmptyCityAtlasData() {
+  return cloneSeedData();
 }
 
 export function resetCityAtlasData() {
   if (typeof window !== "undefined") {
-    window.localStorage.removeItem(STORAGE_KEY);
+    window.localStorage.removeItem(CITYATLAS_STORAGE_KEY);
   }
-  if (defaultFullDataCache) {
-    return cloneData(defaultFullDataCache);
-  }
-  if (defaultBaseDataCache) {
-    return cloneData(defaultBaseDataCache);
-  }
-  return createEmptyCityAtlasData();
+  return cloneSeedData();
 }
 
-export function createNewsletterLead(
-  email: string,
-  interest: NewsletterLead["interest"],
-): NewsletterLead {
-  const referralCode = `atlas-${Math.random().toString(36).slice(2, 8)}`;
-  return {
-    id: createId("lead"),
-    email: email.trim(),
-    interest,
-    referralCode,
-    createdAt: new Date().toISOString(),
-  };
+export async function loadCityAtlasData({ includeGrowthData = false }: { includeGrowthData?: boolean } = {}) {
+  const merged = mergeData(readStoredData());
+  return includeGrowthData ? merged : stripGrowthData(merged);
 }
 
-export function createBusinessSubmission(input: {
-  businessName: string;
-  category: string;
-  neighborhood: string;
-  contactName: string;
-  email: string;
-  website: string;
-  message: string;
-  packageInterest?: PackageId;
-}): BusinessSubmission {
-  return {
-    id: createId(slugify(input.businessName) || "submission"),
-    businessName: input.businessName.trim(),
-    category: input.category.trim(),
-    neighborhood: input.neighborhood.trim(),
-    contactName: input.contactName.trim(),
-    email: input.email.trim(),
-    website: input.website.trim(),
-    message: input.message.trim(),
-    packageInterest: input.packageInterest,
-    status: "review_queue",
-    createdAt: new Date().toISOString(),
-  };
+export async function loadCityAtlasGrowthData(_: {
+  businessProspects?: BusinessProspect[];
+  businessInboundMirror?: BusinessInboundMirrorEntry[];
+} = {}) {
+  const merged = mergeData(readStoredData());
+  return GROWTH_ONLY_KEYS.reduce((accumulator, key) => {
+    ((accumulator as unknown) as Record<string, unknown>)[key] = ((merged as unknown) as Record<string, unknown>)[key];
+    return accumulator;
+  }, {} as Pick<CityAtlasData, typeof GROWTH_ONLY_KEYS[number]>);
 }
 
-export function audit(action: string, entityType: string, entityId: string, summary: string) {
+export function saveCityAtlasData(data: CityAtlasData) {
+  writeStoredData(data);
+}
+
+export function audit(
+  action: string,
+  entityType: string,
+  entityId: string,
+  summary: string,
+): AuditLog {
   return {
     id: createId("audit"),
     action,
     entityType,
     entityId,
     summary,
-    createdAt: new Date().toISOString(),
+    createdAt: nowIso(),
+  };
+}
+
+export function createBusinessProspectAuditSummary(
+  prospects: BusinessProspect[],
+  importedCount: number,
+) {
+  return `Imported ${importedCount} prospect(s). Queue now holds ${prospects.length} reviewed row(s).`;
+}
+
+export function createBusinessSubmission(
+  input: Omit<BusinessSubmission, "id" | "status" | "createdAt">,
+): BusinessSubmission {
+  return {
+    id: createId("submission"),
+    ...input,
+    status: "review_queue",
+    createdAt: nowIso(),
+  };
+}
+
+export function createNewsletterLead(
+  email: string,
+  interest: NewsletterLead["interest"],
+): NewsletterLead {
+  return {
+    id: createId("lead"),
+    email,
+    interest,
+    referralCode: buildReferralCode(email),
+    createdAt: nowIso(),
   };
 }
 
@@ -365,11 +197,29 @@ export function createSavedItem(
   label: string,
 ): SavedItem {
   return {
-    id: createId("save"),
+    id: createId("saved"),
     itemType,
     itemId,
     label,
-    createdAt: new Date().toISOString(),
+    createdAt: nowIso(),
+  };
+}
+
+export function createMissionPlan(
+  mission: CityMission,
+  travelMode: TravelMode = mission.defaultTravelMode,
+): MissionPlanState {
+  const timestamp = nowIso();
+  return {
+    missionId: mission.id,
+    travelMode,
+    steps: mission.steps.map((_, index) => ({
+      stepIndex: index,
+      status: "pending",
+      updatedAt: timestamp,
+    })),
+    startedAt: timestamp,
+    updatedAt: timestamp,
   };
 }
 
@@ -379,11 +229,11 @@ export function createGrowthEvent(
   detail: GrowthEvent["detail"] = {},
 ): GrowthEvent {
   return {
-    id: createId("event"),
+    id: createId("growth"),
     name,
     path,
     detail,
-    createdAt: new Date().toISOString(),
+    createdAt: nowIso(),
   };
 }
 
@@ -391,19 +241,9 @@ export function createManualReplyLog(
   input: Omit<ManualReplyLog, "id" | "createdAt">,
 ): ManualReplyLog {
   return {
-    id: createId("reply"),
+    id: createId("manual-reply"),
     ...input,
-    createdAt: new Date().toISOString(),
-  };
-}
-
-export function createBusinessReplyLog(
-  input: Omit<BusinessReplyLog, "id" | "createdAt">,
-): BusinessReplyLog {
-  return {
-    id: createId("business-reply"),
-    ...input,
-    createdAt: new Date().toISOString(),
+    createdAt: nowIso(),
   };
 }
 
@@ -411,35 +251,27 @@ export function createBusinessReplyBridgeReplayRecord(
   input: Omit<BusinessReplyBridgeReplayRecord, "id">,
 ): BusinessReplyBridgeReplayRecord {
   return {
-    id: createId("business-bridge"),
+    id: createId("reply-replay"),
     ...input,
   };
 }
 
-export function createBusinessInboundMirrorEntry(
-  input: Omit<BusinessInboundMirrorEntry, "id">,
-): BusinessInboundMirrorEntry {
+export function createBusinessReplyLog(
+  input: Omit<BusinessReplyLog, "id" | "createdAt">,
+): BusinessReplyLog {
   return {
-    id: createId("business-mirror"),
+    id: createId("reply-log"),
     ...input,
+    createdAt: nowIso(),
   };
 }
 
-export function createBrainRun(input: Omit<BrainRun, "id" | "createdAt">): BrainRun {
+export function createBrainRun(
+  input: Omit<BrainRun, "id" | "createdAt">,
+): BrainRun {
   return {
-    id: createId("brain"),
+    id: createId("brain-run"),
     ...input,
-    createdAt: new Date().toISOString(),
+    createdAt: nowIso(),
   };
-}
-
-export function createBusinessProspectAuditSummary(
-  prospects: BusinessProspect[],
-  importedCount: number,
-) {
-  const partnerEligible = prospects.filter((prospect) => shouldTreatProspectAsPartnerAnchor(prospect)).length;
-  const contactReady = prospects.filter(
-    (prospect) => prospect.contactReadiness !== "needs_research",
-  ).length;
-  return `Prepared ${importedCount} local business prospect row(s). CityAtlas now has ${prospects.length} unique prospects, ${partnerEligible} partner-eligible rows, ${contactReady} with a usable contact path, and no outreach was sent.`;
 }

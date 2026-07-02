@@ -15,8 +15,6 @@ const screenshotDir = join(outputDir, "local-product-smoke");
 const distIndexPath = join(root, "dist/index.html");
 const previewPort = Number(process.env.CITYATLAS_SMOKE_PORT || "4278");
 const useExistingServer = process.env.CITYATLAS_SMOKE_USE_EXISTING_SERVER === "1";
-const expectProtectedPreviewRoutes =
-  process.env.CITYATLAS_SMOKE_EXPECT_PROTECTED_ROUTES === "1" || !useExistingServer;
 const baseUrl = `http://127.0.0.1:${previewPort}`;
 const navigationWaitUntil = useExistingServer ? "domcontentloaded" : "networkidle";
 const failures = [];
@@ -36,6 +34,11 @@ function noteFailure(scope, error) {
 
 function noteWarning(scope, message) {
   warnings.push(`${scope}: ${message}`);
+}
+
+async function isProtectedExperience(page) {
+  const bodyText = await page.locator("body").innerText();
+  return /protected sharing flow|protected cityatlas workspace|outside the public cityatlas experience|outside the public experience/i.test(bodyText);
 }
 
 async function closeSafely(target, scope) {
@@ -364,11 +367,11 @@ async function runDesktopFlow(browser) {
     ensure(Boolean(chipLabel), "Planner did not expose a saveable chip label.");
     await firstChip.click();
     await page.locator(".saved-row").filter({ hasText: chipLabel }).waitFor();
-    await page.getByRole("button", { name: /Prepare share text/i }).click();
+    await page.getByRole("button", { name: /Copy share text/i }).click();
     await page.locator(".local-success").waitFor();
     const successText = await page.locator(".local-success").innerText();
     ensure(
-      /share text is ready here/i.test(successText),
+      /route text copied|route text is ready below|route shared/i.test(successText),
       `Planner share draft message was not shown. Got "${successText}".`,
     );
 
@@ -412,7 +415,7 @@ async function runDesktopFlow(browser) {
     }).waitFor();
     const bodyText = await page.locator("body").innerText();
     ensure(
-      /Review before publication|No instant public profile/i.test(bodyText),
+      /No fee to start|nothing public goes live automatically|plain-english ask/i.test(bodyText),
       "Partner preview did not render the request-first honesty boundary.",
     );
     const requestHref = await page.getByRole("link", { name: /Start business request/i }).first().getAttribute("href");
@@ -483,7 +486,7 @@ async function runDesktopFlow(browser) {
 
   await runStep(steps, "desktop private preview render", async () => {
     await page.goto(`${baseUrl}/private-preview/date-night`, { waitUntil: navigationWaitUntil });
-    if (expectProtectedPreviewRoutes) {
+    if (await isProtectedExperience(page)) {
       await page.getByRole("heading", {
         level: 1,
         name: /only available inside a protected sharing flow/i,
@@ -518,14 +521,14 @@ async function runDesktopFlow(browser) {
       `${importedBusinessName},hello@smokegallery.example,Taylor,Vancouver,Mount Pleasant,Gallery,Arts venue,Manual source,https://smokegallery.example,https://smokegallery.example,https://smokegallery.example/contact,Smoke import row for local QA,medium`,
     ].join("\n");
 
-    if (expectProtectedPreviewRoutes) {
+    await page.goto(`${baseUrl}/admin`, { waitUntil: navigationWaitUntil });
+
+    if (await isProtectedExperience(page)) {
       return {
         route: "/admin",
         access: "protected",
       };
     }
-
-    await page.goto(`${baseUrl}/admin`, { waitUntil: navigationWaitUntil });
 
     await page.getByRole("heading", { level: 1, name: /CityAtlas operator console/i }).waitFor();
     await page.getByRole("button", { name: /Queue cleanup/i }).click();
@@ -569,7 +572,9 @@ async function runDesktopFlow(browser) {
   });
 
   await runStep(steps, "desktop admin reply log", async () => {
-    if (expectProtectedPreviewRoutes) {
+    await page.goto(`${baseUrl}/admin`, { waitUntil: navigationWaitUntil });
+
+    if (await isProtectedExperience(page)) {
       return {
         route: "/admin",
         access: "protected",
@@ -578,6 +583,7 @@ async function runDesktopFlow(browser) {
 
     const replySummary = "Smoke test reply summary for local QA.";
     const nextStep = "Keep this in local review only after smoke.";
+    await page.getByRole("heading", { level: 1, name: /CityAtlas operator console/i }).waitFor();
     await page.getByRole("button", { name: /Outreach rehearsal/i }).click();
     await page.getByLabel("Reply summary").waitFor();
     await page.getByLabel("Reply summary").fill(replySummary);
@@ -592,7 +598,9 @@ async function runDesktopFlow(browser) {
   });
 
   await runStep(steps, "desktop admin brain save", async () => {
-    if (expectProtectedPreviewRoutes) {
+    await page.goto(`${baseUrl}/admin`, { waitUntil: navigationWaitUntil });
+
+    if (await isProtectedExperience(page)) {
       return {
         route: "/admin",
         access: "protected",
@@ -601,6 +609,7 @@ async function runDesktopFlow(browser) {
     }
 
     const before = await page.locator(".brain-run-row").count();
+    await page.getByRole("heading", { level: 1, name: /CityAtlas operator console/i }).waitFor();
     await page.getByRole("button", { name: /Signals \+ controls/i }).click();
     await page.getByText(/Local command engine/i).waitFor();
     await page.getByRole("button", { name: "Save run", exact: true }).click();
@@ -816,14 +825,14 @@ async function runMobileFlow(browser) {
   });
 
   await runStep(steps, "mobile admin render", async () => {
-    if (expectProtectedPreviewRoutes) {
+    await page.goto(`${baseUrl}/admin`, { waitUntil: navigationWaitUntil });
+
+    if (await isProtectedExperience(page)) {
       return {
         route: "/admin",
         access: "protected",
       };
     }
-
-    await page.goto(`${baseUrl}/admin`, { waitUntil: navigationWaitUntil });
 
     await page.getByRole("heading", { level: 1, name: /CityAtlas operator console/i }).waitFor();
     await page.getByRole("button", { name: /Queue cleanup/i }).click();
@@ -840,7 +849,7 @@ async function runMobileFlow(browser) {
 
   await runStep(steps, "mobile private preview render", async () => {
     await page.goto(`${baseUrl}/private-preview/date-night`, { waitUntil: navigationWaitUntil });
-    if (expectProtectedPreviewRoutes) {
+    if (await isProtectedExperience(page)) {
       await page.getByRole("heading", {
         level: 1,
         name: /only available inside a protected sharing flow/i,

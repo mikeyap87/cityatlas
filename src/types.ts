@@ -199,13 +199,35 @@ export interface SourceBackedPlaceReference {
   featured: boolean;
 }
 
+export type SavedItemType =
+  | "business"
+  | "event"
+  | "guide"
+  | "offer"
+  | "source_backed_place";
+
+export type TravelMode = "walk" | "transit" | "drive" | "bike";
+
+export type MissionStepStatus = "pending" | "visited" | "skipped";
+
+export type MissionFeedbackType =
+  | "would_do_again"
+  | "too_long"
+  | "wrong_pace"
+  | "share_ready";
+
 export interface CityMissionStep {
   label: string;
-  itemType: SavedItem["itemType"];
+  itemType: SavedItemType;
   itemId: string;
   time: string;
   neighborhood: string;
   note: string;
+  durationMinutes: number;
+  bestAt?: string;
+  mapQuery?: string;
+  openInMapsLabel?: string;
+  travelMinutesByMode?: Partial<Record<TravelMode, number>>;
 }
 
 export interface CityMission extends AuditFields {
@@ -215,9 +237,12 @@ export interface CityMission extends AuditFields {
   theme: string;
   audience: string;
   timeBox: string;
+  startWindow: string;
+  defaultTravelMode: TravelMode;
   hook: string;
   routeSummary: string;
   steps: CityMissionStep[];
+  idealFor: string[];
   reward: string;
   sharePrompt: string;
   sponsorAngle: string;
@@ -259,10 +284,24 @@ export interface NewsletterLead {
 
 export interface SavedItem {
   id: string;
-  itemType: "business" | "event" | "guide" | "offer";
+  itemType: SavedItemType;
   itemId: string;
   label: string;
   createdAt: string;
+}
+
+export interface MissionPlanStepState {
+  stepIndex: number;
+  status: MissionStepStatus;
+  updatedAt: string;
+}
+
+export interface MissionPlanState {
+  missionId: string;
+  travelMode: TravelMode;
+  steps: MissionPlanStepState[];
+  startedAt: string;
+  updatedAt: string;
 }
 
 export interface GrowthEvent {
@@ -318,6 +357,8 @@ export interface BusinessProspect {
   id: string;
   cityKey: string;
   cityName: string;
+  municipality?: string;
+  marketScope?: "city_only" | "metro_area";
   businessName: string;
   slug: string;
   neighborhood: string;
@@ -615,6 +656,7 @@ export interface CityAtlasData {
   submissions: BusinessSubmission[];
   newsletterLeads: NewsletterLead[];
   savedItems: SavedItem[];
+  missionPlans: MissionPlanState[];
   growthEvents: GrowthEvent[];
   revenueExperiments: RevenueExperiment[];
   growthPlays: GrowthPlay[];

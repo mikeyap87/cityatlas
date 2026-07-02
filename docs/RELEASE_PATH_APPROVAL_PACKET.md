@@ -1,6 +1,6 @@
 # CityAtlas Release Path Status
 
-Date: 2026-06-17
+Date: 2026-07-02
 
 ## Release Target
 
@@ -11,17 +11,18 @@ CityAtlas Vancouver public batch on:
 
 ## Current Status
 
-The release-path blocker is repaired, but `origin/main` is no longer the exact live deploy twin.
+The original missing-remote blocker is repaired, but the old `codex/vancouver-release-lane` notes in this packet are now historical only.
 
 CityAtlas now has:
 
 - a standalone local git repo at `/Users/michaelyap/Documents/Codex/Workspace/univenture/cityatlas`
 - a dedicated GitHub repo at `https://github.com/mikeyap87/cityatlas`
 - a pushed shared baseline on `origin/main`
-- a pushed tracked release lane on `origin/codex/vancouver-release-lane`
+- a current verified live production base on `origin/codex/cityatlas-cro-release-20260701` at commit `17bb9bd`
+- a fresh clean child release lane used for the newest local route-memory plus attribution proof
 - a live production deploy on the approved public domain
 
-The old missing-remote and missing-base problem is gone. The currently live production build came from `origin/codex/vancouver-release-lane` commit `36cda30`, while `origin/main` is still behind that release lane until a later merge.
+The old missing-remote and missing-base problem is gone. The current safe next release path is to branch from `origin/codex/cityatlas-cro-release-20260701`, prove the intended batch there, then deploy only after approval.
 
 ## Verified
 
@@ -56,8 +57,8 @@ The old missing-remote and missing-base problem is gone. The currently live prod
 ### Repo And Safety Truth
 
 - `git remote -v` now returns `origin https://github.com/mikeyap87/cityatlas.git`.
-- `origin/main` now exists as a shared baseline, but it is `4` commits behind the current live release lane.
-- `origin/codex/vancouver-release-lane` exists, tracks the working release branch, and matches the current live production deploy commit `36cda30`.
+- `origin/main` still exists as a shared baseline, but it is not the current production twin.
+- `origin/codex/cityatlas-cro-release-20260701` is the current verified live production base at commit `17bb9bd`.
 - `node /Users/michaelyap/Documents/Codex/Workspace/univenture/scripts/release-safety-check.mjs --repo /Users/michaelyap/Documents/Codex/Workspace/univenture/cityatlas --base origin/main --allow src,docs,public,scripts --strict` now returns `blocked_unexpected_release_scope` because `README.md` is outside the approved release surface.
 
 Verified release-safety result now:
@@ -69,7 +70,7 @@ Verified release-safety result now:
 
 Plain-English meaning:
 
-There is no missing-repo or missing-remote blocker left. The next release-safety stop is now a narrower payload-scope issue: `main` is behind the live release lane, and `README.md` still sits outside the approved release surface for a strict `origin/main` release check.
+There is no missing-repo or missing-remote blocker left. The next release-safety stop is now simpler: use the current live production base, keep the release payload clean, and do not treat the older damaged working copy or the older `codex/vancouver-release-lane` history as the active deploy lane.
 
 ## What Remains
 
@@ -81,8 +82,8 @@ There is no missing-repo or missing-remote blocker left. The next release-safety
 
 Use this repaired GitHub-backed path for the next real release slice:
 
-1. Build the next approved CityAtlas batch on `codex/vancouver-release-lane`.
+1. Start from `origin/codex/cityatlas-cro-release-20260701`, then create a fresh clean child release lane for the exact approved batch.
 2. Rerun local proof on the exact branch.
-3. Either merge the live release lane into `main` or keep `README.md` out of the strict release payload before using `origin/main` as the safety base.
-4. Rerun release-safety against `origin/main`.
+3. Keep the payload narrow and honest; do not let old damaged-worktree noise or unrelated files become part of the release claim.
+4. Rerun release-safety against the exact live-base branch and intended payload.
 5. Deploy only when the branch contains a real reviewed diff.

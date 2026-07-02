@@ -44,9 +44,9 @@ const modules = [
   {
     name: "Public product",
     progress: 98,
-    done: "Public app, City Missions, business flow, draft terms/privacy, crawl assets, live crawlable Univenture subdomain, HTTPS, robots.txt, route-level noindex guards, hosted owner-route guard, CityAtlas logo, favicon, and brand guide.",
-    remains: "Real source-approved inventory, stronger social preview image, and more source-backed destination pages.",
-    next: "Expand source-backed guides and destination pages now that the approved domain is crawlable.",
+    done: "Public app, City Missions, inline/local route maps when the local key is wired, reorderable saved-plan rows, explicit route feedback, native-share fallback, accountless route-memory signals, local planner personalization, business flow, draft terms/privacy, crawl assets, live crawlable Univenture subdomain, HTTPS, robots.txt, route-level noindex guards, hosted owner-route guard, CityAtlas logo, favicon, and brand guide.",
+    remains: "Real source-approved inventory, stronger social preview image, more source-backed destination pages, hosted proof for the newest route-memory plus inline-map layer, and real user accounts/cross-device sync.",
+    next: "Expand source-backed guides and destination pages now that the approved domain is crawlable, then verify the newest route layer after the next approved release while keeping accounts as a separate later proof gate.",
   },
   {
     name: "Date Night proof sprint",
@@ -71,9 +71,9 @@ const modules = [
   },
   {
     name: "Revenue system",
-    progress: 92,
-    done: "Package framing, draft terms/privacy, Stripe product manifest, accepted Stripe Billing/Checkout plan, live CAD pricing, confirmed live CityAtlas product and recurring price IDs, live Stripe-hosted payment links for both paid packages, local live-payment env wiring, env-gated payment-link handoff support on the public business funnel, local payment-handoff verification, hosted payment-handoff verification, public pricing-page checkout CTA cutover on the approved domain, local request-copy campaign-attribution proof, route-map duration and Google Maps handoff proof, Date Night revenue proof loop, and reply-summary command.",
-    remains: "Final refund policy, one real checkout proof, clean hosted proof after the latest local attribution and route-map hardening is released, optional restricted Maps Embed API key setup after Google Cloud card/free-trial verification, and first real paid-click quality review.",
+    progress: 93,
+    done: "Package framing, calmer request-first business funnel copy, clearer first-deliverable framing on pricing and partner-preview, guided request prompts on the business-request form, draft terms/privacy, Stripe product manifest, accepted Stripe Billing/Checkout plan, live CAD pricing, confirmed live CityAtlas product and recurring price IDs, live Stripe-hosted payment links for both paid packages, local live-payment env wiring, env-gated payment-link handoff support on the public business funnel, local payment-handoff verification, hosted payment-handoff verification, public pricing-page checkout CTA cutover on the approved domain, local request-copy campaign-attribution proof, local desktop/mobile browser proof for the route-memory plus inline-map layer, local paid-traffic verifier proof on the fresh release lane, Date Night revenue proof loop, and reply-summary command.",
+    remains: "Final refund policy, one real checkout proof, clean hosted proof after the latest local attribution and route-memory hardening is released, and first real paid-click quality review.",
     next: "Keep the tiny paid test request-first, prove one real City Partner checkout separately before self-serve charging claims, and rerun hosted proof after any approved release.",
   },
   {
@@ -140,7 +140,7 @@ const report = {
   liveBlocked: [
     "first real live City Partner checkout proof",
     "provider-side GA/Ads conversion receipt before scaling paid traffic",
-    "embedded Google route previews until Google Cloud card/free-trial verification and a restricted Maps Embed API key are complete",
+    "hosted proof for the newest route-memory plus inline-map layer after an approved release",
     "fresh clean release lane before any deploy or push",
     "real provider import",
     "additional customer outreach or follow-ups",
@@ -148,7 +148,7 @@ const report = {
   ],
   nextBestBatch:
     seoProof?.passed === true
-      ? "Use a fresh release lane to carry the local attribution hardening through approved deploy proof, keep the first paid test tiny and request-first, and prove one real City Partner checkout separately before self-serve charging claims."
+      ? "Use the fresh clean release lane to carry the newest route-memory plus inline-map layer and the local attribution hardening through an approved deploy proof, keep the first paid test tiny and request-first, and prove one real City Partner checkout separately before self-serve charging claims."
       : "Fix the local SEO content-machine proof first, then keep expanding only with source-backed destination pages that official public sources can honestly support.",
 };
 

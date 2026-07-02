@@ -7,7 +7,7 @@ import {
 } from "../../config/site";
 import type { BusinessSubmission, CityAtlasData, PackageId } from "../../types";
 import { AppLink } from "../../components/Link";
-import { ArrowRightIcon, CheckIcon, LockIcon, StoreIcon } from "../../components/Icons";
+import { ArrowRightIcon, CheckIcon, ClockIcon, ShieldIcon, SparkIcon, StoreIcon } from "../../components/Icons";
 import { EmptyState, HeroMediaCard, SectionHeader, StatusPill } from "../../components/UI";
 import { getTrafficContext, type AnalyticsDetail } from "../../lib/analytics";
 
@@ -35,9 +35,37 @@ const requestChecklist = [
 ];
 
 const requestNextSteps = [
-  "CityAtlas gets the basics in one clear request.",
-  "The next step stays simple: a reply, a short call, a visit, or a package.",
-  "No payment is needed to start, and you can keep a copy on this device.",
+  "A plain-English read on the page, guide, offer, or service angle that matters first.",
+  "The clearest next step: a reply, short call, hosted visit, or package.",
+  "No payment is needed to start, and a saved copy can stay on this device.",
+];
+
+const requestPromptOptions = [
+  {
+    label: "Clearer page",
+    prompt:
+      "We need a clearer page that explains who we are, who we are for, and why someone should choose us.",
+  },
+  {
+    label: "Guide fit",
+    prompt:
+      "We want help figuring out which CityAtlas route or guide we fit best and why it would matter to the right local reader.",
+  },
+  {
+    label: "Simple offer",
+    prompt:
+      "We need one clear offer or angle that people can understand quickly without extra explanation.",
+  },
+  {
+    label: "Neighborhood visibility",
+    prompt:
+      "We want stronger visibility for our neighborhood and the kinds of people already looking nearby.",
+  },
+  {
+    label: "Service positioning",
+    prompt:
+      "We need to explain our service more clearly so the right local customer understands the value fast.",
+  },
 ];
 
 type SubmitMode = "email" | "draft";
@@ -221,6 +249,27 @@ export function SubmitBusinessPage({ data, onSubmitBusiness, onTrack }: SubmitBu
     setCopyStatus("idle");
   }
 
+  function applyMessagePrompt(prompt: string) {
+    setForm((current) => {
+      const trimmedMessage = current.message.trim();
+      const nextMessage = trimmedMessage
+        ? current.message.includes(prompt)
+          ? current.message
+          : `${current.message.trim()}\n\n${prompt}`
+        : prompt;
+
+      return {
+        ...current,
+        message: nextMessage,
+      };
+    });
+    setCopyStatus("idle");
+    onTrack("business_request_prompt_selected", {
+      packageInterest: form.packageInterest,
+      promptLength: prompt.length,
+    });
+  }
+
   async function copyRequestDetails() {
     const nextForm = { ...form, trafficContext: getTrafficContext() };
     const copyText = buildBusinessRequestCopyText(nextForm);
@@ -345,21 +394,21 @@ export function SubmitBusinessPage({ data, onSubmitBusiness, onTrack }: SubmitBu
             </ul>
           </article>
           <article className="source-panel business-hero-note-card business-hero-note-card-safe">
-            <strong>Why this request works</strong>
+            <strong>What you usually get back first</strong>
             <p>
-              One clear neighborhood, category, and business need is usually enough for CityAtlas
-              to point you to the right next step, whether you run a restaurant, a wellness brand,
-              or a local service business.
+              A first reply should point to the strongest page, guide, offer, or neighborhood angle
+              and say whether the next move is a reply, short call, hosted visit, or package.
             </p>
           </article>
           <article className="source-panel business-hero-note-card">
             <div className="card-topline">
-              <strong>Email-ready request</strong>
-              <StatusPill tone="amber">Easy first step</StatusPill>
+              <strong>What happens after you send</strong>
+              <StatusPill tone="amber">No payment to start</StatusPill>
             </div>
             <p>
               The main button opens your email app with the request filled in. A saved copy stays
-              on this device if you want to come back later.
+              on this device if you want to come back later, and CityAtlas can still point you to a
+              short call or package later if that becomes the cleanest move.
             </p>
           </article>
         </div>
@@ -464,6 +513,26 @@ export function SubmitBusinessPage({ data, onSubmitBusiness, onTrack }: SubmitBu
             </select>
           </label>
 
+          <div className="request-prompt-panel">
+            <span className="request-prompt-label">
+              <SparkIcon />
+              Need a starting point? Tap the closest one.
+            </span>
+            <div className="request-prompt-grid">
+              {requestPromptOptions.map((option) => (
+                <button
+                  aria-pressed={form.message.includes(option.prompt)}
+                  className="request-prompt-chip"
+                  key={option.label}
+                  onClick={() => applyMessagePrompt(option.prompt)}
+                  type="button"
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <label>
             What you want help with
             <textarea
@@ -474,6 +543,9 @@ export function SubmitBusinessPage({ data, onSubmitBusiness, onTrack }: SubmitBu
               required
             />
           </label>
+          <p className="submission-action-note submission-action-note-tight">
+            Keep this short if you want. One clear business problem is enough to start.
+          </p>
 
           <div className="submission-action-row">
             <button className="button primary" type="submit">
@@ -523,7 +595,7 @@ export function SubmitBusinessPage({ data, onSubmitBusiness, onTrack }: SubmitBu
               <strong>Already know the package you want?</strong>
               <p>
                 {selectedPackage?.name} can open in checkout now. Use this request if you want
-                CityAtlas to review the fit first.
+                CityAtlas to review the fit, the deliverable, or the next step first.
               </p>
               <a
                 className="button secondary"
@@ -544,9 +616,9 @@ export function SubmitBusinessPage({ data, onSubmitBusiness, onTrack }: SubmitBu
 
         <aside className="review-sidebar">
           <article className="business-guidance-card business-guidance-card-sidebar">
-            <LockIcon />
+            <ShieldIcon />
             <span className="query-card-kicker">What happens next</span>
-            <strong>CityAtlas points you to the clearest next step</strong>
+            <strong>CityAtlas should point you to the clearest next step</strong>
             <ul className="conversion-list business-guidance-list">
               {requestNextSteps.map((step) => (
                 <li key={step}>
@@ -556,6 +628,14 @@ export function SubmitBusinessPage({ data, onSubmitBusiness, onTrack }: SubmitBu
               ))}
             </ul>
           </article>
+          <div className="source-panel">
+            <ClockIcon />
+            <h2>Keep the first request simple</h2>
+            <p>
+              If writing the full story feels heavy, send the basics and one clear problem. CityAtlas
+              can ask the next useful question after that.
+            </p>
+          </div>
           <div className="source-panel">
             <StoreIcon />
             <h2>Saved drafts on this device</h2>

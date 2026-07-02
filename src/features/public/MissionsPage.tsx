@@ -1,36 +1,72 @@
-import type { CityAtlasData, CityMission, SavedItem } from "../../types";
+import type {
+  CityAtlasData,
+  CityMission,
+  MissionFeedbackType,
+  MissionStepStatus,
+  TravelMode,
+} from "../../types";
 import { MissionCard } from "../../components/Cards";
+import { MissionExecutionPanel } from "../../components/MissionExecutionPanel";
 import { AppLink } from "../../components/Link";
 import { ArrowRightIcon, CheckIcon, MapIcon, ShieldIcon, SparkIcon } from "../../components/Icons";
 import { siteConfig } from "../../config/site";
 import { HeroMediaCard, SectionHeader, StatusPill } from "../../components/UI";
+import {
+  getMissionDonePercent,
+  getMissionFitLabel,
+  getMissionFitNote,
+  getMissionFitTone,
+  getMissionPlanState,
+  getRouteLearningSummary,
+  getMissionSavedCount,
+  getMissionSavedPercent,
+  type MissionBehaviorInsight,
+} from "../../lib/missions";
 import { simplifyMissionDisplayText } from "../../lib/publicCopy";
 
 interface MissionsPageProps {
   data: CityAtlasData;
   onSaveMission: (mission: CityMission) => void;
-}
-
-function stepIsSaved(step: CityMission["steps"][number], savedItems: SavedItem[]) {
-  return savedItems.some((item) => item.itemType === step.itemType && item.itemId === step.itemId);
-}
-
-function progressForMission(mission: CityMission, savedItems: SavedItem[]) {
-  if (mission.steps.length === 0) return 0;
-  const saved = mission.steps.filter((step) => stepIsSaved(step, savedItems)).length;
-  return Math.round((saved / mission.steps.length) * 100);
+  onTrack: (name: string, detail?: Record<string, string | number | boolean>) => void;
+  onSetMissionTravelMode: (mission: CityMission, travelMode: TravelMode) => void;
+  onSetMissionStepStatus: (
+    mission: CityMission,
+    stepIndex: number,
+    status: MissionStepStatus,
+  ) => void;
+  onAddMissionFeedback: (mission: CityMission, feedbackType: MissionFeedbackType) => void;
+  onResetMissionProgress: (mission: CityMission) => void;
 }
 
 function MissionRoute({
+  data,
   mission,
-  savedItems,
   onSaveMission,
+  onTrack,
+  onSetMissionTravelMode,
+  onSetMissionStepStatus,
+  onAddMissionFeedback,
+  onResetMissionProgress,
+  insight,
 }: {
+  data: CityAtlasData;
   mission: CityMission;
-  savedItems: SavedItem[];
   onSaveMission: (mission: CityMission) => void;
+  onTrack: (name: string, detail?: Record<string, string | number | boolean>) => void;
+  onSetMissionTravelMode: (mission: CityMission, travelMode: TravelMode) => void;
+  onSetMissionStepStatus: (
+    mission: CityMission,
+    stepIndex: number,
+    status: MissionStepStatus,
+  ) => void;
+  onAddMissionFeedback: (mission: CityMission, feedbackType: MissionFeedbackType) => void;
+  onResetMissionProgress: (mission: CityMission) => void;
+  insight?: MissionBehaviorInsight;
 }) {
-  const progress = progressForMission(mission, savedItems);
+  const plan = getMissionPlanState(data, mission);
+  const savedCount = getMissionSavedCount(mission, data.savedItems);
+  const savedPercent = getMissionSavedPercent(mission, data.savedItems);
+  const donePercent = getMissionDonePercent(mission, plan);
 
   return (
     <article className="mission-route" id={`mission-${mission.id}`}>
@@ -39,28 +75,35 @@ function MissionRoute({
           <p className="section-label">{mission.theme}</p>
           <h2>{simplifyMissionDisplayText(mission.title)}</h2>
           <p>{simplifyMissionDisplayText(mission.routeSummary)}</p>
+          {insight ? (
+            <div className="mission-route-fit">
+              <StatusPill tone={getMissionFitTone(insight)}>{getMissionFitLabel(insight)}</StatusPill>
+              <small>{getMissionFitNote(mission, insight)}</small>
+            </div>
+          ) : null}
         </div>
         <div className="mission-route-score">
-          <strong>{progress}%</strong>
-          <small>saved</small>
+          <strong>{donePercent}%</strong>
+          <small>{savedCount} saved</small>
         </div>
       </div>
+      <div className="mission-route-meter">
+        <div className="mission-route-meter-bar">
+          <span style={{ width: `${savedPercent}%` }} />
+        </div>
+        <small>{savedPercent}% of the route is already saved on this device.</small>
+      </div>
 
-      <ol className="route-timeline">
-        {mission.steps.map((step, index) => (
-          <li className={stepIsSaved(step, savedItems) ? "saved" : ""} key={`${mission.id}-${step.itemId}-${index}`}>
-            <span>{index + 1}</span>
-            <div>
-              <strong>{simplifyMissionDisplayText(step.label)}</strong>
-              <small>{step.time} - {step.neighborhood}</small>
-              <p>{simplifyMissionDisplayText(step.note)}</p>
-            </div>
-            <StatusPill tone={stepIsSaved(step, savedItems) ? "green" : "muted"}>
-              {stepIsSaved(step, savedItems) ? "saved" : step.itemType}
-            </StatusPill>
-          </li>
-        ))}
-      </ol>
+      <MissionExecutionPanel
+        data={data}
+        mission={mission}
+        onSaveMission={onSaveMission}
+        onTrack={onTrack}
+        onSetMissionTravelMode={onSetMissionTravelMode}
+        onSetMissionStepStatus={onSetMissionStepStatus}
+        onAddMissionFeedback={onAddMissionFeedback}
+        onResetMissionProgress={onResetMissionProgress}
+      />
 
       <div className="mission-reward">
         <SparkIcon />
@@ -70,20 +113,21 @@ function MissionRoute({
           <small>{simplifyMissionDisplayText(mission.sponsorAngle)}</small>
         </div>
       </div>
-
-      <div className="hero-actions">
-        <button className="button primary" type="button" onClick={() => onSaveMission(mission)}>
-          Save full plan
-        </button>
-        <AppLink className="button secondary" to="/planner">
-          Open planner <ArrowRightIcon />
-        </AppLink>
-      </div>
     </article>
   );
 }
 
-export function MissionsPage({ data, onSaveMission }: MissionsPageProps) {
+export function MissionsPage({
+  data,
+  onSaveMission,
+  onTrack,
+  onSetMissionTravelMode,
+  onSetMissionStepStatus,
+  onAddMissionFeedback,
+  onResetMissionProgress,
+}: MissionsPageProps) {
+  const routeLearning = getRouteLearningSummary(data);
+
   return (
     <>
       <section className="city-hero mission-hero">
@@ -174,6 +218,7 @@ export function MissionsPage({ data, onSaveMission }: MissionsPageProps) {
               mission={mission}
               savedItems={data.savedItems}
               onSaveMission={onSaveMission}
+              insight={routeLearning.insightsById[mission.id]}
               key={mission.id}
             />
           ))}
@@ -188,9 +233,15 @@ export function MissionsPage({ data, onSaveMission }: MissionsPageProps) {
         <div className="mission-route-grid">
           {data.cityMissions.map((mission) => (
             <MissionRoute
+              data={data}
               mission={mission}
-              savedItems={data.savedItems}
               onSaveMission={onSaveMission}
+              onTrack={onTrack}
+              onSetMissionTravelMode={onSetMissionTravelMode}
+              onSetMissionStepStatus={onSetMissionStepStatus}
+              onAddMissionFeedback={onAddMissionFeedback}
+              onResetMissionProgress={onResetMissionProgress}
+              insight={routeLearning.insightsById[mission.id]}
               key={mission.id}
             />
           ))}
@@ -222,7 +273,7 @@ export function MissionsPage({ data, onSaveMission }: MissionsPageProps) {
           <h2>For businesses, clearer routes can become clearer pages later</h2>
           <p>
             Saved plans show the kind of route people actually want. Business packages are for
-            operators who want clearer pages, offers, or guide placement as coverage grows.
+            businesses that want clearer pages, offers, or guide placement as coverage grows.
           </p>
         </div>
         <AppLink className="button primary" to="/for-businesses/pricing">

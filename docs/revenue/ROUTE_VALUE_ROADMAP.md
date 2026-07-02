@@ -68,4 +68,4 @@ CityAtlas should not globally replace a place because one person skipped it. Rou
 
 ## Honest Launch Boundary
 
-The current route utility can support paid traffic because it makes CityAtlas feel more useful. It does not prove accounts, AI personalization, public reviews, business dashboards, or automatic route replacement.
+The hosted route utility can support a tiny request-first paid test because it makes CityAtlas feel more useful before the business ask. It does not prove accounts, AI personalization, public reviews, business dashboards, or automatic route replacement.

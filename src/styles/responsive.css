@@ -1584,7 +1584,10 @@
   }
 
   .mission-route-progress-rail {
-    grid-auto-columns: minmax(138px, 84vw);
+    grid-auto-columns: auto;
+    grid-auto-flow: row;
+    grid-template-columns: 1fr;
+    overflow-x: visible;
   }
 
   .pricing-tag-cloud {

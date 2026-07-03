@@ -464,6 +464,23 @@
     padding: 16px;
   }
 
+  .featured-route-card-topline,
+  .compact-guide-card-topline {
+    align-items: flex-start;
+  }
+
+  .featured-route-card-actions,
+  .compact-guide-card-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .featured-route-card-actions .button,
+  .compact-guide-card-actions .card-link,
+  .compact-guide-card-actions .compact-guide-sub-link {
+    width: 100%;
+  }
+
   .hero-link-row {
     display: none;
   }
@@ -498,8 +515,17 @@
     flex-direction: column;
   }
 
+  .guide-route-hero-actions,
+  .guide-answer-links {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
   .guide-answer-actions .button,
-  .guide-answer-actions .text-link {
+  .guide-answer-actions .text-link,
+  .guide-route-hero-actions .button,
+  .guide-route-hero-actions .text-link,
+  .guide-answer-links .text-link {
     width: 100%;
   }
 
@@ -512,6 +538,15 @@
   .guide-library-intro-actions {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .guide-library-route-preview-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .guide-library-route-preview-actions .button {
+    width: 100%;
   }
 
   .guide-library-intro-actions .button,

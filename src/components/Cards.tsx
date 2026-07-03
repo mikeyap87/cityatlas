@@ -42,6 +42,69 @@ function getBusinessStatusLabel(business: Business) {
   return "Check official hours";
 }
 
+export interface GuideSurfaceState {
+  linkedMission?: CityMission;
+  linkedMissionPath: null | string;
+  routeChooser: boolean;
+  routePreviewTags: string[];
+  secondaryAction: null | {
+    label: string;
+    path: string;
+  };
+  stateLabel: string;
+  stateTone: "blue" | "green" | "muted";
+}
+
+export function getGuideSurfaceState(guide: Guide, data?: CityAtlasData): GuideSurfaceState {
+  const linkedMission = data ? getMissionForGuide(data, guide) : undefined;
+  const routeChooser = isGuideRouteChooser(guide);
+  const linkedMissionPath = linkedMission
+    ? getMissionAnchorPath(linkedMission, guide.citySlug ?? "vancouver")
+    : null;
+  const sourceBackedCollection = getSourceBackedCollectionForGuide(guide);
+  const sourceBackedMeta = sourceBackedCollection
+    ? sourceBackedCollectionMeta[sourceBackedCollection]
+    : null;
+  const routePreviewTags = linkedMission
+    ? [
+        linkedMission.timeBox,
+        `${linkedMission.steps.length} stop${linkedMission.steps.length === 1 ? "" : "s"}`,
+        `${getTravelModeLabel(linkedMission.defaultTravelMode)} pace`,
+      ]
+    : [];
+  const stateLabel = linkedMission
+    ? routeChooser
+      ? "Example route map"
+      : "Route map ready"
+    : sourceBackedMeta
+      ? "Guide + local places"
+      : routeChooser
+        ? "Chooser guide"
+        : "Editorial guide";
+  const stateTone = linkedMission ? "blue" : sourceBackedMeta ? "green" : "muted";
+  const secondaryAction = linkedMissionPath
+    ? {
+        label: routeChooser ? "Open example route map" : "Open route map",
+        path: linkedMissionPath,
+      }
+    : sourceBackedMeta
+      ? {
+          label: "See local places",
+          path: sourceBackedMeta.path,
+        }
+      : null;
+
+  return {
+    linkedMission,
+    linkedMissionPath,
+    routeChooser,
+    routePreviewTags,
+    secondaryAction,
+    stateLabel,
+    stateTone,
+  };
+}
+
 export function BusinessCard({ business }: { business: Business }) {
   const exampleOnly = isExampleBusiness(business);
   const pageLabel = exampleOnly ? "Sample page" : "Official link page";
@@ -168,41 +231,8 @@ export function GuideCard({
 }) {
   const guideTitle = simplifyGuideDisplayText(guide.title);
   const guideExcerpt = simplifyGuideDisplayText(guide.excerpt);
-  const linkedMission = data ? getMissionForGuide(data, guide) : undefined;
-  const routeChooser = isGuideRouteChooser(guide);
-  const linkedMissionPath = linkedMission
-    ? getMissionAnchorPath(linkedMission, guide.citySlug ?? "vancouver")
-    : null;
-  const sourceBackedCollection = getSourceBackedCollectionForGuide(guide);
-  const sourceBackedMeta = sourceBackedCollection
-    ? sourceBackedCollectionMeta[sourceBackedCollection]
-    : null;
-  const routePreviewTags = linkedMission
-    ? [
-        linkedMission.timeBox,
-        `${linkedMission.steps.length} stop${linkedMission.steps.length === 1 ? "" : "s"}`,
-        `${getTravelModeLabel(linkedMission.defaultTravelMode)} pace`,
-      ]
-    : [];
-  const stateLabel = linkedMission
-    ? routeChooser
-      ? "Example route with map"
-      : "Route with map"
-    : sourceBackedMeta
-      ? "Guide + local places"
-      : "Guide only";
-  const stateTone = linkedMission ? "blue" : sourceBackedMeta ? "green" : "muted";
-  const secondaryAction = linkedMissionPath
-    ? {
-        label: routeChooser ? "Open example route" : "Open route with map",
-        path: linkedMissionPath,
-      }
-    : sourceBackedMeta
-      ? {
-          label: "See local places",
-          path: sourceBackedMeta.path,
-        }
-      : null;
+  const { routeChooser, routePreviewTags, secondaryAction, stateLabel, stateTone } =
+    getGuideSurfaceState(guide, data);
 
   return (
     <article className="content-card guide-card">
@@ -224,7 +254,7 @@ export function GuideCard({
         <p>{guideExcerpt}</p>
         {routePreviewTags.length > 0 ? (
           <div className="guide-card-route-preview">
-            <small>{routeChooser ? "Example route ready" : "Route ready"}</small>
+            <small>{routeChooser ? "Example route map" : "Route map ready"}</small>
             <div className="guide-card-route-preview-tags">
               {routePreviewTags.map((tag) => (
                 <span key={`${guide.id}-${tag}`}>{tag}</span>
@@ -254,13 +284,20 @@ export function GuideCard({
 
 export function GuideCompactCard({
   guide,
+  data,
   variant = "default",
 }: {
   guide: Guide;
+  data?: CityAtlasData;
   variant?: "default" | "tight";
 }) {
   const guideTitle = simplifyGuideDisplayText(guide.title);
   const guideExcerpt = simplifyGuideDisplayText(guide.excerpt);
+  const { routePreviewTags, secondaryAction, stateLabel, stateTone } = getGuideSurfaceState(
+    guide,
+    data,
+  );
+  const compactRouteTags = routePreviewTags.slice(0, 2);
 
   return (
     <article className={`compact-guide-card${variant === "tight" ? " tight" : ""}`}>
@@ -271,19 +308,36 @@ export function GuideCompactCard({
         loading="lazy"
       />
       <div className="compact-guide-card-body">
-        <div className="card-icon-line">
-          <MapIcon />
-          <span>{guide.readMinutes} min read</span>
+        <div className="compact-guide-card-topline">
+          <StatusPill tone={stateTone}>{stateLabel}</StatusPill>
+          <div className="card-icon-line">
+            <MapIcon />
+            <span>{guide.readMinutes} min read</span>
+          </div>
         </div>
+        {compactRouteTags.length > 0 ? (
+          <div className="compact-guide-route-tags">
+            {compactRouteTags.map((tag) => (
+              <span key={`${guide.id}-${tag}`}>{tag}</span>
+            ))}
+          </div>
+        ) : null}
         <strong>{guideTitle}</strong>
         <p>{guideExcerpt}</p>
         <div className="card-meta compact-guide-meta">
           <span>{simplifyGuideCategoryLabel(guide.category)}</span>
           <span>{guide.neighborhood}</span>
         </div>
-        <AppLink className="card-link" to={getGuidePath(guide)}>
-          Read guide
-        </AppLink>
+        <div className="compact-guide-card-actions">
+          <AppLink className="card-link" to={getGuidePath(guide)}>
+            Read guide
+          </AppLink>
+          {secondaryAction ? (
+            <AppLink className="text-link compact-guide-sub-link" to={secondaryAction.path}>
+              {secondaryAction.label}
+            </AppLink>
+          ) : null}
+        </div>
       </div>
     </article>
   );

@@ -1,11 +1,18 @@
 import { useState } from "react";
 import type { CityAtlasData } from "../../types";
 import { AppLink } from "../../components/Link";
-import { EventCard, GuideCard, GuideCompactCard, OfferCard } from "../../components/Cards";
+import {
+  EventCard,
+  getGuideSurfaceState,
+  GuideCard,
+  GuideCompactCard,
+  OfferCard,
+} from "../../components/Cards";
 import { ArrowRightIcon } from "../../components/Icons";
 import { HeroMediaCard, SectionHeader, StatusPill } from "../../components/UI";
 import { siteConfig } from "../../config/site";
 import { getGuidePath } from "../../lib/cityPaths";
+import { getMissionAnchorPath, getTravelModeLabel } from "../../lib/missions";
 import { getOfferDisplayBusiness } from "../../lib/offers";
 import { simplifyGuideCategoryLabel, simplifyGuideDisplayText } from "../../lib/publicCopy";
 import { getSourceBackedPlaces } from "../../lib/sourceBackedCollections";
@@ -338,71 +345,87 @@ export function GuidesPage({ data }: { data: CityAtlasData }) {
   const featuredRouteCards = [
     {
       path: "/vancouver/date-night-starters",
+      missionId: "mission-date-night",
       kicker: "Tonight and low guesswork",
       title: "Date night",
       copy: "Best when the goal is one strong evening start, fast.",
       image: siteConfig.media.hero,
       imageAlt: "Illustrated Vancouver evening market route",
+      secondaryLabel: "See local places",
     },
     {
       path: "/vancouver/first-time-visitor-starters",
+      missionId: "mission-first-time-vancouver-intro",
       kicker: "Best first impression",
       title: "First visit",
       copy: "Best when Vancouver is new and the first stop needs to feel obviously right.",
       image: siteConfig.media.city,
       imageAlt: "Illustrated Vancouver shoreline route",
+      secondaryLabel: "See local places",
     },
     {
       path: "/vancouver/rainy-day-starters",
+      missionId: "mission-rainy-day-reset",
       kicker: "Indoor-first route",
       title: "Rainy day",
       copy: "Best when weather changes the whole shape of the day.",
       image: siteConfig.media.guides,
       imageAlt: "Illustrated Gastown rainy-day route",
+      secondaryLabel: "See local places",
     },
     {
       path: "/vancouver/weekend-route-starters",
+      missionId: "mission-weekend-waterfront",
       kicker: "Compact and easy",
       title: "Weekend plan",
       copy: "Best when the route should stay strong without crossing the city all day.",
       image: siteConfig.media.weekend,
       imageAlt: "Illustrated Vancouver seawall weekend route",
+      secondaryLabel: "See local places",
     },
     {
       path: "/vancouver/out-of-town-guest-starters",
+      missionId: "mission-hosting-guests-loop",
       kicker: "Hosting made easier",
       title: "Hosting guests",
       copy: "Best when visiting friends or family need a crowd-pleasing first move.",
       image: siteConfig.media.hostingGuests,
       imageAlt: "Illustrated Vancouver harbour route for guests",
+      secondaryLabel: "See local places",
     },
     {
       path: "/vancouver/guides/which-low-friction-vancouver-route-should-you-open-today",
+      missionId: "mission-low-effort-sunday",
       kicker: "Energy-saving route",
       title: "Low-effort day",
       copy: "Best when the day needs fewer decisions, less movement, and less friction.",
       image: siteConfig.media.lowEffort,
       imageAlt: "Illustrated Vancouver beach route for a lower-effort day",
+      secondaryLabel: "See chooser guide",
     },
     {
       path: "/vancouver/kitsilano-scenic-starters",
+      missionId: "mission-kitsilano-scenic-loop",
       kicker: "Scenic and slower",
       title: "Kitsilano day",
       copy: "Best when the right answer is just a calmer west-side route.",
       image: siteConfig.media.waterfront,
       imageAlt: "Illustrated Kitsilano beach route",
+      secondaryLabel: "See local places",
     },
     {
       path: "/vancouver/wellness-reset-starters",
+      missionId: "mission-wellness-reset-hour",
       kicker: "Recovery mode",
       title: "Wellness reset",
       copy: "Best when the day should feel restorative more than ambitious.",
       image: siteConfig.media.wellnessReset,
       imageAlt: "Illustrated Vancouver garden wellness route",
+      secondaryLabel: "See local places",
     },
   ];
   const placePageQuickLinks = trustedPlacePageLinks(starterPackGuide, routeRoundupGuide);
-  const guideIndexGroups = buildGuideIndexGroups(cityGuides, [
+  const guideIndexGroups = buildGuideIndexGroups(data, cityGuides, [
     {
       title: "Date, rainy day, and easy starts",
       summary: "Open this when mood, weather, or a first easy decision matters most.",
@@ -427,6 +450,18 @@ export function GuidesPage({ data }: { data: CityAtlasData }) {
   const [expandedGuideGroups, setExpandedGuideGroups] = useState<string[]>(() =>
     guideIndexGroups.length > 0 ? [guideIndexGroups[0].title] : [],
   );
+  const heroFeaturedMission =
+    data.cityMissions.find((mission) => mission.id === "mission-date-night") ?? data.cityMissions[0];
+  const heroFeaturedRoutePath = heroFeaturedMission
+    ? getMissionAnchorPath(heroFeaturedMission, siteConfig.citySlug)
+    : "/vancouver/missions";
+  const heroFeaturedRouteMeta = heroFeaturedMission
+    ? [
+        heroFeaturedMission.timeBox,
+        `${heroFeaturedMission.steps.length} stops`,
+        `${getTravelModeLabel(heroFeaturedMission.defaultTravelMode)} pace`,
+      ]
+    : [];
 
   function toggleGuideGroup(title: string) {
     setExpandedGuideGroups((current) =>
@@ -460,10 +495,10 @@ export function GuidesPage({ data }: { data: CityAtlasData }) {
         />
         {supportingGuides.length > 0 ? (
           <div className={`guide-cluster-layout ${columns}`}>
-            <GuideCard guide={featuredGuide} key={featuredGuide.id} />
+            <GuideCard data={data} guide={featuredGuide} key={featuredGuide.id} />
             <div className="guide-cluster-stack">
               {visibleSupportingGuides.map((guide) => (
-                <GuideCompactCard guide={guide} key={guide.id} variant="tight" />
+                <GuideCompactCard data={data} guide={guide} key={guide.id} variant="tight" />
               ))}
               {hiddenGuideCount > 0 ? (
                 <a className="guide-more-card" href="#guide-library-index">
@@ -475,7 +510,7 @@ export function GuidesPage({ data }: { data: CityAtlasData }) {
           </div>
         ) : (
           <div className="card-grid two">
-            <GuideCard guide={featuredGuide} key={featuredGuide.id} />
+            <GuideCard data={data} guide={featuredGuide} key={featuredGuide.id} />
           </div>
         )}
       </section>
@@ -504,14 +539,49 @@ export function GuidesPage({ data }: { data: CityAtlasData }) {
           </div>
         </div>
         <div className="starter-hero-side guide-library-side-stack">
-          <HeroMediaCard
-            image={siteConfig.media.guides}
-            alt="Illustrated neighborhood scene inspired by Gastown in Vancouver"
-            eyebrow="Guides"
-            title="Choose the kind of day first"
-            copy="Pick the visitor type, neighborhood, weather, or pace first. Then open the page that already fits."
-            className="hero-media-compact"
-          />
+          {heroFeaturedMission ? (
+            <article className="source-panel guide-library-route-preview">
+              <div className="guide-library-route-preview-head">
+                <span className="query-card-kicker">Featured route</span>
+                <StatusPill tone="blue">Route map ready</StatusPill>
+              </div>
+              <strong>{heroFeaturedMission.title}</strong>
+              <p>{heroFeaturedMission.hook}</p>
+              <div className="guide-library-route-preview-strip" aria-hidden="true">
+                {heroFeaturedMission.steps.slice(0, 3).map((step, index) => (
+                  <div className="guide-library-route-preview-stop" key={`${heroFeaturedMission.id}-${step.itemId}-${index}`}>
+                    <span className="guide-library-route-preview-index">{index + 1}</span>
+                    <div>
+                      <strong>{step.label}</strong>
+                      <small>{step.neighborhood}</small>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="guide-library-route-preview-meta">
+                {heroFeaturedRouteMeta.map((tag) => (
+                  <span key={`${heroFeaturedMission.id}-${tag}`}>{tag}</span>
+                ))}
+              </div>
+              <div className="guide-library-route-preview-actions">
+                <AppLink className="button primary" to={heroFeaturedRoutePath}>
+                  Open route map
+                </AppLink>
+                <AppLink className="button secondary" to="/vancouver/date-night-starters">
+                  See local places
+                </AppLink>
+              </div>
+            </article>
+          ) : (
+            <HeroMediaCard
+              image={siteConfig.media.guides}
+              alt="Illustrated neighborhood scene inspired by Gastown in Vancouver"
+              eyebrow="Guides"
+              title="Choose the kind of day first"
+              copy="Pick the visitor type, neighborhood, weather, or pace first. Then open the page that already fits."
+              className="hero-media-compact"
+            />
+          )}
           <article className="source-panel guide-library-side-card">
             <div className="guide-library-side-pills">
               <StatusPill tone="blue">{cityGuides.length} Vancouver guides</StatusPill>
@@ -592,20 +662,58 @@ export function GuidesPage({ data }: { data: CityAtlasData }) {
         <SectionHeader
           label="Featured routes"
           title="The best Vancouver routes to open first"
-          copy="These are the strongest starting pages when you already know the kind of day you want."
+          copy="Every card below opens a real route map first, with the guide or place-page fallback right beside it."
           action={<StatusPill tone="green">{featuredRouteCards.length} route picks</StatusPill>}
         />
+        <div className="source-panel featured-route-note">
+          <strong>Use route map first when the shape of the day is already clear.</strong>
+          <p>
+            Open the route when you want stop order, timing, and Maps handoff. Use the second link
+            when you want the named places or the guide context first.
+          </p>
+        </div>
         <div className="featured-route-grid">
           {featuredRouteCards.map((card) => (
-            <AppLink className="query-card query-card-link featured-route-card" key={card.path} to={card.path}>
-              <div className="featured-route-card-media">
-                <img alt={card.imageAlt} decoding="async" loading="eager" src={card.image} />
-              </div>
-              <span className="query-card-kicker">{card.kicker}</span>
-              <strong>{card.title}</strong>
-              <p>{card.copy}</p>
-              <span className="query-card-hint">Open route</span>
-            </AppLink>
+            (() => {
+              const mission = data.cityMissions.find((item) => item.id === card.missionId);
+              const routePath = mission ? getMissionAnchorPath(mission, siteConfig.citySlug) : card.path;
+              const metaTags = mission
+                ? [
+                    mission.timeBox,
+                    `${mission.steps.length} stops`,
+                    `${getTravelModeLabel(mission.defaultTravelMode)} pace`,
+                  ]
+                : [];
+
+              return (
+                <article className="query-card featured-route-card" key={card.title}>
+                  <div className="featured-route-card-media">
+                    <img alt={card.imageAlt} decoding="async" loading="eager" src={card.image} />
+                  </div>
+                  <div className="featured-route-card-topline">
+                    <span className="query-card-kicker">{card.kicker}</span>
+                    <StatusPill tone="blue">Route map ready</StatusPill>
+                  </div>
+                  <strong>{card.title}</strong>
+                  <p>{card.copy}</p>
+                  {metaTags.length > 0 ? (
+                    <div className="featured-route-card-meta">
+                      {metaTags.map((tag) => (
+                        <span key={`${card.title}-${tag}`}>{tag}</span>
+                      ))}
+                    </div>
+                  ) : null}
+                  <div className="featured-route-card-actions">
+                    <AppLink className="button primary" to={routePath}>
+                      Open route map
+                    </AppLink>
+                    <AppLink className="button secondary" to={card.path}>
+                      {card.secondaryLabel}
+                    </AppLink>
+                  </div>
+                </article>
+              );
+            })()
           ))}
         </div>
       </section>
@@ -836,6 +944,7 @@ function trustedPlacePageLinks(
 }
 
 function buildGuideIndexGroups(
+  data: CityAtlasData,
   allGuides: CityAtlasData["guides"],
   groups: Array<{ title: string; summary: string; guides: CityAtlasData["guides"] }>,
 ) {
@@ -854,7 +963,7 @@ function buildGuideIndexGroups(
         links: uniqueGuides.map((guide) => ({
           id: guide.id,
           title: simplifyGuideDisplayText(guide.title),
-          detail: `${simplifyGuideCategoryLabel(guide.category)} - ${guide.neighborhood}`,
+          detail: formatGuideIndexDetail(data, guide),
           path: getGuidePath(guide),
         })),
       };
@@ -866,7 +975,7 @@ function buildGuideIndexGroups(
     .map((guide) => ({
       id: guide.id,
       title: simplifyGuideDisplayText(guide.title),
-      detail: `${simplifyGuideCategoryLabel(guide.category)} - ${guide.neighborhood}`,
+      detail: formatGuideIndexDetail(data, guide),
       path: getGuidePath(guide),
     }));
 
@@ -879,4 +988,9 @@ function buildGuideIndexGroups(
   }
 
   return groupedLinks;
+}
+
+function formatGuideIndexDetail(data: CityAtlasData, guide: CityAtlasData["guides"][number]) {
+  const surfaceState = getGuideSurfaceState(guide, data);
+  return `${surfaceState.stateLabel} - ${simplifyGuideCategoryLabel(guide.category)} - ${guide.neighborhood}`;
 }

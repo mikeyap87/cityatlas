@@ -1554,6 +1554,15 @@
     flex-direction: column;
   }
 
+  .route-step-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .route-step-disclosure-tag {
+    justify-content: center;
+    width: 100%;
+  }
+
   .route-step-heading strong {
     flex: none;
     width: 100%;

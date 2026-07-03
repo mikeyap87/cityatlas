@@ -1503,6 +1503,69 @@ button.home-start-mode-card {
   text-decoration: none;
 }
 
+.guide-card-topline {
+  gap: 10px;
+}
+
+.guide-card-topline .card-icon-line {
+  gap: 6px;
+  justify-content: flex-start;
+}
+
+.guide-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  margin-top: auto;
+  padding-top: 14px;
+}
+
+.guide-card-route-preview {
+  background: rgba(240, 248, 244, 0.92);
+  border: 1px solid rgba(14, 139, 90, 0.16);
+  border-radius: 14px;
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 12px;
+}
+
+.guide-card-route-preview small {
+  color: var(--green-deep);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.guide-card-route-preview-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.guide-card-route-preview-tags span {
+  background: #fff;
+  border: 1px solid rgba(17, 35, 56, 0.08);
+  border-radius: 999px;
+  color: var(--ink);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 7px 10px;
+}
+
+.guide-card-actions .card-link,
+.guide-card-actions .guide-card-sub-link {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.guide-card-sub-link {
+  font-size: 0.86rem;
+}
+
 .business-card-footer {
   align-items: center;
   color: var(--muted);
@@ -5770,6 +5833,7 @@ button.home-start-mode-card {
 .mission-map-fallback {
   display: grid;
   gap: 14px;
+  padding: 16px;
 }
 
 .mission-map-surface {
@@ -5784,6 +5848,25 @@ button.home-start-mode-card {
   display: block;
   height: clamp(360px, 58vh, 620px);
   width: 100%;
+}
+
+.mission-map-preview-toolbar {
+  align-items: center;
+  border-bottom: 1px solid rgba(16, 24, 40, 0.08);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 14px 16px 12px;
+}
+
+.mission-map-preview-toolbar > div {
+  display: grid;
+  gap: 4px;
+}
+
+.mission-map-preview-toolbar small {
+  color: var(--muted);
 }
 
 .mission-map-fallback-header {
@@ -5903,6 +5986,10 @@ button.home-start-mode-card {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+}
+
+.mission-map-actions-inline {
+  padding-top: 4px;
 }
 
 .mission-rail-actions {
@@ -6132,8 +6219,14 @@ button.home-start-mode-card {
   width: 28px;
 }
 
-.route-timeline li > div {
+.route-step-detail {
+  display: grid;
+  gap: 10px;
   min-width: 0;
+}
+
+.route-step-detail summary::-webkit-details-marker {
+  display: none;
 }
 
 .route-timeline small,
@@ -6154,6 +6247,19 @@ button.home-start-mode-card {
   flex-wrap: wrap;
   gap: 10px;
   justify-content: space-between;
+}
+
+.route-step-summary {
+  align-items: start;
+  cursor: pointer;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  list-style: none;
+}
+
+.route-step-summary-copy {
+  min-width: 0;
 }
 
 .route-step-heading strong {
@@ -6192,6 +6298,37 @@ button.home-start-mode-card {
 .route-step-meta small {
   margin-top: 0;
   overflow-wrap: anywhere;
+}
+
+.route-step-disclosure-tag {
+  align-items: center;
+  align-self: start;
+  background: rgba(243, 247, 250, 0.96);
+  border: 1px solid rgba(17, 35, 56, 0.08);
+  border-radius: 999px;
+  color: var(--ink-soft);
+  display: inline-flex;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 10px;
+  white-space: nowrap;
+}
+
+.route-step-disclosure-tag svg {
+  height: 14px;
+  transition: transform 160ms ease;
+  width: 14px;
+}
+
+.route-step-detail[open] .route-step-disclosure-tag svg {
+  transform: rotate(180deg);
+}
+
+.route-step-body {
+  border-top: 1px solid rgba(17, 35, 56, 0.08);
+  display: grid;
+  gap: 0;
+  padding-top: 10px;
 }
 
 .route-step-actions {
@@ -7646,6 +7783,25 @@ button.home-start-mode-card {
   flex-wrap: wrap;
   gap: 12px;
   margin-top: 14px;
+}
+
+.guide-route-preview {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 249, 251, 0.9));
+  border: 1px solid rgba(10, 94, 168, 0.12);
+  border-radius: 14px;
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 12px;
+}
+
+.guide-route-preview p {
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+.guide-route-preview-tags {
+  margin-top: 2px;
 }
 
 .guide-sidebar-card {

@@ -10,6 +10,7 @@ import {
   formatMissionClockLabel,
   formatMinutes,
   getMissionFeedbackLabel,
+  getMissionCityName,
   getMissionLatestFeedback,
   getMissionCompletedCount,
   getMissionDirectionsUrl,
@@ -38,6 +39,7 @@ import {
   CalendarIcon,
   CarIcon,
   CheckIcon,
+  ChevronDownIcon,
   ClockIcon,
   CopyIcon,
   ExternalLinkIcon,
@@ -108,6 +110,8 @@ export function MissionExecutionPanel({
   const [shareFeedback, setShareFeedback] = useState("");
   const [feedbackNote, setFeedbackNote] = useState("");
   const [embedFailed, setEmbedFailed] = useState(false);
+  const [showInlineMap, setShowInlineMap] = useState(false);
+  const [expandedStepIndices, setExpandedStepIndices] = useState<number[]>([]);
   const plan = getMissionPlanState(data, mission);
   const mappableStops = useMemo(() => getMissionMappableStops(data, mission), [data, mission]);
   const directionsUrl = useMemo(
@@ -143,7 +147,8 @@ export function MissionExecutionPanel({
   const routeTimelineId = `${mission.id}-route-timeline`;
   const routeActionsId = `${mission.id}-route-actions`;
   const startOptions = mission.startOptions ?? [];
-  const showMapFrame = Boolean(embedUrl && !embedFailed);
+  const canPreviewInlineMap = Boolean(embedUrl && !embedFailed);
+  const showMapFrame = Boolean(canPreviewInlineMap && showInlineMap);
   const latestFeedback = useMemo(
     () => getMissionLatestFeedback(data, mission.id),
     [data, mission.id],
@@ -154,7 +159,7 @@ export function MissionExecutionPanel({
   );
   const nextStepIndex = stepStatuses.findIndex((status) => status !== "visited" && status !== "skipped");
   const nextStep = nextStepIndex >= 0 ? mission.steps[nextStepIndex] : undefined;
-  const nextStepTarget = nextStep ? resolveMissionStepTarget(data, nextStep) : undefined;
+  const nextStepTarget = nextStep ? resolveMissionStepTarget(data, nextStep, mission) : undefined;
   const nextStepMapsUrl = nextStepTarget ? buildStepMapsUrl(nextStepTarget.mapQuery) : undefined;
   const nextStepTravelLabel = nextStep ? getMissionStepTravelLabel(nextStep, plan.travelMode) : undefined;
   const nextStepSchedule = nextStepIndex >= 0
@@ -170,7 +175,39 @@ export function MissionExecutionPanel({
 
   useEffect(() => {
     setEmbedFailed(false);
+    setShowInlineMap(false);
   }, [embedUrl]);
+
+  useEffect(() => {
+    setExpandedStepIndices(nextStepIndex >= 0 ? [nextStepIndex] : []);
+  }, [mission.id]);
+
+  useEffect(() => {
+    if (nextStepIndex < 0) return;
+    setExpandedStepIndices((current) => (
+      current.includes(nextStepIndex) ? current : [nextStepIndex, ...current]
+    ));
+  }, [nextStepIndex]);
+
+  function handleStepDisclosureToggle(stepIndex: number, open: boolean) {
+    setExpandedStepIndices((current) => (
+      open
+        ? current.includes(stepIndex)
+          ? current
+          : [...current, stepIndex]
+        : current.filter((value) => value !== stepIndex)
+    ));
+  }
+
+  function handleStepStatusChange(stepIndex: number, status: MissionStepStatus) {
+    onSetMissionStepStatus(mission, stepIndex, status);
+    setExpandedStepIndices((current) => current.filter((value) => value !== stepIndex));
+  }
+
+  function handleResetProgress() {
+    setExpandedStepIndices([]);
+    onResetMissionProgress(mission);
+  }
 
   async function handleCopyShare() {
     try {
@@ -249,7 +286,7 @@ export function MissionExecutionPanel({
                 </div>
                 <div className="mission-next-stop-meta-item">
                   <span>Where</span>
-                  <strong>{nextStepTarget?.neighborhood ?? "Vancouver route"}</strong>
+                  <strong>{nextStepTarget?.neighborhood ?? `${getMissionCityName(mission)} route`}</strong>
                   <small>{nextStep ? `${remainingCount} stop${remainingCount === 1 ? "" : "s"} still open` : "All stops reviewed"}</small>
                 </div>
                 <div className="mission-next-stop-meta-item">
@@ -273,7 +310,7 @@ export function MissionExecutionPanel({
                   <button
                     className="button secondary"
                     type="button"
-                    onClick={() => onSetMissionStepStatus(mission, nextStepIndex, "visited")}
+                    onClick={() => handleStepStatusChange(nextStepIndex, "visited")}
                   >
                     Mark visited <CheckIcon />
                   </button>
@@ -282,7 +319,7 @@ export function MissionExecutionPanel({
                   <button
                     className="button secondary"
                     type="button"
-                    onClick={() => onSetMissionStepStatus(mission, nextStepIndex, "skipped")}
+                    onClick={() => handleStepStatusChange(nextStepIndex, "skipped")}
                   >
                     Skip this stop
                   </button>
@@ -454,28 +491,43 @@ export function MissionExecutionPanel({
         <div className="mission-planner-map" id={routeMapId}>
           <div className="mission-map-surface">
             {showMapFrame ? (
-              <iframe
-                className="mission-map-frame"
-                loading="lazy"
-                onError={() => setEmbedFailed(true)}
-                referrerPolicy="no-referrer-when-downgrade"
-                src={embedUrl}
-                title={`${mission.title} Google Maps route`}
-              />
+              <>
+                <div className="mission-map-preview-toolbar">
+                  <div>
+                    <strong>Inline map preview</strong>
+                    <small>Use this only when a quick on-page preview helps. Full Google Maps stays clearer for navigation.</small>
+                  </div>
+                  <button className="button secondary" type="button" onClick={() => setShowInlineMap(false)}>
+                    Hide preview
+                  </button>
+                </div>
+                <iframe
+                  className="mission-map-frame"
+                  loading="lazy"
+                  onError={() => setEmbedFailed(true)}
+                  referrerPolicy="no-referrer-when-downgrade"
+                  src={embedUrl}
+                  title={`${mission.title} Google Maps route`}
+                />
+              </>
             ) : (
               <div className="mission-map-fallback">
                 <div className="mission-map-fallback-header">
                   <MapIcon />
                   <div>
                     <strong>
-                      {mappableStops.length >= 2
-                        ? "Route preview opens in Google Maps"
-                        : "Open the anchor stop in Google Maps"}
+                      {embedFailed
+                        ? "Inline map preview is unavailable right now"
+                        : mappableStops.length >= 2
+                          ? "Open the route in Google Maps first"
+                          : "Open the anchor stop in Google Maps"}
                     </strong>
                     <p>
-                      {mappableStops.length >= 2
-                        ? "Open the full route in Google Maps when you are ready to head out."
-                        : "Open this stop in Google Maps when you are ready to go."}
+                      {embedFailed
+                        ? "The route still works. Use the full Google Maps handoff below, then keep the route timing and stop order here."
+                        : mappableStops.length >= 2
+                          ? "CityAtlas keeps the map preview optional so the route still feels clear even if the embed does not help."
+                          : "Open this stop in Google Maps when you are ready to go."}
                     </p>
                   </div>
                 </div>
@@ -490,6 +542,23 @@ export function MissionExecutionPanel({
                     </li>
                   ))}
                 </ol>
+                <div className="mission-map-actions mission-map-actions-inline">
+                  {directionsUrl ? (
+                    <a className="button primary" href={directionsUrl} rel="noreferrer" target="_blank">
+                      Open full route <ExternalLinkIcon />
+                    </a>
+                  ) : null}
+                  {canPreviewInlineMap ? (
+                    <button className="button secondary" type="button" onClick={() => setShowInlineMap(true)}>
+                      Show inline map preview
+                    </button>
+                  ) : null}
+                  {nextStepMapsUrl ? (
+                    <a className="button secondary" href={nextStepMapsUrl} rel="noreferrer" target="_blank">
+                      Next stop only <MapIcon />
+                    </a>
+                  ) : null}
+                </div>
               </div>
             )}
           </div>
@@ -560,64 +629,78 @@ export function MissionExecutionPanel({
 
           <ol className="route-timeline route-timeline-detailed route-timeline-rail">
             {mission.steps.map((step, index) => {
-              const target = resolveMissionStepTarget(data, step);
+              const target = resolveMissionStepTarget(data, step, mission);
               const status = getMissionStepUiStatus(mission, plan, index, data.savedItems);
               const mapsUrl = buildStepMapsUrl(target.mapQuery);
               const travelLabel = getMissionStepTravelLabel(step, plan.travelMode);
               const schedule = scheduleByIndex[index] as { rangeLabel?: string } | undefined;
+              const isExpanded = expandedStepIndices.includes(index);
               return (
                 <li
                   className={`route-step-${status}${nextStepIndex === index && status !== "visited" && status !== "skipped" ? " route-step-next" : ""}`}
                   key={`${mission.id}-${step.itemType}-${step.itemId}-${index}`}
                 >
                   <span>{index + 1}</span>
-                  <div>
-                    <div className="route-step-heading">
-                      <strong>{target.label}</strong>
-                      <div className="route-step-badges">
-                        {nextStepIndex === index && status !== "visited" && status !== "skipped" ? (
-                          <span className="route-step-next-badge">Next up</span>
+                  <details
+                    className="route-step-detail"
+                    open={isExpanded}
+                    onToggle={(event) => handleStepDisclosureToggle(index, event.currentTarget.open)}
+                  >
+                    <summary className="route-step-summary">
+                      <div className="route-step-summary-copy">
+                        <div className="route-step-heading">
+                          <strong>{target.label}</strong>
+                          <div className="route-step-badges">
+                            {nextStepIndex === index && status !== "visited" && status !== "skipped" ? (
+                              <span className="route-step-next-badge">Next up</span>
+                            ) : null}
+                            <StatusPill tone={getStatusTone(status)}>{getStatusLabel(status)}</StatusPill>
+                          </div>
+                        </div>
+                        <div className="route-step-meta">
+                          <small>{step.time} in {target.neighborhood}</small>
+                          {schedule?.rangeLabel ? <small>{schedule.rangeLabel}</small> : null}
+                          {step.bestAt ? <small>{step.bestAt}</small> : null}
+                          {travelLabel ? <small>{travelLabel}</small> : null}
+                        </div>
+                      </div>
+                      <span className="route-step-disclosure-tag" aria-hidden="true">
+                        {isExpanded ? "Hide" : "Details"} <ChevronDownIcon />
+                      </span>
+                    </summary>
+                    <div className="route-step-body">
+                      <p>{step.note}</p>
+                      <div className="route-step-actions">
+                        {mapsUrl ? (
+                          <a className="route-action-chip" href={mapsUrl} rel="noreferrer" target="_blank">
+                            <MapIcon />
+                            <span>{step.openInMapsLabel ?? "Maps"}</span>
+                          </a>
                         ) : null}
-                        <StatusPill tone={getStatusTone(status)}>{getStatusLabel(status)}</StatusPill>
+                        {target.secondaryLink ? (
+                          <a className="route-action-chip" href={target.secondaryLink} rel="noreferrer" target="_blank">
+                            <ExternalLinkIcon />
+                            <span>Official site</span>
+                          </a>
+                        ) : null}
+                        <button
+                          className={status === "visited" ? "route-status-chip active" : "route-status-chip"}
+                          type="button"
+                          onClick={() => handleStepStatusChange(index, "visited")}
+                        >
+                          <CheckIcon />
+                          <span>Visited</span>
+                        </button>
+                        <button
+                          className={status === "skipped" ? "route-status-chip active muted" : "route-status-chip"}
+                          type="button"
+                          onClick={() => handleStepStatusChange(index, "skipped")}
+                        >
+                          <span>Skip</span>
+                        </button>
                       </div>
                     </div>
-                    <div className="route-step-meta">
-                      <small>{step.time} in {target.neighborhood}</small>
-                      {schedule?.rangeLabel ? <small>{schedule.rangeLabel}</small> : null}
-                      {step.bestAt ? <small>{step.bestAt}</small> : null}
-                      {travelLabel ? <small>{travelLabel}</small> : null}
-                    </div>
-                    <p>{step.note}</p>
-                    <div className="route-step-actions">
-                      {mapsUrl ? (
-                        <a className="route-action-chip" href={mapsUrl} rel="noreferrer" target="_blank">
-                          <MapIcon />
-                          <span>{step.openInMapsLabel ?? "Maps"}</span>
-                        </a>
-                      ) : null}
-                      {target.secondaryLink ? (
-                        <a className="route-action-chip" href={target.secondaryLink} rel="noreferrer" target="_blank">
-                          <ExternalLinkIcon />
-                          <span>Official site</span>
-                        </a>
-                      ) : null}
-                      <button
-                        className={status === "visited" ? "route-status-chip active" : "route-status-chip"}
-                        type="button"
-                        onClick={() => onSetMissionStepStatus(mission, index, "visited")}
-                      >
-                        <CheckIcon />
-                        <span>Visited</span>
-                      </button>
-                      <button
-                        className={status === "skipped" ? "route-status-chip active muted" : "route-status-chip"}
-                        type="button"
-                        onClick={() => onSetMissionStepStatus(mission, index, "skipped")}
-                      >
-                        <span>Skip</span>
-                      </button>
-                    </div>
-                  </div>
+                  </details>
                 </li>
               );
             })}
@@ -633,7 +716,7 @@ export function MissionExecutionPanel({
             <button className="button secondary" type="button" onClick={handleNativeShare}>
               Share route <ShareIcon />
             </button>
-            <button className="button tertiary route-reset-button" type="button" onClick={() => onResetMissionProgress(mission)}>
+            <button className="button tertiary route-reset-button" type="button" onClick={handleResetProgress}>
               Reset progress <RefreshIcon />
             </button>
           </div>

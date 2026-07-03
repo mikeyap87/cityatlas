@@ -1,13 +1,18 @@
-import type { Business, CityMission, EventItem, Guide, Offer, SavedItem } from "../types";
+import type { Business, CityAtlasData, CityMission, EventItem, Guide, Offer, SavedItem } from "../types";
 import { getGuidePath } from "../lib/cityPaths";
 import { formatDate } from "../lib/format";
 import {
+  getMissionAnchorPath,
   getMissionFitLabel,
   getMissionFitNote,
   getMissionFitTone,
+  getMissionForGuide,
+  getMissionHubPath,
   getTravelModeLabel,
+  isGuideRouteChooser,
   type MissionBehaviorInsight,
 } from "../lib/missions";
+import { getSourceBackedCollectionForGuide, sourceBackedCollectionMeta } from "../lib/sourceBackedCollections";
 import {
   simplifyBusinessDisplayText,
   simplifyGuideCategoryLabel,
@@ -154,9 +159,50 @@ export function OfferCard({
   );
 }
 
-export function GuideCard({ guide }: { guide: Guide }) {
+export function GuideCard({
+  guide,
+  data,
+}: {
+  guide: Guide;
+  data?: CityAtlasData;
+}) {
   const guideTitle = simplifyGuideDisplayText(guide.title);
   const guideExcerpt = simplifyGuideDisplayText(guide.excerpt);
+  const linkedMission = data ? getMissionForGuide(data, guide) : undefined;
+  const routeChooser = isGuideRouteChooser(guide);
+  const linkedMissionPath = linkedMission
+    ? getMissionAnchorPath(linkedMission, guide.citySlug ?? "vancouver")
+    : null;
+  const sourceBackedCollection = getSourceBackedCollectionForGuide(guide);
+  const sourceBackedMeta = sourceBackedCollection
+    ? sourceBackedCollectionMeta[sourceBackedCollection]
+    : null;
+  const routePreviewTags = linkedMission
+    ? [
+        linkedMission.timeBox,
+        `${linkedMission.steps.length} stop${linkedMission.steps.length === 1 ? "" : "s"}`,
+        `${getTravelModeLabel(linkedMission.defaultTravelMode)} pace`,
+      ]
+    : [];
+  const stateLabel = linkedMission
+    ? routeChooser
+      ? "Example route with map"
+      : "Route with map"
+    : sourceBackedMeta
+      ? "Guide + local places"
+      : "Guide only";
+  const stateTone = linkedMission ? "blue" : sourceBackedMeta ? "green" : "muted";
+  const secondaryAction = linkedMissionPath
+    ? {
+        label: routeChooser ? "Open example route" : "Open route with map",
+        path: linkedMissionPath,
+      }
+    : sourceBackedMeta
+      ? {
+          label: "See local places",
+          path: sourceBackedMeta.path,
+        }
+      : null;
 
   return (
     <article className="content-card guide-card">
@@ -167,20 +213,40 @@ export function GuideCard({ guide }: { guide: Guide }) {
         loading="lazy"
       />
       <div className="card-body">
-        <div className="card-icon-line">
-          <MapIcon />
-          <span>{guide.readMinutes} min read</span>
+        <div className="card-topline guide-card-topline">
+          <StatusPill tone={stateTone}>{stateLabel}</StatusPill>
+          <div className="card-icon-line">
+            <MapIcon />
+            <span>{guide.readMinutes} min read</span>
+          </div>
         </div>
         <h3>{guideTitle}</h3>
         <p>{guideExcerpt}</p>
+        {routePreviewTags.length > 0 ? (
+          <div className="guide-card-route-preview">
+            <small>{routeChooser ? "Example route ready" : "Route ready"}</small>
+            <div className="guide-card-route-preview-tags">
+              {routePreviewTags.map((tag) => (
+                <span key={`${guide.id}-${tag}`}>{tag}</span>
+              ))}
+            </div>
+          </div>
+        ) : null}
         <div className="card-meta">
           <span>{simplifyGuideCategoryLabel(guide.category)}</span>
           <span>{guide.neighborhood}</span>
           {guide.sponsored ? <span>Partner feature</span> : null}
         </div>
-        <AppLink className="card-link" to={getGuidePath(guide)}>
-          Read guide <ArrowRightIcon />
-        </AppLink>
+        <div className="guide-card-actions">
+          <AppLink className="card-link" to={getGuidePath(guide)}>
+            Read guide <ArrowRightIcon />
+          </AppLink>
+          {secondaryAction ? (
+            <AppLink className="text-link guide-card-sub-link" to={secondaryAction.path}>
+              {secondaryAction.label} <ArrowRightIcon />
+            </AppLink>
+          ) : null}
+        </div>
       </div>
     </article>
   );
@@ -236,7 +302,7 @@ export function MissionCard({
   savedItems,
   onSaveMission,
   insight,
-  actionHref = "/vancouver/missions",
+  actionHref,
   actionLabel = "View saved plans",
   actionMode = "app",
 }: {
@@ -249,6 +315,7 @@ export function MissionCard({
   actionMode?: "app" | "anchor";
 }) {
   const progress = getMissionProgress(mission, savedItems);
+  const resolvedActionHref = actionHref ?? getMissionHubPath(mission);
 
   return (
     <article className="content-card mission-card">
@@ -290,11 +357,11 @@ export function MissionCard({
           </button>
         ) : null}
         {actionMode === "anchor" ? (
-          <a className="text-link" href={actionHref}>
+          <a className="text-link" href={resolvedActionHref}>
             {actionLabel} <ArrowRightIcon />
           </a>
         ) : (
-          <AppLink className="text-link" to={actionHref}>
+          <AppLink className="text-link" to={resolvedActionHref}>
             {actionLabel} <ArrowRightIcon />
           </AppLink>
         )}

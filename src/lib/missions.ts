@@ -9,6 +9,11 @@ import type {
   SavedItem,
   TravelMode,
 } from "../types";
+import { siteConfig } from "../config/site";
+import {
+  getSourceBackedCollectionCityName,
+  getSourceBackedCollectionRegionName,
+} from "./sourceBackedCollections";
 
 const runtimeEnv = ((import.meta as ImportMeta & {
   env?: Record<string, string | undefined>;
@@ -99,9 +104,41 @@ export function getTravelModeLabel(mode: TravelMode) {
   return TRAVEL_MODE_LABELS[mode];
 }
 
+export function getMissionCitySlug(mission: CityMission) {
+  return mission.citySlug ?? siteConfig.citySlug;
+}
+
+export function getMissionCityName(mission: CityMission) {
+  return mission.cityName ?? siteConfig.city;
+}
+
+export function getMissionRegionName(mission: CityMission) {
+  return mission.regionName ?? "British Columbia";
+}
+
+export function isGuideRouteChooser(guide: Guide) {
+  const normalizedTitle = guide.title.trim().toLowerCase();
+  const normalizedCategory = guide.category.trim().toLowerCase();
+
+  if (normalizedTitle.startsWith("where should")) return true;
+
+  return [
+    "destination choice",
+    "daytime starter",
+    "culture starter",
+    "campus starter",
+    "garden starter",
+    "neighborhood chooser",
+    "returning visitor",
+    "first date",
+    "route logic",
+  ].includes(normalizedCategory);
+}
+
 export function getMissionForGuide(data: CityAtlasData, guide: Guide) {
   return data.cityMissions.find((mission) =>
-    mission.steps.some((step) => step.itemType === "guide" && step.itemId === guide.id),
+    mission.steps.some((step) => step.itemType === "guide" && step.itemId === guide.id)
+    || mission.guideIds?.includes(guide.id),
   );
 }
 
@@ -113,8 +150,18 @@ export function getMissionAnchorId(mission: CityMission | string) {
   return `mission-${normalizedMissionId}`;
 }
 
-export function getMissionAnchorPath(mission: CityMission, citySlug = "vancouver") {
-  return `/${citySlug}/missions#${getMissionAnchorId(mission)}`;
+export function getMissionHubPathForCity(citySlug: string) {
+  return `/${citySlug}/missions`;
+}
+
+export function getMissionHubPath(missionOrCity: CityMission | string) {
+  return getMissionHubPathForCity(
+    typeof missionOrCity === "string" ? missionOrCity : getMissionCitySlug(missionOrCity),
+  );
+}
+
+export function getMissionAnchorPath(mission: CityMission, citySlug = getMissionCitySlug(mission)) {
+  return `${getMissionHubPathForCity(citySlug)}#${getMissionAnchorId(mission)}`;
 }
 
 export function hasGoogleMapsEmbedSupport() {
@@ -340,6 +387,7 @@ export function resolveSavedItemTypeLabel(itemType: SavedItem["itemType"]) {
 export function resolveMissionStepTarget(
   data: CityAtlasData,
   step: CityMissionStep,
+  mission?: CityMission,
 ) {
   if (step.itemType === "business") {
     const business = resolveBusiness(data, step.itemId);
@@ -353,13 +401,15 @@ export function resolveMissionStepTarget(
 
   if (step.itemType === "event") {
     const event = resolveEvent(data, step.itemId);
+    const cityName = mission ? getMissionCityName(mission) : siteConfig.city;
+    const regionName = mission ? getMissionRegionName(mission) : "British Columbia";
     return {
       label: event?.title ?? step.label,
       neighborhood: event?.neighborhood ?? step.neighborhood,
       mapQuery:
         step.mapQuery
         ?? (event
-          ? `${event.venue}, ${event.neighborhood}, Vancouver, BC`
+          ? `${event.venue}, ${event.neighborhood}, ${cityName}, ${regionName}`
           : undefined),
       secondaryLink: undefined,
     };
@@ -367,7 +417,11 @@ export function resolveMissionStepTarget(
 
   if (step.itemType === "source_backed_place") {
     const place = resolveSourceBackedPlace(data, step.itemId);
-    const derivedMapQuery = place ? `${place.name}, Vancouver, BC` : undefined;
+    const cityName = place ? getSourceBackedCollectionCityName(place.collection) : undefined;
+    const regionName = place ? getSourceBackedCollectionRegionName(place.collection) : undefined;
+    const derivedMapQuery = place && cityName && regionName
+      ? `${place.name}, ${cityName}, ${regionName}`
+      : undefined;
     return {
       label: place?.name ?? step.label,
       neighborhood: place?.neighborhood ?? step.neighborhood,
@@ -397,7 +451,7 @@ export function resolveMissionStepTarget(
 export function getMissionMappableStops(data: CityAtlasData, mission: CityMission) {
   return mission.steps
     .map((step, index) => {
-      const target = resolveMissionStepTarget(data, step);
+      const target = resolveMissionStepTarget(data, step, mission);
       if (!target.mapQuery) return undefined;
       return {
         step,
@@ -530,7 +584,7 @@ export function getMissionShareText(
     "",
     "Stops:",
     ...mission.steps.map((step, index) => {
-      const target = resolveMissionStepTarget(data, step);
+      const target = resolveMissionStepTarget(data, step, mission);
       const status = getMissionStepUiStatus(mission, plan, index, data.savedItems);
       const schedule = scheduleByIndex.get(index);
       const parts = [

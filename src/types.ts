@@ -234,11 +234,15 @@ export interface CityMission extends AuditFields {
   id: string;
   title: string;
   slug: string;
+  citySlug?: string;
+  cityName?: string;
+  regionName?: string;
   theme: string;
   audience: string;
   timeBox: string;
   startWindow: string;
   startOptions?: string[];
+  guideIds?: string[];
   defaultTravelMode: TravelMode;
   hook: string;
   routeSummary: string;

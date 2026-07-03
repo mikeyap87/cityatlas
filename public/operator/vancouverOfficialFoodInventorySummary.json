@@ -1,0 +1,36 @@
+{
+  "generatedAt": "2026-06-21T00:00:00-07:00",
+  "recordCount": 3009,
+  "byBusinessType": {
+    "Restaurant": 1677,
+    "Limited Service Food Establishment": 1332
+  },
+  "byLocalArea": {
+    "Downtown": 823,
+    "West End": 297,
+    "Kitsilano": 245,
+    "Fairview": 202,
+    "Mount Pleasant": 202,
+    "Grandview-Woodland": 180,
+    "Kensington-Cedar Cottage": 169,
+    "Riley Park": 130,
+    "Renfrew-Collingwood": 120,
+    "Hastings-Sunrise": 91,
+    "Sunset": 88,
+    "Strathcona": 86,
+    "Marpole": 65,
+    "Killarney": 50,
+    "Victoria-Fraserview": 49,
+    "West Point Grey": 38,
+    "Kerrisdale": 37,
+    "Arbutus-Ridge": 33,
+    "Oakridge": 33,
+    "South Cambie": 31,
+    "Dunbar-Southlands": 28,
+    "Shaughnessy": 12
+  },
+  "byCity": {
+    "Vancouver": 3009
+  },
+  "sourceScope": "vancouver_food_issued_2026"
+}

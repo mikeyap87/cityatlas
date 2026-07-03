@@ -1,0 +1,39 @@
+{
+  "mode": "review_only",
+  "currency": "cad",
+  "pricingPolicy": "Vancouver and Greater Vancouver packages use CAD. Future US-city packages should use USD with clean rounded price points, not direct exchange-rate conversions.",
+  "products": [
+    {
+      "lookupKey": "cityatlas_community_listing_monthly",
+      "name": "CityAtlas Community Listing",
+      "description": "Basic business review queue and source metadata. Free launch-candidate tier.",
+      "amount": 0,
+      "interval": "month",
+      "paymentBehavior": "manual_free_tier_no_checkout"
+    },
+    {
+      "lookupKey": "cityatlas_city_partner_monthly",
+      "name": "CityAtlas City Partner",
+      "description": "Enhanced CityAtlas profile, founding partner placement review, offer or event module, and monthly visibility snapshot.",
+      "amount": 4900,
+      "interval": "month",
+      "paymentBehavior": "subscription_checkout_after_approval",
+      "testModeProductId": "prod_UlpRdODp3U8Lej",
+      "testModePriceId": "price_1TmJ7MI27jKwwm3HgYWjUQTt",
+      "previousUsdTestModePriceId": "price_1TmHmYI27jKwwm3HG25en3G1"
+    },
+    {
+      "lookupKey": "cityatlas_signature_partner_monthly",
+      "name": "CityAtlas Signature Partner",
+      "description": "Premium local feature package with creator visit brief, sponsored guide proposal, and AI visibility report draft.",
+      "amount": 14900,
+      "interval": "month",
+      "paymentBehavior": "subscription_checkout_after_approval",
+      "testModeProductId": "prod_UlpRvPSRZafgN1",
+      "testModePriceId": "price_1TmJ7VI27jKwwm3H9xOxfhIe",
+      "previousUsdTestModePriceId": "price_1TmHnAI27jKwwm3HVwHkpA03"
+    }
+  ],
+  "activationGate": "Do not create Stripe products, prices, checkout sessions, payment links, invoices, coupons, or subscriptions until owner approval.",
+  "recommendedFirstStep": "Create test-mode products and prices only after package promise, refund policy, support process, and first proof-sprint demand are approved."
+}

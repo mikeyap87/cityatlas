@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /private-preview/
+Disallow: /for-businesses/submit
+
+# Public indexing is enabled for the guide and discovery surface.
+# Keep protected operations and submission flows out of search.
+
+Sitemap: https://city.univenturestudio.com/sitemap.xml

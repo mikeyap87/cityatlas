@@ -1,0 +1,40 @@
+{
+  "generatedAt": "2026-06-22T00:00:00-07:00",
+  "recordCount": 2673,
+  "byBusinessType": {
+    "Beauty Services": 1487,
+    "Building Repair and Maintenance": 580,
+    "Vehicle Repair Detailing and Washing Services": 360,
+    "Sport and Fitness Instruction": 246
+  },
+  "byLocalArea": {
+    "Downtown": 571,
+    "Out of Town": 233,
+    "Fairview": 190,
+    "Kitsilano": 187,
+    "Kensington-Cedar Cottage": 183,
+    "Mount Pleasant": 177,
+    "Grandview-Woodland": 138,
+    "Sunset": 128,
+    "West End": 122,
+    "Marpole": 111,
+    "Renfrew-Collingwood": 110,
+    "Strathcona": 83,
+    "Hastings-Sunrise": 80,
+    "Riley Park": 76,
+    "Victoria-Fraserview": 74,
+    "Killarney": 38,
+    "Kerrisdale": 36,
+    "Arbutus-Ridge": 32,
+    "Dunbar-Southlands": 30,
+    "West Point Grey": 27,
+    "Oakridge": 22,
+    "South Cambie": 17,
+    "Shaughnessy": 6,
+    "UBC": 2
+  },
+  "byCity": {
+    "Vancouver": 2673
+  },
+  "sourceScope": "vancouver_services_issued_2026"
+}

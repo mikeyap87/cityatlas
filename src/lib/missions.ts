@@ -2,6 +2,7 @@ import type {
   CityAtlasData,
   CityMission,
   CityMissionStep,
+  Guide,
   MissionFeedbackType,
   MissionPlanState,
   MissionStepStatus,
@@ -96,6 +97,24 @@ export function formatMinutes(totalMinutes: number) {
 
 export function getTravelModeLabel(mode: TravelMode) {
   return TRAVEL_MODE_LABELS[mode];
+}
+
+export function getMissionForGuide(data: CityAtlasData, guide: Guide) {
+  return data.cityMissions.find((mission) =>
+    mission.steps.some((step) => step.itemType === "guide" && step.itemId === guide.id),
+  );
+}
+
+export function getMissionAnchorId(mission: CityMission | string) {
+  const missionId = typeof mission === "string" ? mission : mission.id;
+  const normalizedMissionId = missionId.startsWith("mission-")
+    ? missionId.slice("mission-".length)
+    : missionId;
+  return `mission-${normalizedMissionId}`;
+}
+
+export function getMissionAnchorPath(mission: CityMission, citySlug = "vancouver") {
+  return `/${citySlug}/missions#${getMissionAnchorId(mission)}`;
 }
 
 export function hasGoogleMapsEmbedSupport() {

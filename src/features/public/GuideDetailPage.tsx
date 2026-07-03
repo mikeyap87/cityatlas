@@ -11,8 +11,10 @@ import {
 import {
   simplifyGuideCategoryLabel,
   simplifyGuideDisplayText,
+  simplifyMissionDisplayText,
   simplifyPublicSurfaceText,
 } from "../../lib/publicCopy";
+import { getMissionAnchorPath, getMissionForGuide } from "../../lib/missions";
 import {
   getGuideHubPath,
   getGuidePath,
@@ -244,6 +246,10 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
   const sourceBackedGuideMeta = sourceBackedCollection
     ? sourceBackedCollectionMeta[sourceBackedCollection]
     : null;
+  const linkedMission = getMissionForGuide(data, guide);
+  const linkedMissionPath = linkedMission
+    ? getMissionAnchorPath(linkedMission, guide.citySlug ?? "vancouver")
+    : null;
   const gateMeta = guideGateMeta[guide.gateDecision];
   const resolvedGuideHubPath = getGuideHubPath(guide);
   const guideVisual = getGuideHeroVisual(guide);
@@ -273,33 +279,55 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
     question: simplifyGuideDisplayText(faq.question),
     answer: simplifyGuideDisplayText(faq.answer),
   }));
-  const guidePrimaryAction = sourceBackedGuideMeta
+  const guideMissionAction = linkedMission && linkedMissionPath
     ? {
-        label: "See local places",
-        path: sourceBackedGuideMeta.path,
+        kicker: "Need the route with map?",
+        title: simplifyMissionDisplayText(linkedMission.title),
+        copy:
+          "Open the saved plan when you want the stop order, timing, and Google Maps handoff for this guide.",
+        label: "Open route with map",
+        path: linkedMissionPath,
       }
-    : {
-        label: guide.ctaLabel,
-        path: guide.ctaPath,
-      };
-  const guideSecondaryAction = sourceBackedGuideMeta
+    : null;
+  const guidePlaceAction = sourceBackedGuideMeta
     ? {
         kicker: "Need named places now?",
         title: sourceBackedGuideMeta.shortLabel,
         copy: sourceBackedGuideMeta.pageDescription,
-        label: "Open local places",
+        label: "See local places",
         path: sourceBackedGuideMeta.path,
       }
-    : {
+    : null;
+  const guideFallbackAction = {
+    label: guide.ctaLabel,
+    path: guide.ctaPath,
+  };
+  const guidePrimaryAction = guideMissionAction ?? guidePlaceAction ?? guideFallbackAction;
+  const guideSecondaryAction = guidePlaceAction
+    ? guidePlaceAction.path !== guidePrimaryAction.path
+      ? guidePlaceAction
+      : null
+    : !guideMissionAction
+      ? {
+        label: guide.ctaLabel,
+        path: guide.ctaPath,
+        }
+      : null;
+  const guideNextSurfaceAction = !guideMissionAction && !guidePlaceAction
+    ? {
         kicker: "Need the next working surface?",
         title: simplifyGuideDisplayText(guide.ctaLabel),
         copy:
           "Use the next CityAtlas surface when the route question is already clear and you want to save, compare, or move the plan forward.",
         label: simplifyGuideDisplayText(guide.ctaLabel),
         path: guide.ctaPath,
-      };
+      }
+    : null;
   const nextResourceLink = simplifiedResourceLinks.find(
-    (link) => link.path !== guidePrimaryAction.path && link.path !== guideSecondaryAction.path,
+    (link) =>
+      link.path !== guidePrimaryAction.path &&
+      link.path !== guideSecondaryAction?.path &&
+      link.path !== guideMissionAction?.path,
   );
   const guideAlternateAction = nextResourceLink
     ? {
@@ -345,6 +373,11 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
               <AppLink className="button primary" to={guidePrimaryAction.path}>
                 {guidePrimaryAction.label} <ArrowRightIcon />
               </AppLink>
+              {guideSecondaryAction ? (
+                <AppLink className="button secondary" to={guideSecondaryAction.path}>
+                  {guideSecondaryAction.label}
+                </AppLink>
+              ) : null}
               <AppLink className="text-link" to={resolvedGuideHubPath}>
                 See all guides <ArrowRightIcon />
               </AppLink>
@@ -388,9 +421,9 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
               </div>
             </div>
             <div className="guide-sidebar-footer">
-              <strong>Need the broader plan next?</strong>
-              <AppLink className="text-link" to={guide.ctaPath}>
-                {simplifyGuideDisplayText(guide.ctaLabel)} <ArrowRightIcon />
+              <strong>{guideMissionAction ? "Need the map-ready route next?" : "Need the broader plan next?"}</strong>
+              <AppLink className="text-link" to={guideMissionAction?.path ?? guide.ctaPath}>
+                {guideMissionAction ? guideMissionAction.label : simplifyGuideDisplayText(guide.ctaLabel)} <ArrowRightIcon />
               </AppLink>
             </div>
           </aside>
@@ -414,14 +447,35 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
               ))}
             </div>
           </article>
-          <AppLink className="query-card query-card-link" to={guideSecondaryAction.path}>
-            <span className="query-card-kicker">{guideSecondaryAction.kicker}</span>
-            <strong>{guideSecondaryAction.title}</strong>
-            <p>{guideSecondaryAction.copy}</p>
-            <span className="query-card-hint">
-              {guideSecondaryAction.label} <ArrowRightIcon />
-            </span>
-          </AppLink>
+          {guideMissionAction ? (
+            <AppLink className="query-card query-card-link" to={guideMissionAction.path}>
+              <span className="query-card-kicker">{guideMissionAction.kicker}</span>
+              <strong>{guideMissionAction.title}</strong>
+              <p>{guideMissionAction.copy}</p>
+              <span className="query-card-hint">
+                {guideMissionAction.label} <ArrowRightIcon />
+              </span>
+            </AppLink>
+          ) : null}
+          {guidePlaceAction ? (
+            <AppLink className="query-card query-card-link" to={guidePlaceAction.path}>
+              <span className="query-card-kicker">{guidePlaceAction.kicker}</span>
+              <strong>{guidePlaceAction.title}</strong>
+              <p>{guidePlaceAction.copy}</p>
+              <span className="query-card-hint">
+                {guidePlaceAction.label} <ArrowRightIcon />
+              </span>
+            </AppLink>
+          ) : guideNextSurfaceAction ? (
+            <AppLink className="query-card query-card-link" to={guideNextSurfaceAction.path}>
+              <span className="query-card-kicker">{guideNextSurfaceAction.kicker}</span>
+              <strong>{guideNextSurfaceAction.title}</strong>
+              <p>{guideNextSurfaceAction.copy}</p>
+              <span className="query-card-hint">
+                {guideNextSurfaceAction.label} <ArrowRightIcon />
+              </span>
+            </AppLink>
+          ) : null}
           <AppLink className="query-card query-card-link" to={guideAlternateAction.path}>
             <span className="query-card-kicker">{guideAlternateAction.kicker}</span>
             <strong>{guideAlternateAction.title}</strong>

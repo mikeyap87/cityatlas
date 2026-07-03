@@ -12,6 +12,7 @@ import { ArrowRightIcon, CheckIcon, MapIcon, ShieldIcon, SparkIcon } from "../..
 import { siteConfig } from "../../config/site";
 import { HeroMediaCard, SectionHeader, StatusPill } from "../../components/UI";
 import {
+  getMissionAnchorId,
   getMissionDonePercent,
   getMissionFitLabel,
   getMissionFitNote,
@@ -70,9 +71,10 @@ function MissionRoute({
   const savedCount = getMissionSavedCount(mission, data.savedItems);
   const savedPercent = getMissionSavedPercent(mission, data.savedItems);
   const donePercent = getMissionDonePercent(mission, plan);
+  const missionAnchorId = getMissionAnchorId(mission);
 
   return (
-    <article className="mission-route" id={`mission-${mission.id}`}>
+    <article className="mission-route" id={missionAnchorId}>
       <div className="mission-route-header">
         <div>
           <p className="section-label">{mission.theme}</p>
@@ -154,7 +156,7 @@ export function MissionsPage({
           </p>
           <div className="hero-actions">
             {featuredMission ? (
-              <a className="button primary" href={`#mission-${featuredMission.id}`}>
+              <a className="button primary" href={`#${getMissionAnchorId(featuredMission)}`}>
                 Open best-fit route
               </a>
             ) : null}
@@ -202,7 +204,7 @@ export function MissionsPage({
                     {featuredMission.timeBox} with {featuredMission.steps.length} stops
                   </p>
                 </div>
-                <a className="button secondary" href={`#mission-${featuredMission.id}`}>
+                <a className="button secondary" href={`#${getMissionAnchorId(featuredMission)}`}>
                   Open route
                 </a>
               </div>
@@ -285,7 +287,7 @@ export function MissionsPage({
               savedItems={data.savedItems}
               onSaveMission={onSaveMission}
               insight={routeLearning.insightsById[mission.id]}
-              actionHref={`#mission-${mission.id}`}
+              actionHref={`#${getMissionAnchorId(mission)}`}
               actionLabel="Open route"
               actionMode="anchor"
               key={mission.id}

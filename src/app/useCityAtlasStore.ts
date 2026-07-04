@@ -7,11 +7,14 @@ import type {
   CityMission,
   CityAtlasData,
   ManualReplyLog,
+  MissionFeedbackType,
+  MissionStepStatus,
   NewsletterLead,
   PackageId,
   SavedItem,
+  TravelMode,
 } from "../types";
-import { buildFlags, canRenderAdminExperience } from "../config/site";
+import { canRenderAdminExperience } from "../config/site";
 import {
   audit,
   createBrainRun,
@@ -21,6 +24,7 @@ import {
   createEmptyCityAtlasData,
   createBusinessSubmission,
   createGrowthEvent,
+  createMissionPlan,
   createManualReplyLog,
   createNewsletterLead,
   createSavedItem,
@@ -29,34 +33,124 @@ import {
   resetCityAtlasData,
   saveCityAtlasData,
 } from "../lib/storage";
-import { getTrafficContext, trackProductEvent } from "../lib/analytics";
-
-let cityGrowthModulePromise: Promise<typeof import("../lib/cityGrowth")> | null = null;
-let businessInboundPreviewModulePromise: Promise<typeof import("../lib/businessInboundPreview")> | null =
-  null;
-
-const loadCityGrowthModule: () => Promise<typeof import("../lib/cityGrowth")> =
-  buildFlags.hostedAdminArtifacts
-    ? () => {
-        cityGrowthModulePromise ??= import("../lib/cityGrowth");
-        return cityGrowthModulePromise;
-      }
-    : async () => {
-        throw new Error("Protected CityAtlas admin artifacts are disabled in this build.");
-      };
-
-const loadBusinessInboundPreviewModule: () => Promise<typeof import("../lib/businessInboundPreview")> =
-  buildFlags.hostedAdminArtifacts
-    ? () => {
-        businessInboundPreviewModulePromise ??= import("../lib/businessInboundPreview");
-        return businessInboundPreviewModulePromise;
-      }
-    : async () => {
-        throw new Error("Protected CityAtlas admin artifacts are disabled in this build.");
-      };
+import { getTrafficContext, trackProductEvent, type TrackProductEventOptions } from "../lib/analytics";
 
 function shouldLoadGrowthData(pathname: string) {
-  return pathname === "/admin" && buildFlags.hostedAdminArtifacts && canRenderAdminExperience();
+  return pathname === "/admin" && canRenderAdminExperience();
+}
+
+function mergeBusinessProspects(
+  existing: BusinessProspect[],
+  incoming: BusinessProspect[],
+) {
+  const byId = new Map(existing.map((prospect) => [prospect.id, prospect]));
+
+  for (const prospect of incoming) {
+    const current = byId.get(prospect.id);
+    if (!current) {
+      byId.set(prospect.id, prospect);
+      continue;
+    }
+
+    const currentUpdatedAt = Date.parse(current.lastUpdatedAt || "");
+    const incomingUpdatedAt = Date.parse(prospect.lastUpdatedAt || "");
+    byId.set(
+      prospect.id,
+      Number.isFinite(incomingUpdatedAt) && incomingUpdatedAt >= currentUpdatedAt
+        ? { ...current, ...prospect }
+        : current,
+    );
+  }
+
+  return Array.from(byId.values()).sort((left, right) => {
+    const leftUpdatedAt = Date.parse(left.lastUpdatedAt || "");
+    const rightUpdatedAt = Date.parse(right.lastUpdatedAt || "");
+    return rightUpdatedAt - leftUpdatedAt || left.businessName.localeCompare(right.businessName);
+  });
+}
+
+function mergeInboundMirrorEntries(
+  existing: BusinessInboundMirrorEntry[],
+  incoming: BusinessInboundMirrorEntry[],
+) {
+  const byFingerprint = new Map<string, BusinessInboundMirrorEntry>();
+
+  for (const entry of [...incoming, ...existing]) {
+    if (!byFingerprint.has(entry.fingerprint)) {
+      byFingerprint.set(entry.fingerprint, entry);
+    }
+  }
+
+  return Array.from(byFingerprint.values()).sort((left, right) => {
+    return Date.parse(right.receivedAt || "") - Date.parse(left.receivedAt || "");
+  });
+}
+
+function inferBusinessProspectOutreachStatus(sentiment: BusinessReplyLog["sentiment"]) {
+  switch (sentiment) {
+    case "bounce":
+    case "wrong_contact":
+      return "held" as const;
+    case "no_interest":
+      return "do_not_contact" as const;
+    default:
+      return "replied" as const;
+  }
+}
+
+function buildBusinessReplyLogDraftFromMirrorEntry(entry: BusinessInboundMirrorEntry) {
+  if (!entry.matchedProspectId) {
+    return undefined;
+  }
+
+  const lowerReply = entry.replyText.toLowerCase();
+  const sentiment: BusinessReplyLog["sentiment"] =
+    /bounce|undeliverable|delivery[ -]?status/i.test(lowerReply)
+      ? "bounce"
+      : /wrong contact|not the right person/i.test(lowerReply)
+        ? "wrong_contact"
+        : /not interested|no thanks|pass/i.test(lowerReply)
+          ? "no_interest"
+          : /later|not now|circle back/i.test(lowerReply)
+            ? "not_now"
+            : /price|pricing|rate|cost|package/i.test(lowerReply)
+              ? "positive_info"
+              : /yes|interested|sounds good|let's/i.test(lowerReply)
+                ? "positive_interest"
+                : "neutral";
+
+  return {
+    prospectId: entry.matchedProspectId,
+    businessName: entry.matchedBusinessName || entry.name || entry.email,
+    channel: "email" as const,
+    sentiment,
+    messageVersion: "mirror-replay-local",
+    summary: entry.replyText.slice(0, 280) || "Local reply replay.",
+    replyText: entry.replyText,
+    nextStep: sentiment === "positive_interest" ? "Review and follow up manually." : "Review manually.",
+    source: "resend_preview_bridge" as const,
+    sourceRail: "Resend" as const,
+    sourceType: entry.sourceType,
+    messageId: entry.messageId,
+    threadId: entry.threadId,
+    receivedAt: entry.receivedAt,
+  };
+}
+
+function buildBusinessReplyBridgeReplayDraft(entry: BusinessInboundMirrorEntry) {
+  return {
+    schemaVersion: entry.schemaVersion,
+    fingerprint: entry.fingerprint,
+    sourceRail: entry.sourceRail,
+    sourceType: entry.sourceType,
+    messageId: entry.messageId,
+    threadId: entry.threadId,
+    prospectId: entry.matchedProspectId,
+    businessName: entry.matchedBusinessName || entry.name || entry.email,
+    status: "Replayed" as const,
+    detail: "Replayed into local CityAtlas reply memory.",
+    replayedAt: new Date().toISOString(),
+  };
 }
 
 export function useCityAtlasStore(pathname: string) {
@@ -139,13 +233,17 @@ export function useCityAtlasStore(pathname: string) {
         }));
         return lead;
       },
-      trackEvent(name: string, detail: Record<string, string | number | boolean> = {}) {
+      trackEvent(
+        name: string,
+        detail: Record<string, string | number | boolean> = {},
+        options: TrackProductEventOptions = {},
+      ) {
         const path = window.location.pathname;
         const enrichedDetail = {
           ...getTrafficContext(),
           ...detail,
         };
-        trackProductEvent(name, path, enrichedDetail);
+        trackProductEvent(name, path, enrichedDetail, options);
         setData((current) => ({
           ...current,
           growthEvents: [
@@ -195,6 +293,35 @@ export function useCityAtlasStore(pathname: string) {
           };
         });
       },
+      moveSavedItem(savedItemId: string, direction: "up" | "down") {
+        setData((current) => {
+          const currentIndex = current.savedItems.findIndex((item) => item.id === savedItemId);
+          if (currentIndex === -1) return current;
+
+          const nextIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+          if (nextIndex < 0 || nextIndex >= current.savedItems.length) {
+            return current;
+          }
+
+          const nextSavedItems = [...current.savedItems];
+          const [movedItem] = nextSavedItems.splice(currentIndex, 1);
+          nextSavedItems.splice(nextIndex, 0, movedItem);
+
+          return {
+            ...current,
+            savedItems: nextSavedItems,
+            growthEvents: [
+              createGrowthEvent("saved_item_reordered", window.location.pathname, {
+                savedItemId,
+                direction,
+                fromIndex: currentIndex + 1,
+                toIndex: nextIndex + 1,
+              }),
+              ...current.growthEvents,
+            ].slice(0, 200),
+          };
+        });
+      },
       saveMission(mission: CityMission) {
         setData((current) => {
           const existingPairs = new Set(
@@ -213,6 +340,9 @@ export function useCityAtlasStore(pathname: string) {
           return {
             ...current,
             savedItems: [...additions, ...current.savedItems],
+            missionPlans: current.missionPlans.some((plan) => plan.missionId === mission.id)
+              ? current.missionPlans
+              : [createMissionPlan(mission), ...current.missionPlans],
             growthEvents: [
               createGrowthEvent("city_mission_saved", window.location.pathname, {
                 missionId: mission.id,
@@ -231,6 +361,164 @@ export function useCityAtlasStore(pathname: string) {
             ],
           };
         });
+      },
+      setMissionTravelMode(mission: CityMission, travelMode: TravelMode) {
+        setData((current) => {
+          const existing = current.missionPlans.find((plan) => plan.missionId === mission.id);
+          const timestamp = new Date().toISOString();
+          const nextPlan = existing
+            ? {
+                ...existing,
+                travelMode,
+                updatedAt: timestamp,
+              }
+            : createMissionPlan(mission, travelMode);
+
+          return {
+            ...current,
+            missionPlans: [
+              nextPlan,
+              ...current.missionPlans.filter((plan) => plan.missionId !== mission.id),
+            ],
+            growthEvents: [
+              createGrowthEvent("mission_travel_mode_changed", window.location.pathname, {
+                missionId: mission.id,
+                travelMode,
+              }),
+              ...current.growthEvents,
+            ].slice(0, 200),
+          };
+        });
+      },
+      setMissionStartTime(mission: CityMission, selectedStartTime: string) {
+        setData((current) => {
+          const existing = current.missionPlans.find((plan) => plan.missionId === mission.id);
+          const timestamp = new Date().toISOString();
+          const nextPlan = existing
+            ? {
+                ...existing,
+                selectedStartTime,
+                updatedAt: timestamp,
+              }
+            : {
+                ...createMissionPlan(mission),
+                selectedStartTime,
+                updatedAt: timestamp,
+              };
+
+          return {
+            ...current,
+            missionPlans: [
+              nextPlan,
+              ...current.missionPlans.filter((plan) => plan.missionId !== mission.id),
+            ],
+            growthEvents: [
+              createGrowthEvent("mission_start_time_selected", window.location.pathname, {
+                missionId: mission.id,
+                selectedStartTime,
+              }),
+              ...current.growthEvents,
+            ].slice(0, 200),
+          };
+        });
+      },
+      setMissionStepStatus(
+        mission: CityMission,
+        stepIndex: number,
+        status: MissionStepStatus,
+      ) {
+        setData((current) => {
+          const timestamp = new Date().toISOString();
+          const existing = current.missionPlans.find((plan) => plan.missionId === mission.id);
+          const basePlan = existing ?? createMissionPlan(mission);
+          const nextPlan = {
+            ...basePlan,
+            updatedAt: timestamp,
+            steps: mission.steps.map((_, index) => {
+              const existingStep = basePlan.steps.find((step) => step.stepIndex === index);
+              if (index !== stepIndex) {
+                return existingStep ?? {
+                  stepIndex: index,
+                  status: "pending" as const,
+                  updatedAt: timestamp,
+                };
+              }
+
+              return {
+                stepIndex,
+                status,
+                updatedAt: timestamp,
+              };
+            }),
+          };
+
+          return {
+            ...current,
+            missionPlans: [
+              nextPlan,
+              ...current.missionPlans.filter((plan) => plan.missionId !== mission.id),
+            ],
+            growthEvents: [
+              createGrowthEvent(
+                status === "visited" ? "mission_step_visited" : "mission_step_skipped",
+                window.location.pathname,
+                {
+                  missionId: mission.id,
+                  stepIndex: stepIndex + 1,
+                },
+              ),
+              ...current.growthEvents,
+            ].slice(0, 200),
+            auditLogs: [
+              audit(
+                status === "visited" ? "mission_step_visited" : "mission_step_skipped",
+                "city_mission",
+                mission.id,
+                `${mission.title}: marked step ${stepIndex + 1} as ${status}.`,
+              ),
+              ...current.auditLogs,
+            ],
+          };
+        });
+      },
+      addMissionFeedback(
+        mission: CityMission,
+        feedbackType: MissionFeedbackType,
+      ) {
+        setData((current) => ({
+          ...current,
+          growthEvents: [
+            createGrowthEvent("mission_feedback_recorded", window.location.pathname, {
+              missionId: mission.id,
+              feedbackType,
+            }),
+            ...current.growthEvents,
+          ].slice(0, 200),
+          auditLogs: [
+            audit(
+              "mission_feedback_recorded",
+              "city_mission",
+              mission.id,
+              `${mission.title}: recorded ${feedbackType.replaceAll("_", " ")} feedback locally.`,
+            ),
+            ...current.auditLogs,
+          ],
+        }));
+      },
+      resetMissionProgress(mission: CityMission) {
+        setData((current) => ({
+          ...current,
+          missionPlans: [
+            createMissionPlan(mission),
+            ...current.missionPlans.filter((plan) => plan.missionId !== mission.id),
+          ],
+          growthEvents: [
+            createGrowthEvent("mission_progress_reset", window.location.pathname, {
+              missionId: mission.id,
+            }),
+            ...current.growthEvents,
+          ].slice(0, 200),
+        }));
       },
       addBusinessSubmission(input: {
         businessName: string;
@@ -269,7 +557,6 @@ export function useCityAtlasStore(pathname: string) {
         sourceLabel = "manual research import",
       ) {
         if (prospects.length === 0) return 0;
-        const { mergeBusinessProspects } = await loadCityGrowthModule();
         let importedCount = 0;
         setData((current) => {
           const merged = mergeBusinessProspects(current.businessProspects, prospects);
@@ -307,12 +594,11 @@ export function useCityAtlasStore(pathname: string) {
       }) {
         let created: ManualReplyLog | undefined;
         setData((current) => {
-          const candidate = current.proofCandidates.find(
-            (item) => item.id === input.candidateId,
-          );
+          const candidate = current.proofCandidates.find((item) => item.id === input.candidateId);
+          const prospect = current.businessProspects.find((item) => item.id === input.candidateId);
           const log = createManualReplyLog({
             ...input,
-            candidateName: candidate?.name ?? "Unknown candidate",
+            candidateName: candidate?.name ?? prospect?.businessName ?? "Unknown candidate",
           });
           created = log;
           return {
@@ -340,8 +626,6 @@ export function useCityAtlasStore(pathname: string) {
       },
       async saveBusinessInboundMirror(entries: BusinessInboundMirrorEntry[]) {
         if (entries.length === 0) return 0;
-        const { compactBusinessProtectedInboundMirrorEntries } =
-          await loadBusinessInboundPreviewModule();
         let savedCount = 0;
         setData((current) => {
           const existingFingerprints = new Set(
@@ -350,9 +634,8 @@ export function useCityAtlasStore(pathname: string) {
           savedCount = entries.filter(
             (entry) => !existingFingerprints.has(entry.fingerprint),
           ).length;
-          const merged = compactBusinessProtectedInboundMirrorEntries([
+          const merged = mergeInboundMirrorEntries(current.businessInboundMirror, [
             ...entries,
-            ...current.businessInboundMirror,
           ]);
 
           return {
@@ -379,11 +662,6 @@ export function useCityAtlasStore(pathname: string) {
         return savedCount;
       },
       async replayBusinessReplyBridgeEntry(entryId: string) {
-        const {
-          buildBusinessReplyBridgeReplayDraft,
-          buildBusinessReplyLogDraftFromMirrorEntry,
-          inferBusinessProspectOutreachStatus,
-        } = await loadBusinessInboundPreviewModule();
         let created: BusinessReplyLog | undefined;
         setData((current) => {
           const entry = current.businessInboundMirror.find((item) => item.id === entryId);

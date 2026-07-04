@@ -1,83 +1,60 @@
-import { Suspense, lazy, useEffect, useMemo } from "react";
-import type { ComponentType } from "react";
+import { useEffect, useMemo } from "react";
 import { AppLink } from "../components/Link";
 import { PublicLayout } from "../components/Layout";
 import { SeoManager } from "../components/Seo";
 import { LockIcon, ShieldIcon } from "../components/Icons";
+import { AdminConsole } from "../features/admin/AdminConsole";
+import { AdminConsole as AdminConsoleDisabled } from "../features/admin/AdminConsoleDisabled";
+import { BookCallPage } from "../features/business/BookCallPage";
+import { PartnerPreviewPage } from "../features/business/PartnerPreviewPage";
+import { PricingPage } from "../features/business/PricingPage";
+import { SubmitBusinessPage } from "../features/business/SubmitBusinessPage";
+import { PrivacyPage, TermsPage } from "../features/legal/LegalPages";
+import { DateNightPreviewPage } from "../features/private/DateNightPreviewPage";
+import { DateNightPreviewPage as DateNightPreviewDisabled } from "../features/private/DateNightPreviewDisabled";
+import { AboutPage } from "../features/public/AboutPage";
+import { BusinessPage } from "../features/public/BusinessPage";
+import { CityPage } from "../features/public/CityPage";
+import { EventsPage, GuidesPage, OffersPage } from "../features/public/CollectionPages";
+import { GuideDetailPage } from "../features/public/GuideDetailPage";
+import { HomePage } from "../features/public/HomePage";
+import { MissionsPage } from "../features/public/MissionsPage";
+import { PlannerPage } from "../features/public/PlannerPage";
+import { SecondaryCityGuidesPage } from "../features/public/SecondaryCityGuidesPage";
+import {
+  DateNightStartersPage,
+  EditorialStandardsPage,
+  FalseCreekCultureStartersPage,
+  FirstEveningStartersPage,
+  FirstTimeVisitorStartersPage,
+  GardenDayStartersPage,
+  KitsilanoScenicStartersPage,
+  OutOfTownGuestStartersPage,
+  RainyDayStartersPage,
+  ReturningVisitorStartersPage,
+  SourceBackedCollectionPage,
+  SundayStartersPage,
+  UbcDiscoveryStartersPage,
+  WeekendRouteStartersPage,
+  WellnessResetStartersPage,
+  WestSideDaytimeStartersPage,
+} from "../features/public/TrustPages";
 import { parseGuideHubPath, parseGuidePath } from "../lib/cityPaths";
+import { consumePendingNavigationEvent } from "../lib/analytics";
 import {
   buildFlags,
   canRenderAdminExperience,
   canRenderPrivatePreviewExperience,
   siteConfig,
 } from "../config/site";
+import { getMissionCitySlug } from "../lib/missions";
 import { getSourceBackedCollectionForPath } from "../lib/sourceBackedCollections";
 import { usePathname } from "./router";
 import { useCityAtlasStore } from "./useCityAtlasStore";
-
-function lazyNamed<TModule extends Record<string, unknown>>(
-  load: () => Promise<TModule>,
-  exportName: keyof TModule,
-) {
-  return lazy(async () => {
-    const module = await load();
-    return { default: module[exportName] as ComponentType<any> };
-  });
-}
-
-const loadPricingPage = () => import("../features/business/PricingPage");
-const loadSubmitBusinessPage = () => import("../features/business/SubmitBusinessPage");
-const loadLegalPages = () => import("../features/legal/LegalPages");
-const loadAboutPage = () => import("../features/public/AboutPage");
-const loadBusinessPage = () => import("../features/public/BusinessPage");
-const loadCityPage = () => import("../features/public/CityPage");
-const loadCollectionPages = () => import("../features/public/CollectionPages");
-const loadGuideDetailPage = () => import("../features/public/GuideDetailPage");
-const loadHomePage = () => import("../features/public/HomePage");
-const loadMissionsPage = () => import("../features/public/MissionsPage");
-const loadPlannerPage = () => import("../features/public/PlannerPage");
-const loadSecondaryCityGuidesPage = () => import("../features/public/SecondaryCityGuidesPage");
-const loadTrustPages = () => import("../features/public/TrustPages");
-const loadAdminConsole = buildFlags.hostedAdminArtifacts
-  ? () => import("../features/admin/AdminConsole")
-  : () => import("../features/admin/AdminConsoleDisabled");
-const loadDateNightPreviewPage = buildFlags.hostedPrivatePreviewArtifacts
-  ? () => import("../features/private/DateNightPreviewPage")
-  : () => import("../features/private/DateNightPreviewDisabled");
-
-const PricingPage = lazyNamed(loadPricingPage, "PricingPage");
-const SubmitBusinessPage = lazyNamed(loadSubmitBusinessPage, "SubmitBusinessPage");
-const PrivacyPage = lazyNamed(loadLegalPages, "PrivacyPage");
-const TermsPage = lazyNamed(loadLegalPages, "TermsPage");
-const AboutPage = lazyNamed(loadAboutPage, "AboutPage");
-const BusinessPage = lazyNamed(loadBusinessPage, "BusinessPage");
-const CityPage = lazyNamed(loadCityPage, "CityPage");
-const EventsPage = lazyNamed(loadCollectionPages, "EventsPage");
-const GuidesPage = lazyNamed(loadCollectionPages, "GuidesPage");
-const OffersPage = lazyNamed(loadCollectionPages, "OffersPage");
-const GuideDetailPage = lazyNamed(loadGuideDetailPage, "GuideDetailPage");
-const HomePage = lazyNamed(loadHomePage, "HomePage");
-const MissionsPage = lazyNamed(loadMissionsPage, "MissionsPage");
-const PlannerPage = lazyNamed(loadPlannerPage, "PlannerPage");
-const SecondaryCityGuidesPage = lazyNamed(loadSecondaryCityGuidesPage, "SecondaryCityGuidesPage");
-const DateNightStartersPage = lazyNamed(loadTrustPages, "DateNightStartersPage");
-const EditorialStandardsPage = lazyNamed(loadTrustPages, "EditorialStandardsPage");
-const FalseCreekCultureStartersPage = lazyNamed(loadTrustPages, "FalseCreekCultureStartersPage");
-const FirstEveningStartersPage = lazyNamed(loadTrustPages, "FirstEveningStartersPage");
-const FirstTimeVisitorStartersPage = lazyNamed(loadTrustPages, "FirstTimeVisitorStartersPage");
-const GardenDayStartersPage = lazyNamed(loadTrustPages, "GardenDayStartersPage");
-const KitsilanoScenicStartersPage = lazyNamed(loadTrustPages, "KitsilanoScenicStartersPage");
-const OutOfTownGuestStartersPage = lazyNamed(loadTrustPages, "OutOfTownGuestStartersPage");
-const RainyDayStartersPage = lazyNamed(loadTrustPages, "RainyDayStartersPage");
-const ReturningVisitorStartersPage = lazyNamed(loadTrustPages, "ReturningVisitorStartersPage");
-const SundayStartersPage = lazyNamed(loadTrustPages, "SundayStartersPage");
-const UbcDiscoveryStartersPage = lazyNamed(loadTrustPages, "UbcDiscoveryStartersPage");
-const WeekendRouteStartersPage = lazyNamed(loadTrustPages, "WeekendRouteStartersPage");
-const WestSideDaytimeStartersPage = lazyNamed(loadTrustPages, "WestSideDaytimeStartersPage");
-const WellnessResetStartersPage = lazyNamed(loadTrustPages, "WellnessResetStartersPage");
-const SourceBackedCollectionPage = lazyNamed(loadTrustPages, "SourceBackedCollectionPage");
-const AdminConsole = lazyNamed(loadAdminConsole, "AdminConsole");
-const DateNightPreviewPage = lazyNamed(loadDateNightPreviewPage, "DateNightPreviewPage");
+const ActiveAdminConsole = buildFlags.hostedAdminArtifacts ? AdminConsole : AdminConsoleDisabled;
+const ActiveDateNightPreviewPage = buildFlags.hostedPrivatePreviewArtifacts
+  ? DateNightPreviewPage
+  : DateNightPreviewDisabled;
 
 function NotFoundPage() {
   return (
@@ -166,12 +143,17 @@ export function CityAtlasApp() {
   const collectionRoute = getSourceBackedCollectionForPath(path);
   const guidePath = parseGuidePath(path);
   const guideHubPath = parseGuideHubPath(path);
+  const missionHubMatch = path.match(/^\/([^/]+)\/missions$/);
   const waitingForProtectedAdminData =
     path === "/admin" && buildFlags.hostedAdminArtifacts && !growthHydrated;
 
   useEffect(() => {
     if (!hydrated) return;
     actions.trackEvent("page_view", { path });
+    const pendingNavigationEvent = consumePendingNavigationEvent();
+    if (pendingNavigationEvent) {
+      actions.trackEvent(pendingNavigationEvent.name, pendingNavigationEvent.detail);
+    }
   }, [actions, hydrated, path]);
 
   const route = useMemo(() => {
@@ -190,8 +172,14 @@ export function CityAtlasApp() {
         <PlannerPage
           data={data}
           onToggleSave={actions.toggleSave}
+          onMoveSavedItem={actions.moveSavedItem}
           onSaveMission={actions.saveMission}
           onTrack={actions.trackEvent}
+          onSetMissionTravelMode={actions.setMissionTravelMode}
+          onSetMissionStartTime={actions.setMissionStartTime}
+          onSetMissionStepStatus={actions.setMissionStepStatus}
+          onAddMissionFeedback={actions.addMissionFeedback}
+          onResetMissionProgress={actions.resetMissionProgress}
         />
       );
     }
@@ -274,8 +262,27 @@ export function CityAtlasApp() {
         />
       );
     }
-    if (path === `/${siteConfig.citySlug}/missions`) {
-      return <MissionsPage data={data} onSaveMission={actions.saveMission} />;
+    if (missionHubMatch) {
+      const missionCitySlug = missionHubMatch[1];
+      const hasCityMissions = data.cityMissions.some(
+        (mission) => getMissionCitySlug(mission) === missionCitySlug,
+      );
+      if (!hasCityMissions) {
+        return <NotFoundPage />;
+      }
+      return (
+        <MissionsPage
+          data={data}
+          citySlug={missionCitySlug}
+          onSaveMission={actions.saveMission}
+          onTrack={actions.trackEvent}
+          onSetMissionTravelMode={actions.setMissionTravelMode}
+          onSetMissionStartTime={actions.setMissionStartTime}
+          onSetMissionStepStatus={actions.setMissionStepStatus}
+          onAddMissionFeedback={actions.addMissionFeedback}
+          onResetMissionProgress={actions.resetMissionProgress}
+        />
+      );
     }
     if (path.startsWith(`/${siteConfig.citySlug}/businesses/`)) {
       const slug = path.split("/").pop();
@@ -289,10 +296,17 @@ export function CityAtlasApp() {
     if (path === "/for-businesses/pricing") {
       return <PricingPage data={data} onTrack={actions.trackEvent} />;
     }
+    if (path === "/for-businesses/book-call") {
+      return <BookCallPage data={data} onTrack={actions.trackEvent} />;
+    }
+    if (path === "/for-businesses/partner-preview") {
+      return <PartnerPreviewPage data={data} onTrack={actions.trackEvent} />;
+    }
     if (path === "/for-businesses/submit") {
       return (
         <SubmitBusinessPage
           data={data}
+          path={path}
           onSubmitBusiness={actions.addBusinessSubmission}
           onTrack={actions.trackEvent}
         />
@@ -308,7 +322,7 @@ export function CityAtlasApp() {
           />
         );
       }
-      return <DateNightPreviewPage data={data} onTrack={actions.trackEvent} />;
+      return <ActiveDateNightPreviewPage data={data} onTrack={actions.trackEvent} />;
     }
     if (path === "/terms") {
       return <TermsPage />;
@@ -330,7 +344,7 @@ export function CityAtlasApp() {
         );
       }
       return (
-        <AdminConsole
+        <ActiveAdminConsole
           data={data}
           onImportBusinessProspects={actions.addBusinessProspects}
           onSetBusinessProspectSupervisedAllowlist={actions.setBusinessProspectSupervisedAllowlist}
@@ -345,7 +359,9 @@ export function CityAtlasApp() {
           onLogManualReply={actions.addManualReplyLog}
           onSaveBrainRun={actions.saveBrainRun}
           onMarkGateReady={actions.markGateReady}
-          onResetDemo={actions.resetDemo}
+          onResetDemo={() => {
+            actions.resetDemo();
+          }}
         />
       );
     }
@@ -363,7 +379,7 @@ export function CityAtlasApp() {
   return (
     <PublicLayout path={path}>
       <SeoManager path={path} data={data} />
-      <Suspense fallback={<RouteLoading />}>{route}</Suspense>
+      {route}
     </PublicLayout>
   );
 }

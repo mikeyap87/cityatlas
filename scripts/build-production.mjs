@@ -3,16 +3,18 @@ import {
   existsSync,
   mkdirSync,
   readdirSync,
+  renameSync,
   rmSync,
   writeFileSync,
 } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { build } from "vite";
-
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
-const outDir = join(root, "dist");
+const liveOutDir = join(root, "dist");
+const localBuildDir = join(root, ".local-build");
+const stageOutDir = join(localBuildDir, "dist.__staging");
+const backupRootDir = join(localBuildDir, "dist-backups");
 const publicDir = join(root, "public");
 const shouldCopyHostedAdminArtifacts = process.env.VITE_CITYATLAS_ENABLE_HOSTED_ADMIN === "true";
 const shouldCopyHostedPrivatePreviewArtifacts =
@@ -24,14 +26,20 @@ function collectOutputs(result) {
 }
 
 function writeOutputFile(fileName, contents) {
-  const targetPath = join(outDir, fileName);
+  const targetPath = join(stageOutDir, fileName);
   mkdirSync(dirname(targetPath), { recursive: true });
   writeFileSync(targetPath, contents);
 }
 
 function shouldSkipPublicEntry(relativePath) {
-  return !shouldCopyHostedAdminArtifacts
-    && (relativePath === "operator" || relativePath.startsWith("operator/"));
+  return (
+    relativePath === "assets/places"
+    || relativePath.startsWith("assets/places/")
+    || (
+    !shouldCopyHostedAdminArtifacts
+    && (relativePath === "operator" || relativePath.startsWith("operator/"))
+    )
+  );
 }
 
 function shouldSkipOutputFile(fileName) {
@@ -81,11 +89,11 @@ function copyDirectoryContents(sourceDir, targetDir, relativeDir = "") {
 }
 
 function writeBuildOutputs(outputs) {
-  rmSync(outDir, { recursive: true, force: true });
-  mkdirSync(outDir, { recursive: true });
+  rmSync(stageOutDir, { recursive: true, force: true });
+  mkdirSync(stageOutDir, { recursive: true });
 
   if (existsSync(publicDir)) {
-    copyDirectoryContents(publicDir, outDir);
+    copyDirectoryContents(publicDir, stageOutDir);
   }
 
   for (const output of outputs) {
@@ -106,36 +114,66 @@ function writeBuildOutputs(outputs) {
   }
 }
 
+function finalizeBuildOutputs() {
+  mkdirSync(backupRootDir, { recursive: true });
+  const backupOutDir = join(backupRootDir, `dist-${Date.now()}`);
+
+  if (existsSync(liveOutDir)) {
+    renameSync(liveOutDir, backupOutDir);
+  }
+
+  renameSync(stageOutDir, liveOutDir);
+
+  return backupOutDir;
+}
+
+function logBuildStage(stage, details = {}) {
+  console.log(
+    JSON.stringify(
+      {
+        stage,
+        ...details,
+      },
+      null,
+      2,
+    ),
+  );
+}
+
+logBuildStage("cityatlas-build:start", { root, liveOutDir, stageOutDir, backupRootDir });
+
+const { build } = await import("vite");
+
+logBuildStage("cityatlas-build:vite-imported");
+
 const result = await build({
   root,
   build: {
-    outDir,
+    outDir: stageOutDir,
+    cssMinify: false,
     modulePreload: false,
     write: false,
   },
 });
 
+logBuildStage("cityatlas-build:vite-complete");
+
 const outputs = collectOutputs(result);
 writeBuildOutputs(outputs);
+const backupOutDir = finalizeBuildOutputs();
 
 const outputSummary = outputs
   .filter((output) => !shouldSkipOutputFile(output.fileName))
   .map((output) => ({
-  fileName: output.fileName,
-  type: output.type,
+    fileName: output.fileName,
+    type: output.type,
   }));
 
-console.log("CityAtlas production build");
-console.log(
-  JSON.stringify(
-    {
-      outDir,
-      outputCount: outputs.length,
-      hostedAdminArtifactsCopied: shouldCopyHostedAdminArtifacts,
-      hostedPrivatePreviewArtifactsCopied: shouldCopyHostedPrivatePreviewArtifacts,
-      outputs: outputSummary,
-    },
-    null,
-    2,
-  ),
-);
+logBuildStage("cityatlas-build:outputs-written", {
+  outDir: liveOutDir,
+  backupOutDir,
+  outputCount: outputs.length,
+  hostedAdminArtifactsCopied: shouldCopyHostedAdminArtifacts,
+  hostedPrivatePreviewArtifactsCopied: shouldCopyHostedPrivatePreviewArtifacts,
+  outputs: outputSummary,
+});

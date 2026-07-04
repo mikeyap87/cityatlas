@@ -12,8 +12,10 @@ export function TermsPage() {
           <p className="section-label">Terms</p>
           <h1>CityAtlas terms for the public site</h1>
           <p>
-            These terms explain the public guide site, the business request form, and what is not
-            live yet. CityAtlas does not take payments on this site today.
+            These terms explain the public guide site, the business request path, and the limited
+            paid partner checkout that now exists. CityAtlas can hand paid partner packages to
+            Stripe-hosted checkout, but paying does not create an automatic public listing,
+            guaranteed placement, or guaranteed traffic.
           </p>
           <div className="hero-actions">
             <AppLink className="button secondary" to="/editorial-standards">
@@ -25,7 +27,7 @@ export function TermsPage() {
           </div>
           <div className="tag-cloud pricing-tag-cloud">
             <span>Public guides live</span>
-            <span>Payments off</span>
+            <span>Hosted partner checkout live</span>
             <span>Requests are review-first</span>
           </div>
         </div>
@@ -33,14 +35,14 @@ export function TermsPage() {
           <div className="public-intro-card-header">
             <div>
               <strong>Plain-English summary</strong>
-              <p>The public guide site is live. Payment is not.</p>
+              <p>The public guide site is live. Paid checkout is limited, and review still matters.</p>
             </div>
-            <StatusPill tone="amber">Payments off</StatusPill>
+            <StatusPill tone="amber">Review-first + paid path</StatusPill>
           </div>
           <ul className="public-note-list">
             <li><ShieldIcon /> Public guides and starting pages are live.</li>
-            <li><LockIcon /> Checkout, subscriptions, and invoices are not live.</li>
-            <li><ShieldIcon /> A business request is not an approved listing.</li>
+            <li><LockIcon /> City Partner and Signature Partner can open in Stripe-hosted checkout.</li>
+            <li><ShieldIcon /> A business request or payment is not an approved listing.</li>
           </ul>
         </div>
       </section>
@@ -60,9 +62,10 @@ export function TermsPage() {
           <LockIcon />
           <h2>What is not live yet</h2>
           <p>
-            Package prices shown in the app describe possible service tiers. CityAtlas does not
-            currently accept payments, create subscriptions, issue invoices, or guarantee
-            placement.
+            CityAtlas does not have custom in-app billing, subscription management, invoice
+            handling, or guaranteed placement. Paid partner plans still require manual follow-up,
+            fact confirmation, and the first real completed checkout proof before self-serve
+            charging should be treated as fully proven.
           </p>
         </article>
 
@@ -72,6 +75,15 @@ export function TermsPage() {
             A business request is not an approved listing, partnership, endorsement, or contract.
             CityAtlas may review, verify, decline, or request more information before any business
             page, offer, or event is published.
+          </p>
+        </article>
+
+        <article className="source-panel">
+          <h2>What a paid checkout does and does not mean</h2>
+          <p>
+            A paid checkout secures package intent and starts manual follow-up on fit, facts, and
+            the clearest next deliverable. It does not automatically publish a page, promise
+            rankings, guarantee traffic, or waive CityAtlas review standards.
           </p>
         </article>
 
@@ -108,14 +120,14 @@ export function TermsPage() {
       <div className="cta-band">
         <ShieldIcon />
         <div>
-          <h2>Before checkout opens</h2>
+          <h2>Before calling self-serve charging fully proven</h2>
           <p>
-            Finalize terms, refund policy, fulfillment scope, Stripe products, support process,
-            and business data policy before enabling checkout.
+            Complete the first real paid checkout, keep support and cancellation questions easy to
+            reach, and continue treating public publication as review-based rather than automatic.
           </p>
         </div>
-        <AppLink className="button secondary" to="/privacy">
-          Privacy
+        <AppLink className="button secondary" to="/for-businesses/pricing">
+          Pricing
         </AppLink>
       </div>
     </section>

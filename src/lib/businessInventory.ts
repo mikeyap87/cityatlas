@@ -11,7 +11,20 @@ const OFFICIAL_VANCOUVER_FOOD_SOURCE_LABEL =
   "Official Vancouver business licence inventory";
 const OFFICIAL_VANCOUVER_SERVICE_SOURCE_LABEL =
   "Official Vancouver service business inventory";
+const OFFICIAL_GREATER_VANCOUVER_SOURCE_LABEL =
+  "Official Greater Vancouver business inventory";
 const REVIEWED_SERVICE_SOURCE_LABEL = "CityAtlas reviewed service business inventory";
+const OFFICIAL_METRO_PRIORITY_CATEGORY_PRIMARY = new Set([
+  "restaurant",
+  "beauty",
+  "wellness",
+  "fitness",
+  "hospitality",
+  "events",
+  "automotive",
+  "home-services",
+  "retail",
+]);
 const FOOD_CATEGORY_PATTERNS = [
   /restaurant/i,
   /limited service food/i,
@@ -23,6 +36,38 @@ const FOOD_CATEGORY_PATTERNS = [
   /brew/i,
   /bistro/i,
 ];
+const OFFICIAL_METRO_HOLDOUT_PATTERNS = [
+  /adult services|body rub|escort/i,
+  /house rental|short term rental|vacation rental|airbnb/i,
+  /financial institutions|bank|credit union|money mart|payday/i,
+  /government|public school|private school|college|university|church|temple|mosque|religious/i,
+];
+const OFFICIAL_METRO_REVIEW_PATTERNS = [
+  /home-based|business - non resident|non resident|mobile business/i,
+  /inter-municipal business licence|imbl/i,
+  /office - general|consultant|professional practitioner/i,
+  /warehouse|wholesale|manufacturer|manufacturers|industrial services|mail order|trucking|cartage/i,
+  /general services|sales\b|unknown/i,
+  /contractor/i,
+];
+const OFFICIAL_METRO_PRIORITY_PATTERNS = [
+  /restaurant|cafe|coffee|bakery|brew|bistro|pub|bar\b/i,
+  /salon|spa|massage|esthetician|barber|nail|personal service(?!.*adult)/i,
+  /fitness|gym|yoga|pilates|wellness|recovery/i,
+  /hotel|inn|gallery|museum|venue|event/i,
+  /auto repair|repair shop|detailing|car wash|tire|mechanic|automotive/i,
+  /cleaning|janitorial|plumbing|electrical|pest|landscap/i,
+  /florist|pet groom|retail trader|retail merchant/i,
+];
+
+export type OfficialMetroPartnerFitTier = "priority" | "review" | "holdout";
+
+export type OfficialMetroPartnerFit = {
+  tier: OfficialMetroPartnerFitTier;
+  reason: string;
+  score: number;
+  flags: string[];
+};
 
 function normalizeText(value: string) {
   return value.trim().toLowerCase();
@@ -156,6 +201,141 @@ function isOfficialFoodInventoryRecord(record: BusinessInventoryRecord) {
     && record.sourceScope === "vancouver_food_issued_2026";
 }
 
+function isOfficialMetroInventoryRecord(record: BusinessInventoryRecord) {
+  return record.sourceSystem !== "cityatlas_service_partner_inventory"
+    && record.sourceSystem !== "vancouver_business_licences";
+}
+
+function buildOfficialMetroPartnerFitText(record: BusinessInventoryRecord) {
+  return normalizeText(
+    [
+      record.businessName,
+      record.businessTradeName,
+      record.businessType,
+      record.businessSubtype,
+      record.categoryPrimary,
+      record.categorySecondary,
+      record.localArea,
+      record.streetAddress,
+    ]
+      .filter(Boolean)
+      .join(" "),
+  );
+}
+
+function buildOfficialMetroPartnerFitFlags(text: string) {
+  const flags: string[] = [];
+
+  if (/adult services|body rub|escort/i.test(text)) flags.push("sensitive");
+  if (/house rental|short term rental|vacation rental|airbnb/i.test(text)) {
+    flags.push("rental");
+  }
+  if (/financial institutions|bank|credit union|money mart|payday/i.test(text)) {
+    flags.push("finance");
+  }
+  if (/home-based|business - non resident|non resident|mobile business/i.test(text)) {
+    flags.push("offsite_or_mobile");
+  }
+  if (/inter-municipal business licence|imbl/i.test(text)) {
+    flags.push("intermunicipal");
+  }
+  if (/office - general|consultant|professional practitioner/i.test(text)) {
+    flags.push("office_or_professional");
+  }
+  if (/warehouse|wholesale|manufacturer|manufacturers|industrial services|mail order|trucking|cartage/i.test(text)) {
+    flags.push("backoffice_or_industrial");
+  }
+  if (/government|public school|private school|college|university|church|temple|mosque|religious/i.test(text)) {
+    flags.push("institutional");
+  }
+  if (/contractor/i.test(text)) flags.push("contractor");
+
+  return flags;
+}
+
+export function getOfficialMetroPartnerFit(record: BusinessInventoryRecord): OfficialMetroPartnerFit {
+  if (!isOfficialMetroInventoryRecord(record)) {
+    return {
+      tier: "review",
+      reason: "Not part of the official Greater Vancouver inventory lane.",
+      score: 0,
+      flags: [],
+    };
+  }
+
+  const text = buildOfficialMetroPartnerFitText(record);
+  const flags = buildOfficialMetroPartnerFitFlags(text);
+  const isHoldout = OFFICIAL_METRO_HOLDOUT_PATTERNS.some((pattern) => pattern.test(text));
+  const needsReview = OFFICIAL_METRO_REVIEW_PATTERNS.some((pattern) => pattern.test(text));
+  const looksPriority =
+    OFFICIAL_METRO_PRIORITY_CATEGORY_PRIMARY.has(record.categoryPrimary)
+    || OFFICIAL_METRO_PRIORITY_PATTERNS.some((pattern) => pattern.test(text));
+
+  if (isHoldout) {
+    return {
+      tier: "holdout",
+      reason:
+        "Low-fit or sensitive licence class for first-pass partnership outreach. Keep it out of the default shortlist.",
+      score: 25,
+      flags,
+    };
+  }
+
+  if (looksPriority && !needsReview) {
+    return {
+      tier: "priority",
+      reason:
+        "Likely public-facing consumer business type and a cleaner first-pass partnership candidate.",
+      score:
+        200
+        + (record.email ? 25 : 0)
+        + (record.phone ? 10 : 0)
+        + (record.localArea ? 5 : 0)
+        + (record.streetAddress && !/business - non resident/i.test(record.streetAddress) ? 10 : 0),
+      flags,
+    };
+  }
+
+  if (looksPriority) {
+    return {
+      tier: "review",
+      reason:
+        "Potential fit, but the licence reads as home-based, mobile, contractor, non-resident, or back-office and should stay review-first.",
+      score:
+        120
+        + (record.email ? 20 : 0)
+        + (record.phone ? 8 : 0)
+        + (record.localArea ? 5 : 0),
+      flags,
+    };
+  }
+
+  return {
+    tier: "review",
+    reason:
+      "Needs manual review before outreach because the public-facing partnership fit is unclear from the licence class alone.",
+    score:
+      90
+      + (record.email ? 15 : 0)
+      + (record.phone ? 5 : 0)
+      + (record.localArea ? 5 : 0),
+    flags,
+  };
+}
+
+export function sortOfficialMetroInventoryRecords(records: BusinessInventoryRecord[]) {
+  return records.slice().sort((left, right) => {
+    const leftFit = getOfficialMetroPartnerFit(left);
+    const rightFit = getOfficialMetroPartnerFit(right);
+    return (
+      rightFit.score - leftFit.score
+      || left.businessType.localeCompare(right.businessType)
+      || left.localArea.localeCompare(right.localArea)
+      || left.businessName.localeCompare(right.businessName)
+    );
+  });
+}
+
 export function isServiceBusinessProspect(prospect: BusinessProspect) {
   return (
     !isFoodLikeLabel(prospect.category)
@@ -183,7 +363,7 @@ export function mapServiceProspectToInventoryRecord(
     categorySecondary: prospect.contactPathType,
     cuisine: "",
     cityName: prospect.cityName,
-    municipality: prospect.cityName,
+    municipality: prospect.municipality || prospect.cityName,
     sourceCityRaw: prospect.cityName,
     localArea: prospect.neighborhood,
     streetAddress: "",
@@ -271,6 +451,9 @@ export function mapBusinessInventoryRecordToImportInput(
   const isLimitedService = record.businessType === "Limited Service Food Establishment";
   const isReviewedServiceInventory = isReviewedServiceInventoryRecord(record);
   const isOfficialServiceInventory = isOfficialServiceInventoryRecord(record);
+  const isOfficialMetroInventory = isOfficialMetroInventoryRecord(record);
+  const isServiceLikeOfficialMetroInventory =
+    isOfficialMetroInventory && !isFoodLikeLabel(record.businessType || record.categoryPrimary);
   const displayName = record.businessTradeName || record.businessName;
   const locationBits = [record.streetAddress, record.postalCode, record.localArea].filter(Boolean);
   const subtype = record.businessSubtype ? `Subtype: ${record.businessSubtype}.` : "";
@@ -280,9 +463,10 @@ export function mapBusinessInventoryRecordToImportInput(
     email: "",
     contactName: "",
     cityName: record.cityName || record.municipality || "Vancouver",
+    municipality: record.municipality || record.cityName || "Vancouver",
     neighborhood: record.localArea,
     category: record.businessType,
-    segment: isReviewedServiceInventory || isOfficialServiceInventory
+    segment: isReviewedServiceInventory || isOfficialServiceInventory || isServiceLikeOfficialMetroInventory
       ? record.businessSubtype || record.businessType || "Service business"
       : isLimitedService
         ? "Cafe and quick-service food"
@@ -291,7 +475,9 @@ export function mapBusinessInventoryRecordToImportInput(
       ? REVIEWED_SERVICE_SOURCE_LABEL
       : isOfficialServiceInventory
         ? OFFICIAL_VANCOUVER_SERVICE_SOURCE_LABEL
-        : OFFICIAL_VANCOUVER_FOOD_SOURCE_LABEL,
+        : isOfficialMetroInventory
+          ? OFFICIAL_GREATER_VANCOUVER_SOURCE_LABEL
+          : OFFICIAL_VANCOUVER_FOOD_SOURCE_LABEL,
     sourceUrl: buildBusinessInventorySourceUrl(record),
     website: record.website,
     contactPath: record.publicContactPath || record.officialSourceUrl,
@@ -300,8 +486,13 @@ export function mapBusinessInventoryRecordToImportInput(
         ? "Imported from the reviewed CityAtlas service-business inventory for local review only."
         : isOfficialServiceInventory
           ? "Imported from the official City of Vancouver service-business inventory for local review only."
-          : "Imported from the official City of Vancouver food-business inventory for local review only.",
+          : isOfficialMetroInventory
+            ? "Imported from the verified Greater Vancouver municipal business inventory for local review only."
+            : "Imported from the official City of Vancouver food-business inventory for local review only.",
       locationBits.length > 0 ? `Location: ${locationBits.join(", ")}.` : "",
+      record.municipality && record.municipality !== record.cityName
+        ? `Municipality: ${record.municipality}.`
+        : "",
       subtype,
       "No outreach, public publishing, or route assignment happened automatically.",
     ]
@@ -315,10 +506,14 @@ export function createBusinessProspectsFromInventoryRecords(records: BusinessInv
   const hasReviewedServiceInventory = records.some(isReviewedServiceInventoryRecord);
   const hasOfficialFoodInventory = records.some(isOfficialFoodInventoryRecord);
   const hasOfficialServiceInventory = records.some(isOfficialServiceInventoryRecord);
+  const hasOfficialMetroInventory = records.some(isOfficialMetroInventoryRecord);
   const importBatchId =
-    hasReviewedServiceInventory && (hasOfficialFoodInventory || hasOfficialServiceInventory)
+    hasReviewedServiceInventory
+    && (hasOfficialFoodInventory || hasOfficialServiceInventory || hasOfficialMetroInventory)
       ? "cityatlas-combined-operator-inventory"
-      : hasOfficialFoodInventory && hasOfficialServiceInventory
+      : hasOfficialMetroInventory
+        ? "cityatlas-official-greater-vancouver-inventory"
+        : hasOfficialFoodInventory && hasOfficialServiceInventory
         ? "cityatlas-official-vancouver-operator-inventory"
         : hasReviewedServiceInventory
         ? "cityatlas-reviewed-service-inventory"
@@ -373,12 +568,19 @@ export function getBusinessInventoryImportSourceLabel(records: BusinessInventory
   const hasReviewedServiceInventory = records.some(isReviewedServiceInventoryRecord);
   const hasOfficialFoodInventory = records.some(isOfficialFoodInventoryRecord);
   const hasOfficialServiceInventory = records.some(isOfficialServiceInventoryRecord);
+  const hasOfficialMetroInventory = records.some(isOfficialMetroInventoryRecord);
 
-  if (hasReviewedServiceInventory && (hasOfficialFoodInventory || hasOfficialServiceInventory)) {
+  if (
+    hasReviewedServiceInventory
+    && (hasOfficialFoodInventory || hasOfficialServiceInventory || hasOfficialMetroInventory)
+  ) {
     return "combined_operator_inventory";
   }
   if (hasReviewedServiceInventory) {
     return "reviewed_service_business_inventory";
+  }
+  if (hasOfficialMetroInventory) {
+    return "official_greater_vancouver_business_inventory";
   }
   if (hasOfficialFoodInventory && hasOfficialServiceInventory) {
     return "official_vancouver_operator_inventory";

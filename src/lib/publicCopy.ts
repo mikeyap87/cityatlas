@@ -2,6 +2,53 @@ function tidyCopy(value: string) {
   return value.replace(/\s+/g, " ").replace(/\s([,.;!?])/g, "$1").trim();
 }
 
+export function simplifyPublicSurfaceText(value: string) {
+  return tidyCopy(
+    value
+      .replace(/official-link/gi, "official link")
+      .replace(/coverage snapshot/gi, "current coverage")
+      .replace(/review flow/gi, "request path")
+      .replace(/in the product/gi, "available now")
+      .replace(/source-backed starter pages/gi, "starting pages with official links")
+      .replace(/source-backed starter page/gi, "starting page with official links")
+      .replace(/source-backed pages/gi, "pages with official links")
+      .replace(/source-backed page/gi, "page with official links")
+      .replace(/source-backed entries/gi, "places on this page")
+      .replace(/source-backed entry/gi, "place on this page")
+      .replace(/source-backed/gi, "official link")
+      .replace(/official-source/gi, "official")
+      .replace(/visible claim boundaries/gi, "clear claim limits")
+      .replace(/claim limits visible/gi, "clear about what is checked")
+      .replace(
+        /public correction or removal path/gi,
+        "public way to report a mistake or ask for a change",
+      )
+      .replace(/\broutes\b/gi, "plans")
+      .replace(/\broute\b/gi, "plan")
+      .replace(/\broute fit\b/gi, "best match")
+      .replace(/\bplan fit\b/gi, "best match")
+      .replace(/route-first/gi, "simple")
+      .replace(/route role/gi, "why it fits")
+      .replace(/route logic/gi, "planning logic")
+      .replace(/lower-friction/gi, "easier")
+      .replace(/low-friction/gi, "easy")
+      .replace(/\banchors\b/gi, "main stops")
+      .replace(/\banchor\b/gi, "main stop"),
+  );
+}
+
+export function simplifyBusinessDisplayText(value: string) {
+  return tidyCopy(
+    simplifyPublicSurfaceText(value)
+      .replace(/\bmain stops\b/gi, "spots")
+      .replace(/\bmain stop\b/gi, "spot")
+      .replace(/\bpage for\b/gi, "spot for")
+      .replace(/CityAtlas uses the official site here for /gi, "CityAtlas uses the official site to confirm ")
+      .replace(/CityAtlas keeps the page focused on /gi, "CityAtlas keeps this page focused on ")
+      .replace(/contact route/gi, "contact path"),
+  );
+}
+
 export function simplifyGuideTitle(value: string) {
   return tidyCopy(
     value
@@ -60,6 +107,10 @@ export function simplifyGuideDisplayText(value: string) {
       .replace(
         /A plan choice guide for deciding whether a rainy day, wellness, Sunday, weekend, or first-evening Vancouver plan fits the day best\./gi,
         "Use this guide to choose between rainy-day, wellness, Sunday, weekend, and first-evening Vancouver plans.",
+      )
+      .replace(
+        /A Vancouver (?:low-friction|easy) choose a plan that helps someone decide between ([^.]+) based on energy, weather, and how much movement the day can hold\./gi,
+        "A Vancouver guide for choosing between $1 based on energy, weather, and how much movement the day can hold.",
       )
       .replace(
         /Open this when the main question is which easy CityAtlas route fits the current energy and timebox best\./gi,
@@ -123,6 +174,8 @@ export function simplifyGuideDisplayText(value: string) {
       .replace(/route placement/gi, "guide placement")
       .replace(/route loops/gi, "saved plans")
       .replace(/route ideas/gi, "plan ideas")
+      .replace(/\banchors\b/gi, "main stops")
+      .replace(/\banchor\b/gi, "main stop")
       .replace(/answer-first guide layer/gi, "guide collection")
       .replace(/answer-first guide cluster/gi, "guide section")
       .replace(/answer-first planning guides/gi, "clear Vancouver guides")
@@ -159,6 +212,7 @@ export function simplifyGuideDisplayText(value: string) {
       .replace(/cross-city weekend checklist/gi, "packed weekend checklist")
       .replace(/source-backed/gi, "carefully sourced")
       .replace(/official-source/gi, "official")
+      .replace(/source discipline/gi, "source rules")
       .replace(/visible claim boundaries/gi, "clear claim limits")
       .replace(/claim limits visible/gi, "stays clear about what is checked")
       .replace(
@@ -202,6 +256,7 @@ export function simplifyGuideCategoryLabel(value: string) {
 export function simplifyMissionDisplayText(value: string) {
   return tidyCopy(
     simplifyGuideDisplayText(value)
+      .replace(/offer preview/gi, "offer example")
       .replace(/\bA easy\b/gi, "An easy")
       .replace(/\bthis route\b/gi, "this plan")
       .replace(/\bthe route\b/gi, "the plan")

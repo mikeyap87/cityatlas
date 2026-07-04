@@ -74,7 +74,7 @@ const publicLaneDefinitions: PublicLaneDefinition[] = [
     title: "Wellness, reset, and slower-day coverage",
     path: "/vancouver/wellness-reset-starters",
     description:
-      "Use this page when the plan needs easier wellness anchors, calmer pacing, or a calmer reset instead of a packed schedule.",
+      "Use this page when the plan needs easier wellness starting points, calmer pacing, or a gentler reset instead of a packed schedule.",
     batchLanes: ["wellness"],
   },
   {
@@ -82,7 +82,7 @@ const publicLaneDefinitions: PublicLaneDefinition[] = [
     title: "Flexible local discovery, cafes, and neighborhood staples",
     path: "/vancouver/guides/cityatlas-guide-roundup-which-vancouver-route-should-you-open-by-situation",
     description:
-      "Choose this lane when the answer is still broad and the best next move is matching a person to the right CityAtlas route before naming one exact stop.",
+      "Choose this page when the answer is still broad and the best next move is matching someone to the right CityAtlas guide before naming one exact stop.",
     batchLanes: ["local_business", "other"],
   },
 ];

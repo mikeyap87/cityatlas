@@ -1,6 +1,8 @@
+import { useEffect, useState } from "react";
+
 import type { Business, CityAtlasData, EventItem, Guide } from "../../types";
 import { AppLink } from "../../components/Link";
-import { BusinessCard, EventCard, GuideCard } from "../../components/Cards";
+import { BusinessCard, EventCard } from "../../components/Cards";
 import { ArrowRightIcon, MapIcon, ShieldIcon } from "../../components/Icons";
 import { SectionHeader, StatusPill } from "../../components/UI";
 import {
@@ -8,8 +10,23 @@ import {
   getSourceBackedPlaceVisual,
   hasSpecificSourceBackedPlaceVisual,
 } from "../../lib/visuals";
-import { simplifyGuideCategoryLabel, simplifyGuideDisplayText } from "../../lib/publicCopy";
 import {
+  simplifyGuideCategoryLabel,
+  simplifyGuideDisplayText,
+  simplifyMissionDisplayText,
+  simplifyPublicSurfaceText,
+} from "../../lib/publicCopy";
+import {
+  formatMinutes,
+  getMissionAnchorPath,
+  getMissionForGuide,
+  getMissionHubPathForCity,
+  getMissionTotalMinutes,
+  getMissionTravelSummary,
+  isGuideRouteChooser,
+} from "../../lib/missions";
+import {
+  getGuideCitySlug,
   getGuideHubPath,
   getGuidePath,
 } from "../../lib/cityPaths";
@@ -25,6 +42,15 @@ interface GuideDetailPageProps {
   guideHubPath?: string;
 }
 
+interface GuideRoutingChoice {
+  actionLabel: string;
+  copy: string;
+  kicker: string;
+  label: string;
+  path: string;
+  title: string;
+}
+
 const guideGateMeta = {
   draft_only: {
     label: "City guide",
@@ -33,13 +59,13 @@ const guideGateMeta = {
       "Use this page to choose the right area or plan shape first. Check exact hours, prices, and availability on the official or business page.",
   },
   needs_real_sources: {
-    label: "Good starting point",
+    label: "Helpful guide",
     tone: "amber",
     trustCopy:
       "This guide helps with the first decision. Use official or business pages for exact live details before you rely on them.",
   },
   ready_for_review: {
-    label: "Checked guide",
+    label: "Planning guide",
     tone: "blue",
     trustCopy:
       "This guide stays useful by focusing on the planning decision first. Exact listings and live details still need direct confirmation.",
@@ -47,20 +73,31 @@ const guideGateMeta = {
 } as const;
 
 function simplifyReferenceText(value: string) {
-  return value
-    .replace(
-      /The official ([^.]+?) gives CityAtlas a (?:direct )?public source for /gi,
-      "The official $1 confirms ",
-    )
-    .replace(/ without pretending [^.]+?\./gi, ".")
-    .replace(/ without pretending [^.]+?,$/gi, "")
-    .replace(/ without pretending [^.]+$/gi, "")
-    .replace(/official-source/gi, "official")
-    .replace(/route role/gi, "why it fits")
-    .replace(/\broute fit\b/gi, "best match")
-    .replace(/\bplan fit\b/gi, "best match")
-    .replace(/  +/g, " ")
-    .trim();
+  return simplifyPublicSurfaceText(
+    value
+      .replace(
+        /The official ([^.]+?) gives CityAtlas a (?:direct )?public source for /gi,
+        "The official $1 confirms ",
+      )
+      .replace(/ without pretending [^.]+?\./gi, ".")
+      .replace(/ without pretending [^.]+?,$/gi, "")
+      .replace(/ without pretending [^.]+$/gi, "")
+      .replace(/  +/g, " ")
+      .trim(),
+  );
+}
+
+function buildGuideActionLabel(title: string) {
+  const normalized = title.trim();
+  if (!normalized) return "Open page";
+  const simplified = simplifyGuideDisplayText(normalized);
+  const label = simplified ? `${simplified[0].toUpperCase()}${simplified.slice(1)}` : simplified;
+  if (/^(open|see|browse)\b/i.test(normalized)) return label;
+  return `Open ${label}`;
+}
+
+function buildGuideRoutingChoiceAction(title: string) {
+  return buildGuideActionLabel(title);
 }
 
 function GuideSourceBackedReferenceCard({
@@ -70,7 +107,7 @@ function GuideSourceBackedReferenceCard({
   reference: ReturnType<typeof getSourceBackedPlaces>[number];
   variant?: "full" | "compact";
 }) {
-  const referenceFacts = reference.verifiedFacts.slice(0, 2);
+  const referenceFacts = reference.verifiedFacts.slice(0, 2).map((fact) => simplifyPublicSurfaceText(fact));
   const referenceTags = [
     reference.neighborhood,
     simplifyGuideDisplayText(reference.routeRole),
@@ -89,8 +126,8 @@ function GuideSourceBackedReferenceCard({
               loading="lazy"
             />
           ) : (
-            <div className="source-reference-media-fallback-note" aria-hidden="true">
-              <span><ShieldIcon /> Official site linked</span>
+          <div className="source-reference-media-fallback-note" aria-hidden="true">
+              <span><ShieldIcon /> Official site</span>
               <span><MapIcon /> Photo not added yet</span>
             </div>
           )}
@@ -148,7 +185,7 @@ function GuideSourceBackedReferenceCard({
           />
         ) : (
           <div className="source-reference-media-fallback-note" aria-hidden="true">
-            <span><ShieldIcon /> Official site linked</span>
+            <span><ShieldIcon /> Official site</span>
             <span><MapIcon /> Photo not added yet</span>
           </div>
         )}
@@ -161,7 +198,7 @@ function GuideSourceBackedReferenceCard({
       <div className="source-reference-body">
         <div className="source-reference-header">
           <p className="section-label">{reference.category}</p>
-          <StatusPill tone="green">Official site linked</StatusPill>
+          <StatusPill tone="green">Official site</StatusPill>
         </div>
         <p>{simplifyReferenceText(reference.summary)}</p>
         <div className="tag-cloud source-reference-tags">
@@ -242,10 +279,18 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
   const sourceBackedGuideMeta = sourceBackedCollection
     ? sourceBackedCollectionMeta[sourceBackedCollection]
     : null;
+  const linkedMission = getMissionForGuide(data, guide);
+  const routeChooser = isGuideRouteChooser(guide);
+  const guideCitySlug = getGuideCitySlug(guide);
+  const linkedMissionPath = linkedMission
+    ? getMissionAnchorPath(linkedMission, guideCitySlug)
+    : null;
+  const guideMissionHubPath = getMissionHubPathForCity(guideCitySlug);
   const gateMeta = guideGateMeta[guide.gateDecision];
   const resolvedGuideHubPath = getGuideHubPath(guide);
   const guideVisual = getGuideHeroVisual(guide);
   const guideCityName = guide.cityName ?? "Vancouver";
+  const normalizedGuideCategory = guide.category.trim().toLowerCase();
   const guideTitle = simplifyGuideDisplayText(guide.title);
   const guideSummary = simplifyGuideDisplayText(guide.summary);
   const guideHeroQuestion = simplifyGuideDisplayText(guide.heroQuestion);
@@ -263,7 +308,7 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
   }));
   const simplifiedResourceLinks = (guide.resourceLinks ?? []).map((link) => ({
     ...link,
-    title: simplifyGuideDisplayText(link.title),
+    title: buildGuideActionLabel(link.title).replace(/^Open\s+/i, ""),
     description: simplifyGuideDisplayText(link.description),
   }));
   const simplifiedFaqs = guide.faqs.map((faq) => ({
@@ -271,40 +316,679 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
     question: simplifyGuideDisplayText(faq.question),
     answer: simplifyGuideDisplayText(faq.answer),
   }));
-  const guidePrimaryAction = sourceBackedGuideMeta
+  const guideMissionPreview = linkedMission
     ? {
+        stopLabel: `${linkedMission.steps.length} ${linkedMission.steps.length === 1 ? "stop" : "stops"}`,
+        totalMinutesLabel: formatMinutes(
+          getMissionTotalMinutes(linkedMission, linkedMission.defaultTravelMode),
+        ),
+        travelSummary: getMissionTravelSummary(linkedMission, linkedMission.defaultTravelMode),
+        startLabel: linkedMission.startOptions?.[0]
+          ? `Suggested start ${linkedMission.startOptions[0]}`
+          : null,
+      }
+    : null;
+  const guideRouterMode = !linkedMission
+    && !sourceBackedGuideMeta
+    && simplifiedResourceLinks.length > 0
+    && ["guide roundup", "route chooser"].includes(normalizedGuideCategory);
+  const guideRouterCandidates = guideRouterMode
+    ? simplifiedResourceLinks.filter(
+        (link) => !/(starter-pack guide|guide roundup|guide library)/i.test(link.title),
+      )
+    : [];
+  const guideRouterResources = guideRouterMode
+    ? (guideRouterCandidates.length ? guideRouterCandidates : simplifiedResourceLinks)
+    : [];
+  const guideSuggestedResource = guideRouterResources[0] ?? null;
+  const guideSecondaryResource = guideRouterResources[1] ?? null;
+  const guideTertiaryResource = guideRouterResources[2] ?? null;
+  const guideRouterPreview = guideRouterMode
+    ? {
+        title: guideSuggestedResource?.title ?? "Focused next options",
+        copy: normalizedGuideCategory === "route chooser"
+          ? "This page works best when it quickly narrows you into the kind of guide that fits today instead of sending you into a broad list first."
+          : "This page works best when it points you to one focused page first, then leaves the wider guide set available underneath.",
+        tags: [
+          `${guideRouterResources.length} focused options`,
+          ...guideRouterResources.slice(0, 3).map((link) => link.title),
+        ],
+      }
+    : null;
+  const guideMissionAction = linkedMission && linkedMissionPath
+    ? {
+        kicker: routeChooser ? "Example route with map" : "Route with map",
+        title: simplifyMissionDisplayText(linkedMission.title),
+        copy: routeChooser
+          ? `Open one workable version of this guide with ${guideMissionPreview?.stopLabel ?? "a saved stop order"}, ${guideMissionPreview?.totalMinutesLabel ?? "timing"}, and Google Maps handoff.`
+          : `Open the route with ${guideMissionPreview?.stopLabel ?? "a saved stop order"}, ${guideMissionPreview?.totalMinutesLabel ?? "timing"}, and Google Maps handoff for this guide.`,
+        label: routeChooser ? "Open example route" : "Open route with map",
+        path: linkedMissionPath,
+      }
+    : null;
+  const routeHeroFacts = guideMissionPreview
+    ? [
+        {
+          label: "Stops",
+          value: guideMissionPreview.stopLabel,
+        },
+        {
+          label: "Timing",
+          value: guideMissionPreview.totalMinutesLabel,
+        },
+      ].concat(
+        guideMissionPreview.startLabel
+          ? [
+              {
+                label: "Start",
+                value: guideMissionPreview.startLabel.replace(/^Suggested start\s+/i, ""),
+              },
+            ]
+          : [
+              {
+                label: "Pace",
+                value: guideMissionPreview.travelSummary,
+              },
+            ],
+      )
+    : [];
+  const routeHeroTimelineStops = linkedMission
+    ? linkedMission.steps.slice(0, 3).map((step, index) => ({
+        index: index + 1,
+        label: simplifyMissionDisplayText(step.label),
+        durationLabel: `${step.durationMinutes} min stop`,
+      }))
+    : [];
+  const guideSavedPlansAction = linkedMissionPath
+    ? {
+        label: routeChooser ? "Open example route" : "Open route with map",
+        path: linkedMissionPath,
+      }
+    : {
+        label: "Saved plans",
+        path: guideMissionHubPath,
+      };
+  const guideRouterAction = guideSuggestedResource
+    ? {
+        kicker: "Best first click",
+        title: guideSuggestedResource.title,
+        copy: guideSuggestedResource.description,
+        label: buildGuideActionLabel(guideSuggestedResource.title),
+        path: guideSuggestedResource.path,
+      }
+    : null;
+  const guidePlaceAction = sourceBackedGuideMeta
+    ? {
+        kicker: "Need named places now?",
+        title: sourceBackedGuideMeta.shortLabel,
+        copy: sourceBackedGuideMeta.pageDescription,
         label: "See local places",
         path: sourceBackedGuideMeta.path,
       }
-    : {
-        label: guide.ctaLabel,
+    : null;
+  const guideFallbackAction = {
+    label: guide.ctaLabel,
+    path: guide.ctaPath,
+  };
+  const guidePrimaryAction = guideMissionAction ?? guidePlaceAction ?? guideRouterAction ?? guideFallbackAction;
+  const guideSecondaryAction = guideMissionAction
+    ? (guidePlaceAction && guidePlaceAction.path !== guidePrimaryAction.path ? guidePlaceAction : null)
+    : guidePlaceAction
+      ? (guidePlaceAction.path !== guidePrimaryAction.path ? guidePlaceAction : null)
+      : guideRouterAction
+        ? (guideFallbackAction.path !== guidePrimaryAction.path
+          ? {
+              label: guide.ctaLabel,
+              path: guide.ctaPath,
+            }
+          : null)
+        : guideFallbackAction.path !== guidePrimaryAction.path
+          ? {
+              label: guide.ctaLabel,
+              path: guide.ctaPath,
+            }
+          : null;
+  const guideNextSurfaceAction = guideRouterMode && guideSecondaryResource
+    ? {
+        kicker: "Try a different starting page",
+        title: guideSecondaryResource.title,
+        copy: guideSecondaryResource.description,
+        label: buildGuideActionLabel(guideSecondaryResource.title),
+        path: guideSecondaryResource.path,
+      }
+    : !guideMissionAction && !guidePlaceAction
+    ? {
+        kicker: "Need the next working surface?",
+        title: simplifyGuideDisplayText(guide.ctaLabel),
+        copy:
+          "Use the next CityAtlas surface when the route question is already clear and you want to save, compare, or move the plan forward.",
+        label: simplifyGuideDisplayText(guide.ctaLabel),
         path: guide.ctaPath,
+      }
+    : null;
+  const nextResourceLink = simplifiedResourceLinks.find(
+    (link) =>
+      link.path !== guidePrimaryAction.path &&
+      link.path !== guideSecondaryAction?.path &&
+      link.path !== guideMissionAction?.path &&
+      link.path !== guideNextSurfaceAction?.path,
+  );
+  const guideAlternateAction = guideRouterMode && guideTertiaryResource
+    ? {
+        kicker: "Still not the right fit?",
+        title: guideTertiaryResource.title,
+        copy: guideTertiaryResource.description,
+        label: buildGuideActionLabel(guideTertiaryResource.title),
+        path: guideTertiaryResource.path,
+      }
+    : nextResourceLink
+    ? {
+        kicker: "Need a different planning question?",
+        title: nextResourceLink.title,
+        copy: nextResourceLink.description,
+        label: "Open related page",
+        path: nextResourceLink.path,
+      }
+    : relatedGuides[0]
+      ? {
+          kicker: "Need a different planning question?",
+          title: simplifyGuideDisplayText(relatedGuides[0].title),
+          copy: simplifyGuideDisplayText(relatedGuides[0].excerpt),
+          label: "Open related guide",
+          path: getGuidePath(relatedGuides[0]),
+        }
+      : {
+          kicker: "Still not the right page?",
+          title: `${guideCityName} guide hub`,
+          copy: `Go back to the ${guideCityName} guide hub when you still need to choose the right route shape before committing to this page.`,
+          label: "See all guides",
+          path: resolvedGuideHubPath,
+        };
+  const showRouteHeroCard = Boolean(guideMissionAction && guideMissionPreview);
+  const guideSidebarFooterAction = showRouteHeroCard
+    ? guideSecondaryAction
+      ? {
+          title: "Need a different next move?",
+          label: guideSecondaryAction.label,
+          path: guideSecondaryAction.path,
+        }
+      : {
+          title: "Need a different guide?",
+          label: "See all guides",
+          path: resolvedGuideHubPath,
+        }
+    : {
+        title: guideMissionAction
+          ? `Route ready now${guideMissionPreview ? `: ${guideMissionPreview.stopLabel}` : ""}`
+          : guideRouterAction
+            ? "Need a focused page next?"
+            : "Need the broader plan next?",
+        label: guideMissionAction
+          ? guideMissionAction.label
+          : guideRouterAction
+            ? guideRouterAction.label
+            : simplifyGuideDisplayText(guide.ctaLabel),
+        path: guideMissionAction?.path ?? guideRouterAction?.path ?? guide.ctaPath,
       };
+  const guideDecisionMeta = showRouteHeroCard
+    ? {
+        label: "Next move",
+        title: "Choose the right next click before you read the whole guide",
+        copy:
+          "Open the route when the stop order already fits. Otherwise switch to the better planning surface instead of carrying extra page weight.",
+      }
+    : {
+        label: "Start faster",
+        title: "Know whether this is the right page before you read the whole guide",
+        copy:
+          "These cards are here so readers can stay on the right surface instead of reading a long guide that solves the wrong planning problem.",
+      };
+  const guideChooserMode = Boolean(
+    guideRouterMode
+      && normalizedGuideCategory === "route chooser"
+      && guideRouterAction
+      && !showRouteHeroCard,
+  );
+  const guideStarterPackMode = Boolean(
+    guideRouterMode
+      && /starter-pack/i.test(guide.slug)
+      && guideRouterAction
+      && !showRouteHeroCard,
+  );
+  const guideRoundupMode = Boolean(
+    guideRouterMode
+      && normalizedGuideCategory === "guide roundup"
+      && !guideStarterPackMode
+      && guideRouterAction
+      && !showRouteHeroCard,
+  );
+  const guideRoutingHubMode = guideChooserMode || guideStarterPackMode || guideRoundupMode;
+  const findGuideRouterResource = (pattern: RegExp) =>
+    guideRouterResources.find((link) => pattern.test(link.title));
+  const guideChooserQuickLinks = guideChooserMode
+    ? [
+        (() => {
+          const link = findGuideRouterResource(/rainy/i);
+          return link
+            ? {
+                actionLabel: buildGuideRoutingChoiceAction(link.title),
+                copy: link.description,
+                kicker: "Best when weather and momentum both need help",
+                label: "Rainy day",
+                path: link.path,
+                title: link.title,
+              }
+            : null;
+        })(),
+        (() => {
+          const link = findGuideRouterResource(/wellness/i);
+          return link
+            ? {
+                actionLabel: buildGuideRoutingChoiceAction(link.title),
+                copy: link.description,
+                kicker: "Best when the day should feel calmer",
+                label: "Wellness",
+                path: link.path,
+                title: link.title,
+              }
+            : null;
+        })(),
+        (() => {
+          const link = findGuideRouterResource(/sunday/i);
+          return link
+            ? {
+                actionLabel: buildGuideRoutingChoiceAction(link.title),
+                copy: link.description,
+                kicker: "Best when one gentle main stop is enough",
+                label: "Slow Sunday",
+                path: link.path,
+                title: link.title,
+              }
+            : null;
+        })(),
+        (() => {
+          const link = findGuideRouterResource(/weekend/i);
+          return link
+            ? {
+                actionLabel: buildGuideRoutingChoiceAction(link.title),
+                copy: link.description,
+                kicker: "Best when the day can still hold one stronger anchor",
+                label: "Weekend",
+                path: link.path,
+                title: link.title,
+              }
+            : null;
+        })(),
+        (() => {
+          const link = findGuideRouterResource(/first-evening|visitor/i);
+          return link
+            ? {
+                actionLabel: buildGuideRoutingChoiceAction(link.title),
+                copy: link.description,
+                kicker: "Best when a new arrival needs an easy start",
+                label: "Visitor start",
+                path: link.path,
+                title: link.title,
+              }
+            : null;
+        })(),
+      ].filter((link): link is GuideRoutingChoice => Boolean(link))
+    : [];
+  const guideStarterPackQuickLinks = guideStarterPackMode
+    ? [
+        (() => {
+          const link = findGuideRouterResource(/date-night starters|rainy-day starters|wellness reset starters|weekend route starters/i);
+          return link
+            ? {
+                actionLabel: buildGuideRoutingChoiceAction(link.title),
+                kicker: "Need checked places fast?",
+                copy: link.description,
+                label: "Checked places",
+                path: link.path,
+                title: link.title,
+              }
+            : null;
+        })(),
+        (() => {
+          const link = findGuideRouterResource(/first-time visitor starters|out-of-town guest starters|returning-visitor starters|first-evening starters/i);
+          return link
+            ? {
+                actionLabel: buildGuideRoutingChoiceAction(link.title),
+                kicker: "Planning around a person?",
+                copy: link.description,
+                label: "Visitor type",
+                path: link.path,
+                title: link.title,
+              }
+            : null;
+        })(),
+        (() => {
+          const link = findGuideRouterResource(/city missions/i);
+          return link
+            ? {
+                actionLabel: buildGuideRoutingChoiceAction(link.title),
+                kicker: "Ready to save a route?",
+                copy: link.description,
+                label: "Saved route",
+                path: link.path,
+                title: link.title,
+              }
+            : null;
+        })(),
+        (() => {
+          const link = findGuideRouterResource(/guide roundup/i);
+          return link
+            ? {
+                actionLabel: buildGuideRoutingChoiceAction(link.title),
+                kicker: "Need the wider route map?",
+                copy: link.description,
+                label: "Route map",
+                path: link.path,
+                title: link.title,
+              }
+            : null;
+        })(),
+      ].filter((link): link is GuideRoutingChoice => Boolean(link))
+    : [];
+  const guideRoundupQuickLinks = guideRoundupMode
+    ? [
+        guideRouterAction
+          ? {
+              actionLabel: buildGuideRoutingChoiceAction(guideRouterAction.title),
+              kicker: "Need named places now?",
+              copy:
+                "Start with the checked-place layer when official links and correction paths matter before anything else.",
+              label: "Named places",
+              path: guideRouterAction.path,
+              title: guideRouterAction.title,
+            }
+          : null,
+        (() => {
+          const link = findGuideRouterResource(/first-time visitor|returning visitor/i);
+          return link
+            ? {
+                actionLabel: buildGuideRoutingChoiceAction(link.title),
+                kicker: "Planning for visitors?",
+                copy: link.description,
+                label: "Visitors",
+                path: link.path,
+                title: link.title,
+              }
+            : null;
+        })(),
+        (() => {
+          const link = findGuideRouterResource(/neighborhood/i);
+          return link
+            ? {
+                actionLabel: buildGuideRoutingChoiceAction(link.title),
+                kicker: "Choosing an area?",
+                copy: link.description,
+                label: "Area",
+                path: link.path,
+                title: link.title,
+              }
+            : null;
+        })(),
+        (() => {
+          const link = findGuideRouterResource(/weekend|wellness|sunday/i);
+          return link
+            ? {
+                actionLabel: buildGuideRoutingChoiceAction(link.title),
+                kicker: "Keeping it easier?",
+                copy: link.description,
+                label: "Easy pace",
+                path: link.path,
+                title: link.title,
+              }
+            : null;
+        })(),
+      ].filter((link): link is GuideRoutingChoice => Boolean(link))
+    : [];
+  const guideRoutingChoices = guideChooserMode
+    ? guideChooserQuickLinks
+    : guideStarterPackMode
+      ? guideStarterPackQuickLinks
+      : guideRoundupMode
+        ? guideRoundupQuickLinks
+        : [];
+  const defaultGuideRoutingChoicePath = guideRoutingChoices[0]?.path ?? guidePrimaryAction.path;
+  const [selectedGuideRoutingChoicePath, setSelectedGuideRoutingChoicePath] = useState(defaultGuideRoutingChoicePath);
+  useEffect(() => {
+    setSelectedGuideRoutingChoicePath(defaultGuideRoutingChoicePath);
+  }, [defaultGuideRoutingChoicePath, guide.id]);
+  const selectedGuideRoutingChoice = guideRoutingChoices.find(
+    (choice) => choice.path === selectedGuideRoutingChoicePath,
+  ) ?? guideRoutingChoices[0] ?? null;
+  const resolvedGuideSidebarFooterAction = guideRoutingHubMode
+    ? {
+        title: guideStarterPackMode || guideRoundupMode ? "Need the whole library?" : "Need a broader scan?",
+        label: simplifyGuideDisplayText(guide.ctaLabel),
+        path: guide.ctaPath,
+      }
+    : guideSidebarFooterAction;
+  const guideHeroTitle = guideStarterPackMode
+    ? `Which ${guideCityName} page should you open first?`
+    : guideRoundupMode
+      ? `Which ${guideCityName} guide should you open first?`
+      : guideTitle;
+  const guideHeroSummary = guideStarterPackMode
+    ? `Choose the right ${guideCityName} planning surface first so the next step is obvious before you open a long guide, mission, or planner tab.`
+    : guideRoundupMode
+      ? `Choose the right ${guideCityName} guide family first so you open one useful route instead of browsing the whole library cold.`
+      : guideChooserMode
+        ? `Pick the day type first so one ${guideCityName} route feels obvious before you read the whole breakdown.`
+    : guideSummary;
+  const guideAnswerKicker = guideRoutingHubMode ? "Start here" : "Quick answer";
+  const guideAnswerTitle = guideStarterPackMode
+    ? "Pick the planning surface first"
+    : guideRoundupMode
+      ? "Pick the kind of route question first"
+    : guideChooserMode
+      ? "Pick the day type first"
+      : guideHeroQuestion;
+  const guideAnswerCopy = guideStarterPackMode
+    ? `Choose checked starters, people-first pages, saveable routes, or the broader route map first so you do not waste time opening the wrong kind of CityAtlas page.`
+    : guideRoundupMode
+      ? `Choose named places, visitor context, neighborhood fit, or a lower-friction pace first so the next guide feels obvious instead of equally possible.`
+    : guideChooserMode
+      ? `Choose the easiest match for today's weather, energy, or pace. You can still compare the other route types without losing your place.`
+      : guidePromise;
+  const showGuideDecisionStrip = !guideRoutingHubMode;
+  const showGuideMetaRow = !guideRoutingHubMode;
 
   return (
     <>
       <section className="guide-hero guide-answer-first">
         <div className="guide-hero-copy">
           <p className="section-label">{simplifyGuideCategoryLabel(guide.category)}</p>
-          <h1>{guideTitle}</h1>
-          <p className="guide-summary">{guideSummary}</p>
-          <div className="guide-meta-row">
-            <StatusPill tone="blue">{guide.readMinutes} min read</StatusPill>
-            <StatusPill tone={gateMeta.tone}>{gateMeta.label}</StatusPill>
-            <span>Updated {guide.lastReviewed}</span>
-          </div>
-          <div className="guide-answer-card guide-answer-card-primary">
-            <span className="query-card-kicker">Quick answer</span>
-            <strong>{guideHeroQuestion}</strong>
-            <p>{guidePromise}</p>
-            <div className="guide-answer-actions">
-              <AppLink className="button primary" to={guidePrimaryAction.path}>
-                {guidePrimaryAction.label} <ArrowRightIcon />
-              </AppLink>
-              <AppLink className="text-link" to={resolvedGuideHubPath}>
-                See all guides <ArrowRightIcon />
-              </AppLink>
+          <h1>{guideHeroTitle}</h1>
+          <p className="guide-summary">{guideHeroSummary}</p>
+          {showGuideMetaRow ? (
+            <div className="guide-meta-row">
+              <StatusPill tone="blue">{guide.readMinutes} min read</StatusPill>
+              <StatusPill tone={gateMeta.tone}>{gateMeta.label}</StatusPill>
+              {guideMissionAction ? (
+                <StatusPill tone="green">
+                  {routeChooser ? "Example route map" : "Route map ready"}
+                </StatusPill>
+              ) : null}
+              <span>Updated {guide.lastReviewed}</span>
             </div>
+          ) : null}
+          {showRouteHeroCard && guideMissionAction ? (
+            <div className="guide-route-hero-card">
+              <div className="guide-route-hero-topline">
+                <span className="query-card-kicker">
+                  {routeChooser ? "Example route ready now" : "Route ready now"}
+                </span>
+                <StatusPill tone="green">
+                  {routeChooser ? "Map + timing" : "Map + timing"}
+                </StatusPill>
+              </div>
+              <div className="guide-route-hero-header">
+                <div>
+                  <strong>{guideMissionAction.title}</strong>
+                  <p>
+                    {routeChooser
+                      ? "Open one concrete version of this plan when you want the stop order, timing, and Maps handoff decided for you."
+                      : "Open the full route when you want the stop order, timing, and Maps handoff handled before you read the rest of the guide."}
+                  </p>
+                </div>
+              </div>
+              <div className="guide-route-hero-actions">
+                <AppLink className="button primary" to={guideMissionAction.path}>
+                  {routeChooser ? "Open example route" : "Open route map"} <ArrowRightIcon />
+                </AppLink>
+                {guideSecondaryAction ? (
+                  <AppLink className="text-link" to={guideSecondaryAction.path}>
+                    {guideSecondaryAction.label}
+                  </AppLink>
+                ) : null}
+                <a className="text-link" href="#guide-article">
+                  Keep reading guide <ArrowRightIcon />
+                </a>
+              </div>
+              <div className="guide-route-hero-facts">
+                {routeHeroFacts.map((fact) => (
+                  <div className="guide-route-hero-fact" key={`${guide.id}-${fact.label}`}>
+                    <span>{fact.label}</span>
+                    <strong>{fact.value}</strong>
+                  </div>
+                ))}
+              </div>
+              {routeHeroTimelineStops.length > 0 ? (
+                <div className="guide-route-hero-timeline">
+                  <span className="query-card-kicker">3-stop preview</span>
+                  <div className="guide-route-hero-timeline-list">
+                    {routeHeroTimelineStops.map((stop) => (
+                      <div className="guide-route-hero-stop" key={`${guide.id}-${stop.index}-${stop.label}`}>
+                        <span>{stop.index}</span>
+                        <div>
+                          <strong>{stop.label}</strong>
+                          <small>{stop.durationLabel}</small>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+          <div className="guide-answer-card guide-answer-card-primary">
+            <span className="query-card-kicker">{guideAnswerKicker}</span>
+            <strong>{guideAnswerTitle}</strong>
+            <p>{guideAnswerCopy}</p>
+            {!showRouteHeroCard && guideMissionPreview && guideMissionAction ? (
+              <div className="guide-route-preview">
+                <span className="query-card-kicker">
+                  {routeChooser ? "Example route preview" : "Route preview"}
+                </span>
+                <strong>{guideMissionAction.title}</strong>
+                <p>
+                  {routeChooser
+                    ? "This gives you one concrete version of the guide when you want the stop order and timing decided for you."
+                    : "This guide already has a linked route, so you can open the stop order, timing, and Google Maps handoff right away."}
+                </p>
+                <div className="tag-cloud guide-route-preview-tags">
+                  <span>{guideMissionPreview.stopLabel}</span>
+                  <span>{guideMissionPreview.totalMinutesLabel}</span>
+                  <span>{guideMissionPreview.travelSummary}</span>
+                  {guideMissionPreview.startLabel ? <span>{guideMissionPreview.startLabel}</span> : null}
+                </div>
+              </div>
+            ) : null}
+            {guideRoutingHubMode && selectedGuideRoutingChoice ? (
+              <div className="guide-route-preview">
+                <div className="guide-routing-segmented" role="tablist" aria-label="Choose the best first page">
+                  {guideRoutingChoices.map((choice) => {
+                    const active = choice.path === selectedGuideRoutingChoice.path;
+                    return (
+                      <button
+                        aria-pressed={active}
+                        className={`guide-routing-segment${active ? " is-active" : ""}`}
+                        key={choice.path}
+                        onClick={() => setSelectedGuideRoutingChoicePath(choice.path)}
+                        type="button"
+                      >
+                        {choice.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="guide-routing-focus-card">
+                  <span className="query-card-kicker">{selectedGuideRoutingChoice.kicker}</span>
+                  <strong>{selectedGuideRoutingChoice.title}</strong>
+                  <p>{selectedGuideRoutingChoice.copy}</p>
+                  <div className="guide-routing-focus-actions">
+                    <AppLink className="button primary" to={selectedGuideRoutingChoice.path}>
+                      {selectedGuideRoutingChoice.actionLabel} <ArrowRightIcon />
+                    </AppLink>
+                    <AppLink className="button secondary" to={resolvedGuideHubPath}>
+                      See full guide library
+                    </AppLink>
+                  </div>
+                </div>
+              </div>
+            ) : guideRouterPreview ? (
+              <div className="guide-route-preview">
+                <strong>{guideRouterPreview.title}</strong>
+                <p>{guideRouterPreview.copy}</p>
+                <div className="tag-cloud guide-route-preview-tags">
+                  {guideRouterPreview.tags.map((tag) => (
+                    <span key={`${guide.id}-${tag}`}>{tag}</span>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+            {showRouteHeroCard ? (
+              <div className="guide-answer-links">
+                <a className="text-link" href="#guide-article">
+                  Read the full guide <ArrowRightIcon />
+                </a>
+                <AppLink className="text-link" to={resolvedGuideHubPath}>
+                  See all guides <ArrowRightIcon />
+                </AppLink>
+              </div>
+            ) : (
+              <div className="guide-answer-actions">
+                {guideRoutingHubMode ? (
+                  <a className="text-link" href="#guide-article">
+                    See the full breakdown <ArrowRightIcon />
+                  </a>
+                ) : guideRoundupMode ? (
+                  <>
+                    <AppLink className="button secondary" to={resolvedGuideHubPath}>
+                      See full guide library
+                    </AppLink>
+                    <a className="text-link" href="#guide-article">
+                      See the full breakdown <ArrowRightIcon />
+                    </a>
+                  </>
+                ) : (
+                  <>
+                    <AppLink className="button primary" to={guidePrimaryAction.path}>
+                      {guidePrimaryAction.label} <ArrowRightIcon />
+                    </AppLink>
+                    {guideSecondaryAction ? (
+                      <AppLink className="button secondary" to={guideSecondaryAction.path}>
+                        {guideSecondaryAction.label}
+                      </AppLink>
+                    ) : null}
+                  </>
+                )}
+                {guideChooserMode ? (
+                  <a className="text-link" href="#guide-article">
+                    Why this pick? <ArrowRightIcon />
+                  </a>
+                ) : guideRoundupMode ? (
+                  null
+                ) : (
+                  <AppLink className="text-link" to={resolvedGuideHubPath}>
+                    See all guides <ArrowRightIcon />
+                  </AppLink>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -334,6 +1018,22 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
               </div>
             </div>
             <div className="guide-sidebar-mini-grid">
+              {guideMissionPreview && guideMissionAction && !showRouteHeroCard ? (
+                <div className="guide-sidebar-mini-card">
+                  <span className="query-card-kicker">
+                    {routeChooser ? "Example route" : "Route ready"}
+                  </span>
+                  <p>
+                    {guideMissionPreview.stopLabel} • {guideMissionPreview.totalMinutesLabel}
+                  </p>
+                </div>
+              ) : null}
+              {guideRouterPreview && !guideRoutingHubMode ? (
+                <div className="guide-sidebar-mini-card">
+                  <span className="query-card-kicker">Fastest first click</span>
+                  <p>{guideRouterPreview.title}</p>
+                </div>
+              ) : null}
               <div className="guide-sidebar-mini-card">
                 <span className="query-card-kicker">This page answers</span>
                 <p>{guideQueryClass}</p>
@@ -344,43 +1044,80 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
               </div>
             </div>
             <div className="guide-sidebar-footer">
-              <strong>Need the broader plan next?</strong>
-              <AppLink className="text-link" to={guide.ctaPath}>
-                {simplifyGuideDisplayText(guide.ctaLabel)} <ArrowRightIcon />
+              <strong>{resolvedGuideSidebarFooterAction.title}</strong>
+              <AppLink className="text-link" to={resolvedGuideSidebarFooterAction.path}>
+                {resolvedGuideSidebarFooterAction.label} <ArrowRightIcon />
               </AppLink>
             </div>
           </aside>
         </div>
       </section>
 
+      {showGuideDecisionStrip ? (
+        <section className="section-block guide-decision-strip">
+          <SectionHeader
+            label={guideDecisionMeta.label}
+            title={guideDecisionMeta.title}
+            copy={guideDecisionMeta.copy}
+          />
+          <div className="guide-query-grid guide-decision-grid">
+            <article className="query-card guide-fit-card">
+              <span className="query-card-kicker">Open this page when</span>
+              <strong>{guideHeroQuestion}</strong>
+              <p>{guidePromise}</p>
+              <div className="tag-cloud">
+                {guide.bestFor.slice(0, 3).map((item) => (
+                  <span key={`${guide.id}-${item}`}>{simplifyGuideDisplayText(item)}</span>
+                ))}
+              </div>
+            </article>
+            {guideMissionAction ? (
+              <AppLink className="query-card query-card-link" to={guideMissionAction.path}>
+                <span className="query-card-kicker">{guideMissionAction.kicker}</span>
+                <strong>{guideMissionAction.title}</strong>
+                <p>{guideMissionAction.copy}</p>
+                <span className="query-card-hint">
+                  {guideMissionAction.label} <ArrowRightIcon />
+                </span>
+              </AppLink>
+            ) : null}
+            {guidePlaceAction ? (
+              <AppLink className="query-card query-card-link" to={guidePlaceAction.path}>
+                <span className="query-card-kicker">{guidePlaceAction.kicker}</span>
+                <strong>{guidePlaceAction.title}</strong>
+                <p>{guidePlaceAction.copy}</p>
+                <span className="query-card-hint">
+                  {guidePlaceAction.label} <ArrowRightIcon />
+                </span>
+              </AppLink>
+            ) : guideNextSurfaceAction ? (
+              <AppLink className="query-card query-card-link" to={guideNextSurfaceAction.path}>
+                <span className="query-card-kicker">{guideNextSurfaceAction.kicker}</span>
+                <strong>{guideNextSurfaceAction.title}</strong>
+                <p>{guideNextSurfaceAction.copy}</p>
+                <span className="query-card-hint">
+                  {guideNextSurfaceAction.label} <ArrowRightIcon />
+                </span>
+              </AppLink>
+            ) : null}
+            <AppLink className="query-card query-card-link" to={guideAlternateAction.path}>
+              <span className="query-card-kicker">{guideAlternateAction.kicker}</span>
+              <strong>{guideAlternateAction.title}</strong>
+              <p>{guideAlternateAction.copy}</p>
+              <span className="query-card-hint">
+                {guideAlternateAction.label} <ArrowRightIcon />
+              </span>
+            </AppLink>
+          </div>
+        </section>
+      ) : null}
+
       <section className="guide-layout">
-        <article className="guide-article">
+        <article className="guide-article" id="guide-article">
           <div className="guide-intro">
             <p>{guideIntro}</p>
             <p>{guideBody}</p>
           </div>
-
-          {simplifiedSections.map((section, index) => (
-            <details className="guide-section guide-section-toggle" key={section.heading} open={index === 0}>
-              <summary className="guide-section-summary">
-                <div className="guide-section-summary-copy">
-                  <span className="query-card-kicker">Step {index + 1}</span>
-                  <h2>{section.heading}</h2>
-                  <p className="guide-section-answer">{section.answer}</p>
-                </div>
-                <span className="guide-section-toggle-chip" aria-hidden="true">
-                  {index === 0 ? "Open" : "More"}
-                </span>
-              </summary>
-              <div className="guide-section-body">
-                <ul className="plain-list guide-bullet-list">
-                  {section.bullets.map((bullet) => (
-                    <li key={bullet}>{bullet}</li>
-                  ))}
-                </ul>
-              </div>
-            </details>
-          ))}
 
           {simplifiedResourceLinks.length ? (
             <section className="guide-section">
@@ -415,6 +1152,28 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
               </div>
             </section>
           ) : null}
+
+          {simplifiedSections.map((section, index) => (
+            <details className="guide-section guide-section-toggle" key={section.heading} open={index === 0}>
+              <summary className="guide-section-summary">
+                <div className="guide-section-summary-copy">
+                  <span className="query-card-kicker">Step {index + 1}</span>
+                  <h2>{section.heading}</h2>
+                  <p className="guide-section-answer">{section.answer}</p>
+                </div>
+                <span className="guide-section-toggle-chip" aria-hidden="true">
+                  {index === 0 ? "Open" : "More"}
+                </span>
+              </summary>
+              <div className="guide-section-body">
+                <ul className="plain-list guide-bullet-list">
+                  {section.bullets.map((bullet) => (
+                    <li key={bullet}>{bullet}</li>
+                  ))}
+                </ul>
+              </div>
+            </details>
+          ))}
 
           <section className="guide-section">
             <SectionHeader
@@ -456,7 +1215,7 @@ export function GuideDetailPage({ guide, data, guideHubPath }: GuideDetailPagePr
             </div>
             <div className="rail-links">
               <AppLink to={resolvedGuideHubPath}>See all guides</AppLink>
-              <AppLink to="/vancouver/missions">Saved plans</AppLink>
+              <AppLink to={guideSavedPlansAction.path}>{guideSavedPlansAction.label}</AppLink>
               <AppLink to="/planner">Planner</AppLink>
               <AppLink to="/for-businesses/pricing">For businesses</AppLink>
               {sourceBackedGuideMeta ? (

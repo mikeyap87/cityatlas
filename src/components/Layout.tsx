@@ -41,14 +41,16 @@ const footerGroups = [
     ],
   },
   {
-    title: "Trust and business",
-    note: "How CityAtlas labels pages and how businesses apply.",
-    links: [
-      { to: "/about", label: "About CityAtlas" },
-      { to: "/for-businesses/submit", label: "Submit a business" },
-      { to: "/for-businesses/pricing", label: "Business packages" },
-      { to: "/editorial-standards", label: "Editorial standards" },
-      { to: "/privacy", label: "Privacy" },
+      title: "Trust and business",
+      note: "How CityAtlas labels pages and how businesses apply.",
+      links: [
+        { to: "/about", label: "About CityAtlas" },
+        { to: "/for-businesses/submit", label: "Submit a business" },
+        { to: "/for-businesses/book-call", label: "Book a short call" },
+        { to: "/for-businesses/partner-preview", label: "How features work" },
+        { to: "/for-businesses/pricing", label: "Business packages" },
+        { to: "/editorial-standards", label: "Editorial standards" },
+        { to: "/privacy", label: "Privacy" },
       { to: "/terms", label: "Terms" },
     ],
   },
@@ -61,13 +63,13 @@ interface LayoutProps {
 
 function navClass(path: string, target: string) {
   const isPlacesRoute = path.startsWith("/vancouver/") && path.endsWith("-starters");
-  const isGuidesRoute = path.startsWith("/vancouver/guides");
+  const isGuidesRoute = /^\/[^/]+\/guides(?:\/|$)/.test(path);
   const isBusinessRoute = path.startsWith("/for-businesses");
 
   const isActive =
     target === "/vancouver"
       ? path === "/vancouver"
-      : target === "/vancouver/guides"
+      : target.endsWith("/guides")
         ? isGuidesRoute
         : target === "/vancouver/date-night-starters"
           ? isPlacesRoute
@@ -78,8 +80,18 @@ function navClass(path: string, target: string) {
   return isActive ? "nav-link active" : "nav-link";
 }
 
+function getGuidesNavPath(path: string) {
+  return path.startsWith("/toronto/") ? "/toronto/guides" : "/vancouver/guides";
+}
+
+function getSavedPlansNavPath(path: string) {
+  return path.startsWith("/toronto/") ? "/toronto/missions" : "/vancouver/missions";
+}
+
 export function PublicLayout({ children, path }: LayoutProps) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const guidesNavPath = getGuidesNavPath(path);
+  const savedPlansNavPath = getSavedPlansNavPath(path);
 
   useEffect(() => {
     setMobileNavOpen(false);
@@ -114,8 +126,8 @@ export function PublicLayout({ children, path }: LayoutProps) {
             About
           </AppLink>
           <AppLink
-            to="/vancouver/guides"
-            className={navClass(path, "/vancouver/guides")}
+            to={guidesNavPath}
+            className={navClass(path, guidesNavPath)}
             onClick={closeMobileNav}
           >
             Guides
@@ -128,8 +140,8 @@ export function PublicLayout({ children, path }: LayoutProps) {
             Local places
           </AppLink>
           <AppLink
-            to="/vancouver/missions"
-            className={navClass(path, "/vancouver/missions")}
+            to={savedPlansNavPath}
+            className={navClass(path, savedPlansNavPath)}
             onClick={closeMobileNav}
           >
             Saved plans
@@ -186,8 +198,8 @@ export function PublicLayout({ children, path }: LayoutProps) {
             <AppLink className="button primary" to="/vancouver/guides">
               Open Vancouver guides
             </AppLink>
-            <AppLink className="button secondary" to="/for-businesses/submit">
-              Start business request
+            <AppLink className="button secondary" to="/for-businesses/book-call">
+              Book a short call
             </AppLink>
           </div>
           <div className="footer-feature-grid">

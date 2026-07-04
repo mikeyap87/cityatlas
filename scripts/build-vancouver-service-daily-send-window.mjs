@@ -9,11 +9,16 @@ const DEFAULT_INPUT_JSON = path.resolve(
   __dirname,
   "../output/growth/vancouver-service-send-packet.json",
 );
+const DEFAULT_INPUT_CSV = path.resolve(
+  __dirname,
+  "../output/growth/vancouver-service-send-packet.csv",
+);
 const DEFAULT_OUTPUT_DIR = path.resolve(
   __dirname,
   "../output/growth/vancouver-service-daily-send-window/current",
 );
 const DEFAULT_LIMIT = 20;
+const INPUT_READ_TIMEOUT_MS = 3000;
 
 function normalizeText(value) {
   return String(value ?? "")
@@ -32,6 +37,7 @@ function slugify(value) {
 function parseArgs(argv) {
   const options = {
     inputJson: DEFAULT_INPUT_JSON,
+    inputCsv: DEFAULT_INPUT_CSV,
     outputDir: DEFAULT_OUTPUT_DIR,
     limit: DEFAULT_LIMIT,
   };
@@ -52,10 +58,105 @@ function parseArgs(argv) {
   return options;
 }
 
+function parseCsv(text) {
+  const rows = [];
+  let row = [];
+  let field = "";
+  let inQuotes = false;
+
+  for (let index = 0; index < text.length; index += 1) {
+    const character = text[index];
+    const nextCharacter = text[index + 1];
+
+    if (inQuotes) {
+      if (character === '"' && nextCharacter === '"') {
+        field += '"';
+        index += 1;
+      } else if (character === '"') {
+        inQuotes = false;
+      } else {
+        field += character;
+      }
+      continue;
+    }
+
+    if (character === '"') {
+      inQuotes = true;
+      continue;
+    }
+    if (character === ",") {
+      row.push(field);
+      field = "";
+      continue;
+    }
+    if (character === "\n") {
+      row.push(field);
+      rows.push(row);
+      row = [];
+      field = "";
+      continue;
+    }
+    if (character === "\r") {
+      continue;
+    }
+
+    field += character;
+  }
+
+  if (field.length > 0 || row.length > 0) {
+    row.push(field);
+    rows.push(row);
+  }
+
+  const [headers = [], ...dataRows] = rows;
+  return dataRows
+    .filter((currentRow) => currentRow.some((value) => value.trim().length > 0))
+    .map((currentRow) =>
+      Object.fromEntries(headers.map((header, columnIndex) => [header, currentRow[columnIndex] ?? ""])),
+    );
+}
+
+async function fileExists(targetPath) {
+  try {
+    await fs.access(targetPath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function readJsonWithTimeout(targetPath, timeoutMs) {
+  const raw = await fs.readFile(targetPath, "utf8", {
+    signal: AbortSignal.timeout(timeoutMs),
+  });
+  return JSON.parse(raw);
+}
+
+async function readPacketRows(options) {
+  if (path.extname(options.inputJson).toLowerCase() === ".csv") {
+    const csvRaw = await fs.readFile(options.inputJson, "utf8");
+    return parseCsv(csvRaw);
+  }
+
+  try {
+    const rows = await readJsonWithTimeout(options.inputJson, INPUT_READ_TIMEOUT_MS);
+    if (Array.isArray(rows)) {
+      return rows;
+    }
+  } catch (error) {
+    const fallbackExists = await fileExists(options.inputCsv);
+    if (!fallbackExists) {
+      throw error;
+    }
+  }
+
+  const csvRaw = await fs.readFile(options.inputCsv, "utf8");
+  return parseCsv(csvRaw);
+}
+
 async function main() {
   const options = parseArgs(process.argv.slice(2));
-  const raw = await fs.readFile(options.inputJson, "utf8");
-  const rows = JSON.parse(raw);
+  const rows = await readPacketRows(options);
 
   const selected = rows
     .filter((row) => row.currentSendStatus === "owner_review_ready")
@@ -77,9 +178,14 @@ async function main() {
       bodyFile,
       neighborhood: row.neighborhood,
       cityName: row.cityName,
+      municipality: row.municipality || row.cityName,
+      coverageLabel: row.coverageLabel,
       category: row.category,
+      businessType: row.businessType,
       sourceLabel: row.sourceLabel,
       batchStage: row.batchStage,
+      personalizationAngle: row.personalizationAngle,
+      hostedAsk: row.hostedAsk,
       currentSendStatus: row.currentSendStatus,
     });
   }

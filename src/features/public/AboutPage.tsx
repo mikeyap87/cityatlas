@@ -25,7 +25,7 @@ export function AboutPage() {
           <h1>CityAtlas helps people choose the right Vancouver start</h1>
           <p>
             CityAtlas helps locals and visitors choose the right guide, saved plan, or local place
-            first. It also helps Vancouver businesses and service operators show up more clearly in
+            first. It also helps Vancouver restaurants, shops, and service businesses show up more clearly in
             local discovery.
           </p>
           <div className="hero-actions">
@@ -57,7 +57,7 @@ export function AboutPage() {
           />
           <ul className="plain-list compact">
             <li>One question per guide keeps the planning path easy to follow.</li>
-            <li>Saved plans help when you want to keep a route, not just read about it.</li>
+            <li>Saved plans help when you want to keep a plan, not just read about it.</li>
             <li>Open a local place when the next move is a real stop, not more browsing.</li>
             <li>Vancouver is the deepest city today, and Toronto shows the same structure can travel well.</li>
             <li>The business side can also start with local services that need clearer city-facing positioning.</li>
@@ -122,7 +122,7 @@ export function AboutPage() {
             <li>Guides help people solve one specific Vancouver planning question.</li>
             <li>Saved plans turn those ideas into reusable local plans.</li>
             <li>Local places stay clear about what they checked and where the source lives.</li>
-            <li>Businesses and service operators can request a page or package through a simpler review flow.</li>
+            <li>Businesses and service businesses can request a page or package through a simpler request path.</li>
           </ul>
         </div>
         <div className="source-panel">

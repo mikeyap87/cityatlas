@@ -108,7 +108,7 @@ export function SecondaryCityGuidesPage({
         />
         <div className="card-grid two">
           {guides.map((guide) => (
-            <GuideCard guide={guide} key={guide.id} />
+            <GuideCard data={data} guide={guide} key={guide.id} />
           ))}
         </div>
       </section>

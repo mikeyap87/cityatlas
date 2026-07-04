@@ -44,6 +44,46 @@ const DEFAULT_SHORTLIST_DOC_PATH = path.resolve(
 );
 const DEFAULT_SHORTLIST_LIMIT = 20;
 const SERVICE_REVIEW_BATCH_ID = "cityatlas-vancouver-service-owner-review-donor-2026-06-22";
+const METRO_AREA_PATTERN =
+  /\b(greater vancouver|metro vancouver|lower mainland|fraser valley)\b/i;
+const MUNICIPALITY_MATCHERS = [
+  { label: "North Vancouver", pattern: /\bnorth vancouver\b/i },
+  { label: "West Vancouver", pattern: /\bwest vancouver\b/i },
+  { label: "Port Coquitlam", pattern: /\bport coquitlam\b/i },
+  { label: "Port Moody", pattern: /\bport moody\b/i },
+  { label: "New Westminster", pattern: /\bnew westminster\b/i },
+  { label: "Maple Ridge", pattern: /\bmaple ridge\b/i },
+  { label: "Pitt Meadows", pattern: /\bpitt meadows\b/i },
+  { label: "White Rock", pattern: /\bwhite rock\b/i },
+  { label: "Coquitlam", pattern: /\bcoquitlam\b/i },
+  { label: "Burnaby", pattern: /\bburnaby\b/i },
+  { label: "Richmond", pattern: /\brichmond\b/i },
+  { label: "Surrey", pattern: /\bsurrey\b/i },
+  { label: "Delta", pattern: /\bdelta\b/i },
+  { label: "Langley", pattern: /\blangley\b/i },
+  { label: "Vancouver", pattern: /\bvancouver\b/i },
+];
+
+function findMunicipalityLabel(text, includeVancouver = true) {
+  for (const matcher of MUNICIPALITY_MATCHERS) {
+    if (!includeVancouver && matcher.label === "Vancouver") {
+      continue;
+    }
+    if (matcher.pattern.test(text)) {
+      return matcher.label;
+    }
+  }
+  return "";
+}
+
+function countMentionedMunicipalities(...values) {
+  const text = values.filter(Boolean).join(" ");
+  return new Set(
+    MUNICIPALITY_MATCHERS
+      .filter((matcher) => matcher.label !== "Vancouver" && matcher.pattern.test(text))
+      .map((matcher) => matcher.label),
+  ).size;
+}
 
 function parseArgs(argv) {
   const options = {
@@ -262,6 +302,65 @@ function findSendLedgerEntry(lookup, row) {
     }
   }
   return null;
+}
+
+function inferMunicipalityFromValues(...values) {
+  const [explicitMunicipality, cityName, neighborhood, businessName, sourceUrl, website, address] =
+    values.map((value) => normalizeText(value));
+
+  const explicitMatch = findMunicipalityLabel(explicitMunicipality);
+  if (explicitMatch) {
+    return explicitMatch;
+  }
+
+  const locationFieldMatch = findMunicipalityLabel(
+    [cityName, neighborhood, address].filter(Boolean).join(" "),
+    false,
+  );
+  if (locationFieldMatch) {
+    return locationFieldMatch;
+  }
+
+  const cityMatch = findMunicipalityLabel(cityName);
+  if (cityMatch) {
+    return cityMatch;
+  }
+
+  const neighborhoodMatch = findMunicipalityLabel(neighborhood);
+  if (neighborhoodMatch) {
+    return neighborhoodMatch;
+  }
+
+  const primaryMatch = findMunicipalityLabel(
+    [businessName, sourceUrl, website].filter(Boolean).join(" "),
+    false,
+  );
+  if (primaryMatch) {
+    return primaryMatch;
+  }
+
+  return "Vancouver";
+}
+
+function inferMarketScope(row) {
+  const text = [
+    row.municipality,
+    row.businessName,
+    row.neighborhood,
+    row.sourceUrl,
+    row.website,
+    row.email,
+    row.contactPath,
+    row.sourceProof,
+    row.notes,
+  ]
+    .filter(Boolean)
+    .join(" ");
+  return row.municipality && row.municipality !== "Vancouver"
+    ? "metro_area"
+    : METRO_AREA_PATTERN.test(text) || countMentionedMunicipalities(text) > 0
+      ? "metro_area"
+      : "city_only";
 }
 
 function isServiceReviewGeneratedProspect(prospect) {
@@ -523,9 +622,21 @@ function buildServiceReviewSeedRows(enrichedRows, reviewRows, sendLedgerLookup, 
         : "needs_research";
     const promotedToOwnerReview =
       Boolean(email) && looksLikeServiceReviewCategory(`${category} ${segment}`);
+    const municipality = inferMunicipalityFromValues(
+      enrichedRow.cityName,
+      enrichedRow.localArea,
+      enrichedRow.businessName,
+      enrichedRow.officialWebsite,
+      enrichedRow.contactPage,
+      enrichedRow.outscraperPlaceName,
+      enrichedRow.outscraperFullAddress,
+      reviewRow.outscraperPlaceName,
+      reviewRow.reviewReason,
+    );
     const baseRow = {
       businessName: normalizeText(enrichedRow.businessName),
       neighborhood: normalizeText(enrichedRow.localArea),
+      municipality,
       category,
       segment,
       sourceUrl: normalizeText(
@@ -577,6 +688,8 @@ function buildServiceReviewSeedRows(enrichedRows, reviewRows, sendLedgerLookup, 
           ? "Rehearsal ready"
           : "Review first",
     };
+
+    baseRow.marketScope = inferMarketScope(baseRow);
 
     seedRows.push(applySendLedgerOverride(baseRow, findSendLedgerEntry(sendLedgerLookup, baseRow)));
   }
@@ -648,6 +761,8 @@ function renderSeedRow(row) {
   const fields = [
     `businessName: '${escapeString(row.businessName)}'`,
     `neighborhood: '${escapeString(row.neighborhood)}'`,
+    `municipality: '${escapeString(row.municipality || "Vancouver")}'`,
+    `marketScope: '${escapeString(row.marketScope || inferMarketScope(row))}'`,
     `category: '${escapeString(row.category)}'`,
     `segment: '${escapeString(row.segment)}'`,
     `sourceUrl: '${escapeString(row.sourceUrl)}'`,
@@ -672,6 +787,7 @@ function renderSeedRow(row) {
 function buildSeedFile(seedRows, sourcePaths) {
   const lines = [
     "// Generated by scripts/sync-vancouver-service-review-business-seeds.mjs",
+    "// @ts-nocheck",
     "// Sources:",
     ...sourcePaths.map((sourcePath) => `// - ${path.relative(path.dirname(DEFAULT_OUTPUT_PATH), sourcePath)}`),
     "",
@@ -697,6 +813,7 @@ function buildShortlistRows(shortlist) {
     rank: String(index + 1),
     businessName: candidate.seed.businessName,
     neighborhood: candidate.seed.neighborhood,
+    municipality: candidate.seed.municipality || "Vancouver",
     category: candidate.seed.category,
     segment: candidate.seed.segment,
     email: candidate.seed.email,
@@ -720,6 +837,7 @@ function buildShortlistMarkdown(shortlist, summary) {
     `- Imported official service review rows folded in from Outscraper: ${summary.importedOfficialSeedRows}`,
     `- Service seed rows regenerated: ${summary.totalSeedRows}`,
     `- Email-ready service rows promoted into owner-review-ready: ${summary.ownerReviewReadyCount}`,
+    `- Rows currently tagged as Greater Vancouver rather than Vancouver-only: ${summary.metroAreaRowCount}`,
     `- Contact-path or hold rows kept review-only: ${summary.reviewOnlyCount}`,
     `- Already-sent service rows preserved from the live ledger: ${summary.sentManualCount}`,
     `- Current shortlist size: ${summary.shortlistCount}`,
@@ -727,11 +845,11 @@ function buildShortlistMarkdown(shortlist, summary) {
     "",
     "## Best first owner review list",
     "",
-    "| Rank | Business | Neighborhood | Category | Email | Why now |",
-    "| --- | --- | --- | --- | --- | --- |",
+    "| Rank | Business | Municipality | Neighborhood | Category | Email | Why now |",
+    "| --- | --- | --- | --- | --- | --- | --- |",
     ...shortlist.map((candidate, index) => {
       const neighborhood = candidate.seed.neighborhood || "Unknown";
-      return `| ${index + 1} | ${candidate.seed.businessName} | ${neighborhood} | ${candidate.seed.category} | ${candidate.seed.email || "-"} | ${candidate.whyNow} |`;
+      return `| ${index + 1} | ${candidate.seed.businessName} | ${candidate.seed.municipality || "Vancouver"} | ${neighborhood} | ${candidate.seed.category} | ${candidate.seed.email || "-"} | ${candidate.whyNow} |`;
     }),
     "",
     "## Next move",
@@ -772,9 +890,20 @@ async function main() {
   const stagedRows = serviceProspects.map((prospect) => {
     const candidate = buildBusinessProofCandidate(prospect);
     const promotedToOwnerReview = shouldPromoteToOwnerReview(prospect);
+    const municipality = inferMunicipalityFromValues(
+      prospect.municipality,
+      prospect.cityName,
+      prospect.neighborhood,
+      prospect.businessName,
+      prospect.sourceUrl,
+      prospect.website,
+      prospect.sourceProof,
+      prospect.notes,
+    );
     const baseRow = {
       businessName: normalizeText(prospect.businessName),
       neighborhood: normalizeText(prospect.neighborhood),
+      municipality,
       category: normalizeText(prospect.category),
       segment: normalizeText(prospect.segment),
       sourceUrl: normalizeText(prospect.sourceUrl),
@@ -797,6 +926,11 @@ async function main() {
       batchLane: candidate.batchLane,
       stage: candidate.stage,
     };
+
+    baseRow.marketScope =
+      prospect.marketScope === "metro_area" || inferMarketScope(baseRow) === "metro_area"
+        ? "metro_area"
+        : "city_only";
 
     return applySendLedgerOverride(baseRow, findSendLedgerEntry(sendLedgerLookup, baseRow));
   });
@@ -848,6 +982,7 @@ async function main() {
       seed: {
         businessName: row.businessName,
         neighborhood: row.neighborhood,
+        municipality: row.municipality,
         category: row.category,
         segment: row.segment,
         website: row.website,
@@ -908,6 +1043,8 @@ async function main() {
     ownerReviewReadyCount: renderableSeedRows.filter(
       (row) => row.approvalStatus === "ready_for_owner_review",
     ).length,
+    metroAreaRowCount: renderableSeedRows.filter((row) => row.marketScope === "metro_area").length,
+    municipalities: [...new Set(renderableSeedRows.map((row) => row.municipality || "Vancouver"))].sort(),
     reviewOnlyCount: renderableSeedRows.filter((row) => row.approvalStatus === "review_only").length,
     sentManualCount: renderableSeedRows.filter((row) => row.outreachStatus === "sent_manual").length,
     shortlistCount: shortlist.length,
@@ -939,7 +1076,7 @@ async function main() {
     fs.writeFile(
       options.shortlistCsvPath,
       buildCsv(
-        ["rank", "businessName", "neighborhood", "category", "segment", "email", "website", "shortlistScore", "whyNow"],
+        ["rank", "businessName", "neighborhood", "municipality", "category", "segment", "email", "website", "shortlistScore", "whyNow"],
         shortlistRows,
       ),
       "utf8",

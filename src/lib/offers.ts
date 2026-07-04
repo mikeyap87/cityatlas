@@ -2,9 +2,9 @@ import type { Business, Offer } from "../types";
 
 export function getOfferDisplayBusiness(offer: Offer, businesses: Business[]) {
   if (offer.businessId) {
-    const attachedBusiness = businesses.find((business) => business.id === offer.businessId);
-    if (attachedBusiness) {
-      return attachedBusiness;
+    const directMatch = businesses.find((business) => business.id === offer.businessId);
+    if (directMatch) {
+      return directMatch;
     }
   }
 
@@ -16,6 +16,9 @@ export function getOfferDisplayBusiness(offer: Offer, businesses: Business[]) {
 }
 
 export function isOfferBusinessPreviewContext(offer: Offer, business?: Business) {
-  if (!business) return false;
-  return Boolean(offer.previewBusinessId) && offer.previewBusinessId === business.id && offer.businessId !== business.id;
+  if (!business) {
+    return true;
+  }
+
+  return offer.previewBusinessId === business.id || business.trustLevel === "fictional_seed";
 }

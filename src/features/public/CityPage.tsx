@@ -6,6 +6,7 @@ import { BusinessCard, EventCard, GuideCard, MissionCard, OfferCard } from "../.
 import { ArrowRightIcon, SearchIcon } from "../../components/Icons";
 import { HeroMediaCard, SectionHeader, StatusPill } from "../../components/UI";
 import { getOfferDisplayBusiness } from "../../lib/offers";
+import { simplifyBusinessDisplayText } from "../../lib/publicCopy";
 import { getSourceBackedPlaces } from "../../lib/sourceBackedCollections";
 import { VancouverBusinessCoverageSection } from "./VancouverBusinessCoverageSection";
 
@@ -89,6 +90,11 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
     sourceBackedWellnessResetStarters.length;
   const cityHeroQuickStarts = [
     {
+      label: "Date night",
+      detail: "Fast evening starts that do not need overthinking",
+      to: "/vancouver/date-night-starters",
+    },
+    {
       label: "First visit",
       detail: "Downtown, scenic, or west-side first stop",
       to: "/vancouver/first-time-visitor-starters",
@@ -104,11 +110,6 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
       to: "/vancouver/rainy-day-starters",
     },
     {
-      label: "Kitsilano",
-      detail: "Slower waterfront and west-side flow",
-      to: "/vancouver/kitsilano-scenic-starters",
-    },
-    {
       label: "Hosting guests",
       detail: "Easy crowd-pleasing path for visitors",
       to: "/vancouver/out-of-town-guest-starters",
@@ -117,6 +118,11 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
       label: "Wellness reset",
       detail: "Lower-key recovery and reset plans",
       to: "/vancouver/wellness-reset-starters",
+    },
+    {
+      label: "Low-effort day",
+      detail: "Choose the easiest route when energy is limited",
+      to: "/vancouver/guides/which-low-friction-vancouver-route-should-you-open-today",
     },
   ];
   const neighborhoodGuideCount =
@@ -147,7 +153,7 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
     {
       path: "/vancouver/date-night-starters",
       label: "Date night",
-      detail: "Real evening anchors with official site links.",
+      detail: "Real evening spots with official site links.",
     },
     {
       path: "/vancouver/rainy-day-starters",
@@ -173,6 +179,11 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
       path: "/vancouver/weekend-route-starters",
       label: "Weekend plan",
       detail: "Compact weekend starts without crossing the city all day.",
+    },
+    {
+      path: "/vancouver/guides/which-low-friction-vancouver-route-should-you-open-today",
+      label: "Low-effort day",
+      detail: "Use the easier-day chooser when energy and friction matter most.",
     },
     {
       path: "/vancouver/out-of-town-guest-starters",
@@ -213,7 +224,7 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
         business.name,
         business.category,
         business.neighborhood,
-        business.shortDescription,
+        simplifyBusinessDisplayText(business.shortDescription),
       ]
         .join(" ")
         .toLowerCase();
@@ -231,8 +242,8 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
           <h1>Find the right Vancouver start first</h1>
           <p>
             Start here when you know the kind of day you want, but not the exact place yet.
-            CityAtlas helps you choose the right area, guide, or local place before the tab
-            pile gets noisy.
+            CityAtlas helps you choose the right use case, area, guide, or local place before the
+            tab pile gets noisy.
           </p>
           <div className="hero-actions">
             <AppLink className="button primary" to="/vancouver/guides">
@@ -323,7 +334,7 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
             {(neighborhoodStarterGuides.length > 0 ? neighborhoodStarterGuides : neighborhoodGuides)
               .slice(0, 4)
               .map((guide) => (
-              <GuideCard guide={guide} key={guide.id} />
+              <GuideCard data={data} guide={guide} key={guide.id} />
             ))}
           </div>
         </section>
@@ -391,9 +402,9 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
 
       <section className="section-block">
         <SectionHeader
-          title="Source-backed Vancouver business pages"
+          title="Vancouver business pages with official links"
           copy={`${businesses.length} Vancouver business pages now use real venue names, actual venue photos, and the official path to re-check details before you visit.`}
-          action={<StatusPill tone="green">Source-backed pages</StatusPill>}
+          action={<StatusPill tone="green">Official link pages</StatusPill>}
         />
         <div className="card-grid three">
           {businesses.map((business) => (
@@ -459,7 +470,7 @@ export function CityPage({ data, onSaveMission }: CityPageProps) {
         />
         <div className="card-grid two">
           {featuredCityGuides.map((guide) => (
-            <GuideCard guide={guide} key={guide.id} />
+            <GuideCard data={data} guide={guide} key={guide.id} />
           ))}
         </div>
       </section>

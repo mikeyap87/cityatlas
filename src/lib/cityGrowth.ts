@@ -643,6 +643,8 @@ export interface BusinessProspectImportInput {
   email: string;
   contactName: string;
   cityName: string;
+  municipality?: string;
+  marketScope?: BusinessProspect["marketScope"];
   neighborhood: string;
   category: string;
   segment: string;
@@ -1073,11 +1075,20 @@ function buildManualImportProspect(
   const email = input.email.trim().toLowerCase();
   const sourceUrl = input.sourceUrl.trim();
   const contactPath = input.contactPath.trim() || sourceUrl || input.website.trim();
+  const municipality = input.municipality?.trim() || input.cityName.trim() || getCityName(cityKey);
+  const marketScope = input.marketScope
+    || (
+      cityKey === "vancouver" && municipality && municipality !== "Vancouver"
+        ? "metro_area"
+        : "city_only"
+    );
 
   return {
     id: `prospect-import-${slugify(input.businessName || "business")}-${slugify(input.cityName || "city")}`,
     cityKey,
     cityName: input.cityName.trim() || getCityName(cityKey),
+    municipality,
+    marketScope,
     businessName: input.businessName.trim(),
     slug: slugify(input.businessName),
     neighborhood: input.neighborhood.trim(),
@@ -1132,6 +1143,11 @@ function mergeProspect(current: BusinessProspect, next: BusinessProspect): Busin
     ...current,
     ...next,
     id: current.id,
+    municipality: next.municipality || current.municipality,
+    marketScope:
+      next.marketScope === "metro_area" || current.marketScope === "metro_area"
+        ? "metro_area"
+        : next.marketScope || current.marketScope,
     sourceType:
       sourceTypeRank[next.sourceType] > sourceTypeRank[current.sourceType]
         ? next.sourceType

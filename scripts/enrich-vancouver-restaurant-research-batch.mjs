@@ -146,6 +146,79 @@ const PROFILE_CONFIG = {
         .join(" ");
     },
   },
+  metro: {
+    label: "metro",
+    input: path.resolve(
+      __dirname,
+      "../output/growth/greater-vancouver-official-priority-research-batch-001.csv",
+    ),
+    outputCsv: path.resolve(
+      __dirname,
+      "../output/growth/greater-vancouver-official-priority-research-batch-001-enriched.csv",
+    ),
+    outputJson: path.resolve(
+      __dirname,
+      "../output/growth/greater-vancouver-official-priority-research-batch-001-enriched.json",
+    ),
+    outputSummary: path.resolve(
+      __dirname,
+      "../output/growth/greater-vancouver-official-priority-research-batch-001-enriched-summary.json",
+    ),
+    reviewCsv: path.resolve(
+      __dirname,
+      "../output/growth/greater-vancouver-official-priority-research-batch-001-review.csv",
+    ),
+    reviewSummary: path.resolve(
+      __dirname,
+      "../output/growth/greater-vancouver-official-priority-research-batch-001-review-summary.json",
+    ),
+    isCategoryFit(value) {
+      return /(restaurant|cafe|coffee|bakery|brew|bistro|pub|bar|salon|spa|massage|esthetician|barber|nail|fitness|gym|yoga|pilates|wellness|recovery|hotel|inn|gallery|museum|venue|event|auto repair|repair shop|detailing|car wash|tire|mechanic|automotive|cleaning|janitorial|plumbing|electrical|pest|landscap|florist|pet groom|retail trader|retail merchant)/i.test(
+        normalizeText(value),
+      );
+    },
+    buildImportSourceLabel(reviewDecision) {
+      if (reviewDecision === "email_candidate_review") {
+        return "Outscraper Greater Vancouver official review email candidate";
+      }
+      if (reviewDecision === "contact_path_review") {
+        return "Outscraper Greater Vancouver official review contact path";
+      }
+      return "Outscraper Greater Vancouver official research review";
+    },
+    buildImportSegment(row) {
+      return pickFirst(
+        row.businessSubtype,
+        row.outscraperPlaceType,
+        row.businessType,
+        "Local business",
+      );
+    },
+    buildImportCategory(row) {
+      return pickFirst(
+        row.categoryFromSite,
+        row.outscraperPlaceType,
+        row.categoryPrimary,
+        row.businessSubtype,
+        row.businessType,
+        "Local business",
+      );
+    },
+    buildImportNotes(row, reviewDecision, reviewReason) {
+      return [
+        `Imported from Greater Vancouver official review batch ${normalizeText(row.researchBatchId) || "001"}.`,
+        normalizeText(row.municipality) ? `Municipality: ${normalizeText(row.municipality)}.` : "",
+        `Review decision: ${reviewDecision.replaceAll("_", " ")}.`,
+        `Review reason: ${trimSentenceEnding(reviewReason)}.`,
+        normalizeText(row.partnerFitReason)
+          ? `Partner-fit reason: ${trimSentenceEnding(row.partnerFitReason)}.`
+          : "",
+        normalizeText(row.nextStep),
+      ]
+        .filter(Boolean)
+        .join(" ");
+    },
+  },
 };
 
 function parseArgs(argv) {

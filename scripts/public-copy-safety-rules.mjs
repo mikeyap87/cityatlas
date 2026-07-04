@@ -1,5 +1,25 @@
 export const blockedPhrases = [
   {
+    phrase: "source-backed",
+    reason: "Public pages should use customer-facing wording instead of internal source-backed shorthand.",
+  },
+  {
+    phrase: "official-link",
+    reason: "Public pages should use natural wording like official link or official site.",
+  },
+  {
+    phrase: "coverage snapshot",
+    reason: "Public pages should describe current coverage directly, not internal snapshot language.",
+  },
+  {
+    phrase: "in the product",
+    reason: "Public pages should describe what is available now, not internal product-state language.",
+  },
+  {
+    phrase: "page example only",
+    reason: "Public pages should avoid internal example-state labels.",
+  },
+  {
     phrase: "preview profile",
     reason: "Public business copy should not read like an internal preview state.",
   },

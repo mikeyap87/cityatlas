@@ -159,13 +159,16 @@ async function main() {
       const serviceMetricText = metricTexts.find((text) => /Service businesses/i.test(text)) ?? "";
       const officialServiceMetricText = metricTexts.find((text) => /Official service/i.test(text)) ?? "";
       const officialFoodMetricText = metricTexts.find((text) => /Official food/i.test(text)) ?? "";
+      const officialMetroMetricText = metricTexts.find((text) => /Official metro/i.test(text)) ?? "";
       const serviceCount = extractLeadingNumber(serviceMetricText);
       const officialServiceCount = extractLeadingNumber(officialServiceMetricText);
       const officialFoodCount = extractLeadingNumber(officialFoodMetricText);
+      const officialMetroCount = extractLeadingNumber(officialMetroMetricText);
 
       ensure(Number.isFinite(serviceCount) && serviceCount > 0, `Expected service-business inventory rows, got "${serviceMetricText}".`);
       ensure(Number.isFinite(officialServiceCount) && officialServiceCount > 0, `Expected official-service inventory rows, got "${officialServiceMetricText}".`);
       ensure(Number.isFinite(officialFoodCount) && officialFoodCount > 0, `Expected official-food inventory rows, got "${officialFoodMetricText}".`);
+      ensure(Number.isFinite(officialMetroCount) && officialMetroCount > 0, `Expected official-metro inventory rows, got "${officialMetroMetricText}".`);
 
       return {
         route: "/admin",
@@ -292,6 +295,81 @@ async function main() {
         route: "/admin",
         sampleRows,
         screenshot: await saveScreenshot(page, "admin-official-food.png"),
+      };
+    });
+
+    await runCheck(checks, "admin official-metro filter", async () => {
+      await page.goto(`${baseUrl}/admin`, { waitUntil: navigationWaitUntil });
+      await page.getByRole("heading", { level: 1, name: /CityAtlas operator console/i }).waitFor();
+      const inventoryPanel = page
+        .locator("article.admin-panel.large")
+        .filter({ hasText: "business database" })
+        .first();
+      await page.getByLabel("Inventory source").selectOption("official_metro");
+      const metroMunicipalitySelect = page.getByLabel("Metro municipality");
+      await metroMunicipalitySelect.waitFor();
+      const municipalityOptions = await metroMunicipalitySelect.locator("option").evaluateAll((options) =>
+        options.map((option) => (option instanceof HTMLOptionElement ? option.textContent?.trim() ?? "" : "")),
+      );
+      const loadStartedAt = Date.now();
+      const municipalitySignals = ["Surrey", "Coquitlam", "Township of Langley"];
+      try {
+        await page.waitForFunction(
+          ({ signals }) =>
+            Array.from(document.querySelectorAll(".business-prospect-row")).some((row) => {
+              const text = row.textContent || "";
+              return signals.some((signal) => text.includes(signal));
+            }),
+          { signals: municipalitySignals },
+          { timeout: 120_000 },
+        );
+      } catch (error) {
+        const panelSnapshot = await inventoryPanel.innerText();
+        const message = error instanceof Error ? error.message : String(error);
+        throw new Error(`${message}\nPanel snapshot:\n${panelSnapshot.slice(0, 4000)}`);
+      }
+      if (municipalityOptions.includes("Burnaby")) {
+        await metroMunicipalitySelect.selectOption("Burnaby");
+        await page.waitForFunction(
+          () =>
+            Array.from(document.querySelectorAll(".business-prospect-row")).some((row) =>
+              (row.textContent || "").includes("Burnaby"),
+            ),
+          undefined,
+          { timeout: 30_000 },
+        );
+      }
+      if (municipalityOptions.includes("Coquitlam")) {
+        await metroMunicipalitySelect.selectOption("Coquitlam");
+        await page.waitForFunction(
+          () =>
+            Array.from(document.querySelectorAll(".business-prospect-row")).some((row) =>
+              (row.textContent || "").includes("Coquitlam"),
+            ),
+          undefined,
+          { timeout: 30_000 },
+        );
+      }
+      await wait(500);
+
+      const sampleRows = await inventoryPanel.locator(".business-prospect-row").evaluateAll((rows) =>
+        rows.slice(0, 10).map((row) => row.textContent?.replace(/\s+/g, " ").trim() ?? ""),
+      );
+
+      ensure(sampleRows.length > 0, "Expected official-metro inventory rows to render.");
+      ensure(
+        sampleRows.some((row) =>
+          municipalitySignals.some((signal) => row.includes(signal)),
+        ),
+        `Official-metro rows did not show recognizable metro municipalities. Samples: ${JSON.stringify(sampleRows)}.`,
+      );
+
+      return {
+        route: "/admin",
+        loadDurationMs: Date.now() - loadStartedAt,
+        municipalityOptions,
+        sampleRows,
+        screenshot: await saveScreenshot(page, "admin-official-metro.png"),
       };
     });
   } finally {

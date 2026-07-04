@@ -26,6 +26,74 @@ function normalizeKey(value) {
   return normalizeText(value).toLowerCase();
 }
 
+function normalizeEmail(value) {
+  return normalizeText(value).replace(/^mailto:/i, "").toLowerCase();
+}
+
+function isUsableEmail(value) {
+  const email = normalizeEmail(value);
+  if (!email) return false;
+  if (/[<>\s]/.test(email)) return false;
+  if (/u003e|u003c|%3e|%3c|&gt;|&lt;|&#/.test(email)) return false;
+  return /^[^@]+@[^@]+\.[^@]+$/.test(email);
+}
+
+const MUNICIPALITY_PRIORITY = [
+  "Vancouver",
+  "Langley",
+  "Township of Langley",
+  "Burnaby",
+  "Richmond",
+  "Coquitlam",
+  "Surrey",
+  "North Vancouver",
+  "West Vancouver",
+  "Port Coquitlam",
+  "Port Moody",
+  "New Westminster",
+  "Delta",
+  "Maple Ridge",
+  "Pitt Meadows",
+  "White Rock",
+];
+
+const MUNICIPALITY_PRIORITY_LOOKUP = new Map(
+  MUNICIPALITY_PRIORITY.map((municipality, index) => [normalizeKey(municipality), index]),
+);
+
+const GREATER_VANCOUVER_PATTERN =
+  /\b(burnaby|richmond|surrey|north vancouver|west vancouver|coquitlam|port coquitlam|port moody|delta|maple ridge|pitt meadows|white rock|langley|new westminster|greater vancouver|metro vancouver|lower mainland|fraser valley)\b/i;
+const REVIEW_FIRST_SOURCE_PATTERN = /\b(greater vancouver official|official review donor)\b/i;
+const GENERIC_EMAIL_DOMAINS = new Set([
+  "gmail.com",
+  "googlemail.com",
+  "hotmail.com",
+  "icloud.com",
+  "live.com",
+  "me.com",
+  "msn.com",
+  "outlook.com",
+  "yahoo.ca",
+  "yahoo.com",
+]);
+const BUSINESS_TOKEN_STOPWORDS = new Set([
+  "and",
+  "bc",
+  "canada",
+  "canadian",
+  "city",
+  "co",
+  "company",
+  "corp",
+  "corporation",
+  "inc",
+  "incorporated",
+  "ltd",
+  "limited",
+  "the",
+  "vancouver",
+]);
+
 async function readJsonOrNull(targetPath) {
   try {
     return JSON.parse(await fs.readFile(targetPath, "utf8"));
@@ -84,6 +152,100 @@ function buildCsv(headers, rows) {
   return `${lines.join("\n")}\n`;
 }
 
+function normalizeDomain(value) {
+  return normalizeKey(value)
+    .replace(/^www\./, "")
+    .split("/")
+    .at(0)
+    ?.replace(/[^a-z0-9.-]/g, "")
+    ?? "";
+}
+
+function getEmailDomain(value) {
+  const email = normalizeEmail(value);
+  if (!email.includes("@")) return "";
+  return normalizeDomain(email.split("@").pop());
+}
+
+function getUrlHostname(value) {
+  const raw = normalizeText(value);
+  if (!raw) return "";
+  try {
+    return normalizeDomain(new URL(raw).hostname);
+  } catch {
+    return normalizeDomain(raw.replace(/^https?:\/\//i, ""));
+  }
+}
+
+function getBusinessTokens(value) {
+  return normalizeKey(value)
+    .split(/[^a-z0-9]+/)
+    .filter((token) => token.length >= 3 && !BUSINESS_TOKEN_STOPWORDS.has(token));
+}
+
+function hasBusinessDomainOverlap(prospect, domain) {
+  if (!domain) return true;
+  const domainText = normalizeKey(domain);
+  return getBusinessTokens(prospect.businessName).some((token) => domainText.includes(token));
+}
+
+function getContactQualityIssue(prospect) {
+  const sourceLabel = normalizeText(prospect.sourceLabel);
+  const emailDomain = getEmailDomain(prospect.email);
+  if (!REVIEW_FIRST_SOURCE_PATTERN.test(sourceLabel) || !emailDomain || GENERIC_EMAIL_DOMAINS.has(emailDomain)) {
+    return "";
+  }
+
+  const websiteHost = getUrlHostname(prospect.website || prospect.sourceUrl);
+  const contactHost = getUrlHostname(prospect.contactPath);
+  const emailDomainMatchesBusiness = hasBusinessDomainOverlap(prospect, emailDomain);
+  if (
+    !emailDomainMatchesBusiness
+    && (websiteHost.endsWith(`.${emailDomain}`) || contactHost.endsWith(`.${emailDomain}`))
+  ) {
+    return `Hold for contact QA: ${emailDomain} looks like a contact-platform domain for ${prospect.businessName}, not the business contact itself.`;
+  }
+
+  const candidateDomains = [emailDomain, websiteHost, contactHost].filter(Boolean);
+  const hasOverlap = candidateDomains.some((domain) => hasBusinessDomainOverlap(prospect, domain));
+  if (hasOverlap) return "";
+
+  return `Hold for contact QA: email/domain ${emailDomain} does not clearly match ${prospect.businessName}.`;
+}
+
+function getMunicipalityLabel(prospect) {
+  return normalizeText(prospect.municipality || prospect.cityName || "Unknown");
+}
+
+function getBusinessTypeLabel(prospect) {
+  return normalizeText(prospect.category || prospect.segment || prospect.sourceLabel || "Unknown");
+}
+
+function getMunicipalityPriority(prospectOrRow) {
+  const municipality = normalizeKey(prospectOrRow.municipality || prospectOrRow.cityName);
+  return MUNICIPALITY_PRIORITY_LOOKUP.get(municipality) ?? Number.MAX_SAFE_INTEGER;
+}
+
+function buildCountMap(rows, labelGetter, limit = Number.MAX_SAFE_INTEGER) {
+  const counts = new Map();
+  for (const row of rows) {
+    const label = normalizeText(labelGetter(row));
+    if (!label) continue;
+    counts.set(label, (counts.get(label) || 0) + 1);
+  }
+
+  return Object.fromEntries(
+    Array.from(counts.entries())
+      .sort((left, right) => {
+        if (right[1] !== left[1]) {
+          return right[1] - left[1];
+        }
+        return left[0].localeCompare(right[0]);
+      })
+      .slice(0, limit),
+  );
+}
+
 function looksLikeRestaurantLane(prospect) {
   if (isServiceBusinessProspect(prospect)) {
     return false;
@@ -122,12 +284,63 @@ function getAngle(prospect, candidate) {
   return candidate.draft.angle || "a Vancouver local-discovery angle";
 }
 
+function getBatchLabel(prospect) {
+  const text = normalizeKey(`${prospect.category} ${prospect.segment}`);
+  if (/italian/.test(text)) return "Italian spots";
+  if (/pizza/.test(text)) return "pizza spots";
+  if (/sushi/.test(text)) return "sushi spots";
+  if (/ramen/.test(text)) return "ramen spots";
+  if (/bakery/.test(text)) return "cafes and bakeries";
+  if (/cafe|coffee/.test(text)) return "cafes and coffee spots";
+  if (/bar|pub|wine|tavern|cocktail/.test(text)) return "bars and night-out spots";
+  return "restaurant spots";
+}
+
+function getCoverageLabel(prospect) {
+  if (prospect.marketScope === "metro_area") {
+    return "Greater Vancouver";
+  }
+  if (normalizeText(prospect.municipality) && normalizeText(prospect.municipality) !== "Vancouver") {
+    return "Greater Vancouver";
+  }
+
+  const text = [
+    prospect.businessName,
+    prospect.municipality,
+    prospect.neighborhood,
+    prospect.category,
+    prospect.segment,
+    prospect.notes,
+    prospect.sourceProof,
+  ]
+    .filter(Boolean)
+    .join(" ");
+  return GREATER_VANCOUVER_PATTERN.test(text) ? "Greater Vancouver" : "Vancouver";
+}
+
+function getHostedAsk(prospect) {
+  const text = normalizeKey(`${prospect.businessName} ${prospect.category} ${prospect.segment}`);
+  if (/bar|pub|wine|tavern|cocktail|brewery/.test(text)) {
+    return "a complimentary hosted drinks-and-bites visit, tasting, or evening experience for Michael and one guest";
+  }
+  if (/cafe|coffee|bakery|brunch|breakfast/.test(text)) {
+    return "a complimentary hosted coffee, pastry, brunch, or daytime visit for Michael and one guest";
+  }
+  if (/sushi|pizza|ramen|afghan|indian|yakiniku|restaurant|kitchen|grill|bistro|chicken|dining/.test(text)) {
+    return "a complimentary hosted tasting, meal, or dining visit for Michael and one guest";
+  }
+  return "a complimentary hosted tasting, meal, or visit for Michael and one guest";
+}
+
 function buildSubject(prospect) {
   return `CityAtlas feature idea for ${prospect.businessName}`;
 }
 
 function buildBody(prospect, candidate) {
   const angle = getAngle(prospect, candidate);
+  const batchLabel = getBatchLabel(prospect);
+  const coverageLabel = getCoverageLabel(prospect);
+  const hostedAsk = getHostedAsk(prospect);
   const neighborhood = normalizeText(prospect.neighborhood);
   const neighborhoodLine = neighborhood
     ? `- the ${neighborhood} route, neighborhood, or guide where you fit best`
@@ -136,16 +349,20 @@ function buildBody(prospect, candidate) {
   return [
     `Hi ${prospect.businessName} team,`,
     "",
-    "I run CityAtlas, a Vancouver discovery site built around local routes and neighborhood guides instead of flat listings.",
+    "I run CityAtlas, a Vancouver-first discovery site built around local routes and neighborhood guides instead of flat listings.",
     "",
-    `I already have ${prospect.businessName} in my local review queue for ${angle}, and I think there is a strong fit for a complimentary preview feature or route placement draft.`,
+    `I'm reviewing a small batch of ${coverageLabel} ${batchLabel} right now, with a few others already in the review list, and ${prospect.businessName} looks like a strong fit for ${angle}.`,
+    "",
+    "There is no fee to be considered for this first batch.",
+    "The first yes is not a paid package; it is simply a preview conversation so we can see if the fit is real.",
+    "Here is the plain-English partner preview: https://city.univenturestudio.com/for-businesses/partner-preview",
     "",
     "If helpful, I can send over a short preview showing:",
     "- the CityAtlas angle I think fits you",
     neighborhoodLine,
     "- the one booking, visit, or planning angle that reads most clearly",
     "",
-    "If the fit feels good, I would love to line up a hosted visit so I can experience it properly and build the feature with accurate detail.",
+    `If the preview feels useful and you want to move ahead, the first ask is simple: ${hostedAsk}, so I can experience it properly and build the feature with accurate detail.`,
     "",
     "Worth sending over a quick preview?",
     "",
@@ -159,6 +376,7 @@ function getCurrentSendStatus(prospect) {
   if (prospect.outreachStatus === "sent_manual") return "already_sent";
   if (prospect.outreachStatus === "replied") return "replied";
   if (prospect.outreachStatus === "do_not_contact") return "do_not_contact";
+  if (getContactQualityIssue(prospect)) return "review_only";
   if (prospect.approvalStatus === "owner_approved") return "approved_but_not_sent_here";
   if (prospect.approvalStatus === "ready_for_owner_review") return "owner_review_ready";
   return "review_only";
@@ -175,7 +393,7 @@ async function main() {
   const businessProspects = buildDefaultBusinessProspects(seedData);
   const currentRows = businessProspects
     .filter((prospect) => prospect.cityKey === "vancouver")
-    .filter((prospect) => Boolean(normalizeText(prospect.email)))
+    .filter((prospect) => isUsableEmail(prospect.email))
     .filter((prospect) => looksLikeRestaurantLane(prospect));
   const liveLedgerMatchedCount = currentRows.filter((prospect) => findLiveLedgerEntry(liveLedgerLookup, prospect)).length;
 
@@ -184,14 +402,18 @@ async function main() {
     .filter((prospect) => !findLiveLedgerEntry(liveLedgerLookup, prospect))
     .map((prospect) => {
       const candidate = buildBusinessProofCandidate(prospect);
+      const contactQualityIssue = getContactQualityIssue(prospect);
       return {
         businessName: prospect.businessName,
         email: prospect.email,
         subject: buildSubject(prospect),
         body: buildBody(prospect, candidate),
         cityName: prospect.cityName,
+        municipality: getMunicipalityLabel(prospect),
+        coverageLabel: getCoverageLabel(prospect),
         neighborhood: prospect.neighborhood,
         category: prospect.category,
+        businessType: getBusinessTypeLabel(prospect),
         segment: prospect.segment,
         sourceLabel: prospect.sourceLabel,
         sourceUrl: prospect.sourceUrl,
@@ -203,7 +425,9 @@ async function main() {
         batchLane: candidate.batchLane,
         promotionScore: candidate.score,
         personalizationAngle: getAngle(prospect, candidate),
-        nextStep: candidate.missing.join(" | ") || "Ready for the next reviewed send decision.",
+        hostedAsk: getHostedAsk(prospect),
+        contactQualityIssue,
+        nextStep: contactQualityIssue || candidate.missing.join(" | ") || "Ready for the next reviewed send decision.",
         notes: prospect.notes,
       };
     })
@@ -211,19 +435,33 @@ async function main() {
       if (left.currentSendStatus !== right.currentSendStatus) {
         return left.currentSendStatus.localeCompare(right.currentSendStatus);
       }
+      if (getMunicipalityPriority(left) !== getMunicipalityPriority(right)) {
+        return getMunicipalityPriority(left) - getMunicipalityPriority(right);
+      }
       if (right.promotionScore !== left.promotionScore) {
         return right.promotionScore - left.promotionScore;
       }
       return left.businessName.localeCompare(right.businessName);
     });
 
+  const ownerReviewReadyRows = unsentRows.filter((row) => row.currentSendStatus === "owner_review_ready");
+  const reviewOnlyRows = unsentRows.filter((row) => row.currentSendStatus === "review_only");
+  const approvedButUnsentRows = unsentRows.filter((row) => row.currentSendStatus === "approved_but_not_sent_here");
+  const contactQualityIssueRows = unsentRows.filter((row) => row.contactQualityIssue);
+
   const summary = {
     generatedAt: new Date().toISOString(),
     totalRestaurantEmailRowsInQueue: currentRows.length,
     unsentRestaurantEmailRows: unsentRows.length,
-    ownerReviewReadyRows: unsentRows.filter((row) => row.currentSendStatus === "owner_review_ready").length,
-    reviewOnlyRows: unsentRows.filter((row) => row.currentSendStatus === "review_only").length,
-    approvedButUnsentRows: unsentRows.filter((row) => row.currentSendStatus === "approved_but_not_sent_here").length,
+    ownerReviewReadyRows: ownerReviewReadyRows.length,
+    reviewOnlyRows: reviewOnlyRows.length,
+    approvedButUnsentRows: approvedButUnsentRows.length,
+    contactQualityIssueRows: contactQualityIssueRows.length,
+    municipalityPriority: MUNICIPALITY_PRIORITY,
+    ownerReviewReadyByMunicipality: buildCountMap(ownerReviewReadyRows, (row) => row.municipality),
+    ownerReviewReadyByType: buildCountMap(ownerReviewReadyRows, (row) => row.businessType, 10),
+    unsentByMunicipality: buildCountMap(unsentRows, (row) => row.municipality),
+    unsentByType: buildCountMap(unsentRows, (row) => row.businessType, 10),
     liveLedgerSuppressionCount: liveLedgerMatchedCount,
     liveSendLedgerPath: DEFAULT_LIVE_SEND_LEDGER_PATH,
     outputCsv: DEFAULT_CSV_PATH,
@@ -241,8 +479,11 @@ async function main() {
           "subject",
           "body",
           "cityName",
+          "municipality",
+          "coverageLabel",
           "neighborhood",
           "category",
+          "businessType",
           "segment",
           "sourceLabel",
           "sourceUrl",
@@ -254,6 +495,8 @@ async function main() {
           "batchLane",
           "promotionScore",
           "personalizationAngle",
+          "hostedAsk",
+          "contactQualityIssue",
           "nextStep",
           "notes",
         ],

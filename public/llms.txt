@@ -4,12 +4,12 @@ CityAtlas is a Vancouver-first guide, route planner, and local discovery platfor
 
 ## Summary
 
-CityAtlas helps locals and visitors plan Vancouver more clearly with answer-first guides, neighborhood pages, source-backed starter routes, and visible correction paths. It also gives businesses a review-request path for clearer local visibility pages and guide placement. A narrower Toronto pilot now exists for first-time visitor destination choice using the same official-source and correction-path pattern.
+CityAtlas helps locals and visitors plan Vancouver more clearly with answer-first guides, neighborhood pages, officially checked starter routes, and visible correction paths. It also gives businesses a review-request path for clearer local visibility pages and guide placement. A narrower Toronto pilot now exists for first-time visitor destination choice using the same official-source and correction-path pattern.
 
 ## Current Status
 
 CityAtlas is publicly crawlable at `city.univenturestudio.com`.
-Public guide, mission, and source-backed route pages are open to crawling.
+Public guide, mission, and officially checked route pages are open to crawling.
 Protected operations and submission routes stay out of search.
 
 ## Best-Fit Users
@@ -24,20 +24,20 @@ Protected operations and submission routes stay out of search.
 - `/about` - entity and trust explainer
 - `/vancouver` - Vancouver discovery hub
 - `/vancouver/guides` - answer-first Vancouver guide library
-- `/vancouver/date-night-starters` - official-source Vancouver date-night starters with visible claim boundaries
-- `/vancouver/rainy-day-starters` - official-source Vancouver rainy-day starters with visible claim boundaries
-- `/vancouver/first-evening-starters` - official-source Vancouver first-evening starters with visible claim boundaries
-- `/vancouver/first-time-visitor-starters` - official-source Vancouver first-time visitor starters with visible claim boundaries
-- `/vancouver/garden-day-starters` - official-source Vancouver garden and conservatory starters with visible claim boundaries
-- `/vancouver/kitsilano-scenic-starters` - official-source Vancouver Kitsilano scenic starters with visible claim boundaries
-- `/vancouver/west-side-daytime-starters` - official-source Vancouver west-side daytime starters with visible claim boundaries
-- `/vancouver/false-creek-culture-starters` - official-source Vancouver False Creek culture starters with visible claim boundaries
-- `/vancouver/ubc-discovery-starters` - official-source Vancouver UBC discovery starters with visible claim boundaries
-- `/vancouver/returning-visitor-starters` - official-source Vancouver returning-visitor starters with visible claim boundaries
-- `/vancouver/out-of-town-guest-starters` - official-source Vancouver out-of-town guest starters with visible claim boundaries
-- `/vancouver/weekend-route-starters` - official-source Vancouver weekend route starters with visible claim boundaries
-- `/vancouver/sunday-starters` - official-source Vancouver Sunday starters with visible claim boundaries
-- `/vancouver/wellness-reset-starters` - official-source Vancouver wellness reset starters with visible claim boundaries
+- `/vancouver/date-night-starters` - officially checked Vancouver date-night starters with visible claim boundaries
+- `/vancouver/rainy-day-starters` - officially checked Vancouver rainy-day starters with visible claim boundaries
+- `/vancouver/first-evening-starters` - officially checked Vancouver first-evening starters with visible claim boundaries
+- `/vancouver/first-time-visitor-starters` - officially checked Vancouver first-time visitor starters with visible claim boundaries
+- `/vancouver/garden-day-starters` - officially checked Vancouver garden and conservatory starters with visible claim boundaries
+- `/vancouver/kitsilano-scenic-starters` - officially checked Vancouver Kitsilano scenic starters with visible claim boundaries
+- `/vancouver/west-side-daytime-starters` - officially checked Vancouver west-side daytime starters with visible claim boundaries
+- `/vancouver/false-creek-culture-starters` - officially checked Vancouver False Creek culture starters with visible claim boundaries
+- `/vancouver/ubc-discovery-starters` - officially checked Vancouver UBC discovery starters with visible claim boundaries
+- `/vancouver/returning-visitor-starters` - officially checked Vancouver returning-visitor starters with visible claim boundaries
+- `/vancouver/out-of-town-guest-starters` - officially checked Vancouver out-of-town guest starters with visible claim boundaries
+- `/vancouver/weekend-route-starters` - officially checked Vancouver weekend route starters with visible claim boundaries
+- `/vancouver/sunday-starters` - officially checked Vancouver Sunday starters with visible claim boundaries
+- `/vancouver/wellness-reset-starters` - officially checked Vancouver wellness reset starters with visible claim boundaries
 - `/vancouver/guides/how-to-plan-a-vancouver-date-night-without-crossing-the-city-twice`
 - `/vancouver/guides/rainy-day-vancouver-plan-coffee-walk-and-reset`
 - `/vancouver/guides/vancouver-wellness-experiences-to-review`
@@ -62,11 +62,12 @@ Protected operations and submission routes stay out of search.
 - `/vancouver/guides/where-should-you-start-a-false-creek-vancouver-culture-afternoon`
 - `/vancouver/guides/where-should-you-start-a-ubc-adjacent-vancouver-discovery-day`
 - `/toronto/guides` - narrow Toronto pilot guide hub
-- `/toronto/first-time-visitor-starters` - official-source Toronto first-time visitor starters with visible claim boundaries
+- `/toronto/first-time-visitor-starters` - officially checked Toronto first-time visitor starters with visible claim boundaries
 - `/toronto/guides/where-should-a-first-time-toronto-visitor-start`
-- `/toronto/weekend-route-starters` - official-source Toronto weekend-route starters with visible claim boundaries
+- `/toronto/weekend-route-starters` - officially checked Toronto weekend-route starters with visible claim boundaries
 - `/toronto/guides/how-to-build-a-toronto-weekend-route-without-crossing-the-city-all-day`
 - `/vancouver/missions` - saveable city routes
+- `/for-businesses/partner-preview` - business partner preview explaining free review, hosted experience, and optional package path
 - `/for-businesses/pricing` - business visibility packages with review-first billing
 - `/editorial-standards` - public source policy, correction path, and removal-review route
 - `/terms` - current public terms
@@ -81,6 +82,6 @@ Protected and noindex routes:
 ## Trust Notes
 
 - Some marketplace-style business, event, and offer pages are sample formats and should not be treated as verified listings.
-- Public source-backed pages link directly to official sources and visible correction paths.
+- Public officially checked pages link directly to official sources and visible correction paths.
 - CityAtlas avoids fake rankings, unsupported availability claims, and scraped media.
 - The main public query clusters are date night, rainy day, weekend route ideas, low-effort Sunday planning, wellness reset, work-friendly cafes, first-evening visitor loops, first-time visitor starting areas, returning-visitor local discovery, out-of-town guest hosting, itinerary starter routing, neighborhood-intent route planning, and a narrow Toronto first-visit pilot.

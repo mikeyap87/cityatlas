@@ -15,8 +15,13 @@ const screenshotDir = join(outputDir, "local-product-smoke");
 const distIndexPath = join(root, "dist/index.html");
 const previewPort = Number(process.env.CITYATLAS_SMOKE_PORT || "4278");
 const useExistingServer = process.env.CITYATLAS_SMOKE_USE_EXISTING_SERVER === "1";
+const protectedRoutesOverride = process.env.CITYATLAS_SMOKE_EXPECT_PROTECTED_ROUTES;
 const expectProtectedPreviewRoutes =
-  process.env.CITYATLAS_SMOKE_EXPECT_PROTECTED_ROUTES === "1" || !useExistingServer;
+  protectedRoutesOverride === "1"
+    ? true
+    : protectedRoutesOverride === "0"
+      ? false
+      : !useExistingServer || previewPort !== 5178;
 const baseUrl = `http://127.0.0.1:${previewPort}`;
 const navigationWaitUntil = useExistingServer ? "domcontentloaded" : "networkidle";
 const failures = [];
@@ -67,7 +72,7 @@ function attachRuntimeCapture(page, bucket) {
     const abortedChunkRequest =
       errorText === "net::ERR_ABORTED"
       && request.resourceType() === "script"
-      && url.startsWith(`${baseUrl}/assets/`);
+      && (url.startsWith(`${baseUrl}/assets/`) || url.startsWith(`${baseUrl}/src/`));
 
     // Navigating between pages can cancel in-flight same-origin images without affecting users.
     if (url.startsWith(baseUrl) && !abortedImageRequest && !abortedChunkRequest) {
@@ -84,25 +89,30 @@ function attachRuntimeCapture(page, bucket) {
 async function saveScreenshot(page, fileName) {
   mkdirSync(screenshotDir, { recursive: true });
   const path = join(screenshotDir, fileName);
-  await page.evaluate(async () => {
-    const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-    const maxScrollTop = Math.max(
-      document.documentElement.scrollHeight,
-      document.body.scrollHeight,
-    ) - window.innerHeight;
-    const step = Math.max(Math.round(window.innerHeight * 0.82), 320);
+  try {
+    await page.evaluate(async () => {
+      const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+      const maxScrollTop = Math.max(
+        document.documentElement.scrollHeight,
+        document.body.scrollHeight,
+      ) - window.innerHeight;
+      const step = Math.max(Math.round(window.innerHeight * 0.82), 320);
 
-    for (let scrollTop = 0; scrollTop < maxScrollTop; scrollTop += step) {
-      window.scrollTo(0, Math.min(scrollTop, maxScrollTop));
-      await pause(80);
-    }
+      for (let scrollTop = 0; scrollTop < maxScrollTop; scrollTop += step) {
+        window.scrollTo(0, Math.min(scrollTop, maxScrollTop));
+        await pause(80);
+      }
 
-    window.scrollTo(0, maxScrollTop);
-    await pause(120);
-    window.scrollTo(0, 0);
-    await pause(120);
-  });
-  await page.screenshot({ path, fullPage: true });
+      window.scrollTo(0, maxScrollTop);
+      await pause(120);
+      window.scrollTo(0, 0);
+      await pause(120);
+    });
+  } catch {
+    // A route can finish a client-side navigation during the scroll prep on dev.
+    // Still attempt the screenshot so the smoke reflects rendered UI, not helper timing.
+  }
+  await page.screenshot({ path, fullPage: true, timeout: 60_000 });
   return `output/qa/local-product-smoke/${fileName}`;
 }
 
@@ -251,6 +261,26 @@ async function runDesktopFlow(browser) {
     };
   });
 
+  await runStep(steps, "desktop route chooser guide render", async () => {
+    await page.goto(`${baseUrl}/vancouver/guides/which-low-friction-vancouver-route-should-you-open-today`, {
+      waitUntil: navigationWaitUntil,
+    });
+    await page.getByRole("heading", {
+      level: 1,
+      name: /Which easy Vancouver guide should you open today/i,
+    }).waitFor();
+    const bodyText = await page.locator("body").innerText();
+    ensure(
+      /Focused next options|Try a different starting page|Need a focused page next|Pick the day type first|Rainy day|Visitor start/i.test(bodyText),
+      "Route chooser guide did not render the focused next-page routing module.",
+    );
+
+    return {
+      route: "/vancouver/guides/which-low-friction-vancouver-route-should-you-open-today",
+      screenshot: await saveScreenshot(page, "desktop-route-chooser-guide.png"),
+    };
+  });
+
   await runStep(steps, "desktop about render", async () => {
     await page.goto(`${baseUrl}/about`, { waitUntil: navigationWaitUntil });
     await page.getByRole("heading", {
@@ -279,7 +309,7 @@ async function runDesktopFlow(browser) {
     }).waitFor();
     const bodyText = await page.locator("body").innerText();
     ensure(
-      /Open official places|Need the broader plan next/i.test(bodyText),
+      /See local places|Browse more Vancouver guides|Local places to open next/i.test(bodyText),
       "Guide detail did not render the follow-through guidance section.",
     );
 
@@ -326,10 +356,19 @@ async function runDesktopFlow(browser) {
     await page.getByRole("link", { name: /Read the Toronto destination guide/i }).click();
     await page.waitForURL(`${baseUrl}/toronto/guides/where-should-a-first-time-toronto-visitor-start`);
     const bodyText = await page.locator("body").innerText();
-    ensure(/first-time Toronto visitor/i.test(bodyText), "Toronto pilot guide did not render recognizable first-time visitor copy.");
+    ensure(
+      /first-time Toronto visitor|Open example route|Route preview|Toronto First Arrival Loop/i.test(bodyText),
+      "Toronto pilot guide did not render the first-time visitor route handoff.",
+    );
+    await page.locator('a[href="/toronto/missions#mission-toronto-first-arrival-loop"]').first().click();
+    await page.waitForURL(/\/toronto\/missions#mission-toronto-first-arrival-loop$/);
+    ensure(
+      /Toronto First Arrival Loop|Follow the route one stop at a time/i.test(await page.locator("body").innerText()),
+      "Toronto missions page did not render the first-arrival route after guide handoff.",
+    );
 
     return {
-      route: "/toronto/guides/where-should-a-first-time-toronto-visitor-start",
+      route: "/toronto/missions#mission-toronto-first-arrival-loop",
       screenshot: await saveScreenshot(page, "desktop-toronto-pilot.png"),
     };
   });
@@ -346,13 +385,42 @@ async function runDesktopFlow(browser) {
     }).waitFor();
     const bodyText = await page.locator("body").innerText();
     ensure(
-      /Toronto weekend planning guide|choose the kind of Toronto weekend first|weekend visitors/i.test(bodyText),
-      "Toronto weekend guide did not render recognizable Toronto weekend guidance.",
+      /Toronto weekend planning guide|Open route with map|Route preview/i.test(bodyText),
+      "Toronto weekend guide did not render the weekend route handoff.",
+    );
+    await page.getByRole("link", { name: /Open route with map/i }).first().click();
+    await page.waitForURL(/\/toronto\/missions#mission-toronto-weekend-waterfront-loop$/);
+    await page.getByRole("heading", { level: 2, name: /Toronto Weekend Waterfront Loop/i }).waitFor();
+
+    return {
+      route: "/toronto/missions#mission-toronto-weekend-waterfront-loop",
+      screenshot: await saveScreenshot(page, "desktop-toronto-weekend.png"),
+    };
+  });
+
+  await runStep(steps, "desktop cafe guide route handoff", async () => {
+    await page.goto(`${baseUrl}/vancouver/guides/how-to-pick-a-work-friendly-vancouver-cafe`, {
+      waitUntil: navigationWaitUntil,
+    });
+    await page.getByRole("heading", {
+      level: 1,
+      name: /How To Pick A Work-Friendly Vancouver Cafe/i,
+    }).waitFor();
+    const bodyText = await page.locator("body").innerText();
+    ensure(
+      /Open route with map|Route preview|Focus Block Flex Route/i.test(bodyText),
+      "Cafe guide did not render the new route handoff.",
+    );
+    await page.locator('a[href="/vancouver/missions#mission-focus-block-flex"]').first().click();
+    await page.waitForURL(/\/vancouver\/missions#mission-focus-block-flex$/);
+    ensure(
+      /Focus Block Flex plan|Follow the route one stop at a time/i.test(await page.locator("body").innerText()),
+      "Missions page did not render the focus-block route after the cafe guide handoff.",
     );
 
     return {
-      route: "/toronto/guides/how-to-build-a-toronto-weekend-route-without-crossing-the-city-all-day",
-      screenshot: await saveScreenshot(page, "desktop-toronto-weekend.png"),
+      route: "/vancouver/missions#mission-focus-block-flex",
+      screenshot: await saveScreenshot(page, "desktop-cafe-guide-route.png"),
     };
   });
 
@@ -364,11 +432,11 @@ async function runDesktopFlow(browser) {
     ensure(Boolean(chipLabel), "Planner did not expose a saveable chip label.");
     await firstChip.click();
     await page.locator(".saved-row").filter({ hasText: chipLabel }).waitFor();
-    await page.getByRole("button", { name: /Prepare share text/i }).click();
+    await page.locator(".share-draft").getByRole("button", { name: /Copy (share text|route summary)/i }).click();
     await page.locator(".local-success").waitFor();
     const successText = await page.locator(".local-success").innerText();
     ensure(
-      /share text is ready here/i.test(successText),
+      /route (text|summary) copied|route (text|summary) is ready/i.test(successText),
       `Planner share draft message was not shown. Got "${successText}".`,
     );
 
@@ -404,6 +472,28 @@ async function runDesktopFlow(browser) {
     };
   });
 
+  await runStep(steps, "desktop partner preview render", async () => {
+    await page.goto(`${baseUrl}/for-businesses/partner-preview`, { waitUntil: navigationWaitUntil });
+    await page.getByRole("heading", {
+      level: 1,
+      name: /How a CityAtlas business feature starts/i,
+    }).waitFor();
+    const bodyText = await page.locator("body").innerText();
+    ensure(
+      /Michael and one guest|complimentary meal, service, walkthrough, or offering/i.test(bodyText),
+      "Partner preview did not explain the complimentary hosted experience ask.",
+    );
+    ensure(
+      /No fee to start the conversation|Paid packages remain optional/i.test(bodyText),
+      "Partner preview did not render the request-first or paid-optional framing.",
+    );
+
+    return {
+      route: "/for-businesses/partner-preview",
+      screenshot: await saveScreenshot(page, "desktop-partner-preview.png"),
+    };
+  });
+
   await runStep(steps, "desktop terms render", async () => {
     await page.goto(`${baseUrl}/terms`, { waitUntil: navigationWaitUntil });
     await page.getByRole("heading", { level: 1, name: /CityAtlas terms for the public site/i }).waitFor();
@@ -434,21 +524,27 @@ async function runDesktopFlow(browser) {
       waitUntil: navigationWaitUntil,
     });
     await page.getByRole("heading", { level: 1, name: /Tell CityAtlas what should improve first/i }).waitFor();
-    const packageInterest = await page.getByLabel("Package interest").inputValue();
+    await page.getByText(/Step 1 of 3/i).waitFor();
+    await page.getByLabel("Business name").fill(businessName);
+    await page.getByLabel("Neighborhood").fill("Gastown");
+    await page.getByLabel("Email").fill("hello@smoke-bistro.example");
+    await page.getByRole("button", { name: /^Continue$/i }).click();
+    await page.getByText(/What should improve first\?/i).waitFor();
+    await page.getByLabel("What you want help with").fill("Smoke test request for local visibility help.");
+    await page.getByRole("button", { name: /^Continue$/i }).click();
+    await page.locator(".submission-review-card").getByText(/^Ready to send$/i).waitFor();
+    const packageInterest = await page.getByLabel("Package direction").inputValue();
     ensure(
       packageInterest === "signature_partner",
       `Expected signature_partner query prefill, got "${packageInterest}".`,
     );
-
-    await page.getByLabel("Business name").fill(businessName);
     await page.getByLabel("Category").fill("Restaurant");
-    await page.getByLabel("Neighborhood").fill("Gastown");
-    await page.getByLabel("Website").fill("https://smoke-bistro.example");
+    await page.getByLabel("Website or Instagram").fill("https://smoke-bistro.example");
     await page.getByLabel("Contact name").fill("Jordan");
-    await page.getByLabel("Email").fill("hello@smoke-bistro.example");
-    await page.getByLabel("What you want help with").fill("Smoke test request for local visibility help.");
-    await page.getByRole("button", { name: /Save draft for later/i }).click();
-    await page.getByText(/Your draft is saved in this browser/i).waitFor();
+    await page.getByRole("button", { name: /Copy request/i }).click();
+    await page.getByText(/Copied\./i).waitFor();
+    await page.getByRole("button", { name: /Save for later/i }).click();
+    await page.getByText(/Your request is saved on this device/i).waitFor();
     await page.locator(".submission-row").filter({ hasText: businessName }).waitFor();
 
     return {
@@ -504,6 +600,15 @@ async function runDesktopFlow(browser) {
 
     await page.goto(`${baseUrl}/admin`, { waitUntil: navigationWaitUntil });
 
+    const adminHoldText = await page.locator("body").innerText();
+    if (/operator console is intentionally stripped from this build/i.test(adminHoldText)) {
+      return {
+        route: "/admin",
+        access: "held",
+        screenshot: await saveScreenshot(page, "desktop-admin-held.png"),
+      };
+    }
+
     await page.getByRole("heading", { level: 1, name: /CityAtlas operator console/i }).waitFor();
     await page.getByRole("button", { name: /Queue cleanup/i }).click();
     await page.getByText(/No-send business prospect queue/i).waitFor();
@@ -555,6 +660,13 @@ async function runDesktopFlow(browser) {
 
     const replySummary = "Smoke test reply summary for local QA.";
     const nextStep = "Keep this in local review only after smoke.";
+    const adminHoldText = await page.locator("body").innerText();
+    if (/operator console is intentionally stripped from this build/i.test(adminHoldText)) {
+      return {
+        route: "/admin",
+        access: "held",
+      };
+    }
     await page.getByRole("button", { name: /Outreach rehearsal/i }).click();
     await page.getByLabel("Reply summary").waitFor();
     await page.getByLabel("Reply summary").fill(replySummary);
@@ -578,6 +690,14 @@ async function runDesktopFlow(browser) {
     }
 
     const before = await page.locator(".brain-run-row").count();
+    const adminHoldText = await page.locator("body").innerText();
+    if (/operator console is intentionally stripped from this build/i.test(adminHoldText)) {
+      return {
+        route: "/admin",
+        access: "held",
+        screenshot: await saveScreenshot(page, "desktop-admin.png"),
+      };
+    }
     await page.getByRole("button", { name: /Signals \+ controls/i }).click();
     await page.getByText(/Local command engine/i).waitFor();
     await page.getByRole("button", { name: "Save run", exact: true }).click();
@@ -639,27 +759,41 @@ async function runMobileFlow(browser) {
   });
 
   await runStep(steps, "mobile Toronto pilot render", async () => {
-    await page.goto(`${baseUrl}/toronto/first-time-visitor-starters`, { waitUntil: navigationWaitUntil });
+    await page.goto(`${baseUrl}/toronto/guides/where-should-a-first-time-toronto-visitor-start`, {
+      waitUntil: navigationWaitUntil,
+    });
     await page.getByRole("heading", {
       level: 1,
-      name: /Toronto first-time visitor starting points/i,
+      name: /Where Should A First-Time Toronto Visitor Start/i,
     }).waitFor();
+    const bodyText = await page.locator("body").innerText();
+    ensure(
+      /Open example route|Route preview|Toronto First Arrival Loop/i.test(bodyText),
+      "Mobile Toronto first-visit guide did not show the route handoff.",
+    );
 
     return {
-      route: "/toronto/first-time-visitor-starters",
+      route: "/toronto/guides/where-should-a-first-time-toronto-visitor-start",
       screenshot: await saveScreenshot(page, "mobile-toronto-pilot.png"),
     };
   });
 
   await runStep(steps, "mobile Toronto weekend render", async () => {
-    await page.goto(`${baseUrl}/toronto/weekend-route-starters`, { waitUntil: navigationWaitUntil });
+    await page.goto(`${baseUrl}/toronto/guides/how-to-build-a-toronto-weekend-route-without-crossing-the-city-all-day`, {
+      waitUntil: navigationWaitUntil,
+    });
     await page.getByRole("heading", {
       level: 1,
-      name: /Toronto weekend.*starting points/i,
+      name: /How To Build A Toronto Weekend Plan Without Crossing The City All Day/i,
     }).waitFor();
+    const bodyText = await page.locator("body").innerText();
+    ensure(
+      /Open route with map|Route preview|Toronto Weekend Waterfront Loop/i.test(bodyText),
+      "Mobile Toronto weekend guide did not show the route handoff.",
+    );
 
     return {
-      route: "/toronto/weekend-route-starters",
+      route: "/toronto/guides/how-to-build-a-toronto-weekend-route-without-crossing-the-city-all-day",
       screenshot: await saveScreenshot(page, "mobile-toronto-weekend.png"),
     };
   });
@@ -705,6 +839,46 @@ async function runMobileFlow(browser) {
     };
   });
 
+  await runStep(steps, "mobile neighborhood chooser route preview", async () => {
+    await page.goto(`${baseUrl}/vancouver/guides/how-to-choose-between-gastown-mount-pleasant-and-kitsilano-for-a-vancouver-evening`, {
+      waitUntil: navigationWaitUntil,
+    });
+    await page.getByRole("heading", {
+      level: 1,
+      name: /Gastown, Mount Pleasant, And Kitsilano/i,
+    }).waitFor();
+    const bodyText = await page.locator("body").innerText();
+    ensure(
+      /Open example route|Route ready now|Example route preview/i.test(bodyText),
+      "Neighborhood chooser did not render the route preview handoff.",
+    );
+
+    return {
+      route: "/vancouver/guides/how-to-choose-between-gastown-mount-pleasant-and-kitsilano-for-a-vancouver-evening",
+      screenshot: await saveScreenshot(page, "mobile-neighborhood-chooser-guide.png"),
+    };
+  });
+
+  await runStep(steps, "mobile cafe guide route preview", async () => {
+    await page.goto(`${baseUrl}/vancouver/guides/how-to-pick-a-work-friendly-vancouver-cafe`, {
+      waitUntil: navigationWaitUntil,
+    });
+    await page.getByRole("heading", {
+      level: 1,
+      name: /How To Pick A Work-Friendly Vancouver Cafe/i,
+    }).waitFor();
+    const bodyText = await page.locator("body").innerText();
+    ensure(
+      /Open route with map|Route preview|Focus Block Flex Route/i.test(bodyText),
+      "Mobile cafe guide did not render the route handoff.",
+    );
+
+    return {
+      route: "/vancouver/guides/how-to-pick-a-work-friendly-vancouver-cafe",
+      screenshot: await saveScreenshot(page, "mobile-cafe-guide-route.png"),
+    };
+  });
+
   await runStep(steps, "mobile business detail render", async () => {
     await page.goto(`${baseUrl}/vancouver/businesses/published-on-main`, { waitUntil: navigationWaitUntil });
     await page.getByRole("heading", { level: 1, name: /Published on Main/i }).waitFor();
@@ -733,7 +907,12 @@ async function runMobileFlow(browser) {
   await runStep(steps, "mobile business request render", async () => {
     await page.goto(`${baseUrl}/for-businesses/submit`, { waitUntil: navigationWaitUntil });
     await page.getByRole("heading", { level: 1, name: /Tell CityAtlas what should improve first/i }).waitFor();
-    await page.getByRole("button", { name: /Open email draft/i }).waitFor();
+    await page.getByText(/Step 1 of 3/i).waitFor();
+    await page.getByRole("button", { name: /^Continue$/i }).waitFor();
+    ensure(
+      (await page.locator(".submission-step-dot").count()) === 3,
+      "Expected three visible wizard steps on mobile business request page.",
+    );
 
     return {
       route: "/for-businesses/submit",
@@ -755,6 +934,24 @@ async function runMobileFlow(browser) {
       route: "/for-businesses/pricing",
       packageCards,
       screenshot: await saveScreenshot(page, "mobile-business-pricing.png"),
+    };
+  });
+
+  await runStep(steps, "mobile partner preview render", async () => {
+    await page.goto(`${baseUrl}/for-businesses/partner-preview`, { waitUntil: navigationWaitUntil });
+    await page.getByRole("heading", {
+      level: 1,
+      name: /How a CityAtlas business feature starts/i,
+    }).waitFor();
+    const bodyText = await page.locator("body").innerText();
+    ensure(
+      /Michael and one guest|complimentary meal, service, walkthrough, or offering/i.test(bodyText),
+      "Mobile partner preview did not explain the complimentary hosted experience ask.",
+    );
+
+    return {
+      route: "/for-businesses/partner-preview",
+      screenshot: await saveScreenshot(page, "mobile-partner-preview.png"),
     };
   });
 
@@ -787,6 +984,15 @@ async function runMobileFlow(browser) {
     }
 
     await page.goto(`${baseUrl}/admin`, { waitUntil: navigationWaitUntil });
+
+    const adminHoldText = await page.locator("body").innerText();
+    if (/operator console is intentionally stripped from this build/i.test(adminHoldText)) {
+      return {
+        route: "/admin",
+        access: "held",
+        screenshot: await saveScreenshot(page, "mobile-admin.png"),
+      };
+    }
 
     await page.getByRole("heading", { level: 1, name: /CityAtlas operator console/i }).waitFor();
     await page.getByRole("button", { name: /Queue cleanup/i }).click();

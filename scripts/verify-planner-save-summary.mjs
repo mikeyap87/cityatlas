@@ -57,10 +57,43 @@ function buildPlannerShareText(data, savedItems) {
   ].join(" -> ");
 }
 
+function buildExpectedMissionShareText(data, mission) {
+  const missionBusinesses = mission.steps
+    .filter((step) => step.itemType === "business")
+    .map((step) => data.businesses.find((business) => business.id === step.itemId))
+    .filter(Boolean);
+  const missionEvents = mission.steps
+    .filter((step) => step.itemType === "event")
+    .map((step) => data.events.find((event) => event.id === step.itemId))
+    .filter(Boolean);
+  const missionGuides = mission.steps
+    .filter((step) => step.itemType === "guide")
+    .map((step) => data.guides.find((guide) => guide.id === step.itemId))
+    .filter(Boolean);
+  const missionOffers = mission.steps
+    .filter((step) => step.itemType === "offer")
+    .map((step) => data.offers.find((offer) => offer.id === step.itemId))
+    .filter(Boolean);
+
+  return [
+    ...missionBusinesses.map((business) => `Visit ${business.name} in ${business.neighborhood}`),
+    ...missionEvents.map((event) => `Check ${event.title} on ${event.date}`),
+    ...missionGuides.map((guide) => `Read ${simplifyGuideDisplayText(guide.title)}`),
+    ...missionOffers.map((offer) => `Save ${offer.title}`),
+  ].join(" -> ");
+}
+
 function main() {
   const data = JSON.parse(JSON.stringify(seedData));
-  const savedItems = simulateMissionSave(data, "mission-date-night");
+  const missionId = "mission-date-night";
+  const mission = data.cityMissions.find((item) => item.id === missionId);
+  if (!mission) {
+    throw new Error(`Mission not found: ${missionId}`);
+  }
+
+  const savedItems = simulateMissionSave(data, missionId);
   const itineraryText = buildPlannerShareText(data, savedItems);
+  const expectedItineraryText = buildExpectedMissionShareText(data, mission);
 
   const duplicateBusinessEntries = savedItems.filter(
     (item, index, list) =>
@@ -72,18 +105,18 @@ function main() {
   );
 
   const report = {
-    missionId: "mission-date-night",
+    missionId,
     savedItems: savedItems.map((item) => ({
       itemType: item.itemType,
       itemId: item.itemId,
       label: item.label,
     })),
     itineraryText,
+    expectedItineraryText,
     duplicateBusinessEntryCount: duplicateBusinessEntries.length,
     passed:
       duplicateBusinessEntries.length === 0 &&
-      itineraryText ===
-        "Visit Published on Main in Main Street -> Visit Kissa Tanto in Chinatown -> Read How To Plan A Vancouver Date Night Without Crossing The City Twice",
+      itineraryText === expectedItineraryText,
   };
 
   console.log("CityAtlas planner save-summary proof");

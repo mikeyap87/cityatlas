@@ -101,7 +101,7 @@ export const vancouverPublicBusinessCoverageSnapshot: PublicBusinessCoverageSnap
       id: "wellness",
       title: "Wellness, reset, and slower-day coverage",
       description:
-        "Use this page when the plan needs easier wellness anchors, calmer pacing, or a calmer reset instead of a packed schedule.",
+        "Use this page when the plan needs easier wellness starting points, calmer pacing, or a gentler reset instead of a packed schedule.",
       path: "/vancouver/wellness-reset-starters",
       count: 11,
       topCategories: [{ label: "Wellness", count: 11 }],

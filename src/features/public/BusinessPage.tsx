@@ -1,4 +1,5 @@
 import type { Business, CityAtlasData, SourceRecord } from "../../types";
+import { simplifyBusinessDisplayText } from "../../lib/publicCopy";
 import { getReadinessChecklist } from "../../lib/scoring";
 import { AppLink } from "../../components/Link";
 import { ArrowRightIcon, MapIcon, ShieldIcon, StoreIcon } from "../../components/Icons";
@@ -45,7 +46,7 @@ function getSourceStatusLabel(source: SourceRecord) {
   if (source.type === "business_submission") {
     return source.verified ? "Business confirmed" : "Business submitted";
   }
-  if (source.type === "founder_review") return source.verified ? "Checked manually" : "Needs checking";
+  if (source.type === "founder_review") return source.verified ? "Checked by CityAtlas" : "Needs checking";
   return source.verified ? "Checked" : "Needs checking";
 }
 
@@ -76,7 +77,7 @@ export function BusinessPage({ business, data }: BusinessPageProps) {
     .filter((source): source is SourceRecord => Boolean(source));
   const exampleOnly = isExampleBusiness(business);
   const businessPageLabel = getBusinessExampleLabel(business);
-  const heroStatusLabel = exampleOnly ? "Sample page" : "Source-backed page";
+  const heroStatusLabel = exampleOnly ? "Sample page" : "Official link page";
   const proofBannerTitle = exampleOnly ? "What is live on this page" : "What CityAtlas checked";
   const proofBannerCopy = exampleOnly
     ? "The page shape is live now. Official hours, booking details, and offer terms are added only after a real business check."
@@ -106,7 +107,7 @@ export function BusinessPage({ business, data }: BusinessPageProps) {
             <div className="business-media-copy">
               <span>{businessPageLabel}</span>
               <strong>{getBusinessHeroTitle(business)}</strong>
-              <p>{business.shortDescription}</p>
+              <p>{simplifyBusinessDisplayText(business.shortDescription)}</p>
             </div>
           </div>
         </div>
@@ -116,7 +117,7 @@ export function BusinessPage({ business, data }: BusinessPageProps) {
             <StatusPill tone="amber">Check official details before you visit</StatusPill>
           </div>
           <h1>{business.name}</h1>
-          <p>{business.fullDescription}</p>
+          <p>{simplifyBusinessDisplayText(business.fullDescription)}</p>
           <div className="business-highlight-row">
             <span className="query-card-kicker">Best for</span>
             <div className="tag-cloud business-highlight-cloud">

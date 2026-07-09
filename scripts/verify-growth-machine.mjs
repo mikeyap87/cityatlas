@@ -1,3 +1,5 @@
+import fs from "node:fs/promises";
+
 import { seedData } from "../src/data/seed.ts";
 import {
   buildCityBusinessRollups,
@@ -21,6 +23,18 @@ import {
 } from "../src/lib/businessSupervisedExecution.ts";
 import { buildConnectorCityRollups } from "../src/lib/cityConnectorWarmPaths.ts";
 import { buildCityOutreachRehearsalRollups } from "../src/lib/cityOutreachRehearsalTruth.ts";
+import {
+  RESTAURANT_DAILY_SEND_LIMIT,
+  SERVICE_DAILY_SEND_LIMIT,
+  TOTAL_DAILY_SEND_LIMIT,
+} from "./lib/cityatlas-daily-send-limits.mjs";
+import {
+  BUSINESS_REPLY_STATUS_OUTPUT_JSON_PATH,
+  BUSINESS_REPLY_STATUS_OUTPUT_TS_PATH,
+  BUSINESS_REPLY_STATUS_SOURCE_PATH,
+  buildBusinessReplyStatusSnapshot,
+  formatBusinessReplyStatusTypeScript,
+} from "./lib/cityatlas-business-reply-status.mjs";
 
 function check(condition, message) {
   if (!condition) {
@@ -217,6 +231,28 @@ const businessSupervisedExecutionReport = buildBusinessSupervisedExecutionLaneRe
   prospects: businessProspects.filter((prospect) => prospect.cityKey === "vancouver"),
   setup: getBusinessSupervisedOutreachSetup(),
 });
+const businessReplyStatusMarkdown = await fs.readFile(BUSINESS_REPLY_STATUS_SOURCE_PATH, "utf8");
+const expectedBusinessReplyStatusSnapshot = buildBusinessReplyStatusSnapshot(
+  businessReplyStatusMarkdown,
+);
+const actualBusinessReplyStatusJson = JSON.parse(
+  await fs.readFile(BUSINESS_REPLY_STATUS_OUTPUT_JSON_PATH, "utf8"),
+);
+const outreachQueueStatus = JSON.parse(
+  await fs.readFile("output/growth/cityatlas-outreach-queue-status.json", "utf8"),
+);
+const paidTrafficReadiness = JSON.parse(
+  await fs.readFile("output/qa/paid-traffic-readiness.json", "utf8"),
+);
+const hostedBusinessFunnelReport = JSON.parse(
+  await fs.readFile("output/qa/hosted-business-funnel.json", "utf8"),
+);
+const actualBusinessReplyStatusTs = await fs.readFile(
+  BUSINESS_REPLY_STATUS_OUTPUT_TS_PATH,
+  "utf8",
+);
+const expectedBusinessReplyStatusTs =
+  `${formatBusinessReplyStatusTypeScript(expectedBusinessReplyStatusSnapshot)}\n`;
 
 function getSourceDomain(url) {
   try {
@@ -472,6 +508,78 @@ check(
   businessSupervisedExecutionReport.caps.allowlistCap === 5,
   "The Vancouver supervised execution lane lost its tiny allowlist guardrail.",
 );
+check(
+  RESTAURANT_DAILY_SEND_LIMIT === 70,
+  "The restaurant daily send limit regressed below the approved 70/day cap.",
+);
+check(
+  SERVICE_DAILY_SEND_LIMIT === 30,
+  "The service daily send limit regressed below the approved 30/day cap.",
+);
+check(
+  TOTAL_DAILY_SEND_LIMIT === 100,
+  "The combined daily send capacity regressed below the approved 100/day total.",
+);
+check(
+  outreachQueueStatus.publicPartnerPreviewUrl === "https://city.univenturestudio.com/for-businesses/partner-preview",
+  "The outreach queue status no longer points businesses to the hosted partner-preview surface.",
+);
+check(
+  outreachQueueStatus.lanes?.find((lane) => lane.id === "restaurant")?.dailyLimit
+    === RESTAURANT_DAILY_SEND_LIMIT,
+  "The outreach queue status drifted away from the approved restaurant daily limit.",
+);
+check(
+  outreachQueueStatus.lanes?.find((lane) => lane.id === "service")?.dailyLimit
+    === SERVICE_DAILY_SEND_LIMIT,
+  "The outreach queue status drifted away from the approved service daily limit.",
+);
+check(
+  outreachQueueStatus.combined?.nextDailyWindowLimit === TOTAL_DAILY_SEND_LIMIT,
+  "The outreach queue status no longer reports the approved combined 100/day cap.",
+);
+check(
+  /manifest rows inside the 100\/day cap/i.test(outreachQueueStatus.bestNextMove || ""),
+  "The outreach queue status lost the approved manifest-only 100/day execution guidance.",
+);
+check(
+  paidTrafficReadiness.localBusinessFunnelPassed === true,
+  "The paid-traffic readiness artifact no longer proves the local business funnel.",
+);
+check(
+  paidTrafficReadiness.proof?.businessReplyProof?.ready === true,
+  "The paid-traffic readiness artifact lost the current business reply proof snapshot.",
+);
+check(
+  paidTrafficReadiness.proof?.hostedBusinessFunnel?.available === true,
+  "The paid-traffic readiness artifact no longer includes hosted business-funnel proof.",
+);
+check(
+  paidTrafficReadiness.proof?.hostedBusinessFunnel?.generatedAt === hostedBusinessFunnelReport.generatedAt,
+  "The paid-traffic readiness artifact drifted away from the current hosted business-funnel report.",
+);
+check(
+  ["/for-businesses/pricing", "/for-businesses/partner-preview", "/for-businesses/book-call", "/for-businesses/submit"].every(
+    (route) => hostedBusinessFunnelReport.routeReports?.some((report) => report.route === route),
+  ),
+  "The hosted business-funnel verifier no longer covers all four business routes.",
+);
+if (hostedBusinessFunnelReport.passed === false) {
+  check(
+    paidTrafficReadiness.blockers?.some((blocker) =>
+      /Hosted business funnel is still behind local/i.test(String(blocker)),
+    ),
+    "The paid-traffic readiness artifact stopped surfacing the hosted-vs-local business-funnel gap.",
+  );
+}
+check(
+  JSON.stringify(actualBusinessReplyStatusJson) === JSON.stringify(expectedBusinessReplyStatusSnapshot),
+  "The generated business reply proof JSON drifted away from the maintained reply-status doc.",
+);
+check(
+  actualBusinessReplyStatusTs === expectedBusinessReplyStatusTs,
+  "The app-level business reply proof snapshot drifted away from the maintained reply-status doc.",
+);
 
 const preview = parseBusinessProspectImport(
   [
@@ -520,6 +628,15 @@ console.log(
         matchedBusinessName: businessInboundPreview.rows[0]?.matchedBusinessName,
         mirroredEntries: businessMirrorEntries.length,
         bridgeReady: businessReplyBridgeReport.rows[0]?.canReplay ?? false,
+        snapshotLastUpdated: expectedBusinessReplyStatusSnapshot.lastUpdated,
+        liveRepliesSent:
+          expectedBusinessReplyStatusSnapshot.metrics.find((metric) => metric.label === "Live replies sent")?.value
+          ?? 0,
+      },
+      sendLimits: {
+        restaurant: RESTAURANT_DAILY_SEND_LIMIT,
+        service: SERVICE_DAILY_SEND_LIMIT,
+        total: TOTAL_DAILY_SEND_LIMIT,
       },
       businessSupervisedExecution: {
         queueRows: businessSupervisedExecutionReport.queue.length,

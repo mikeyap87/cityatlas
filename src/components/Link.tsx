@@ -11,11 +11,16 @@ export function AppLink({ to, children, onClick, ...props }: AppLinkProps) {
     <a
       href={to}
       onClick={(event) => {
+        onClick?.(event);
+
+        if (event.defaultPrevented) {
+          return;
+        }
+
         if (!event.metaKey && !event.ctrlKey && !event.shiftKey && event.button === 0) {
           event.preventDefault();
           navigate(to);
         }
-        onClick?.(event);
       }}
       {...props}
     >

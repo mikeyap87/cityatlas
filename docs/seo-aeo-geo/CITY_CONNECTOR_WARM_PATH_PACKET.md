@@ -1,6 +1,6 @@
 # City Connector Warm-Path Packet
 
-Updated: June 16, 2026
+Updated: June 25, 2026
 
 Generated from local repo truth by `npm run growth:packets`.
 
@@ -69,7 +69,7 @@ without pretending those two systems are interchangeable.
 ### 7. Tokyo
 
 - Connector stack: `10` organization connectors
-- Current business queue: `4` unique · `4` contact-ready · `2` email-ready
+- Current business queue: `6` unique · `6` contact-ready · `2` email-ready
 - Status: `organization_ready`
 - Next safe move: Use the organization-level connector stack to stage warm-path review and named-person follow-up packets before any outreach decision exists.
 
@@ -115,13 +115,13 @@ without pretending those two systems are interchangeable.
 <!-- CURRENT_SHARED_MACHINE_TRUTH:START -->
 ## Current Shared Machine Truth
 
-- Synced June 16, 2026 from current repo truth.
+- Synced June 25, 2026 from current repo truth.
 - `41` useful pieces
 - `25` guides
 - `16` source-backed wedge collections
 - `80` source-backed anchors
 - `16` mapped guide-to-collection links
 - all `25` current guides now have at least one direct-path internal link into another CityAtlas page.
-- `npm run seo:structure:proof` currently passes across `38` key routes.
+- `npm run seo:structure:proof` currently passes across `39` key routes.
 <!-- CURRENT_SHARED_MACHINE_TRUTH:END -->
 

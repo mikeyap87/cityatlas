@@ -7,6 +7,7 @@ import type {
   SourceBackedPlaceReference,
 } from "../types";
 import { buildDefaultSeededBusinessProspects } from "./businessProspectSeeds.ts";
+import { shouldTreatProspectAsPartnerAnchor } from "./businessProspectRole.ts";
 
 const rolloutTargets: CityRolloutTarget[] = [
   {
@@ -642,6 +643,8 @@ export interface BusinessProspectImportInput {
   email: string;
   contactName: string;
   cityName: string;
+  municipality?: string;
+  marketScope?: BusinessProspect["marketScope"];
   neighborhood: string;
   category: string;
   segment: string;
@@ -894,12 +897,7 @@ export function classifyBusinessProspectRole(
     return "partner_candidate";
   }
 
-  if (
-    prospect.contactReadiness !== "needs_research" ||
-    /(restaurant|bar|gallery|museum|market|attraction|hotel|cafe|venue|event|wellness|spa)/i.test(
-      `${prospect.category} ${prospect.segment}`,
-    )
-  ) {
+  if (shouldTreatProspectAsPartnerAnchor(prospect)) {
     return "partner_and_anchor";
   }
 
@@ -950,9 +948,16 @@ export function parseBusinessProspectImport(
 }
 
 export function createImportedBusinessProspects(rows: BusinessProspectImportRow[]) {
-  return rows
-    .filter((row) => row.importable)
-    .map((row) => buildManualImportProspect(row.input, row.prospect.importBatchId));
+  return createBusinessProspectsFromImportInputs(
+    rows.filter((row) => row.importable).map((row) => row.input),
+  );
+}
+
+export function createBusinessProspectsFromImportInputs(
+  inputs: BusinessProspectImportInput[],
+  importBatchId = `cityatlas-import-${Date.now()}`,
+) {
+  return inputs.map((input) => buildManualImportProspect(input, importBatchId));
 }
 
 function mapSourceBackedPlaceToProspect(place: SourceBackedPlaceReference): BusinessProspect {
@@ -1070,11 +1075,20 @@ function buildManualImportProspect(
   const email = input.email.trim().toLowerCase();
   const sourceUrl = input.sourceUrl.trim();
   const contactPath = input.contactPath.trim() || sourceUrl || input.website.trim();
+  const municipality = input.municipality?.trim() || input.cityName.trim() || getCityName(cityKey);
+  const marketScope = input.marketScope
+    || (
+      cityKey === "vancouver" && municipality && municipality !== "Vancouver"
+        ? "metro_area"
+        : "city_only"
+    );
 
   return {
     id: `prospect-import-${slugify(input.businessName || "business")}-${slugify(input.cityName || "city")}`,
     cityKey,
     cityName: input.cityName.trim() || getCityName(cityKey),
+    municipality,
+    marketScope,
     businessName: input.businessName.trim(),
     slug: slugify(input.businessName),
     neighborhood: input.neighborhood.trim(),
@@ -1129,6 +1143,11 @@ function mergeProspect(current: BusinessProspect, next: BusinessProspect): Busin
     ...current,
     ...next,
     id: current.id,
+    municipality: next.municipality || current.municipality,
+    marketScope:
+      next.marketScope === "metro_area" || current.marketScope === "metro_area"
+        ? "metro_area"
+        : next.marketScope || current.marketScope,
     sourceType:
       sourceTypeRank[next.sourceType] > sourceTypeRank[current.sourceType]
         ? next.sourceType

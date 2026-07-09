@@ -93,11 +93,82 @@ export function CalendarIcon(props: IconProps) {
   );
 }
 
+export function ClockIcon(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M12 7.7v4.7l3.2 1.8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </IconBase>
+  );
+}
+
 export function StoreIcon(props: IconProps) {
   return (
     <IconBase {...props}>
       <path d="M5 10h14l-1.2-5.5H6.2L5 10Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
       <path d="M6.5 10v9h11v-9M9.5 19v-5h5v5" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+    </IconBase>
+  );
+}
+
+export function UsersIcon(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <circle cx="9" cy="8.2" r="2.3" stroke="currentColor" strokeWidth="1.8" />
+      <circle cx="15.6" cy="7.4" r="1.9" stroke="currentColor" strokeWidth="1.8" />
+      <path
+        d="M4.8 18.6c0-2.7 2.2-4.9 4.9-4.9h1.7c2.7 0 4.9 2.2 4.9 4.9"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <path
+        d="M14.1 14.1h1c2.1 0 3.9 1.7 3.9 3.9"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </IconBase>
+  );
+}
+
+export function WalkIcon(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <circle cx="13" cy="5.2" r="2" fill="currentColor" />
+      <path d="m10.2 21 1.7-5.8 2.6-2.2 1.6 2.8V21M10.7 10.6l2.7-2 3.1 1.6m-6.3 1.1 2.4 1.4-1.4 2.9H8.4m4.2-3.2 1.1-3.1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </IconBase>
+  );
+}
+
+export function TransitIcon(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <rect x="6" y="3.8" width="12" height="13.2" rx="3" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M8.8 7.7h6.4M8.8 10.9h6.4M9.4 17l-1.8 3M14.6 17l1.8 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="9.3" cy="14.2" r="0.9" fill="currentColor" />
+      <circle cx="14.7" cy="14.2" r="0.9" fill="currentColor" />
+    </IconBase>
+  );
+}
+
+export function CarIcon(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="M6.3 15.8h11.4l-1.1-5.2a2.2 2.2 0 0 0-2.2-1.8H9.6a2.2 2.2 0 0 0-2.2 1.8l-1.1 5.2Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+      <path d="M5.8 15.8V18a1.7 1.7 0 0 0 1.7 1.7h.8V18m7.4 1.7h.8a1.7 1.7 0 0 0 1.7-1.7v-2.2M8.5 12h1.5m5 0h1.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="8.4" cy="15.8" r="1.1" fill="currentColor" />
+      <circle cx="15.6" cy="15.8" r="1.1" fill="currentColor" />
+    </IconBase>
+  );
+}
+
+export function BikeIcon(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <circle cx="7.1" cy="16.2" r="3.1" stroke="currentColor" strokeWidth="1.8" />
+      <circle cx="16.9" cy="16.2" r="3.1" stroke="currentColor" strokeWidth="1.8" />
+      <path d="m9.8 8.6 2.2 4.5h3.5M10.7 8.6H8.4m3.6 0h2.2l-1.3 2.2m-2.4 2.3-1.4 3.1m3-3.1 2 3.1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
     </IconBase>
   );
 }
@@ -118,10 +189,80 @@ export function ArrowRightIcon(props: IconProps) {
   );
 }
 
+export function ChevronUpIcon(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="m6 14 6-6 6 6" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
+    </IconBase>
+  );
+}
+
+export function ChevronDownIcon(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="m6 10 6 6 6-6" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
+    </IconBase>
+  );
+}
+
+export function ExternalLinkIcon(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="M10 6H6.8A1.8 1.8 0 0 0 5 7.8v9.4A1.8 1.8 0 0 0 6.8 19h9.4a1.8 1.8 0 0 0 1.8-1.8V14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M13 5h6v6M11 13l8-8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </IconBase>
+  );
+}
+
+export function MenuIcon(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="M4.5 7.5h15M4.5 12h15M4.5 16.5h15" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
+    </IconBase>
+  );
+}
+
+export function CopyIcon(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <rect x="8" y="6" width="10" height="12" rx="2.2" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M6.5 15.5H6A2 2 0 0 1 4 13.5V5.8A1.8 1.8 0 0 1 5.8 4H13.5A2 2 0 0 1 15.5 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </IconBase>
+  );
+}
+
+export function ShareIcon(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <circle cx="17.2" cy="6.2" r="2.2" stroke="currentColor" strokeWidth="1.8" />
+      <circle cx="7" cy="12" r="2.2" stroke="currentColor" strokeWidth="1.8" />
+      <circle cx="17.2" cy="17.8" r="2.2" stroke="currentColor" strokeWidth="1.8" />
+      <path d="m9.1 11 5.7-3.2M9.1 13 14.8 16.2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </IconBase>
+  );
+}
+
+export function CloseIcon(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="m6 6 12 12M18 6 6 18" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
+    </IconBase>
+  );
+}
+
 export function CheckIcon(props: IconProps) {
   return (
     <IconBase {...props}>
       <path d="m5.2 12.4 4.1 4.1 9.5-9.8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </IconBase>
+  );
+}
+
+export function RefreshIcon(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="M19 8.5V4.8h-3.7M5 15.5v3.7h3.7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M17.4 10.1a6.4 6.4 0 0 0-11.2-2M6.6 13.9a6.4 6.4 0 0 0 11.2 2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
     </IconBase>
   );
 }

@@ -17,194 +17,178 @@ export interface SourceBackedCollectionMeta {
   guideHubLabel?: string;
 }
 
+function toTitleCase(value: string) {
+  return value.replace(/\b\w/g, (match) => match.toUpperCase());
+}
+
+function buildCollectionMeta(input: {
+  path: string;
+  shortLabel: string;
+  pageDescription: string;
+  itemListDescription: string;
+  cityName?: string;
+  regionName?: string;
+  guideHubPath?: string;
+  guideHubLabel?: string;
+}): SourceBackedCollectionMeta {
+  const cityName = input.cityName ?? siteConfig.city;
+  const label = input.shortLabel.replace(/-/g, " ");
+
+  return {
+    path: input.path,
+    shortLabel: input.shortLabel,
+    breadcrumbName: `${cityName} ${toTitleCase(label)}`,
+    pageTitle: `${cityName} ${toTitleCase(label)} With Official Site Links | CityAtlas`,
+    pageDescription: input.pageDescription,
+    itemListName: `${cityName} ${label} with official site links`,
+    itemListDescription: input.itemListDescription,
+    cityName: input.cityName,
+    regionName: input.regionName,
+    guideHubPath: input.guideHubPath,
+    guideHubLabel: input.guideHubLabel,
+  };
+}
+
 export const sourceBackedCollectionMeta: Record<
   SourceBackedCollectionId,
   SourceBackedCollectionMeta
 > = {
-  vancouver_date_night_starters: {
+  vancouver_date_night_starters: buildCollectionMeta({
     path: "/vancouver/date-night-starters",
-    shortLabel: "Date-night starters",
-    breadcrumbName: "Vancouver Date Night Starters",
-    pageTitle: "Vancouver Date Night Starters With Official Source Notes | CityAtlas",
+    shortLabel: "Date night starting points",
     pageDescription:
-      "Five Vancouver date-night starting points with official source notes, claim boundaries, and a public correction path.",
-    itemListName: "Vancouver date night starters with official source notes",
+      "Five real Vancouver date-night starting points with official site links, simple planning notes, and a public way to report a mistake.",
     itemListDescription:
-      "A narrow CityAtlas list of source-backed Vancouver date-night anchors with visible claim boundaries and correction path.",
-  },
-  vancouver_rainy_day_starters: {
+      "A short CityAtlas list of real Vancouver date-night places with official site links and simple planning notes.",
+  }),
+  vancouver_rainy_day_starters: buildCollectionMeta({
     path: "/vancouver/rainy-day-starters",
-    shortLabel: "Rainy-day starters",
-    breadcrumbName: "Vancouver Rainy Day Starters",
-    pageTitle: "Vancouver Rainy Day Starters With Official Source Notes | CityAtlas",
+    shortLabel: "Rainy day starting points",
     pageDescription:
-      "Five Vancouver rainy-day starting points with official source notes, indoor-friendly route roles, and a public correction path.",
-    itemListName: "Vancouver rainy-day starters with official source notes",
+      "Five real Vancouver rainy-day starting points with official site links, simple planning notes, and a public way to report a mistake.",
     itemListDescription:
-      "A narrow CityAtlas list of source-backed Vancouver rainy-day anchors with visible claim boundaries and correction path.",
-  },
-  vancouver_first_evening_starters: {
+      "A short CityAtlas list of real Vancouver rainy-day places with official site links and simple planning notes.",
+  }),
+  vancouver_first_evening_starters: buildCollectionMeta({
     path: "/vancouver/first-evening-starters",
-    shortLabel: "First-evening starters",
-    breadcrumbName: "Vancouver First-Evening Starters",
-    pageTitle: "Vancouver First-Evening Starters With Official Source Notes | CityAtlas",
+    shortLabel: "First evening starting points",
     pageDescription:
-      "Five Vancouver first-evening starting points with official source notes, visitor-friendly route roles, and a public correction path.",
-    itemListName: "Vancouver first-evening starters with official source notes",
+      "Five real Vancouver first-evening starting points with official site links, simple planning notes, and a public way to report a mistake.",
     itemListDescription:
-      "A narrow CityAtlas list of source-backed Vancouver first-evening anchors with visible claim boundaries and correction path.",
-  },
-  vancouver_first_time_visitor_starters: {
+      "A short CityAtlas list of real Vancouver first-evening places with official site links and simple planning notes.",
+  }),
+  vancouver_first_time_visitor_starters: buildCollectionMeta({
     path: "/vancouver/first-time-visitor-starters",
-    shortLabel: "First-time visitor starters",
-    breadcrumbName: "Vancouver First-Time Visitor Starters",
-    pageTitle: "Vancouver First-Time Visitor Starters With Official Source Notes | CityAtlas",
+    shortLabel: "First-time visitor starting points",
     pageDescription:
-      "Five Vancouver first-time visitor starting areas with official source notes, route-fit guidance, and a public correction path.",
-    itemListName: "Vancouver first-time visitor starters with official source notes",
+      "Five real Vancouver first-time visitor starting areas with official site links, simple planning notes, and a public way to report a mistake.",
     itemListDescription:
-      "A narrow CityAtlas list of source-backed Vancouver first-time visitor starting areas with visible claim boundaries and correction path.",
-  },
-  toronto_first_time_visitor_starters: {
+      "A short CityAtlas list of real Vancouver first-visit areas with official site links and simple planning notes.",
+  }),
+  toronto_first_time_visitor_starters: buildCollectionMeta({
     path: "/toronto/first-time-visitor-starters",
-    shortLabel: "Toronto first-time visitor starters",
-    breadcrumbName: "Toronto First-Time Visitor Starters",
-    pageTitle: "Toronto First-Time Visitor Starters With Official Source Notes | CityAtlas",
+    shortLabel: "First-time visitor starting points",
     pageDescription:
-      "Five Toronto first-time visitor starting areas with official source notes, route-fit guidance, and a public correction path.",
-    itemListName: "Toronto first-time visitor starters with official source notes",
+      "Five real Toronto first-time visitor starting areas with official site links, simple planning notes, and a public way to report a mistake.",
     itemListDescription:
-      "A narrow CityAtlas list of source-backed Toronto first-time visitor starting areas with visible claim boundaries and correction path.",
+      "A short CityAtlas list of real Toronto first-visit areas with official site links and simple planning notes.",
     cityName: "Toronto",
     regionName: "Ontario",
     guideHubPath: "/toronto/guides",
     guideHubLabel: "Toronto Guides",
-  },
-  toronto_weekend_route_starters: {
+  }),
+  toronto_weekend_route_starters: buildCollectionMeta({
     path: "/toronto/weekend-route-starters",
-    shortLabel: "Toronto weekend route starters",
-    breadcrumbName: "Toronto Weekend Route Starters",
-    pageTitle: "Toronto Weekend Route Starters With Official Source Notes | CityAtlas",
+    shortLabel: "Weekend starting points",
     pageDescription:
-      "Five Toronto weekend route starters with official source notes, route-fit guidance, and a public correction path.",
-    itemListName: "Toronto weekend route starters with official source notes",
+      "Five real Toronto weekend starting points with official site links, simple planning notes, and a public way to report a mistake.",
     itemListDescription:
-      "A narrow CityAtlas list of source-backed Toronto weekend route anchors with visible claim boundaries and correction path.",
+      "A short CityAtlas list of real Toronto weekend places with official site links and simple planning notes.",
     cityName: "Toronto",
     regionName: "Ontario",
     guideHubPath: "/toronto/guides",
     guideHubLabel: "Toronto Guides",
-  },
-  vancouver_garden_day_starters: {
+  }),
+  vancouver_garden_day_starters: buildCollectionMeta({
     path: "/vancouver/garden-day-starters",
-    shortLabel: "Garden day starters",
-    breadcrumbName: "Vancouver Garden Day Starters",
-    pageTitle: "Vancouver Garden Day Starters With Official Source Notes | CityAtlas",
+    shortLabel: "Garden day starting points",
     pageDescription:
-      "Five Vancouver garden and conservatory starters with official source notes, route-fit guidance, and a public correction path.",
-    itemListName: "Vancouver garden day starters with official source notes",
+      "Five real Vancouver garden-day starting points with official site links, simple planning notes, and a public way to report a mistake.",
     itemListDescription:
-      "A narrow CityAtlas list of source-backed Vancouver garden and conservatory anchors with visible claim boundaries and correction path.",
-  },
-  vancouver_kitsilano_scenic_starters: {
+      "A short CityAtlas list of real Vancouver garden and conservatory places with official site links and simple planning notes.",
+  }),
+  vancouver_kitsilano_scenic_starters: buildCollectionMeta({
     path: "/vancouver/kitsilano-scenic-starters",
-    shortLabel: "Kitsilano scenic starters",
-    breadcrumbName: "Vancouver Kitsilano Scenic Starters",
-    pageTitle: "Vancouver Kitsilano Scenic Starters With Official Source Notes | CityAtlas",
+    shortLabel: "Kitsilano scenic starting points",
     pageDescription:
-      "Five Vancouver west-side scenic starters with official source notes, slower-route guidance, and a public correction path.",
-    itemListName: "Vancouver Kitsilano scenic starters with official source notes",
+      "Five real Vancouver west-side scenic starting points with official site links, simple planning notes, and a public way to report a mistake.",
     itemListDescription:
-      "A narrow CityAtlas list of source-backed Vancouver west-side scenic anchors with visible claim boundaries and correction path.",
-  },
-  vancouver_west_side_daytime_starters: {
+      "A short CityAtlas list of real Vancouver west-side scenic places with official site links and simple planning notes.",
+  }),
+  vancouver_west_side_daytime_starters: buildCollectionMeta({
     path: "/vancouver/west-side-daytime-starters",
-    shortLabel: "West-side daytime starters",
-    breadcrumbName: "Vancouver West-Side Daytime Starters",
-    pageTitle: "Vancouver West-Side Daytime Starters With Official Source Notes | CityAtlas",
+    shortLabel: "West-side daytime starting points",
     pageDescription:
-      "Five Vancouver west-side daytime starters with official source notes, destination-fit guidance, and a public correction path.",
-    itemListName: "Vancouver west-side daytime starters with official source notes",
+      "Five real Vancouver west-side daytime starting points with official site links, simple planning notes, and a public way to report a mistake.",
     itemListDescription:
-      "A narrow CityAtlas list of source-backed Vancouver west-side daytime anchors with visible claim boundaries and correction path.",
-  },
-  vancouver_false_creek_culture_starters: {
+      "A short CityAtlas list of real Vancouver west-side daytime places with official site links and simple planning notes.",
+  }),
+  vancouver_false_creek_culture_starters: buildCollectionMeta({
     path: "/vancouver/false-creek-culture-starters",
-    shortLabel: "False Creek culture starters",
-    breadcrumbName: "Vancouver False Creek Culture Starters",
-    pageTitle: "Vancouver False Creek Culture Starters With Official Source Notes | CityAtlas",
+    shortLabel: "False Creek culture starting points",
     pageDescription:
-      "Five Vancouver False Creek culture starters with official source notes, compact-route guidance, and a public correction path.",
-    itemListName: "Vancouver False Creek culture starters with official source notes",
+      "Five real Vancouver False Creek culture starting points with official site links, simple planning notes, and a public way to report a mistake.",
     itemListDescription:
-      "A narrow CityAtlas list of source-backed Vancouver False Creek culture anchors with visible claim boundaries and correction path.",
-  },
-  vancouver_ubc_discovery_starters: {
+      "A short CityAtlas list of real Vancouver False Creek culture places with official site links and simple planning notes.",
+  }),
+  vancouver_ubc_discovery_starters: buildCollectionMeta({
     path: "/vancouver/ubc-discovery-starters",
-    shortLabel: "UBC discovery starters",
-    breadcrumbName: "Vancouver UBC Discovery Starters",
-    pageTitle: "Vancouver UBC Discovery Starters With Official Source Notes | CityAtlas",
+    shortLabel: "UBC discovery starting points",
     pageDescription:
-      "Five Vancouver UBC discovery starters with official source notes, campus-fit guidance, and a public correction path.",
-    itemListName: "Vancouver UBC discovery starters with official source notes",
+      "Five real Vancouver UBC discovery starting points with official site links, simple planning notes, and a public way to report a mistake.",
     itemListDescription:
-      "A narrow CityAtlas list of source-backed Vancouver UBC discovery anchors with visible claim boundaries and correction path.",
-  },
-  vancouver_returning_visitor_starters: {
+      "A short CityAtlas list of real Vancouver UBC-side places with official site links and simple planning notes.",
+  }),
+  vancouver_returning_visitor_starters: buildCollectionMeta({
     path: "/vancouver/returning-visitor-starters",
-    shortLabel: "Returning-visitor starters",
-    breadcrumbName: "Vancouver Returning-Visitor Starters",
-    pageTitle: "Vancouver Returning-Visitor Starters With Official Source Notes | CityAtlas",
+    shortLabel: "Returning-visitor starting points",
     pageDescription:
-      "Five Vancouver returning-visitor starting points with official source notes, local-discovery guidance, and a public correction path.",
-    itemListName: "Vancouver returning-visitor starters with official source notes",
+      "Five real Vancouver returning-visitor starting points with official site links, simple planning notes, and a public way to report a mistake.",
     itemListDescription:
-      "A narrow CityAtlas list of source-backed Vancouver returning-visitor anchors with visible claim boundaries and correction path.",
-  },
-  vancouver_out_of_town_guest_starters: {
+      "A short CityAtlas list of real Vancouver second-look places with official site links and simple planning notes.",
+  }),
+  vancouver_out_of_town_guest_starters: buildCollectionMeta({
     path: "/vancouver/out-of-town-guest-starters",
-    shortLabel: "Out-of-town guest starters",
-    breadcrumbName: "Vancouver Out-Of-Town Guest Starters",
-    pageTitle: "Vancouver Out-Of-Town Guest Starters With Official Source Notes | CityAtlas",
+    shortLabel: "Out-of-town guest starting points",
     pageDescription:
-      "Five Vancouver guest-hosting starting points with official source notes, low-friction route guidance, and a public correction path.",
-    itemListName: "Vancouver out-of-town guest starters with official source notes",
+      "Five real Vancouver guest-hosting starting points with official site links, simple planning notes, and a public way to report a mistake.",
     itemListDescription:
-      "A narrow CityAtlas list of source-backed Vancouver guest-hosting anchors with visible claim boundaries and correction path.",
-  },
-  vancouver_weekend_route_starters: {
+      "A short CityAtlas list of real Vancouver guest-friendly places with official site links and simple planning notes.",
+  }),
+  vancouver_weekend_route_starters: buildCollectionMeta({
     path: "/vancouver/weekend-route-starters",
-    shortLabel: "Weekend route starters",
-    breadcrumbName: "Vancouver Weekend Route Starters",
-    pageTitle: "Vancouver Weekend Route Starters With Official Source Notes | CityAtlas",
+    shortLabel: "Weekend route starting points",
     pageDescription:
-      "Five Vancouver weekend route starters with official source notes, route-fit guidance, and a public correction path.",
-    itemListName: "Vancouver weekend route starters with official source notes",
+      "Five real Vancouver weekend-route starting points with official site links, simple planning notes, and a public way to report a mistake.",
     itemListDescription:
-      "A narrow CityAtlas list of source-backed Vancouver weekend route anchors with visible claim boundaries and correction path.",
-  },
-  vancouver_sunday_starters: {
+      "A short CityAtlas list of real Vancouver weekend places with official site links and simple planning notes.",
+  }),
+  vancouver_sunday_starters: buildCollectionMeta({
     path: "/vancouver/sunday-starters",
-    shortLabel: "Sunday starters",
-    breadcrumbName: "Vancouver Sunday Starters",
-    pageTitle: "Vancouver Sunday Starters With Official Source Notes | CityAtlas",
+    shortLabel: "Sunday starting points",
     pageDescription:
-      "Five Vancouver Sunday starting points with official source notes, low-effort route-fit guidance, and a public correction path.",
-    itemListName: "Vancouver Sunday starters with official source notes",
+      "Five real Vancouver Sunday starting points with official site links, simple planning notes, and a public way to report a mistake.",
     itemListDescription:
-      "A narrow CityAtlas list of source-backed Vancouver Sunday anchors with visible claim boundaries and correction path.",
-  },
-  vancouver_wellness_reset_starters: {
+      "A short CityAtlas list of real Vancouver Sunday places with official site links and simple planning notes.",
+  }),
+  vancouver_wellness_reset_starters: buildCollectionMeta({
     path: "/vancouver/wellness-reset-starters",
-    shortLabel: "Wellness reset starters",
-    breadcrumbName: "Vancouver Wellness Reset Starters",
-    pageTitle: "Vancouver Wellness Reset Starters With Official Source Notes | CityAtlas",
+    shortLabel: "Wellness reset starting points",
     pageDescription:
-      "Five Vancouver wellness reset starting points with official source notes, low-pressure route-fit guidance, and a public correction path.",
-    itemListName: "Vancouver wellness reset starters with official source notes",
+      "Five real Vancouver wellness-reset starting points with official site links, simple planning notes, and a public way to report a mistake.",
     itemListDescription:
-      "A narrow CityAtlas list of source-backed Vancouver wellness reset anchors with visible claim boundaries and correction path.",
-  },
+      "A short CityAtlas list of real Vancouver reset places with official site links and simple planning notes.",
+  }),
 };
 
 export function getSourceBackedCollectionForPath(path: string): SourceBackedCollectionId | null {

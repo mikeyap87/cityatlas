@@ -1,0 +1,30 @@
+docs
+output
+dist
+dist *
+.local-build
+node_modules 2
+node_modules.broken-20260630
+node_modules
+dist 2
+dist.__staging
+dist.__broken_current_20260630
+dist.__previous
+dist.__previous_*
+dist.__*
+dist.broken-20260629
+dist.broken-*
+test-results
+package 2.json
+tsconfig.tsbuildinfo
+public/operator/cityatlasOutreachQueueStatus*.json
+public/operator/greaterVancouverOfficialBusinessInventory-burnaby.json
+public/operator/greaterVancouverOfficialBusinessInventory-coquitlam.json
+public/operator/greaterVancouverOfficialBusinessInventory-surrey.json
+public/operator/greaterVancouverOfficialBusinessInventory-township-of-langley.json
+public/operator/greaterVancouverOfficialBusinessInventorySummary.json
+**/* 2.md
+**/* 2.mjs
+**/* 2.ts
+**/* 2.tsx
+**/*.bak

@@ -5,18 +5,28 @@ import { fileURLToPath } from "node:url";
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 
 const scripts = [
-  "sync-rooms-vancouver-business-seeds.mjs",
-  "sync-rooms-vancouver-review-business-seeds.mjs",
-  "sync-rooms-multi-city-business-seeds.mjs",
-  "sync-rooms-connector-seeds.mjs",
-  "sync-rooms-outreach-rehearsal-seeds.mjs",
-  "sync-roam-public-business-wave-seeds.mjs",
-  "sync-roam-city-sourcing-seeds.mjs",
+  { name: "sync-rooms-vancouver-business-seeds.mjs", args: [] },
+  { name: "sync-rooms-vancouver-review-business-seeds.mjs", args: [] },
+  {
+    name: "sync-vancouver-restaurant-review-business-seeds.mjs",
+    args: [
+      "--email-import-csv=output/growth/vancouver-restaurant-contact-research-batch-all-email-candidate-review-import.csv",
+      "--contact-import-csv=output/growth/vancouver-restaurant-contact-research-batch-all-contact-path-review-import.csv",
+      "--email-review-csv=output/growth/vancouver-restaurant-contact-research-batch-all-email-candidate-review.csv",
+      "--contact-review-csv=output/growth/vancouver-restaurant-contact-research-batch-all-contact-path-review.csv",
+    ],
+  },
+  { name: "sync-vancouver-service-review-business-seeds.mjs", args: [] },
+  { name: "sync-rooms-multi-city-business-seeds.mjs", args: [] },
+  { name: "sync-rooms-connector-seeds.mjs", args: [] },
+  { name: "sync-rooms-outreach-rehearsal-seeds.mjs", args: [] },
+  { name: "sync-roam-public-business-wave-seeds.mjs", args: [] },
+  { name: "sync-roam-city-sourcing-seeds.mjs", args: [] },
 ];
 
-function runScript(scriptName) {
+function runScript(scriptName, args = []) {
   return new Promise((resolve, reject) => {
-    const child = spawn(process.execPath, [join(root, "scripts", scriptName)], {
+    const child = spawn(process.execPath, [join(root, "scripts", scriptName), ...args], {
       cwd: root,
       stdio: "inherit",
     });
@@ -31,16 +41,16 @@ function runScript(scriptName) {
   });
 }
 
-for (const scriptName of scripts) {
-  await runScript(scriptName);
+for (const script of scripts) {
+  await runScript(script.name, script.args);
 }
 
 console.log(
   JSON.stringify(
-    {
-      ok: true,
-      scripts,
-    },
+      {
+        ok: true,
+        scripts: scripts.map((script) => script.name),
+      },
     null,
     2,
   ),

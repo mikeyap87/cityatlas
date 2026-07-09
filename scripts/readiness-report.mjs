@@ -26,6 +26,36 @@ const src = {
 const seoProof = has("output/seo/local-content-machine-proof.json")
   ? readJson("output/seo/local-content-machine-proof.json")
   : null;
+const hostedBusinessFunnel = has("output/qa/hosted-business-funnel.json")
+  ? readJson("output/qa/hosted-business-funnel.json")
+  : null;
+const paidTrafficProof = has("output/qa/paid-traffic-readiness.json")
+  ? readJson("output/qa/paid-traffic-readiness.json")
+  : null;
+const outreachQueueStatus = has("output/growth/cityatlas-outreach-queue-status.json")
+  ? readJson("output/growth/cityatlas-outreach-queue-status.json")
+  : null;
+
+const restaurantLane =
+  outreachQueueStatus?.lanes?.find((lane) => lane.id === "restaurant") ?? null;
+const serviceLane =
+  outreachQueueStatus?.lanes?.find((lane) => lane.id === "service") ?? null;
+const combinedOutreach = outreachQueueStatus?.combined ?? null;
+const combinedDailyLimit = combinedOutreach?.nextDailyWindowLimit ?? null;
+const hostedBusinessFunnelBehindLocal =
+  hostedBusinessFunnel?.passed === false && Array.isArray(hostedBusinessFunnel?.failures);
+const paidTrafficBlockedByHostedGap =
+  paidTrafficProof?.strict === true && paidTrafficProof?.paidTrafficReady === false;
+const businessFunnelNextStep =
+  hostedBusinessFunnelBehindLocal
+    ? "Use a fresh release lane to deploy the newer proof-first business funnel, rerun hosted business-funnel smoke on pricing, partner preview, fit call, and business request, then keep the first paid test tiny until hosted proof catches up."
+    : "Keep the tiny paid test request-first, prove one real City Partner checkout separately before self-serve charging claims, and rerun hosted proof after any approved release.";
+const businessFunnelRemains = hostedBusinessFunnelBehindLocal
+  ? "Approved deploy of the newer pricing, partner-preview, fit-call, and business-request funnel, rerun hosted business-funnel proof, final refund policy, one real checkout proof, and first real paid-click quality review."
+  : "Final refund policy, one real checkout proof, clean hosted proof after the latest local attribution hardening is released, and first real paid-click quality review.";
+const businessFunnelDone = hostedBusinessFunnelBehindLocal
+  ? "Package framing, the local request-first business funnel, the reply-proof layer, local paid-traffic proof, live Stripe-hosted payment links, local payment-handoff verification, and hosted pricing checkout CTA proof are in place, but the hosted pricing, partner-preview, fit-call, and business-request funnel is still older than local."
+  : "Package framing, the local request-first business funnel, the reply-proof layer, live Stripe-hosted payment links, local and hosted payment-handoff verification, hosted business-funnel proof, public pricing-page checkout CTA proof, Date Night revenue proof loop, and reply-summary command.";
 
 const modules = [
   {
@@ -63,6 +93,19 @@ const modules = [
     next: "Use the admin reply tracker or CSV template as replies arrive, then run npm run replies:analyze.",
   },
   {
+    name: "Business outreach machine",
+    progress: combinedDailyLimit === 100 ? 94 : 88,
+    done: combinedOutreach
+      ? `Reviewed restaurant and service lanes now share one outreach queue with ${combinedOutreach.ownerReviewReadyRows} owner-review-ready rows, ${combinedOutreach.alreadySentRows} already-sent rows, and a ${combinedDailyLimit}/day ceiling split ${restaurantLane?.dailyLimit ?? "?"} restaurant + ${serviceLane?.dailyLimit ?? "?"} service.`
+      : "Reviewed restaurant and service outreach lanes, suppression truth, and queue-status reporting are in place.",
+    remains:
+      "More reply learning, held-contact repair, wrong-contact cleanup, and continued ranking based on real outcomes rather than only queue fit.",
+    next:
+      combinedDailyLimit === 100
+        ? "Keep the daily window capped at 100/day while replies and bounces accumulate, then keep tuning the queue from real outcomes."
+        : "Refresh the outreach queue status and confirm the approved daily cap before widening sends.",
+  },
+  {
     name: "AI Brain",
     progress: 92,
     done: "Local command engine, QA checks, saved Brain Runs, readiness report, hosted-domain proof awareness, contact-readiness checks, package-demand signal checks, shadow-mode outreach decisioning, post-send monitoring state, and bounce/wrong-contact repair recommendations.",
@@ -71,17 +114,17 @@ const modules = [
   },
   {
     name: "Revenue system",
-    progress: 88,
-    done: "Package framing, draft terms/privacy, Stripe product manifest, accepted Stripe-hosted payment-link plan, guarded City Partner and Signature Partner checkout handoff, Date Night revenue proof loop, and reply-summary command.",
-    remains: "One owner-controlled successful City Partner checkout proof, refund/cancellation policy confirmation, Stripe dashboard receipt review, and fulfillment handoff review.",
-    next: "Use the paid-traffic readiness packet for a tiny request-first paid test, then complete one real City Partner checkout proof before calling the product fully charge-ready or self-serve verified.",
+    progress: hostedBusinessFunnelBehindLocal ? 91 : 94,
+    done: businessFunnelDone,
+    remains: businessFunnelRemains,
+    next: businessFunnelNextStep,
   },
   {
     name: "Launch infrastructure",
-    progress: 98,
-    done: "Univenture folder, Vercel project, public alias, protected preview, hosted route flags, Cloudflare DNS, Vercel alias, HTTPS certificate, custom-domain smoke, public crawlable robots release, production corrective deploy proof, and consent-gated GA4 handoff.",
-    remains: "Real ad-platform conversion evidence, ongoing crawl/index monitoring, and one real checkout proof.",
-    next: "Run the tiny paid-traffic test with request-first copy, UTM discipline, and strict stop rules; keep admin/private-preview protected.",
+    progress: 96,
+    done: "Univenture folder, Vercel project, public alias, protected preview, hosted route flags, Cloudflare DNS, Vercel alias, HTTPS certificate, custom-domain smoke, public crawlable robots release, and consent-gated hosted GA script/instrumentation proof.",
+    remains: "Provider-side GA/Ads conversion receipt before scaling spend, clean release-lane proof before deploy, and ongoing crawl/index monitoring.",
+    next: "Keep admin/private-preview protected, rerun hosted analytics/payment proof after approved releases, and publish stronger source-backed pages.",
   },
   {
     name: "Data/source policy",
@@ -105,6 +148,18 @@ const report = {
     privatePreview: has("src/features/private/DateNightPreviewPage.tsx"),
     aiBrain: has("src/lib/aiBrain.ts") && src.app.includes("onSaveBrainRun"),
     stripeManifest: has("stripe/products.review.json"),
+    businessReplyProofSurface: has("src/components/BusinessReplyProof.tsx") &&
+      has("src/data/businessReplyStatus.ts"),
+    outreachQueueStatus: has("output/growth/cityatlas-outreach-queue-status.json") &&
+      combinedDailyLimit === 100,
+    paymentHandoffVerification: has("scripts/verify-live-payment-handoff.mjs"),
+    hostedPaymentHandoffVerification: has("scripts/verify-hosted-payment-handoff.mjs") &&
+      has("output/qa/hosted-payment-handoff.json"),
+    hostedBusinessFunnelVerification: has("scripts/verify-hosted-business-funnel.mjs") &&
+      has("output/qa/hosted-business-funnel.json"),
+    hostedBusinessFunnelPassing: hostedBusinessFunnel?.passed === true,
+    paidTrafficReadinessReport: has("output/qa/paid-traffic-readiness.json"),
+    paidTrafficStrictReady: paidTrafficProof?.strict === true && paidTrafficProof?.paidTrafficReady === true,
     proofSprintPacket: has("docs/proof-sprints/DATE_NIGHT_10_PROSPECT_PACKET.md") &&
       has("output/proof-sprints/date-night-vancouver-10-prospect-packet.json"),
     proofSprintContactResearch: has("docs/proof-sprints/DATE_NIGHT_CONTACT_PATHS_RESEARCH.md") &&
@@ -135,15 +190,24 @@ const report = {
     sourcePolicy: has("docs/REAL_WORLD_SOURCE_POLICY.md") && has("supabase/schema.sql"),
   },
   liveBlocked: [
-    "agent-run real payment completion or Stripe account mutation",
-    "paid ad spend",
+    ...(hostedBusinessFunnelBehindLocal
+      ? ["approved deploy to bring the newer proof-first business funnel live on city.univenturestudio.com"]
+      : []),
+    ...(paidTrafficBlockedByHostedGap
+      ? ["hosted business-funnel proof and hosted ad-landing proof before buying or scaling paid traffic"]
+      : []),
+    "first real live City Partner checkout proof",
+    "provider-side GA/Ads conversion receipt before scaling paid traffic",
+    "fresh clean release lane before any deploy or push",
     "real provider import",
     "additional customer outreach or follow-ups",
     "public real-business publication",
   ],
   nextBestBatch:
     seoProof?.passed === true
-      ? "Run one tightly capped request-first paid-traffic test into the reviewed business request and Stripe-hosted checkout handoff, then complete one owner-controlled City Partner checkout proof before calling CityAtlas fully charge-ready or self-serve verified."
+      ? hostedBusinessFunnelBehindLocal
+        ? "Use a fresh release lane to deploy the locally verified business proof funnel, rerun hosted business-funnel smoke on pricing, partner preview, fit call, and business request, and keep the combined outreach queue capped at 100/day while real reply learning accumulates."
+        : "Keep the tiny paid test request-first, prove one real City Partner checkout separately before self-serve charging claims, and keep the combined outreach queue capped at 100/day while real reply learning accumulates."
       : "Fix the local SEO content-machine proof first, then keep expanding only with source-backed destination pages that official public sources can honestly support.",
 };
 

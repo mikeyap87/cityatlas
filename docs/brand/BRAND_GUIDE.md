@@ -36,6 +36,20 @@ Do not replace the mark with a generic map, compass, globe, skyline, or location
 
 Avoid turning the whole product into a single green, blue, amber, or dark-slate theme. CityAtlas should feel structured and civic, with color used as wayfinding.
 
+## Typography Roles
+
+- Display and section headings should feel direct, confident, and easy to scan.
+- Body copy should stay plain and highly readable before it tries to feel editorial.
+- Small labels, kicks, and meta text should use the same clean sans direction as the rest of the UI, not a decorative serif accent.
+- Public pages should avoid fussy font mixing. CityAtlas should read like a practical city product, not a travel magazine template.
+
+## Imagery Rules
+
+- Prefer real city photography over illustrative or generic SaaS-style scene art on public pages.
+- Use imagery to reinforce the planning job: waterfront for scenic choice, rainy-day indoor anchors for weather backup, calm wellness imagery for recovery plans, and real neighborhood context when available.
+- If a city does not yet have strong truthful imagery, prefer a clean structured card or text panel over the wrong city's photo.
+- Avoid decorative visuals that imply luxury, authority, coverage depth, or live operational proof that CityAtlas has not actually earned yet.
+
 ## Product Voice
 
 Use plain, specific, operational language:

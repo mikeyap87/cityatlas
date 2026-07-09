@@ -1,19 +1,19 @@
 # Vancouver Business Machine Packet
 
-Updated: June 16, 2026
+Updated: June 25, 2026
 
 ## Current Local Truth
 
 Local proof from `npm run growth:verify` now shows:
 
-- `143` unique Vancouver prospect rows
-- `124` partner-eligible rows
+- `3697` unique Vancouver prospect rows
+- `3678` partner-eligible rows
 - `19` anchor-only rows
-- `93` contact-ready rows
-- `66` email-ready rows
+- `3650` contact-ready rows
+- `1532` email-ready rows
 - `14` source-backed collection lanes still covered
 - `23` useful Vancouver guides in the current library
-- `277` total staged business prospects across the shared CityAtlas machine
+- `3833` total staged business prospects across the shared CityAtlas machine
 - all `25` rollout cities now have at least one local no-send business queue
 - `2` cities currently meet the local prepared threshold: Vancouver and Toronto
 
@@ -44,40 +44,46 @@ The admin console also keeps three guarded prep lanes:
 
 The current Vancouver queue is built from seven local layers:
 
-- Source-backed CityAtlas anchors: `25` rows
-- Founder proof-sprint rows already staged inside CityAtlas: `8` rows
+- Source-backed CityAtlas anchors: `20` rows
+- Founder proof-sprint rows already staged inside CityAtlas: `5` rows
 - Roam Relaxation donor seed layer imported from official-site partner research: `10` rows
 - Roam public-business-wave donor layer imported from saved Roam provider-discovery fixtures: `5` rows
-- Synced Rooms Vancouver email-ready donor layer: `44` rows
-- Wider synced Rooms Vancouver review donor layer: `42` rows
+- Synced Rooms Vancouver email-ready donor layer: `35` rows
+- Wider synced Rooms Vancouver review donor layer: `40` rows
 - Roam city-sourcing donor layer recovered from multiple qualifying preview artifacts: `5` rows
 
 The wider Rooms Vancouver review donor layer adds:
 
-- `17` review-first contact-path-ready Vancouver rows
-- `25` research-only Vancouver rows
+- `15` review-first contact-path-ready Vancouver rows
+- `22` research-only Vancouver rows
 - Browserbase/manual-browser-only notes without turning contact-form rows into send-ready rows
 
 The current Vancouver source lanes are:
 
-- Rooms host-space donor (official public source): `36` Vancouver rows
-- Rooms host-space review donor (official public source): `33` Vancouver rows
+- Vancouver restaurant review donor (contact-path review): `1152` Vancouver rows
+- Greater Vancouver official review donor (contact path): `934` Vancouver rows
+- Vancouver restaurant review donor (email candidate): `774` Vancouver rows
+- Greater Vancouver official review donor (email candidate): `680` Vancouver rows
+- Rooms host-space review donor (official public source): `31` Vancouver rows
+- Rooms host-space donor (official public source): `27` Vancouver rows
+- Service review path: `17` Vancouver rows
 - Official City of Vancouver page: `11` Vancouver rows
 - Roam partner research donor (official site): `10` Vancouver rows
 - Rooms host-space review donor (official site plus secondary public listing): `9` Vancouver rows
 - Rooms host-space donor (official site plus secondary public listing): `8` Vancouver rows
-- Founder proof sprint queue: `6` Vancouver rows
+- Founder proof sprint queue: `5` Vancouver rows
+- Official service review path: `5` Vancouver rows
 - Roam public business wave donor (official public contact): `5` Vancouver rows
+- Service review email: `4` Vancouver rows
 - Roam city-sourcing donor (public phone path): `3` Vancouver rows
+- Official service review email: `2` Vancouver rows
 - Rooms Browserbase review donor (official public source): `2` Vancouver rows
 - Rooms contact-form review donor (official public source): `2` Vancouver rows
 - Official Central Library branch page: `1` Vancouver rows
 - Official centre website: `1` Vancouver rows
 - Official Commercial Drive site: `1` Vancouver rows
 - Official contact page: `1` Vancouver rows
-- Official Granville Island site: `1` Vancouver rows
 - Official GreenHeart TreeWalk page: `1` Vancouver rows
-- Official group bookings page: `1` Vancouver rows
 - Official hours and admission page: `1` Vancouver rows
 - Official hours and admissions page: `1` Vancouver rows
 - Official MOA visit page: `1` Vancouver rows
@@ -92,13 +98,13 @@ The current Vancouver source lanes are:
 
 ## Promotion Lanes Closest To Rehearsal
 
-- `58` non-email partner rows already have a visible public route or a clear next manual step.
+- `2146` non-email partner rows already have a visible public route or a clear next manual step.
 
 - Protected-email review: `2` Vancouver rows
-- Private-form review: `6` Vancouver rows
-- Phone/text review: `3` Vancouver rows
-- Official-path review: `22` Vancouver rows
-- Manual lookup: `25` Vancouver rows
+- Private-form review: `104` Vancouver rows
+- Phone/text review: `13` Vancouver rows
+- Official-path review: `1937` Vancouver rows
+- Manual lookup: `90` Vancouver rows
 
 This keeps the next cleanup wave honest: CityAtlas can prioritize the rows closest to owner review instead of pretending every contact-path row is equally ready.
 
@@ -155,13 +161,13 @@ The next strongest local batch is:
 <!-- CURRENT_SHARED_MACHINE_TRUTH:START -->
 ## Current Shared Machine Truth
 
-- Synced June 16, 2026 from current repo truth.
+- Synced June 25, 2026 from current repo truth.
 - `41` useful pieces
 - `25` guides
 - `16` source-backed wedge collections
 - `80` source-backed anchors
 - `16` mapped guide-to-collection links
 - all `25` current guides now have at least one direct-path internal link into another CityAtlas page.
-- `npm run seo:structure:proof` currently passes across `38` key routes.
+- `npm run seo:structure:proof` currently passes across `39` key routes.
 <!-- CURRENT_SHARED_MACHINE_TRUTH:END -->
 

@@ -26,11 +26,13 @@ CityAtlas helps a business get:
 
 ## Pricing UI In The App
 
-- Community Listing: `$0 / month`
-- City Partner: `$49 / month planned`
-- Signature Partner: `$149 / month planned`
+- Community Listing: `$0 CAD / month`
+- City Partner: `$49 CAD / month planned`
+- Signature Partner: `$149 CAD / month planned`
 
-No live payment acceptance is active. Treat these as packaging tests until owner approval.
+Vancouver and Greater Vancouver prices should be CAD. Future US-city prices should be USD with clean rounded price points, not direct exchange-rate conversions.
+
+CityAtlas now supports a gated Stripe-hosted checkout handoff for the two paid plans when `VITE_CITYATLAS_ENABLE_LIVE_PAYMENTS=true` and the matching payment-link env vars are populated. That hosted wiring is now live on the public pricing page, but one real checkout proof is still required before calling self-serve charging fully verified.
 
 ## What To Validate Before Stripe
 
@@ -70,7 +72,7 @@ No live payment acceptance is active. Treat these as packaging tests until owner
 ## Cut From First Public Launch
 
 - multi-city expansion
-- open self-serve checkout
+- custom in-app self-serve checkout
 - automated cold outreach
 - unreviewed Google Places imports
 - public real-business pages without consent or source policy

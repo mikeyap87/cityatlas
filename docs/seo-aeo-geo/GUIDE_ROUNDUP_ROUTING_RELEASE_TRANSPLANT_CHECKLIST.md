@@ -89,8 +89,8 @@ Before any live release:
 <!-- CURRENT_SHARED_MACHINE_TRUTH:START -->
 ## Current Shared Machine Truth
 
-- Synced June 16, 2026 from current repo truth.
+- Synced June 25, 2026 from current repo truth.
 - Current local machine truth: `41` useful pieces, `25` guides, `16` source-backed wedge collections, `80` source-backed anchors, and `16` mapped guide-to-collection links.
 - all `25` current guides now have at least one direct-path internal link into another CityAtlas page.
-- `npm run seo:structure:proof` currently passes across `38` key routes.
+- `npm run seo:structure:proof` currently passes across `39` key routes.
 <!-- CURRENT_SHARED_MACHINE_TRUTH:END -->

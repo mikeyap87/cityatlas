@@ -1,6 +1,6 @@
 # Vancouver Business First Batch Packet
 
-Updated: June 16, 2026
+Updated: June 25, 2026
 
 ## Purpose
 
@@ -25,45 +25,45 @@ It exists so CityAtlas can reuse the safer Rooms launch pattern:
 
 ## Recommended First Batch
 
-### 1. Alliance Francaise Vancouver
+### 1. KUBE GALLERY
 
-- Lane: Culture / venue and cultural partner
-- Contact path now: `rentals@alliancefrancaise.ca`
-- Source route: `https://www.alliancefrancaise.ca/`
-- Why this belongs: Alliance Francaise Vancouver already behaves like a business-development target, not just a public city anchor.
-- Current state: rehearsal ready, rooms venue donor seed, reverify before any send
+- Lane: Culture / art gallery
+- Contact path now: `info@kubegallery.com`
+- Source route: `http://kubegallery.com/`
+- Why this belongs: KUBE GALLERY already behaves like a business-development target, not just a public city anchor.
+- Current state: rehearsal ready, cityatlas donor business seed, reverify before any send
 
-### 2. Arcana Spirit Lounge
+### 2. #1 Sub Garden Ltd
 
-- Lane: Hospitality / hospitality and hosted-visit partner
-- Contact path now: `events@arcanabar.com`
-- Source route: `https://arcanabar.com/`
-- Why this belongs: Arcana Spirit Lounge already behaves like a business-development target, not just a public city anchor.
-- Current state: rehearsal ready, rooms venue donor seed, reverify before any send
+- Lane: Hospitality / commercial/industrial
+- Contact path now: `owner@subgarden.ca`
+- Source route: `http://subgarden.ca/`
+- Why this belongs: #1 Sub Garden Ltd already behaves like a business-development target, not just a public city anchor.
+- Current state: rehearsal ready, cityatlas donor business seed, reverify before any send
 
-### 3. Auberge Vancouver Hotel
+### 3. ACCENT INNS-BURNABY
 
-- Lane: Hotel Guest / guest services partner
-- Contact path now: `reservations@aubergevancouver.com`
-- Source route: `https://aubergevancouver.com/contact/`
-- Why this belongs: Auberge Vancouver Hotel already behaves like a business-development target, not just a public city anchor.
-- Current state: rehearsal ready, roam donor business seed, reverify before any send
+- Lane: Hotel Guest / land
+- Contact path now: `accent@accentinns.com`
+- Source route: `http://www.accentinns.com/burnaby`
+- Why this belongs: ACCENT INNS-BURNABY already behaves like a business-development target, not just a public city anchor.
+- Current state: rehearsal ready, cityatlas donor business seed, reverify before any send
 
-### 4. Heritage Hall Vancouver
+### 4. Royals Event And Community Centre
 
-- Lane: Event Group / private-group and hosted-visit partner
-- Contact path now: `heritage@heritagehallvancouver.ca`
-- Source route: `https://heritagehallvancouver.ca/`
-- Why this belongs: Heritage Hall Vancouver already behaves like a business-development target, not just a public city anchor.
-- Current state: rehearsal ready, rooms venue donor seed, reverify before any send
+- Lane: Event Group / commercial/industrial
+- Contact path now: `royals@royalseventcommunitycenter.com`
+- Source route: `https://royalseventcommunitycenter.com/`
+- Why this belongs: Royals Event And Community Centre already behaves like a business-development target, not just a public city anchor.
+- Current state: rehearsal ready, cityatlas donor business seed, reverify before any send
 
-### 5. d'Latibule Wellness
+### 5. A & G VOWELL
 
-- Lane: Wellness / mobile massage and recovery partner
-- Contact path now: `info@dlatibulewellness.ca`
-- Source route: `https://www.dlatibulewellness.com/mobile-massage`
-- Why this belongs: d'Latibule Wellness already behaves like a business-development target, not just a public city anchor.
-- Current state: rehearsal ready, roam donor business seed, reverify before any send
+- Lane: Wellness / alias
+- Contact path now: `info@agmassagetherapy.com`
+- Source route: `http://www.agmassagetherapy.com/`
+- Why this belongs: A & G VOWELL already behaves like a business-development target, not just a public city anchor.
+- Current state: rehearsal ready, cityatlas donor business seed, reverify before any send
 
 ## Owner-Inbox Rehearsal Rule
 
@@ -88,13 +88,13 @@ Before any real CityAtlas outreach approval:
 <!-- CURRENT_SHARED_MACHINE_TRUTH:START -->
 ## Current Shared Machine Truth
 
-- Synced June 16, 2026 from current repo truth.
+- Synced June 25, 2026 from current repo truth.
 - `41` useful pieces
 - `25` guides
 - `16` source-backed wedge collections
 - `80` source-backed anchors
 - `16` mapped guide-to-collection links
 - all `25` current guides now have at least one direct-path internal link into another CityAtlas page.
-- `npm run seo:structure:proof` currently passes across `38` key routes.
+- `npm run seo:structure:proof` currently passes across `39` key routes.
 <!-- CURRENT_SHARED_MACHINE_TRUTH:END -->
 

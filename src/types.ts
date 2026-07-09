@@ -59,11 +59,11 @@ export interface Business extends AuditFields {
   fullDescription: string;
   highlights: string[];
   bestFor: string[];
-  priceTier: "$" | "$$" | "$$$" | "$$$$";
-  rating: number;
-  reviewCount: number;
-  openNow: boolean;
-  hoursToday: string;
+  priceTier?: "$" | "$$" | "$$$" | "$$$$";
+  rating?: number;
+  reviewCount?: number;
+  openNow?: boolean;
+  hoursToday?: string;
   featured: boolean;
   claimedStatus: "unclaimed" | "claim_pending" | "claimed";
   partnerFitScore: number;
@@ -96,7 +96,8 @@ export interface EventItem extends AuditFields {
 
 export interface Offer extends AuditFields {
   id: string;
-  businessId: string;
+  businessId?: string;
+  previewBusinessId?: string;
   title: string;
   description: string;
   redemptionInstructions: string;
@@ -198,25 +199,55 @@ export interface SourceBackedPlaceReference {
   featured: boolean;
 }
 
+export type SavedItemType =
+  | "business"
+  | "event"
+  | "guide"
+  | "offer"
+  | "source_backed_place";
+
+export type TravelMode = "walk" | "transit" | "drive" | "bike";
+
+export type MissionStepStatus = "pending" | "visited" | "skipped";
+
+export type MissionFeedbackType =
+  | "would_do_again"
+  | "too_long"
+  | "wrong_pace"
+  | "share_ready";
+
 export interface CityMissionStep {
   label: string;
-  itemType: SavedItem["itemType"];
+  itemType: SavedItemType;
   itemId: string;
   time: string;
   neighborhood: string;
   note: string;
+  durationMinutes: number;
+  bestAt?: string;
+  mapQuery?: string;
+  openInMapsLabel?: string;
+  travelMinutesByMode?: Partial<Record<TravelMode, number>>;
 }
 
 export interface CityMission extends AuditFields {
   id: string;
   title: string;
   slug: string;
+  citySlug?: string;
+  cityName?: string;
+  regionName?: string;
   theme: string;
   audience: string;
   timeBox: string;
+  startWindow: string;
+  startOptions?: string[];
+  guideIds?: string[];
+  defaultTravelMode: TravelMode;
   hook: string;
   routeSummary: string;
   steps: CityMissionStep[];
+  idealFor: string[];
   reward: string;
   sharePrompt: string;
   sponsorAngle: string;
@@ -258,10 +289,25 @@ export interface NewsletterLead {
 
 export interface SavedItem {
   id: string;
-  itemType: "business" | "event" | "guide";
+  itemType: SavedItemType;
   itemId: string;
   label: string;
   createdAt: string;
+}
+
+export interface MissionPlanStepState {
+  stepIndex: number;
+  status: MissionStepStatus;
+  updatedAt: string;
+}
+
+export interface MissionPlanState {
+  missionId: string;
+  travelMode: TravelMode;
+  selectedStartTime?: string;
+  steps: MissionPlanStepState[];
+  startedAt: string;
+  updatedAt: string;
 }
 
 export interface GrowthEvent {
@@ -317,6 +363,8 @@ export interface BusinessProspect {
   id: string;
   cityKey: string;
   cityName: string;
+  municipality?: string;
+  marketScope?: "city_only" | "metro_area";
   businessName: string;
   slug: string;
   neighborhood: string;
@@ -378,6 +426,52 @@ export interface BusinessProspect {
   supervisedLiveReviewRequestedAt?: string;
   importBatchId?: string;
   lastUpdatedAt: string;
+}
+
+export interface BusinessInventoryRecord {
+  inventoryId: string;
+  sourceSystem: string;
+  sourceScope: string;
+  sourceRecordId: string;
+  licenseYear: string;
+  licenseStatus: string;
+  businessName: string;
+  businessTradeName: string;
+  businessType: string;
+  businessSubtype: string;
+  categoryPrimary: string;
+  categorySecondary: string;
+  cuisine: string;
+  cityName: string;
+  municipality: string;
+  sourceCityRaw: string;
+  localArea: string;
+  streetAddress: string;
+  postalCode: string;
+  latitude: string;
+  longitude: string;
+  website: string;
+  menuUrl: string;
+  publicContactPath: string;
+  publicContactType: string;
+  email: string;
+  phone: string;
+  officialSourceUrl: string;
+  osmSourceUrl: string;
+  verificationStatus: string;
+  contactReadiness: string;
+  outreachPriority: string;
+  notes: string;
+  lastVerifiedDate: string;
+}
+
+export interface BusinessInventorySummary {
+  generatedAt: string;
+  recordCount: number;
+  byBusinessType: Record<string, number>;
+  byLocalArea: Record<string, number>;
+  byCity: Record<string, number>;
+  sourceScope: string;
 }
 
 export interface ProofCandidate {
@@ -568,6 +662,7 @@ export interface CityAtlasData {
   submissions: BusinessSubmission[];
   newsletterLeads: NewsletterLead[];
   savedItems: SavedItem[];
+  missionPlans: MissionPlanState[];
   growthEvents: GrowthEvent[];
   revenueExperiments: RevenueExperiment[];
   growthPlays: GrowthPlay[];

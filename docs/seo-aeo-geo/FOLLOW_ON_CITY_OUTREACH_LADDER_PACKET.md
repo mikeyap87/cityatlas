@@ -1,6 +1,6 @@
 # CityAtlas Follow-On City Outreach Ladder Packet
 
-Updated: June 16, 2026
+Updated: June 25, 2026
 
 Generated from local repo truth by `npm run growth:packets`.
 
@@ -20,11 +20,11 @@ This packet stages the same safer tiny-batch logic used for Vancouver across the
 - `25` city targets remain in the reusable rollout map
 - `25` seeded cities already have local queue coverage
 - `8` follow-on cities currently have an exact tiny-batch packet staged locally
-- `6` of those cities are active next-wave or expansion-wave packets
-- `5` active follow-on cities are ready for an owner-inbox rehearsal
+- `5` of those cities are active next-wave or expansion-wave packets
+- `4` active follow-on cities are ready for an owner-inbox rehearsal
 - `1` of those cities already meet the local queue threshold for city-readiness
 - `1` city currently satisfies both local threshold readiness and owner-inbox rehearsal readiness
-- `2` later-wave cities already have donor-backed rehearsal packets staged locally, but `2` of those remain intentionally held in research-only mode
+- `3` later-wave cities already have donor-backed rehearsal packets staged locally, but `3` of those remain intentionally held in research-only mode
 
 ## Exact Follow-On City Packet Truth
 
@@ -112,7 +112,21 @@ This packet stages the same safer tiny-batch logic used for Vancouver across the
   - The Conduit London (Rehearsal ready; Wellness; membership@theconduit.com)
   - 180 Studios (Rehearsal ready; Event Group; info@180studios.com)
 
-### 7. Chicago
+### 7. Tokyo
+
+- Phase and status: Later global wave / `Building` at `38%` progress
+- Packet mode: `Research-only`
+- Queue truth: `6` unique · `6` contact-ready · `2` email-ready
+- Tiny-batch packet: `5` selected · `2` rehearsal-ready · `2` business lanes · `2` source lanes
+- Owner inbox rehearsal: `Held for later-wave research only`
+- City rollout blocker: Later-wave caveat: even with enough local donor rows for a rehearsal packet, this city stays research-only until earlier North American proof is stronger.
+- Next local action: Keep this city in donor-truth and template mode until earlier North American proof is stronger.
+- Example candidates:
+  - TERRADA Warehouse Event Space (Rehearsal ready; Event Group; info.what@terrada.co.jp)
+  - International House of Japan (Rehearsal ready; Wellness; okimochi@i-house.or.jp)
+  - Rakuan Massage (Review first; Wellness; tel:0120-899-838)
+
+### 8. Chicago
 
 - Phase and status: Expansion wave / `Building` at `31%` progress
 - Packet mode: `Active follow-on`
@@ -125,20 +139,6 @@ This packet stages the same safer tiny-batch logic used for Vancouver across the
   - Chicago Luxury Mobile Massage (Rehearsal ready; Wellness; info@chicagoluxurymobilemassage.com)
   - Chicago Mobile Massage (Review first; Wellness; tel:224.578.3711)
   - Flow In Balance Massage Therapy and Bodywork (Review first; Wellness; tel:+1847-338-8367)
-
-### 8. Montreal
-
-- Phase and status: Next wave / `Building` at `25%` progress
-- Packet mode: `Active follow-on`
-- Queue truth: `4` unique · `4` contact-ready · `1` email-ready
-- Tiny-batch packet: `4` selected · `1` rehearsal-ready · `1` business lanes · `1` source lanes
-- Owner inbox rehearsal: `Owner inbox rehearsal is ready`
-- City rollout blocker: City rollout caveat: 16 more unique prospects; 6 more partner-eligible rows; 6 more contact-ready rows; 1 more source-backed collection starter
-- Next local action: Run one owner-inbox rehearsal with the strongest direct-email candidate. Do not contact the business from CityAtlas.
-- Example candidates:
-  - Massothérapeutes Professionnels & Certifiés à Domicile (Rehearsal ready; Wellness; contact@massaya.ca)
-  - Massage à domicile à Montréal (Review first; Wellness; tel:1726085433)
-  - Massothérapie à Domicile & en Entreprise (Review first; Wellness; tel:+1-888-923-2448)
 
 ## What Batch-Ready Does Not Mean
 
@@ -165,13 +165,13 @@ These stay local-only. They exist so the next city wave can move with exact proo
 <!-- CURRENT_SHARED_MACHINE_TRUTH:START -->
 ## Current Shared Machine Truth
 
-- Synced June 16, 2026 from current repo truth.
+- Synced June 25, 2026 from current repo truth.
 - `41` useful pieces
 - `25` guides
 - `16` source-backed wedge collections
 - `80` source-backed anchors
 - `16` mapped guide-to-collection links
 - all `25` current guides now have at least one direct-path internal link into another CityAtlas page.
-- `npm run seo:structure:proof` currently passes across `38` key routes.
+- `npm run seo:structure:proof` currently passes across `39` key routes.
 <!-- CURRENT_SHARED_MACHINE_TRUTH:END -->
 

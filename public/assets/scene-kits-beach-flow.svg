@@ -1,0 +1,112 @@
+<svg width="1600" height="1000" viewBox="0 0 1600 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1600" height="1000" fill="#A4D4F6"/>
+  <rect width="1600" height="1000" fill="url(#kitsSky)"/>
+  <path d="M0 482C190 448 294 500 447 463C610 424 756 322 934 330C1101 337 1222 434 1358 452C1451 464 1530 458 1600 438V1000H0V482Z" fill="#6FA7D0"/>
+  <path d="M0 550C185 515 286 562 431 530C593 494 726 404 905 410C1053 415 1180 495 1322 517C1435 535 1523 530 1600 506V1000H0V550Z" fill="#5E96C0"/>
+  <path d="M0 633H1600V1000H0V633Z" fill="url(#water)"/>
+  <path d="M0 786H1600V1000H0V786Z" fill="#D8BE8B"/>
+  <path d="M0 846H1600V1000H0V846Z" fill="#CDA86E"/>
+  <circle cx="1252" cy="162" r="76" fill="#FFE9A5"/>
+  <path d="M294 276L435 192L538 238L714 132L910 231L1044 177L1185 280" stroke="#EEF7FF" stroke-opacity="0.78" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M788 456C970 462 1128 513 1252 621" stroke="#FFFFFF" stroke-opacity="0.52" stroke-width="12" stroke-linecap="round"/>
+  <g>
+    <ellipse cx="700" cy="808" rx="250" ry="48" fill="#7EA7C5" fill-opacity="0.24"/>
+    <path
+      d="M660 548C642 563 629 588 627 620C625 665 644 715 685 753C728 791 786 803 835 781C884 759 916 708 915 653C914 603 887 559 843 531C799 503 713 504 660 548Z"
+      fill="#D6A06A"
+    />
+    <path
+      d="M701 582C694 624 693 665 705 706"
+      stroke="#B97D4E"
+      stroke-width="8"
+      stroke-linecap="round"
+    />
+    <path
+      d="M747 575C742 613 743 655 754 695"
+      stroke="#B97D4E"
+      stroke-width="8"
+      stroke-linecap="round"
+    />
+    <path
+      d="M664 729C709 747 774 751 837 734C847 770 849 808 839 844H629C625 805 638 765 664 729Z"
+      fill="#C79045"
+    />
+    <path
+      d="M678 842C677 872 673 902 666 934"
+      stroke="#8B5C2D"
+      stroke-width="16"
+      stroke-linecap="round"
+    />
+    <path
+      d="M804 839C810 872 819 903 830 934"
+      stroke="#8B5C2D"
+      stroke-width="16"
+      stroke-linecap="round"
+    />
+    <path
+      d="M650 705C614 722 574 754 536 809"
+      stroke="#C7895A"
+      stroke-width="20"
+      stroke-linecap="round"
+    />
+    <path
+      d="M824 693C866 673 901 641 936 594"
+      stroke="#C7895A"
+      stroke-width="20"
+      stroke-linecap="round"
+    />
+    <path
+      d="M723 440C695 442 670 456 655 478C641 498 639 525 650 545C662 568 684 583 710 586C737 589 765 578 781 557C797 536 800 506 790 482C779 458 752 441 723 440Z"
+      fill="#D6A06A"
+    />
+    <path
+      d="M663 470C676 440 705 423 735 424C768 425 794 449 800 481C783 475 762 468 742 465C715 461 688 463 663 470Z"
+      fill="#2B211C"
+    />
+    <path
+      d="M694 494C708 489 728 489 744 497C739 512 728 522 714 523C704 522 697 511 694 494Z"
+      fill="#2B211C"
+      fill-opacity="0.66"
+    />
+    <path
+      d="M651 611C672 603 689 600 704 602"
+      stroke="#E6CF9B"
+      stroke-width="15"
+      stroke-linecap="round"
+    />
+    <path
+      d="M699 603C759 547 804 492 825 437C844 389 844 329 814 286C791 252 750 234 712 245C675 255 650 293 649 341C647 394 672 450 716 511C739 542 766 575 801 611"
+      stroke="#E6CF9B"
+      stroke-width="14"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <path
+      d="M699 603C759 547 804 492 825 437C844 389 844 329 814 286C791 252 750 234 712 245C675 255 650 293 649 341C647 394 672 450 716 511C739 542 766 575 801 611"
+      stroke="#B89B63"
+      stroke-width="4"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      opacity="0.45"
+    />
+    <circle cx="701" cy="604" r="11" fill="#3A2B22"/>
+    <circle cx="801" cy="611" r="9" fill="#3A2B22" opacity="0.55"/>
+  </g>
+  <g fill="#F7F1E0" fill-opacity="0.92">
+    <rect x="120" y="772" width="132" height="20" rx="10"/>
+    <rect x="244" y="754" width="106" height="18" rx="9"/>
+    <rect x="1310" y="716" width="162" height="22" rx="11"/>
+    <rect x="1186" y="744" width="120" height="18" rx="9"/>
+  </g>
+  <defs>
+    <linearGradient id="kitsSky" x1="800" y1="0" x2="800" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#BFE5FF"/>
+      <stop offset="0.52" stop-color="#77B8E2"/>
+      <stop offset="1" stop-color="#4F86B1"/>
+    </linearGradient>
+    <linearGradient id="water" x1="800" y1="633" x2="800" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4F95C2"/>
+      <stop offset="1" stop-color="#2C688D"/>
+    </linearGradient>
+  </defs>
+</svg>

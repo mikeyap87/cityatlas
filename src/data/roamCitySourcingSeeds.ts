@@ -24,6 +24,7 @@
 // - ../roam-relaxation/storage/automation/homepage-city-sourcing/new-york__mode-preview-depth-fast-queries-1-per-city-3-rendered-0-auto-deep-1-auto-deep-cap-1-query-default.json
 // - ../roam-relaxation/storage/automation/homepage-city-sourcing/miami__mode-preview-depth-fast-queries-1-per-city-3-rendered-0-auto-deep-1-auto-deep-cap-1-query-default.json
 // - ../roam-relaxation/storage/automation/homepage-city-sourcing/miami__mode-preview-depth-fast-queries-1-per-city-3-rendered-0-auto-deep-1-auto-deep-cap-1.json
+// - ../roam-relaxation/storage/automation/homepage-city-sourcing/tokyo__mode-preview-depth-fast-queries-1-per-city-3-rendered-0-auto-deep-1-auto-deep-cap-1-query-default-exa-0-exa-results-5.json
 // - ../roam-relaxation/storage/automation/homepage-city-sourcing/tokyo__mode-preview-depth-fast-queries-1-per-city-3-rendered-0-auto-deep-1-auto-deep-cap-1-query-default.json
 // - ../roam-relaxation/storage/automation/homepage-city-sourcing/lisbon__mode-preview-depth-fast-queries-1-per-city-3-rendered-0-auto-deep-1-auto-deep-cap-1-query-default-exa-0-exa-results-5.json
 // - ../roam-relaxation/storage/automation/homepage-city-sourcing/lisbon__mode-preview-depth-fast-queries-1-per-city-3-rendered-0-auto-deep-1-auto-deep-cap-1.json
@@ -1088,6 +1089,23 @@ export const roamCitySourcingSeeds = [
   {
     cityKey: 'tokyo',
     cityName: 'Tokyo',
+    businessName: 'Rakuan Massage',
+    neighborhood: '',
+    category: 'Wellness',
+    segment: 'Mobile massage and recovery partner',
+    sourceUrl: 'https://rakuan-massage.jp/tokyo/',
+    website: 'https://rakuan-massage.jp/tokyo/',
+    email: '',
+    contactPath: 'tel:0120-899-838',
+    contactPathType: 'phone_or_text',
+    sourceProof: 'DuckDuckGo Lite search for "出張 マッサージ 東京" returned https://rakuan-massage.jp/tokyo/.',
+    notes: 'Imported from Roam city-sourcing preview for local CityAtlas review only. Public business website appears massage-focused for Tokyo. Public phone 0120-899-838 is visible on the site. Original donor next step: review trust and outreach before any send.',
+    contactConfidence: 'medium',
+    donorSourceLabel: 'Roam city-sourcing donor (public phone path)',
+  },
+  {
+    cityKey: 'tokyo',
+    cityName: 'Tokyo',
     businessName: 'Trip Massage',
     neighborhood: '',
     category: 'Wellness',
@@ -1101,6 +1119,23 @@ export const roamCitySourcingSeeds = [
     notes: 'Imported from Roam city-sourcing preview for local CityAtlas review only. Roam confirmed a same-domain public contact path at https://trip-massage.tokyo/about/. Original donor title: Home. Original donor next step: review trust and outreach before any send.',
     contactConfidence: 'low',
     donorSourceLabel: 'Roam city-sourcing donor (public business page)',
+  },
+  {
+    cityKey: 'tokyo',
+    cityName: 'Tokyo',
+    businessName: '出張マッサージ東京CHIC｜HOME',
+    neighborhood: '',
+    category: 'Wellness',
+    segment: 'Mobile massage and recovery partner',
+    sourceUrl: 'https://chic-massage.tokyo/',
+    website: 'https://chic-massage.tokyo/',
+    email: '',
+    contactPath: 'tel:03-6712-7126',
+    contactPathType: 'phone_or_text',
+    sourceProof: 'DuckDuckGo Lite search for "出張 マッサージ 東京" returned https://chic-massage.tokyo/.',
+    notes: 'Imported from Roam city-sourcing preview for local CityAtlas review only. Public phone 03-6712-7126 is visible on the site. Original donor next step: review trust and outreach before any send.',
+    contactConfidence: 'medium',
+    donorSourceLabel: 'Roam city-sourcing donor (public phone path)',
   },
   {
     cityKey: 'tokyo',

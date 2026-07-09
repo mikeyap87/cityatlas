@@ -26,6 +26,45 @@ interface StatusPillProps {
   children: ReactNode;
 }
 
+interface HeroMediaCardProps {
+  image: string;
+  alt: string;
+  eyebrow: string;
+  title: string;
+  copy: string;
+  className?: string;
+  priority?: boolean;
+}
+
+export function HeroMediaCard({
+  image,
+  alt,
+  eyebrow,
+  title,
+  copy,
+  className,
+  priority = true,
+}: HeroMediaCardProps) {
+  const cardClassName = className ? `starter-hero-media ${className}` : "starter-hero-media";
+
+  return (
+    <div className={cardClassName}>
+      <img
+        src={image}
+        alt={alt}
+        decoding="async"
+        fetchPriority={priority ? "high" : "auto"}
+        loading={priority ? "eager" : "lazy"}
+      />
+      <div className="starter-hero-media-copy">
+        <span>{eyebrow}</span>
+        <strong>{title}</strong>
+        <p>{copy}</p>
+      </div>
+    </div>
+  );
+}
+
 export function StatusPill({ tone = "muted", children }: StatusPillProps) {
   return <span className={`status-pill ${tone}`}>{children}</span>;
 }
@@ -64,10 +103,10 @@ export function SafeModeNotice() {
     <aside className="safe-mode-notice">
       <LockIcon />
       <div>
-        <strong>Every business request starts with a review step.</strong>
+        <strong>Every business page starts with a fact check.</strong>
         <p>
-          CityAtlas confirms fit, scope, and partner details before a package, perk, profile, or
-          partner workflow goes live.
+          CityAtlas checks the basics before it turns a business into a public page, guide
+          mention, or offer.
         </p>
       </div>
     </aside>

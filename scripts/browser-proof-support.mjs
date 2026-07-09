@@ -1,5 +1,7 @@
 import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
+import { request as httpRequest } from "node:http";
+import { request as httpsRequest } from "node:https";
 import { createRequire } from "node:module";
 import { homedir } from "node:os";
 import { join } from "node:path";
@@ -39,14 +41,41 @@ export function loadPlaywright() {
   );
 }
 
+function probeServer(urlString) {
+  return new Promise((resolve, reject) => {
+    const url = new URL(urlString);
+    const requestImpl = url.protocol === "https:" ? httpsRequest : httpRequest;
+    const request = requestImpl(
+      url,
+      {
+        method: "HEAD",
+        timeout: 2_000,
+      },
+      (response) => {
+        const { statusCode = 0 } = response;
+        response.resume();
+        if (statusCode < 500) {
+          resolve();
+          return;
+        }
+        reject(new Error(`Unexpected status ${statusCode}`));
+      },
+    );
+
+    request.on("timeout", () => {
+      request.destroy(new Error("Timed out"));
+    });
+    request.on("error", reject);
+    request.end();
+  });
+}
+
 export async function waitForServer(url, getServerLogs, timeoutMs = 30_000) {
   const startedAt = Date.now();
   while (Date.now() - startedAt < timeoutMs) {
     try {
-      const response = await fetch(url, { redirect: "manual" });
-      if (response.status < 500) {
-        return;
-      }
+      await probeServer(url);
+      return;
     } catch {
       // Keep polling until the timeout so preview has time to boot.
     }

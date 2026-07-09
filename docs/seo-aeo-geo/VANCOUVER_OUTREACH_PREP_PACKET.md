@@ -1,20 +1,20 @@
 # CityAtlas Vancouver Outreach Prep Packet
 
-Updated: June 16, 2026
+Updated: June 25, 2026
 
 Generated from local repo truth by `npm run growth:packets`.
 
 ## Current Local Truth
 
-- Vancouver queue: `143` unique rows
-- Vancouver partner-eligible rows: `124`
-- Vancouver contact-ready rows: `93`
-- Vancouver email-ready rows: `66`
-- Vancouver promotion-candidate rows: `58`
+- Vancouver queue: `3697` unique rows
+- Vancouver partner-eligible rows: `3678`
+- Vancouver contact-ready rows: `3650`
+- Vancouver email-ready rows: `1532`
+- Vancouver promotion-candidate rows: `2146`
 - Proof-batch selected count: `5`
 - Rehearsal-ready candidates: `5`
 - Distinct batch lanes in packet: `5`
-- Distinct donor/source lanes in packet: `2`
+- Distinct donor/source lanes in packet: `1`
 - Owner inbox rehearsal: `Owner inbox rehearsal is ready`
 - The Roam city-sourcing donor sync now merges every qualifying local preview artifact for a city and rejects obvious directory/search-result noise before CityAtlas stages those rows.
 - The reusable Roam public-business-wave donor sync adds official-contact wellness/service businesses from saved public-business fixtures without widening CityAtlas into paid EXA or live scraping.
@@ -29,75 +29,75 @@ Generated from local repo truth by `npm run growth:packets`.
 
 ## Vancouver Action-Lane Mix
 
-- Email-ready: `66` Vancouver rows
+- Email-ready: `1532` Vancouver rows
 - Protected-email review: `2` Vancouver rows
-- Private-form review: `6` Vancouver rows
-- Phone/text review: `3` Vancouver rows
-- Official-path review: `22` Vancouver rows
-- Manual lookup: `25` Vancouver rows
+- Private-form review: `104` Vancouver rows
+- Phone/text review: `13` Vancouver rows
+- Official-path review: `1937` Vancouver rows
+- Manual lookup: `90` Vancouver rows
 - Anchor support only: `19` Vancouver rows
 
 ## Strongest Vancouver Email-Ready Segments
 
-- Restaurant / bar / Hospitality and hosted-visit partner: `12` email-ready rows
-- Cultural space / Venue and cultural partner: `9` email-ready rows
-- Event venue / Private-group and hosted-visit partner: `9` email-ready rows
-- Local business / Vancouver business partner: `8` email-ready rows
-- Hotel / Guest services and event-space partner: `5` email-ready rows
-- Wellness / Mobile massage and recovery partner: `4` email-ready rows
-- Events / Event planner partner: `3` email-ready rows
-- Hotel / Guest services partner: `3` email-ready rows
+- restaurants / Class 1 with liquor service: `286` email-ready rows
+- restaurants / Without Liquor: `67` email-ready rows
+- restaurants / Class 1 no liquor service: `39` email-ready rows
+- restaurants / Commercial/Industrial: `37` email-ready rows
+- restaurants / restaurants: `27` email-ready rows
+- coffee shops / Without Liquor: `25` email-ready rows
+- cafes / Without Liquor: `24` email-ready rows
+- Bakery / Without Liquor: `23` email-ready rows
 
 ## Current Tiny-Batch Candidates
 
-### 1. Alliance Francaise Vancouver
+### 1. KUBE GALLERY
 
 - Stage: `Rehearsal ready`
 - Batch lane: `Culture`
 - Role: `Partner Candidate`
-- Contact route: rentals@alliancefrancaise.ca
-- Source lane: Rooms venue donor seed
-- Why this is in the packet: Alliance Francaise Vancouver already behaves like a business-development target, not just a public city anchor.
+- Contact route: info@kubegallery.com
+- Source lane: CityAtlas donor business seed
+- Why this is in the packet: KUBE GALLERY already behaves like a business-development target, not just a public city anchor.
 - Missing before any real send: Reverify the imported contact path on the official source before any real send.
 
-### 2. Arcana Spirit Lounge
+### 2. #1 Sub Garden Ltd
 
 - Stage: `Rehearsal ready`
 - Batch lane: `Hospitality`
 - Role: `Partner Candidate`
-- Contact route: events@arcanabar.com
-- Source lane: Rooms venue donor seed
-- Why this is in the packet: Arcana Spirit Lounge already behaves like a business-development target, not just a public city anchor.
+- Contact route: owner@subgarden.ca
+- Source lane: CityAtlas donor business seed
+- Why this is in the packet: #1 Sub Garden Ltd already behaves like a business-development target, not just a public city anchor.
 - Missing before any real send: Reverify the imported contact path on the official source before any real send.
 
-### 3. Auberge Vancouver Hotel
+### 3. ACCENT INNS-BURNABY
 
 - Stage: `Rehearsal ready`
 - Batch lane: `Hotel Guest`
 - Role: `Partner Candidate`
-- Contact route: reservations@aubergevancouver.com
-- Source lane: Roam donor business seed
-- Why this is in the packet: Auberge Vancouver Hotel already behaves like a business-development target, not just a public city anchor.
+- Contact route: accent@accentinns.com
+- Source lane: CityAtlas donor business seed
+- Why this is in the packet: ACCENT INNS-BURNABY already behaves like a business-development target, not just a public city anchor.
 - Missing before any real send: Reverify the imported contact path on the official source before any real send.
 
-### 4. Heritage Hall Vancouver
+### 4. Royals Event And Community Centre
 
 - Stage: `Rehearsal ready`
 - Batch lane: `Event Group`
 - Role: `Partner Candidate`
-- Contact route: heritage@heritagehallvancouver.ca
-- Source lane: Rooms venue donor seed
-- Why this is in the packet: Heritage Hall Vancouver already behaves like a business-development target, not just a public city anchor.
+- Contact route: royals@royalseventcommunitycenter.com
+- Source lane: CityAtlas donor business seed
+- Why this is in the packet: Royals Event And Community Centre already behaves like a business-development target, not just a public city anchor.
 - Missing before any real send: Reverify the imported contact path on the official source before any real send.
 
-### 5. d'Latibule Wellness
+### 5. A & G VOWELL
 
 - Stage: `Rehearsal ready`
 - Batch lane: `Wellness`
 - Role: `Partner Candidate`
-- Contact route: info@dlatibulewellness.ca
-- Source lane: Roam donor business seed
-- Why this is in the packet: d'Latibule Wellness already behaves like a business-development target, not just a public city anchor.
+- Contact route: info@agmassagetherapy.com
+- Source lane: CityAtlas donor business seed
+- Why this is in the packet: A & G VOWELL already behaves like a business-development target, not just a public city anchor.
 - Missing before any real send: Reverify the imported contact path on the official source before any real send.
 
 ## Local Exports Ready Now
@@ -127,14 +127,14 @@ Generated from local repo truth by `npm run growth:packets`.
 
 ## Follow-On City Promotion Density From The Shared Map
 
-- Toronto: `6` promotion-candidate rows
+- Toronto: `5` promotion-candidate rows
 - Boston: `4` promotion-candidate rows
 - Chicago: `4` promotion-candidate rows
+- Tokyo: `4` promotion-candidate rows
 - Los Angeles: `3` promotion-candidate rows
 - Miami: `3` promotion-candidate rows
 - Montreal: `3` promotion-candidate rows
 - San Francisco: `3` promotion-candidate rows
-- Washington DC: `3` promotion-candidate rows
 
 ## Reusable Outreach Sequence Borrowed From Rooms And Roam
 

@@ -1,6 +1,6 @@
 # Vancouver Connector Warm-Path Packet
 
-Updated: June 16, 2026
+Updated: June 25, 2026
 
 Generated from local repo truth by `npm run growth:packets`.
 
@@ -14,9 +14,9 @@ It exists so CityAtlas can reuse the strongest local Rooms connector research wi
 
 ## Current Vancouver Warm-Path Truth
 
-- `143` unique Vancouver prospects
-- `93` contact-ready Vancouver business rows
-- `66` email-ready Vancouver business rows
+- `3697` unique Vancouver prospects
+- `3650` contact-ready Vancouver business rows
+- `1532` email-ready Vancouver business rows
 - `10` organization-level Vancouver connectors
 - `9` named Vancouver warm paths
 - `3` named connector lanes
@@ -145,13 +145,13 @@ These organization rows stay useful even when a named person is already staged, 
 <!-- CURRENT_SHARED_MACHINE_TRUTH:START -->
 ## Current Shared Machine Truth
 
-- Synced June 16, 2026 from current repo truth.
+- Synced June 25, 2026 from current repo truth.
 - `41` useful pieces
 - `25` guides
 - `16` source-backed wedge collections
 - `80` source-backed anchors
 - `16` mapped guide-to-collection links
 - all `25` current guides now have at least one direct-path internal link into another CityAtlas page.
-- `npm run seo:structure:proof` currently passes across `38` key routes.
+- `npm run seo:structure:proof` currently passes across `39` key routes.
 <!-- CURRENT_SHARED_MACHINE_TRUTH:END -->
 

@@ -3,18 +3,16 @@ import { AppLink } from "../components/Link";
 import { PublicLayout } from "../components/Layout";
 import { SeoManager } from "../components/Seo";
 import { LockIcon, ShieldIcon } from "../components/Icons";
-import { parseGuideHubPath, parseGuidePath } from "../lib/cityPaths";
-import {
-  canShowHostedAdmin,
-  canShowHostedPrivatePreview,
-  siteConfig,
-} from "../config/site";
 import { AdminConsole } from "../features/admin/AdminConsole";
+import { AdminConsole as AdminConsoleDisabled } from "../features/admin/AdminConsoleDisabled";
+import { BookCallPage } from "../features/business/BookCallPage";
+import { BusinessRequestStatusPage } from "../features/business/BusinessRequestStatusPage";
 import { PartnerPreviewPage } from "../features/business/PartnerPreviewPage";
 import { PricingPage } from "../features/business/PricingPage";
 import { SubmitBusinessPage } from "../features/business/SubmitBusinessPage";
 import { PrivacyPage, TermsPage } from "../features/legal/LegalPages";
 import { DateNightPreviewPage } from "../features/private/DateNightPreviewPage";
+import { DateNightPreviewPage as DateNightPreviewDisabled } from "../features/private/DateNightPreviewDisabled";
 import { AboutPage } from "../features/public/AboutPage";
 import { BusinessPage } from "../features/public/BusinessPage";
 import { CityPage } from "../features/public/CityPage";
@@ -35,16 +33,29 @@ import {
   OutOfTownGuestStartersPage,
   RainyDayStartersPage,
   ReturningVisitorStartersPage,
+  SourceBackedCollectionPage,
   SundayStartersPage,
   UbcDiscoveryStartersPage,
   WeekendRouteStartersPage,
-  WestSideDaytimeStartersPage,
   WellnessResetStartersPage,
-  SourceBackedCollectionPage,
+  WestSideDaytimeStartersPage,
 } from "../features/public/TrustPages";
+import { parseGuideHubPath, parseGuidePath } from "../lib/cityPaths";
+import { consumePendingNavigationEvent } from "../lib/analytics";
+import {
+  buildFlags,
+  canRenderAdminExperience,
+  canRenderPrivatePreviewExperience,
+  siteConfig,
+} from "../config/site";
+import { getMissionCitySlug } from "../lib/missions";
 import { getSourceBackedCollectionForPath } from "../lib/sourceBackedCollections";
 import { usePathname } from "./router";
 import { useCityAtlasStore } from "./useCityAtlasStore";
+const ActiveAdminConsole = buildFlags.hostedAdminArtifacts ? AdminConsole : AdminConsoleDisabled;
+const ActiveDateNightPreviewPage = buildFlags.hostedPrivatePreviewArtifacts
+  ? DateNightPreviewPage
+  : DateNightPreviewDisabled;
 
 function NotFoundPage() {
   return (
@@ -52,9 +63,43 @@ function NotFoundPage() {
       <p className="section-label">Route not found</p>
       <h1>CityAtlas does not have that page yet.</h1>
       <p>
-        Try one of the Vancouver guides, neighborhood starters, business pages, or saved routes
+        Try one of the Vancouver guides, neighborhood starting pages, business pages, or ready-made routes
         instead.
       </p>
+      <div className="hero-actions">
+        <AppLink className="button primary" to="/vancouver/guides">
+          Open Vancouver guides
+        </AppLink>
+        <AppLink className="button secondary" to="/">
+          Back to homepage
+        </AppLink>
+      </div>
+      <div className="guide-query-grid">
+        <AppLink className="query-card query-card-link" to="/vancouver">
+          <strong>Start with Vancouver</strong>
+          <p>Use the city page when you know the kind of day you want, but not the exact place yet.</p>
+        </AppLink>
+        <AppLink className="query-card query-card-link" to="/vancouver/missions">
+          <strong>Ready-made routes</strong>
+          <p>Open reusable Vancouver routes when you want the stop order handled before you save anything.</p>
+        </AppLink>
+        <AppLink className="query-card query-card-link" to="/for-businesses/pricing">
+          <strong>For businesses</strong>
+          <p>Open the business path when the real goal is a clearer page, offer, or guide fit.</p>
+        </AppLink>
+      </div>
+    </section>
+  );
+}
+
+function RouteLoading() {
+  return (
+    <section className="route-loading">
+      <div className="route-loading-card">
+        <p className="section-label">Opening page</p>
+        <strong>Loading CityAtlas</strong>
+        <p>Pulling the next page into place.</p>
+      </div>
     </section>
   );
 }
@@ -79,7 +124,7 @@ function ProtectedRouteNotice({
       <ul>
         <li><LockIcon /> Partner operations stay inside the protected CityAtlas workspace.</li>
         <li><LockIcon /> Packages, perks, and outreach open only after review.</li>
-        <li><LockIcon /> Public CityAtlas pages focus on guides, neighborhoods, and routes.</li>
+        <li><LockIcon /> Public CityAtlas pages focus on guides, neighborhoods, and clear local plans.</li>
       </ul>
       <div className="button-row">
         <AppLink className="button primary" to="/">
@@ -95,14 +140,22 @@ function ProtectedRouteNotice({
 
 export function CityAtlasApp() {
   const path = usePathname();
-  const { data, actions } = useCityAtlasStore();
+  const { data, actions, hydrated, growthHydrated } = useCityAtlasStore(path);
   const collectionRoute = getSourceBackedCollectionForPath(path);
   const guidePath = parseGuidePath(path);
   const guideHubPath = parseGuideHubPath(path);
+  const missionHubMatch = path.match(/^\/([^/]+)\/missions$/);
+  const waitingForProtectedAdminData =
+    path === "/admin" && buildFlags.hostedAdminArtifacts && !growthHydrated;
 
   useEffect(() => {
+    if (!hydrated) return;
     actions.trackEvent("page_view", { path });
-  }, [actions, path]);
+    const pendingNavigationEvent = consumePendingNavigationEvent();
+    if (pendingNavigationEvent) {
+      actions.trackEvent(pendingNavigationEvent.name, pendingNavigationEvent.detail);
+    }
+  }, [actions, hydrated, path]);
 
   const route = useMemo(() => {
     if (path === "/") {
@@ -115,13 +168,20 @@ export function CityAtlasApp() {
         />
       );
     }
-    if (path === "/planner") {
+    if (path === "/planner" || path === "/saved-plans" || path === "/my-plans") {
       return (
         <PlannerPage
           data={data}
           onToggleSave={actions.toggleSave}
+          onClearSavedPlan={actions.clearSavedPlan}
+          onMoveSavedItem={actions.moveSavedItem}
           onSaveMission={actions.saveMission}
           onTrack={actions.trackEvent}
+          onSetMissionTravelMode={actions.setMissionTravelMode}
+          onSetMissionStartTime={actions.setMissionStartTime}
+          onSetMissionStepStatus={actions.setMissionStepStatus}
+          onAddMissionFeedback={actions.addMissionFeedback}
+          onResetMissionProgress={actions.resetMissionProgress}
         />
       );
     }
@@ -204,8 +264,42 @@ export function CityAtlasApp() {
         />
       );
     }
-    if (path === `/${siteConfig.citySlug}/missions`) {
-      return <MissionsPage data={data} onSaveMission={actions.saveMission} />;
+    if (path === "/ready-made-routes") {
+      return (
+        <MissionsPage
+          data={data}
+          citySlug={siteConfig.citySlug}
+          onSaveMission={actions.saveMission}
+          onTrack={actions.trackEvent}
+          onSetMissionTravelMode={actions.setMissionTravelMode}
+          onSetMissionStartTime={actions.setMissionStartTime}
+          onSetMissionStepStatus={actions.setMissionStepStatus}
+          onAddMissionFeedback={actions.addMissionFeedback}
+          onResetMissionProgress={actions.resetMissionProgress}
+        />
+      );
+    }
+    if (missionHubMatch) {
+      const missionCitySlug = missionHubMatch[1];
+      const hasCityMissions = data.cityMissions.some(
+        (mission) => getMissionCitySlug(mission) === missionCitySlug,
+      );
+      if (!hasCityMissions) {
+        return <NotFoundPage />;
+      }
+      return (
+        <MissionsPage
+          data={data}
+          citySlug={missionCitySlug}
+          onSaveMission={actions.saveMission}
+          onTrack={actions.trackEvent}
+          onSetMissionTravelMode={actions.setMissionTravelMode}
+          onSetMissionStartTime={actions.setMissionStartTime}
+          onSetMissionStepStatus={actions.setMissionStepStatus}
+          onAddMissionFeedback={actions.addMissionFeedback}
+          onResetMissionProgress={actions.resetMissionProgress}
+        />
+      );
     }
     if (path.startsWith(`/${siteConfig.citySlug}/businesses/`)) {
       const slug = path.split("/").pop();
@@ -217,25 +311,38 @@ export function CityAtlasApp() {
       );
     }
     if (path === "/for-businesses/pricing") {
-      return <PricingPage data={data} />;
+      return <PricingPage data={data} onTrack={actions.trackEvent} />;
+    }
+    if (path === "/for-businesses/book-call") {
+      return <BookCallPage data={data} onTrack={actions.trackEvent} />;
     }
     if (path === "/for-businesses/partner-preview") {
       return <PartnerPreviewPage data={data} onTrack={actions.trackEvent} />;
     }
     if (path === "/for-businesses/submit") {
-      return <SubmitBusinessPage data={data} onSubmitBusiness={actions.addBusinessSubmission} />;
+      return (
+        <SubmitBusinessPage
+          data={data}
+          path={path}
+          onSubmitBusiness={actions.addBusinessSubmission}
+          onTrack={actions.trackEvent}
+        />
+      );
+    }
+    if (path === "/for-businesses/status") {
+      return <BusinessRequestStatusPage data={data} onTrack={actions.trackEvent} />;
     }
     if (path === "/private-preview/date-night") {
-      if (!canShowHostedPrivatePreview()) {
+      if (!canRenderPrivatePreviewExperience()) {
         return (
           <ProtectedRouteNotice
-            label="Protected route"
-            title="This route is only available inside a protected sharing flow."
+            label="Protected page"
+            title="This page is only available inside a protected sharing flow."
             copy="It includes planning material that is shared selectively, so it stays outside the public CityAtlas experience."
           />
         );
       }
-      return <DateNightPreviewPage data={data} onTrack={actions.trackEvent} />;
+      return <ActiveDateNightPreviewPage data={data} onTrack={actions.trackEvent} />;
     }
     if (path === "/terms") {
       return <TermsPage />;
@@ -247,17 +354,17 @@ export function CityAtlasApp() {
       return <PrivacyPage />;
     }
     if (path === "/admin") {
-      if (!canShowHostedAdmin()) {
+      if (!canRenderAdminExperience()) {
         return (
           <ProtectedRouteNotice
-            label="Protected operations route"
+            label="Protected operations page"
             title="This page is only available inside the protected CityAtlas workspace."
             copy="Business reviews, partner notes, and operations data are handled in a protected workspace, so this page stays outside the public experience."
           />
         );
       }
       return (
-        <AdminConsole
+        <ActiveAdminConsole
           data={data}
           onImportBusinessProspects={actions.addBusinessProspects}
           onSetBusinessProspectSupervisedAllowlist={actions.setBusinessProspectSupervisedAllowlist}
@@ -272,12 +379,22 @@ export function CityAtlasApp() {
           onLogManualReply={actions.addManualReplyLog}
           onSaveBrainRun={actions.saveBrainRun}
           onMarkGateReady={actions.markGateReady}
-          onResetDemo={actions.resetDemo}
+          onResetDemo={() => {
+            actions.resetDemo();
+          }}
         />
       );
     }
     return <NotFoundPage />;
   }, [actions, data, path]);
+
+  if (!hydrated || waitingForProtectedAdminData) {
+    return (
+      <PublicLayout path={path}>
+        <RouteLoading />
+      </PublicLayout>
+    );
+  }
 
   return (
     <PublicLayout path={path}>

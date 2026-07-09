@@ -1,174 +1,194 @@
 # CityAtlas Release Path Approval Packet
 
-Date: 2026-06-16
+Date: 2026-07-07
 
 ## Release Target
 
-CityAtlas Vancouver public batch on:
+CityAtlas business-growth funnel on:
 
-- `https://city.univenturestudio.com`
-- fallback alias `https://cityatlas-one.vercel.app`
+- `https://city.univenturestudio.com/for-businesses/pricing`
+- `https://city.univenturestudio.com/for-businesses/partner-preview`
+- `https://city.univenturestudio.com/for-businesses/book-call`
+- `https://city.univenturestudio.com/for-businesses/submit`
+
+Supporting truth that should stay aligned with that funnel:
+
+- the generated business reply proof snapshot
+- the generated outreach queue status and approved `100/day` cap
+- the local paid-traffic readiness artifact
+- the hosted business-funnel smoke report
 
 ## Intended Change
 
-Release the current locally proven Vancouver batch that sharpens public business-coverage truth, keeps internal-style copy off the crawlable surface, and preserves the answer-first guide and source-backed authority library.
+Ship the locally verified proof-first business funnel so the live business pages match the current CityAtlas rule:
 
-This packet started as a release-mechanics-only approval packet. It now records the current release-path truth after the standalone-repo repair and the direct Vercel production deploy.
+- start with a free reviewed request first
+- show real reply proof instead of future-tense claims
+- keep the first reply, short call, and hosted ask cautious
+- keep paid packages optional until the fit is clear
 
-## Current Release Truth
+This release should also preserve the approved outreach capacity truth:
 
-- CityAtlas is locally linked to the live Vercel project `cityatlas` through `.vercel/project.json`.
-- CityAtlas now has its own standalone local git repo at `/Users/michaelyap/Documents/Codex/Workspace/univenture/cityatlas`.
-- The current local release branch is `codex/vancouver-release-lane`.
-- The first clean standalone CityAtlas commit is `1cc4761`.
-- The approved public domain is already live and crawlable.
-- The current local batch has fresh proof artifacts dated 2026-06-17.
-- The current production deployment is `dpl_EH4ZGfu6TxX1Erg6dARaNuBGJv7y` at `https://cityatlas-rcpxa1sng-michael-yaps-projects-92932836.vercel.app`.
-- The approved custom domain now responds with `HTTP/2 200` and `last-modified: Wed, 17 Jun 2026 06:46:43 GMT`, which confirms the current batch is live for review.
+- `70/day` reviewed restaurant rows
+- `30/day` reviewed service-business rows
+- `100/day` combined maximum
 
-## Exact Blocker
+## Current Verified Truth
 
-The Vancouver batch is no longer blocked from live review. It is now blocked only from a clean remote-backed push and deploy lane.
+### Local Product Proof
 
-What is true right now:
+- `npm run build` passed on 2026-07-07 and refreshed the current `dist` output.
+- `npm run qa:smoke:local` passed on 2026-07-07 after the fresh build.
+- Local smoke currently passes:
+  - `24` desktop product checks
+  - `19` mobile product checks
+  - pricing, partner preview, fit call, and business request all rendered successfully on desktop and mobile
+- The fit-call page now uses the same `Current reply proof` wording as the stronger business pages, and that wording is covered by local smoke.
 
-- `univenture/cityatlas` now resolves to its own standalone git repo.
-- The parent-workspace git collision is no longer the active blocker.
-- The current Vancouver batch has already been deployed directly through the linked Vercel project.
-- No remote is configured on the new CityAtlas repo yet.
-- No live base branch or commit has been identified from the real release source of truth yet.
-- The release-safety checker still cannot prove a normal branch-against-live release path until the remote and base are known.
+### Local Business-Growth Proof
 
-Verified release-safety result:
+- `npm run growth:verify` passed on 2026-07-07.
+- That verifier now confirms:
+  - the generated outreach queue status still reports the approved `70 + 30 = 100/day` cap
+  - the maintained reply-proof source doc still matches the generated app snapshot and JSON artifact
+  - the paid-traffic readiness artifact still includes hosted business-funnel truth
+  - all four business routes are still covered by the hosted business-funnel verifier
+- Current `growth:verify` business-growth highlights:
+  - `sendLimits.restaurant = 70`
+  - `sendLimits.service = 30`
+  - `sendLimits.total = 100`
+  - `businessReplyRail.liveRepliesSent = 3`
 
-- repo now resolves to `/Users/michaelyap/Documents/Codex/Workspace/univenture/cityatlas`
-- the release branch is now `codex/vancouver-release-lane`
-- `origin/main` is still missing locally
-- release status returned `blocked_missing_base_ref`
+### Local Readiness Truth
 
-Plain-English meaning:
-
-CityAtlas now has a real standalone local release lane, but it still does not have a trustworthy remote-backed push and deploy path for this batch.
-
-## Verified
+- `npm run readiness` passed on 2026-07-07.
+- Current readiness summary:
+  - average readiness: `92%`
+  - business outreach machine: `94%`
+  - revenue system: `91%`
+- The readiness report now explicitly says the next best batch is a clean release lane for the locally verified business proof funnel.
 
 ### Hosted Truth
 
-- `https://city.univenturestudio.com/` returns `HTTP/2 200`.
-- `https://cityatlas-one.vercel.app/` returns `HTTP/2 200`.
-- Hosted `robots.txt` is public and still blocks `/admin`, `/private-preview/`, and `/for-businesses/submit`.
-- Hosted `sitemap.xml` is live and contains the current Vancouver crawlable guide and starter library.
-- Production deploy `dpl_EH4ZGfu6TxX1Erg6dARaNuBGJv7y` is live on the public aliases.
-- Hosted smoke passed on 2026-06-17 for the first source-backed packet, the second source-backed packet, and the starter-pack routing packet on `https://city.univenturestudio.com`.
-- Existing docs show CityAtlas already has a linked Vercel project, a public alias, and a public custom domain.
+- `npm run qa:business:hosted` reran on 2026-07-07 and still failed honestly with the live site.
+- Current hosted business-funnel gaps remain:
+  - pricing still lacks the current reply-proof section and proof examples
+  - partner preview is still on the older pre-proof framing
+  - fit call still lacks the newer reply-proof section and package helper layer
+  - business request still lacks the newer question/proof-disclosure flow
+- The hosted report still shows `14` failures, which keeps the local-versus-live gap explicit.
 
-### Local Proof For The New Batch
+### Paid-Traffic Gate Truth
 
-- `output/seo/local-proof-stack.json` passed on `2026-06-17T06:44:13.189Z`.
-- Current local proof summary:
-  - useful pieces: `41`
-  - guides: `25`
-  - source-backed collections: `16`
-  - source-backed places: `80`
-  - checked routes: `38`
-  - checked rendered routes: `51`
-  - readiness average: `90`
-- `output/qa/local-product-smoke.json` passed on `2026-06-17T06:44:08.430Z`.
-- Local smoke passed desktop and mobile checks across homepage, Vancouver starter navigation, Toronto pilot routes, planner, business submit, admin, and private preview.
-- `npm run growth:verify` passed on 2026-06-17 with Vancouver still at `143` total prospects, `124` partner candidates, `93` contact-ready rows, and `66` email-ready rows.
-- `npm run build` passed on 2026-06-17 before deploy.
+- The current strict paid-traffic artifact still says paid traffic is **not** ready.
+- The active blockers are:
+  - hosted business funnel is still behind local
+  - hosted ad-landing proof still needs the approved deploy and rerun
 
-### Repo And Tooling Truth
+## Release Safety Truth
 
-- `git -C /Users/michaelyap/Documents/Codex/Workspace/univenture/cityatlas rev-parse --show-toplevel` now resolves to `/Users/michaelyap/Documents/Codex/Workspace/univenture/cityatlas`.
-- `git -C /Users/michaelyap/Documents/Codex/Workspace/univenture/cityatlas branch --show-current` now returns `codex/vancouver-release-lane`.
-- `git -C /Users/michaelyap/Documents/Codex/Workspace/univenture/cityatlas log -1 --oneline` now returns the standalone root commit `1cc4761 Initialize standalone CityAtlas release lane`.
-- `git -C /Users/michaelyap/Documents/Codex/Workspace/univenture/cityatlas remote -v` still returns no remote.
-- The committed payload is now isolated to the CityAtlas project instead of the mixed parent workspace.
-- The release-safety checker exists for Univenture, but the shared standard points to a broader workspace path than the actual checker location for this repo family. The checker itself is usable, but only after the repo/base problem is fixed.
+Current branch state from the release-safety check:
 
-## Not Verified
+- repo: `/Users/michaelyap/Documents/Codex/Workspace/univenture/cityatlas`
+- branch: `codex/vancouver-release-lane`
+- head: `d819ce34c066`
+- safety base checked: `origin/codex/vancouver-release-lane`
+- local tracking state: behind `1`, ahead `2`
+- release-safety status: `blocked_dirty_worktree`
 
-- There is no pushable remote branch for CityAtlas.
-- There is no confirmed live base branch or commit for a safe release transplant.
-- There is no rollback snapshot tied to a clean repo history for this new local batch.
+What that means:
 
-## Smallest Viable Release-Path Options
+- the current branch is **not** safe to deploy from directly
+- the working tree still has `29` mixed local changes
+- the broader committed diff is much wider than this business-funnel release should be
 
-### Option 1: Dedicated CityAtlas Repo First
+Additional refresh note:
 
-Completed locally except for the remote and live-base step. CityAtlas now has its own standalone local git repo, first clean commit, fresh local proof, and one live Vercel deploy. The remaining move is to attach the intended GitHub remote, confirm the live base, rerun the release-safety check against that real base, then move future releases onto the dedicated repo path.
+- a fresh `git fetch origin` was attempted on 2026-07-07
+- one sandboxed attempt failed on DNS resolution
+- one elevated retry failed with `fetch-pack: invalid index-pack output`
+- treat the current local tracking refs as the best available branch-base truth until Git transport is repaired
 
-Why this is best:
+## Exact Payload To Move Into A Clean Release Lane
 
-- cleanest audit trail
-- narrowest payload
-- easiest rollback and release proof
-- least confusion between CityAtlas and the wider workspace
+The next clean release lane should transplant only the business-growth slice below unless a file proves unnecessary:
 
-Cost:
+- `src/features/business/PricingPage.tsx`
+- `src/features/business/PartnerPreviewPage.tsx`
+- `src/features/business/BookCallPage.tsx`
+- `src/features/business/SubmitBusinessPage.tsx`
+- `src/components/BusinessReplyProof.tsx`
+- `src/data/businessReplyStatus.ts`
+- `scripts/build-cityatlas-business-reply-status.mjs`
+- `scripts/lib/cityatlas-business-reply-status.mjs`
+- `scripts/lib/cityatlas-daily-send-limits.mjs`
+- `scripts/build-cityatlas-outreach-queue-status.mjs`
+- `scripts/build-vancouver-restaurant-daily-send-window.mjs`
+- `scripts/build-vancouver-service-daily-send-window.mjs`
+- `scripts/verify-hosted-business-funnel.mjs`
+- `scripts/verify-local-product-smoke.mjs`
+- `scripts/verify-paid-traffic-readiness.mjs`
+- `scripts/verify-growth-machine.mjs`
+- `scripts/verify-hosted-payment-handoff.mjs`
+- `scripts/readiness-report.mjs`
+- `package.json`
+- `README.md`
+- `docs/PROJECT.md`
+- `docs/READINESS_PROGRESS.md`
 
-- requires the owner to confirm the intended repo destination or remote
+Only include `src/lib/businessOutreachPrep.ts`, `src/styles/components.css`, and `src/styles/responsive.css` if the release lane proves they are required by the current business pages or proof surfaces.
 
-### Option 2: Standalone Local Repo Now, Remote Decision Next
+## Keep Out Of This Release Unless Separately Re-Approved
 
-This local repair step is complete. CityAtlas has its own local repo, branch, and first clean commit. The remaining work is the remote decision.
+Do **not** silently widen this release with:
 
-Why this helps:
+- homepage, city-hub, planner, guide-detail, or other public-route work outside the four business pages
+- unrelated public assets, favicon, sitemap, or crawl-file changes
+- broader Greater Vancouver inventory, shortlist, donor-seed, or operator-database changes
+- unrelated admin, legal, analytics, or content-machine work that is not required by the business-funnel payload
 
-- gets CityAtlas onto a real release lane quickly
-- separates the app from the mixed parent workspace state
+## Rollback Snapshot
 
-Cost:
+Current documented rollback base from local project docs:
 
-- still does not create a push or deploy path until the remote is chosen
+- live production branch family: `origin/codex/vancouver-release-lane`
+- documented live production commit: `36cda30`
+- documented live production deployment family: the currently public `cityatlas` production aliases
 
-### Option 3: One-Off Direct Vercel Deploy From The Linked Folder
+Before any real deploy approval, refresh the hosted deployment status doc with the exact current live deployment identifier so rollback does not depend on stale June status text.
 
-Use the existing `.vercel` link to deploy directly from the folder without solving the git release lane first.
+## Post-Deploy Smoke
 
-Why this is fast:
+Immediately after an approved deploy, rerun:
 
-- fastest path to making the newest local batch live
+1. `npm run qa:business:hosted`
+2. `npm run qa:payments:hosted`
+3. `npm run qa:paid-traffic:strict`
 
-Why this is weaker:
+The hosted business-funnel smoke must prove:
 
-- not a clean commit and push path
-- weaker rollback clarity
-- weaker proof that the exact local payload is what shipped
+- pricing shows `Current reply proof`, live reply metrics, and at least `2` proof examples
+- partner preview shows the current heading, reply proof, live reply metrics, and at least `2` proof cards
+- fit call shows `Current reply proof`, live reply metrics, the package selector, and no preselected package
+- business request shows the question-progress label, the first-reply explanation, and the proof-disclosure entry point
 
-### Option 4: Release From The Parent Workspace Repo
+## Current Blockers
 
-Not recommended.
+- current branch is mixed and blocked by release safety
+- current tracked release branch is behind its remote by `1` commit
+- hosted business funnel is still older than local
+- current hosted deployment status doc is stale for a new production action
+- Git transport needs repair before branch freshness can be revalidated cleanly against GitHub
 
-Why:
+## Safest Next Move
 
-- no commits
-- no remote
-- unrelated mixed workspace scope
-- release-safety proof already says this path is blocked
+1. Repair Git fetch truth for the CityAtlas repo or otherwise confirm the latest live release base.
+2. Cut a fresh clean release lane from that base.
+3. Transplant only the business-funnel payload listed above.
+4. Run `npm run build`, `npm run qa:smoke:local`, `npm run growth:verify`, `npm run readiness`, and `npm run qa:paid-traffic:strict` on that exact release lane.
+5. Refresh the rollback snapshot and hosted deployment status doc.
+6. Stop for explicit deploy approval before any push or production deploy.
 
-## Safest And Fastest Recommendation
+## Approval Needed
 
-Safest: Option 1.
-
-Fastest while still responsible: keep the current live direct-deploy path available for review, then immediately continue into Option 1 once the remote is confirmed.
-
-Fastest live-only but weakest mechanically: Option 3.
-
-## Owner Decision Required
-
-Please choose the release source of truth for CityAtlas:
-
-1. Approve creating or reconnecting a dedicated CityAtlas GitHub remote, then moving future releases onto that repo-based path.
-2. Approve keeping the current one-off direct Vercel deploy as the temporary live-review path while the remote is resolved.
-
-## Recommended Approval Sentence
-
-If you want the cleanest path:
-
-`Approved: connect CityAtlas to its intended GitHub remote, rerun release-safety against the real base, and move future releases onto the clean repo-based path.`
-
-If you want to keep today's live review path while that gets resolved:
-
-`Approved: keep the current direct Vercel deploy as the temporary review path, and continue toward the clean GitHub remote path next.`
+Approve a fresh clean CityAtlas release lane that ships only the business-funnel payload above, then reruns hosted smoke on pricing, partner preview, fit call, and business request before any broader CityAtlas changes or paid-traffic decisions.

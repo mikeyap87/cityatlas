@@ -6,9 +6,10 @@ export interface TrackProductEventOptions {
 }
 
 interface AnalyticsReadiness {
-  provider: "ga4";
+  provider: "" | "ga4" | "meta" | "ga4+meta";
   hasExternalDestination: boolean;
   measurementIdConfigured: boolean;
+  metaPixelConfigured: boolean;
 }
 
 interface AnalyticsState {
@@ -23,6 +24,12 @@ interface PendingNavigationAnalyticsEvent {
   detail: AnalyticsDetail;
 }
 
+interface QueuedMetaEvent {
+  mode: "track" | "trackCustom";
+  name: string;
+  payload: Record<string, string | number | boolean>;
+}
+
 interface TrafficContextState extends AnalyticsDetail {
   firstLandingPath: string;
   latestLandingPath: string;
@@ -33,7 +40,10 @@ declare global {
   interface Window {
     __cityatlasAnalyticsReadiness?: AnalyticsReadiness;
     __cityatlasAnalyticsState?: AnalyticsState;
+    __cityatlasMetaQueue__?: QueuedMetaEvent[];
+    __cityatlasMetaReadyListenerInstalled__?: boolean;
     dataLayer?: unknown[];
+    fbq?: (...args: unknown[]) => void;
     gtag?: (...args: unknown[]) => void;
     google_tag_manager?: Record<string, unknown>;
   }
@@ -43,8 +53,12 @@ const runtimeEnv = ((import.meta as ImportMeta & {
   env?: Record<string, string | undefined>;
 }).env ?? {}) as Record<string, string | undefined>;
 
-const DEFAULT_GA_MEASUREMENT_ID = "";
+const DEFAULT_GA_MEASUREMENT_ID = "G-43N3DKZYRL";
+const DEFAULT_META_PIXEL_ID = "1511001586900874";
 const ANALYTICS_SCRIPT_ID = "cityatlas-ga4-script";
+const META_PIXEL_SCRIPT_ID = "cityatlas-meta-pixel-loader";
+const META_PIXEL_CONFIG_ID = "cityatlas-meta-pixel-config";
+const META_READY_EVENT = "cityatlas:meta-ready";
 const ANALYTICS_CONSENT_STORAGE_KEY = "cityatlas.analytics.consent.v1";
 const ANALYTICS_DEBUG_STORAGE_KEY = "cityatlas.analytics.debug.v1";
 const TRAFFIC_CONTEXT_STORAGE_KEY = "cityatlas.traffic.context.v1";
@@ -62,13 +76,41 @@ function getMeasurementId() {
   );
 }
 
-function getProvider() {
-  const configuredProvider = runtimeEnv.VITE_CITYATLAS_ANALYTICS_PROVIDER?.trim();
-  if (configuredProvider) {
-    return configuredProvider;
+function getMetaPixelId() {
+  const configuredPixelId =
+    runtimeEnv.VITE_CITYATLAS_META_PIXEL_ID?.trim() || runtimeEnv.VITE_META_PIXEL_ID?.trim();
+
+  if (configuredPixelId) {
+    return configuredPixelId;
   }
 
-  return getMeasurementId() ? "ga4" : "";
+  if (canUseDom()) {
+    const localHosts = new Set(["127.0.0.1", "::1", "localhost"]);
+    if (localHosts.has(window.location.hostname)) {
+      return "";
+    }
+  }
+
+  return DEFAULT_META_PIXEL_ID;
+}
+
+function getProvider() {
+  const gaConfigured = Boolean(getMeasurementId());
+  const metaConfigured = Boolean(getMetaPixelId());
+
+  if (gaConfigured && metaConfigured) {
+    return "ga4+meta";
+  }
+
+  if (gaConfigured) {
+    return "ga4";
+  }
+
+  if (metaConfigured) {
+    return "meta";
+  }
+
+  return "";
 }
 
 function getStorage() {
@@ -116,10 +158,15 @@ function removeStorageItem(key: string) {
 }
 
 function buildAnalyticsReadiness(): AnalyticsReadiness {
+  const measurementIdConfigured = Boolean(getMeasurementId());
+  const metaPixelConfigured = Boolean(getMetaPixelId());
+  const provider = getProvider();
+
   return {
-    provider: "ga4",
-    hasExternalDestination: getProvider() === "ga4" && Boolean(getMeasurementId()),
-    measurementIdConfigured: Boolean(getMeasurementId()),
+    provider,
+    hasExternalDestination: Boolean(provider),
+    measurementIdConfigured,
+    metaPixelConfigured,
   };
 }
 
@@ -186,12 +233,131 @@ function injectAnalyticsScript() {
   return true;
 }
 
+function injectMetaPixelScript() {
+  if (!canUseDom()) return false;
+
+  const metaPixelId = getMetaPixelId();
+  if (!metaPixelId) return false;
+
+  let loader = document.getElementById(META_PIXEL_SCRIPT_ID) as HTMLScriptElement | null;
+  if (!loader) {
+    loader = document.createElement("script");
+    loader.id = META_PIXEL_SCRIPT_ID;
+    loader.textContent = `
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+    `;
+    document.head.appendChild(loader);
+  }
+
+  let config = document.getElementById(META_PIXEL_CONFIG_ID) as HTMLScriptElement | null;
+  if (!config) {
+    config = document.createElement("script");
+    config.id = META_PIXEL_CONFIG_ID;
+    config.textContent = `
+      fbq('init', '${metaPixelId}');
+      window.dispatchEvent(new Event('${META_READY_EVENT}'));
+    `;
+    document.head.appendChild(config);
+  }
+
+  return true;
+}
+
 function readTrafficContextState() {
   return readJson<TrafficContextState>(TRAFFIC_CONTEXT_STORAGE_KEY);
 }
 
 function writeTrafficContextState(state: TrafficContextState) {
   writeJson(TRAFFIC_CONTEXT_STORAGE_KEY, state);
+}
+
+function sanitizeMetaPayload(detail: AnalyticsDetail = {}) {
+  const payload: Record<string, string | number | boolean> = {};
+
+  for (const [key, value] of Object.entries(detail)) {
+    if (typeof value === "string") {
+      const trimmed = value.trim();
+      if (trimmed) {
+        payload[key] = trimmed;
+      }
+      continue;
+    }
+
+    if (typeof value === "number" && Number.isFinite(value)) {
+      payload[key] = value;
+      continue;
+    }
+
+    if (typeof value === "boolean") {
+      payload[key] = value;
+    }
+  }
+
+  return payload;
+}
+
+function flushQueuedMetaEvents() {
+  if (!canUseDom() || typeof window.fbq !== "function") {
+    return;
+  }
+
+  const queued = window.__cityatlasMetaQueue__ || [];
+  window.__cityatlasMetaQueue__ = [];
+
+  for (const entry of queued) {
+    window.fbq(entry.mode, entry.name, entry.payload);
+  }
+}
+
+function ensureMetaReadyListener() {
+  if (!canUseDom() || window.__cityatlasMetaReadyListenerInstalled__) {
+    return;
+  }
+
+  window.addEventListener(META_READY_EVENT, flushQueuedMetaEvents);
+  window.__cityatlasMetaReadyListenerInstalled__ = true;
+}
+
+function emitMetaEvent(
+  name: string,
+  payload: Record<string, string | number | boolean>,
+  mode: "track" | "trackCustom" = "trackCustom",
+) {
+  if (!canUseDom() || !getMetaPixelId()) {
+    return;
+  }
+
+  if (typeof window.fbq !== "function") {
+    window.__cityatlasMetaQueue__ = window.__cityatlasMetaQueue__ || [];
+    window.__cityatlasMetaQueue__?.push({ mode, name, payload });
+    ensureMetaReadyListener();
+    return;
+  }
+
+  window.fbq(mode, name, payload);
+}
+
+function getStandardMetaEvent(name: string) {
+  switch (name) {
+    case "page_view":
+      return "PageView";
+    case "newsletter_lead_saved":
+    case "business_submission_saved":
+    case "business_request_saved_for_later":
+      return "Lead";
+    case "business_package_cta_clicked":
+    case "business_package_checkout_clicked":
+      return "InitiateCheckout";
+    default:
+      return null;
+  }
 }
 
 function getCurrentTrafficContext(): TrafficContextState {
@@ -272,32 +438,44 @@ function configureGrantedConsent(path?: string, includePageView = false) {
     return;
   }
 
-  ensureDataLayer();
-  const injected = injectAnalyticsScript();
   const measurementId = getMeasurementId();
+  const metaPixelId = getMetaPixelId();
+  const hasGaDestination = Boolean(measurementId);
+  const hasMetaDestination = Boolean(metaPixelId);
 
   const state = readRuntimeState();
-  if (!state.defaultConsentSet) {
-    pushAnalyticsTuple("js", new Date());
-    pushAnalyticsTuple("consent", "default", {
-      analytics_storage: "denied",
+  let injected = false;
+  let metaInjected = false;
+
+  if (hasGaDestination) {
+    ensureDataLayer();
+    injected = injectAnalyticsScript();
+    if (!state.defaultConsentSet) {
+      pushAnalyticsTuple("js", new Date());
+      pushAnalyticsTuple("consent", "default", {
+        analytics_storage: "denied",
+        ad_storage: "denied",
+      });
+    }
+
+    pushAnalyticsTuple("consent", "update", {
+      analytics_storage: "granted",
       ad_storage: "denied",
+    });
+    pushAnalyticsTuple("config", measurementId, {
+      anonymize_ip: true,
     });
   }
 
-  pushAnalyticsTuple("consent", "update", {
-    analytics_storage: "granted",
-    ad_storage: "denied",
-  });
-  pushAnalyticsTuple("config", measurementId, {
-    anonymize_ip: true,
-  });
+  if (hasMetaDestination) {
+    metaInjected = injectMetaPixelScript();
+  }
 
   writeRuntimeState({
     appliedConsent: "granted",
     configuredMeasurementId: measurementId,
-    defaultConsentSet: true,
-    scriptInjected: injected,
+    defaultConsentSet: state.defaultConsentSet || hasGaDestination,
+    scriptInjected: injected || metaInjected,
   });
 
   if (includePageView) {
@@ -345,6 +523,16 @@ export function setAnalyticsConsentState(
     return;
   }
 
+  if (canUseDom() && getAnalyticsReadiness().hasExternalDestination) {
+    if (getMeasurementId()) {
+      ensureDataLayer();
+      pushAnalyticsTuple("consent", "update", {
+        analytics_storage: "denied",
+        ad_storage: "denied",
+      });
+    }
+  }
+
   writeRuntimeState({
     appliedConsent: "denied",
   });
@@ -377,11 +565,35 @@ export function trackProductEvent(
   }
 
   configureGrantedConsent(path, false);
-  pushAnalyticsTuple("event", name, {
-    page_path: path,
-    anonymize_ip: true,
-    ...detail,
-  });
+  if (getMeasurementId()) {
+    pushAnalyticsTuple("event", name, {
+      page_path: path,
+      anonymize_ip: true,
+      ...detail,
+    });
+  }
+
+  if (getMetaPixelId()) {
+    const metaPayload = sanitizeMetaPayload({
+      page_path: path,
+      ...(canUseDom()
+        ? {
+            page_location: window.location.href,
+            page_title: document.title,
+          }
+        : {}),
+      ...detail,
+    });
+
+    if (name !== "page_view") {
+      emitMetaEvent(name, metaPayload, "trackCustom");
+    }
+
+    const standardMetaEvent = getStandardMetaEvent(name);
+    if (standardMetaEvent) {
+      emitMetaEvent(standardMetaEvent, metaPayload, "track");
+    }
+  }
 }
 
 restoreAnalyticsFromStoredConsent();

@@ -218,7 +218,12 @@ function selectBatchCandidates(sorted: BusinessProofBatchCandidate[]) {
   };
 
   for (const lane of batchLanePriority) {
-    const candidate = pickPreferredLaneCandidate(sorted, lane, selectedIds);
+    const candidate = pickPreferredLaneCandidate(
+      sorted,
+      lane,
+      selectedIds,
+      new Set(sourceLaneCounts.keys()),
+    );
     if (!candidate) {
       continue;
     }
@@ -267,6 +272,7 @@ function pickPreferredLaneCandidate(
   candidates: BusinessProofBatchCandidate[],
   lane: BusinessBatchLane,
   selectedIds: Set<string>,
+  selectedSourceLanes: Set<string>,
 ) {
   const laneCandidates = candidates.filter(
     (candidate) => candidate.batchLane === lane && !selectedIds.has(candidate.prospectId),
@@ -278,13 +284,19 @@ function pickPreferredLaneCandidate(
 
   if (lane === "event_group") {
     return laneCandidates.find((candidate) =>
+      !selectedSourceLanes.has(candidate.sourceLane)
+      && /event venue|private-group|event-space|venue/i.test(
+        `${candidate.category} ${candidate.segment}`,
+      ),
+    ) || laneCandidates.find((candidate) =>
       /event venue|private-group|event-space|venue/i.test(
         `${candidate.category} ${candidate.segment}`,
       ),
     ) || laneCandidates[0];
   }
 
-  return laneCandidates[0];
+  return laneCandidates.find((candidate) => !selectedSourceLanes.has(candidate.sourceLane))
+    || laneCandidates[0];
 }
 
 function buildBusinessOutreachDraft(prospect: BusinessProspect): BusinessOutreachDraft {
@@ -295,14 +307,14 @@ function buildBusinessOutreachDraft(prospect: BusinessProspect): BusinessOutreac
   const body = [
     opening,
     "",
-    `I'm Michael from CityAtlas, a city guide focused on source-backed local routes and better local business visibility in ${cityName}.`,
+    `I'm with CityAtlas, a city guide focused on source-backed local routes and better local business visibility in ${cityName}.`,
     "",
-    `I'm preparing a small manual review batch for ${angle}. If CityAtlas drafted a factual mention or visibility page for ${prospect.businessName}, would you be open to a quick review of the details before anything public is treated as final?`,
+    `We're preparing a small manual review batch for ${angle}. If CityAtlas drafted a factual mention or visibility page for ${prospect.businessName}, would you be open to a quick review of the details before anything public is treated as final?`,
     "",
-    "No rush and no obligation. I'm keeping the first batch small and review-first so the quality stays real.",
+    "No rush and no obligation. We're keeping the first batch small and review-first so the quality stays real.",
     "",
     "Best,",
-    "Michael",
+    "CityAtlas team",
     "CityAtlas",
     "https://city.univenturestudio.com",
     "",

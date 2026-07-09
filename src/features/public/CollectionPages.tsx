@@ -1,48 +1,201 @@
+import { useState } from "react";
 import type { CityAtlasData } from "../../types";
 import { AppLink } from "../../components/Link";
-import { EventCard, GuideCard, OfferCard } from "../../components/Cards";
+import {
+  EventCard,
+  getGuideSurfaceState,
+  OfferCard,
+} from "../../components/Cards";
 import { ArrowRightIcon } from "../../components/Icons";
-import { SectionHeader, StatusPill } from "../../components/UI";
+import { HeroMediaCard, SectionHeader, StatusPill } from "../../components/UI";
 import { siteConfig } from "../../config/site";
+import { getGuidePath } from "../../lib/cityPaths";
+import { getMissionAnchorPath } from "../../lib/missions";
+import { getOfferDisplayBusiness } from "../../lib/offers";
+import { simplifyGuideCategoryLabel, simplifyGuideDisplayText } from "../../lib/publicCopy";
 import { getSourceBackedPlaces } from "../../lib/sourceBackedCollections";
+import { getBusinessVisual, getEventVisual } from "../../lib/visuals";
 
 export function EventsPage({ data }: { data: CityAtlasData }) {
+  const featuredEvent = data.events[0];
+
   return (
-    <section className="section-block page-top">
-      <SectionHeader
-        label="Events"
-        title="Vancouver event pages"
-        copy="These example cards show how CityAtlas can present events more clearly. Confirm live details with hosts or official sources."
-        action={<StatusPill tone="amber">Event example</StatusPill>}
-      />
-      <div className="card-grid two">
-        {data.events.map((event) => (
-          <EventCard event={event} key={event.id} />
-        ))}
-      </div>
-    </section>
+    <>
+      <section className="city-hero page-top">
+        <div className="city-hero-copy">
+          <p className="section-label">Events</p>
+          <h1>Vancouver event ideas that can shape the day</h1>
+          <p>
+            Open these when a market, class, or one-time event helps decide the day. Confirm the
+            final timing, location, and booking details with the host before you rely on them.
+          </p>
+          <div className="hero-actions">
+            <AppLink className="button primary" to="/vancouver/guides">
+              Open Vancouver guides
+            </AppLink>
+            <AppLink className="button secondary" to="/vancouver/date-night-starters">
+              Open local places
+            </AppLink>
+          </div>
+          <article className="source-panel business-hero-note-card business-hero-note-card-safe pricing-hero-summary-card">
+            <strong>Use event pages when one live stop can help decide the day faster.</strong>
+            <p>
+              Start here when timing matters, then confirm the final schedule and booking details
+              with the host before you rely on the plan.
+            </p>
+          </article>
+        </div>
+        <div className="starter-hero-side">
+          <HeroMediaCard
+            image={featuredEvent ? getEventVisual(featuredEvent) : siteConfig.media.hero}
+            alt={
+              featuredEvent
+                ? `Supporting image for ${featuredEvent.title}`
+                : "Illustrated market scene inspired by Granville Island Public Market in Vancouver"
+            }
+            eyebrow={featuredEvent ? featuredEvent.neighborhood : "Event ideas"}
+            title={featuredEvent?.title ?? "Vancouver event ideas"}
+            copy={
+              featuredEvent?.description ??
+              "Use these when a live event helps shape the day more than a generic list of places."
+            }
+            className="hero-media-compact"
+          />
+        </div>
+      </section>
+
+      <section className="split-section">
+        <div className="source-panel starter-hero-note">
+          <strong>How to use this page</strong>
+          <ul className="plain-list compact">
+            <li>Use this page when a live event matters more than a static place list.</li>
+            <li>Check the final schedule, ticketing, and location with the host.</li>
+            <li>Open a guide first when the bigger question is still where to start.</li>
+          </ul>
+          <StatusPill tone="amber">{data.events.length} event ideas</StatusPill>
+        </div>
+        <div className="source-panel conversion-panel">
+          <h2>Best next move if the day is still wide open</h2>
+          <p>
+            Open a guide first when the real job is still choosing the neighborhood, pace, or
+            weather shape before the event itself matters.
+          </p>
+          <AppLink className="button secondary" to="/vancouver/guides">
+            Open all guides <ArrowRightIcon />
+          </AppLink>
+        </div>
+      </section>
+
+      <section className="section-block">
+        <SectionHeader
+          label="Events"
+          title="Event cards built for fast scanning"
+          copy="These cards stay short on purpose so the event can help shape the day without taking over the whole planning flow."
+          action={<StatusPill tone="amber">Check details first</StatusPill>}
+        />
+        <div className="card-grid two">
+          {data.events.map((event) => (
+            <EventCard event={event} key={event.id} />
+          ))}
+        </div>
+      </section>
+    </>
   );
 }
 
 export function OffersPage({ data }: { data: CityAtlasData }) {
+  const featuredOffer = data.offers[0];
+  const featuredOfferBusiness = featuredOffer
+    ? getOfferDisplayBusiness(featuredOffer, data.businesses)
+    : undefined;
+
   return (
-    <section className="section-block page-top">
-      <SectionHeader
-        label="Offers"
-        title="Vancouver offer pages"
-        copy="These example cards show how CityAtlas can package partner perks once the business confirms the details and redemption rules."
-        action={<StatusPill tone="amber">Perk example</StatusPill>}
-      />
-      <div className="card-grid two">
-        {data.offers.map((offer) => (
-          <OfferCard
-            offer={offer}
-            business={data.businesses.find((business) => business.id === offer.businessId)}
-            key={offer.id}
+    <>
+      <section className="city-hero page-top">
+        <div className="city-hero-copy">
+          <p className="section-label">Offers</p>
+          <h1>Vancouver offers worth checking before a detour</h1>
+          <p>
+            Open these when a clear local offer could change the plan. The value only works when
+            the timing, terms, and redemption details are easy to understand first.
+          </p>
+          <div className="hero-actions">
+            <AppLink className="button primary" to="/for-businesses/submit">
+              Start business request
+            </AppLink>
+            <AppLink className="button secondary" to="/vancouver/date-night-starters">
+              Open local places
+            </AppLink>
+          </div>
+          <article className="source-panel business-hero-note-card business-hero-note-card-safe pricing-hero-summary-card">
+            <strong>Use offer pages when one clear local deal can change where someone goes.</strong>
+            <p>
+              CityAtlas only wants offers that are easy to understand fast, with timing and
+              redemption details clear before the detour happens.
+            </p>
+          </article>
+        </div>
+        <div className="starter-hero-side">
+          <HeroMediaCard
+            image={
+              featuredOfferBusiness ? getBusinessVisual(featuredOfferBusiness) : siteConfig.media.waterfront
+            }
+            alt={
+              featuredOfferBusiness
+                ? `${featuredOfferBusiness.name} venue photo`
+                : "Illustrated shoreline scene inspired by Kitsilano Beach in Vancouver"
+            }
+            eyebrow={featuredOfferBusiness?.name ?? "Local offer"}
+            title={featuredOffer?.title ?? "Vancouver local offers"}
+            copy={
+              featuredOffer?.description ??
+              "Use these when a clear local offer can help choose where to go next."
+            }
+            className="hero-media-compact"
           />
-        ))}
-      </div>
-    </section>
+        </div>
+      </section>
+
+      <section className="split-section">
+        <div className="source-panel starter-hero-note">
+          <strong>How to use this page</strong>
+          <ul className="plain-list compact">
+            <li>Use this page when the offer itself could change where someone goes.</li>
+            <li>Check dates, limits, and redemption rules before treating an offer as current.</li>
+            <li>Use the business request form when a business wants a page or offer like this.</li>
+          </ul>
+          <StatusPill tone="amber">{data.offers.length} sample offers</StatusPill>
+        </div>
+        <div className="source-panel conversion-panel">
+          <h2>Best next move for businesses</h2>
+          <p>
+            Open the business request when the business needs a clearer page, better offer
+            framing, or guide placement before anything goes public.
+          </p>
+          <AppLink className="button secondary" to="/for-businesses/submit">
+            Start business request <ArrowRightIcon />
+          </AppLink>
+        </div>
+      </section>
+
+      <section className="section-block">
+        <SectionHeader
+          label="Offers"
+          title="Offers that stay clear before someone makes the detour"
+          copy="These sample offers show the level of clarity CityAtlas wants before an offer becomes part of the public experience."
+          action={<StatusPill tone="amber">Check terms first</StatusPill>}
+        />
+        <div className="card-grid two">
+          {data.offers.map((offer) => (
+            <OfferCard
+              offer={offer}
+              business={getOfferDisplayBusiness(offer, data.businesses)}
+              key={offer.id}
+            />
+          ))}
+        </div>
+      </section>
+    </>
   );
 }
 
@@ -72,6 +225,13 @@ export function GuidesPage({ data }: { data: CityAtlasData }) {
   const neighborhoodStarterGuides = neighborhoodGuides.filter(
     (guide) => guide.category === "Neighborhood Starter",
   );
+  const neighborhoodGuideCollection =
+    neighborhoodStarterGuides.length > 0
+      ? [
+          ...neighborhoodStarterGuides,
+          ...neighborhoodGuides.filter((guide) => guide.category !== "Neighborhood Starter"),
+        ]
+      : neighborhoodGuides;
   const sourceBackedDateNightStarters = getSourceBackedPlaces(data, "vancouver_date_night_starters");
   const sourceBackedRainyDayStarters = getSourceBackedPlaces(data, "vancouver_rainy_day_starters");
   const sourceBackedFirstEveningStarters = getSourceBackedPlaces(
@@ -119,450 +279,387 @@ export function GuidesPage({ data }: { data: CityAtlasData }) {
     data,
     "vancouver_wellness_reset_starters",
   );
-  const guideRouterCards = [
+  const officialLinkPageCount = [
+    sourceBackedDateNightStarters,
+    sourceBackedRainyDayStarters,
+    sourceBackedFirstEveningStarters,
+    sourceBackedFirstTimeVisitorStarters,
+    sourceBackedGardenDayStarters,
+    sourceBackedKitsilanoScenicStarters,
+    sourceBackedWestSideDaytimeStarters,
+    sourceBackedFalseCreekCultureStarters,
+    sourceBackedUbcDiscoveryStarters,
+    sourceBackedReturningVisitorStarters,
+    sourceBackedOutOfTownGuestStarters,
+    sourceBackedWeekendRouteStarters,
+    sourceBackedSundayStarters,
+    sourceBackedWellnessResetStarters,
+  ].filter((collection) => collection.length > 0).length;
+  const officialLinkPageLabel = `${officialLinkPageCount} place pages with official links`;
+  const placePageQuickLinks = trustedPlacePageLinks(starterPackGuide, routeRoundupGuide);
+  const guideIndexGroups = buildGuideIndexGroups(data, cityGuides, [
     {
-      title: "Need real places with official public sources?",
-      copy:
-        "Open the starter layer first when named Vancouver anchors matter more than broad route logic.",
-      primaryLabel: "Source-backed starters",
-      primaryPath: "/vancouver/date-night-starters",
-      secondaryLabel: "Guide roundup",
-      secondaryPath:
-        "/vancouver/guides/cityatlas-guide-roundup-which-vancouver-route-should-you-open-by-situation",
-      meta: "Best for trust-first real-place routing",
+      title: "Date, rainy day, and easy starts",
+      summary: "Open this when mood, weather, or a first easy decision matters most.",
+      guides: dateAndWeatherGuides,
     },
     {
-      title: "Need the right page for a visitor or guest?",
-      copy:
-        "Use the visitor-intent cluster when the strongest answer changes with who the city plan is for.",
-      primaryLabel: "Visitor and host guides",
-      primaryPath: "#visitor-guide-cluster",
-      secondaryLabel: "First-time visitor starters",
-      secondaryPath: "/vancouver/first-time-visitor-starters",
-      meta: "First evening, first trip, repeat trip, or hosting",
+      title: "Visitors and hosts",
+      summary: "Best for first visits, repeat visits, and days with guests.",
+      guides: visitorGuides,
     },
     {
-      title: "Need one calmer weekend or reset route?",
-      copy:
-        "Open the lower-friction cluster when the real problem is energy, pace, and keeping the day compact.",
-      primaryLabel: "Weekend and reset guides",
-      primaryPath: "#weekend-guide-cluster",
-      secondaryLabel: "Weekend route starters",
-      secondaryPath: "/vancouver/weekend-route-starters",
-      meta: "Weekend, Sunday, and wellness-first planning",
+      title: "Weekend and wellness",
+      summary: "Use this when calmer pace, recovery, or an easier plan matters.",
+      guides: weekendAndResetGuides,
     },
     {
-      title: "Need to choose the part of Vancouver first?",
-      copy:
-        "Use neighborhood and destination-choice pages when place fit matters more than one exact stop.",
-      primaryLabel: "Neighborhood guides",
-      primaryPath: "#neighborhood-guide-cluster",
-      secondaryLabel: "Neighborhood chooser",
-      secondaryPath:
-        "/vancouver/guides/how-to-choose-between-gastown-mount-pleasant-and-kitsilano-for-a-vancouver-evening",
-      meta: "Destination intent before venue-by-venue browsing",
+      title: "Neighborhood choices",
+      summary: "Start here when the biggest decision is which part of Vancouver fits first.",
+      guides: neighborhoodGuideCollection,
     },
+  ]);
+  const [expandedGuideGroups, setExpandedGuideGroups] = useState<string[]>(() =>
+    guideIndexGroups.length > 0 ? [guideIndexGroups[0].title] : [],
+  );
+  const heroFeaturedMission =
+    data.cityMissions.find((mission) => mission.id === "mission-date-night") ?? data.cityMissions[0];
+  const heroFeaturedRoutePath = heroFeaturedMission
+    ? getMissionAnchorPath(heroFeaturedMission, siteConfig.citySlug)
+    : "/vancouver/missions";
+  const firstVisitorGuide =
+    visitorGuides.find((guide) => guide.id !== starterPackGuide?.id) ?? visitorGuides[0];
+  const firstWeekendGuide = weekendAndResetGuides[0];
+  const firstNeighborhoodGuide = neighborhoodGuideCollection[0];
+  const situationSupportLinks = [
+    routeRoundupGuide
+      ? { path: getGuidePath(routeRoundupGuide), label: "Browse by situation" }
+      : null,
+    firstVisitorGuide ? { path: getGuidePath(firstVisitorGuide), label: "First visit" } : null,
+    firstWeekendGuide ? { path: getGuidePath(firstWeekendGuide), label: "Weekend plan" } : null,
+  ].filter((link): link is { path: string; label: string } => link !== null);
+  const neighborhoodSupportLinks = Array.from(
+    new Map(
+      neighborhoodGuideCollection.slice(0, 4).map((guide) => [
+        guide.neighborhood,
+        { path: getGuidePath(guide), label: guide.neighborhood },
+      ]),
+    ).values(),
+  );
+  const placeSupportLinks = placePageQuickLinks
+    .filter((link) => link.label !== "Editorial standards")
+    .slice(0, 6)
+    .map((link) => ({ path: link.path, label: link.label }));
+  const guideSelectorOptions = [
+    {
+      id: "start",
+      label: "I want the easiest start",
+      summary: "One page tells you the best first click.",
+      meta: "Best first click",
+      tone: "green" as const,
+      status: "Start here",
+      title: "Open one guide that tells you where to begin",
+      copy: "Use this when you do not want to scan a long guide library first.",
+      primaryLabel: "Open the start-here guide",
+      primaryPath: starterPackGuide ? getGuidePath(starterPackGuide) : "/vancouver/date-night-starters",
+      image: siteConfig.media.weekend,
+      imageAlt: "Illustrated Vancouver planning scene for the CityAtlas start-here guide",
+      supportLinks: situationSupportLinks.slice(0, 2),
+    },
+    {
+      id: "day",
+      label: "I know the kind of day",
+      summary: "Rainy day, guest day, weekend, or similar.",
+      meta: "By situation",
+      tone: "blue" as const,
+      status: "Guide picker",
+      title: "Match the day before you match the place",
+      copy:
+        "Use this when you already know it is a visitor day, rainy day, weekend plan, or another clear situation.",
+      primaryLabel: routeRoundupGuide ? "Browse by situation" : "Open guide choices",
+      primaryPath: routeRoundupGuide
+        ? getGuidePath(routeRoundupGuide)
+        : "/vancouver/guides/which-low-friction-vancouver-route-should-you-open-today",
+      image: siteConfig.media.guides,
+      imageAlt: "Illustrated Gastown scene for a Vancouver guide situation picker",
+      supportLinks: [
+        dateAndWeatherGuides[0]
+          ? { path: getGuidePath(dateAndWeatherGuides[0]), label: "Date or rainy day" }
+          : null,
+        firstVisitorGuide ? { path: getGuidePath(firstVisitorGuide), label: "Visitors and hosts" } : null,
+        firstWeekendGuide ? { path: getGuidePath(firstWeekendGuide), label: "Weekend and reset" } : null,
+      ].filter((link): link is { path: string; label: string } => link !== null),
+    },
+    {
+      id: "plan",
+      label: "I want a ready-made plan",
+      summary: "The stop order is already handled.",
+      meta: "Route ready",
+      tone: "amber" as const,
+      status: "One route ready",
+      title: "Open a ready-made route instead of another long guide list",
+      copy:
+        "Use this when you want the stop order and timing handled for you instead of choosing between guide types first.",
+      primaryLabel: "Open ready-made route",
+      primaryPath: heroFeaturedRoutePath,
+      image: siteConfig.media.guides,
+      imageAlt: "Illustrated route-planning scene for a ready-made Vancouver plan",
+      supportLinks: [{ path: "/vancouver/missions", label: "See all ready-made routes" }],
+    },
+    ...(officialLinkPageCount > 0
+      ? [
+          {
+            id: "places",
+            label: "I want real places",
+            summary: "Named restaurants, parks, cafes, or venues.",
+            meta: "Official-link place pages",
+            tone: "green" as const,
+            status: "Real places",
+            title: "Skip the extra reading and open named Vancouver places",
+            copy:
+              "Use this when the next step is a restaurant, park, cafe, or venue, not more planning copy.",
+            primaryLabel: "Open local places",
+            primaryPath: "/vancouver/date-night-starters",
+            image: siteConfig.media.city,
+            imageAlt: "Illustrated Vancouver waterfront scene for real place pages",
+            supportLinks: placeSupportLinks,
+          },
+        ]
+      : []),
+    ...(firstNeighborhoodGuide
+      ? [
+          {
+            id: "neighborhood",
+            label: "I want a neighborhood",
+            summary: "Pick the part of town before the venue.",
+            meta: "Part of town first",
+            tone: "blue" as const,
+            status: "Neighborhood guides",
+            title: "Start with the part of Vancouver that fits best",
+            copy:
+              "Use this when the biggest question is Kitsilano, Gastown, Mount Pleasant, or another area first.",
+            primaryLabel: "Open neighborhood guides",
+            primaryPath: getGuidePath(firstNeighborhoodGuide),
+            image: siteConfig.media.guides,
+            imageAlt: "Illustrated Vancouver neighborhood scene for choosing the right area first",
+            supportLinks: neighborhoodSupportLinks,
+          },
+        ]
+      : []),
   ];
+  const guideDoorOptions = [
+    {
+      id: "visiting",
+      label: "I'm visiting Vancouver",
+      path: firstVisitorGuide ? getGuidePath(firstVisitorGuide) : "/vancouver/first-time-visitor-starters",
+      image: siteConfig.media.doorFirstVisit,
+    },
+    {
+      id: "local-day",
+      label: "I live here - plan my day",
+      path: routeRoundupGuide
+        ? getGuidePath(routeRoundupGuide)
+        : "/vancouver/guides/which-low-friction-vancouver-route-should-you-open-today",
+      image: siteConfig.media.doorWeekendPlan,
+    },
+    {
+      id: "one-plan",
+      label: "Just show me one good plan",
+      path: heroFeaturedRoutePath,
+      image: siteConfig.media.doorDateNight,
+    },
+  ] as const;
+  function toggleGuideGroup(title: string) {
+    setExpandedGuideGroups((current) =>
+      current.includes(title)
+        ? current.filter((item) => item !== title)
+        : [...current, title],
+    );
+  }
 
   return (
     <>
-      <section className="section-block page-top">
-        <SectionHeader
-          label="Guides"
-          title="Editorial guide system for city moments, neighborhood fit, and route intent"
-          copy="These pages are designed to answer real Vancouver planning questions fast, then connect people into discovery pages, missions, and partner paths."
-          action={<StatusPill tone="blue">Route logic first</StatusPill>}
-        />
-        <div className="split-section">
-          <div className="source-panel">
-            <SectionHeader
-              label="Start here"
-              title="Open the right guide cluster before the city gets overbuilt"
-              copy="CityAtlas works best when someone starts with the right planning question first: weather, visitor type, neighborhood choice, weekend shape, or a source-backed real-place layer."
-            />
-            <div className="guide-query-grid">
-              {starterPackGuide ? (
-                <AppLink
-                  className="query-card query-card-link"
-                  to={`/vancouver/guides/${starterPackGuide.slug}`}
-                >
-                  <strong>Starter-pack guide</strong>
-                  <p>Choose the right CityAtlas page first when the main problem is where to begin.</p>
-                </AppLink>
-              ) : null}
-              <a className="query-card query-card-link" href="#visitor-guide-cluster">
-                <strong>Visitors and hosts</strong>
-                <p>Move into first-time, returning-visitor, first-evening, and guest-hosting routes.</p>
-              </a>
-              <a className="query-card query-card-link" href="#weekend-guide-cluster">
-                <strong>Weekend and reset</strong>
-                <p>Open the cluster for wellness, Sunday, and compact weekend-route planning.</p>
-              </a>
-              <a className="query-card query-card-link" href="#neighborhood-guide-cluster">
-                <strong>Neighborhood choice</strong>
-                <p>Use these pages when the first decision is which part of Vancouver fits the plan, then move into the Gastown, Mount Pleasant, and Kitsilano starter trio.</p>
-              </a>
-              <AppLink className="query-card query-card-link" to="/vancouver/date-night-starters">
-                <strong>Source-backed starters</strong>
-                <p>Jump straight to official-source route anchors when real-place clarity matters first.</p>
-              </AppLink>
-              <AppLink className="query-card query-card-link" to="/vancouver/garden-day-starters">
-                <strong>Garden day starters</strong>
-                <p>Use this when the route should choose between conservatory calm, hilltop gardens, and fuller botanical pacing before the day sprawls.</p>
-              </AppLink>
-              <AppLink className="query-card query-card-link" to="/vancouver/kitsilano-scenic-starters">
-                <strong>Kitsilano scenic starters</strong>
-                <p>Use this narrower west-side source-backed layer when the plan needs scenic anchors instead of a full-city route.</p>
-              </AppLink>
-              <AppLink className="query-card query-card-link" to="/vancouver/west-side-daytime-starters">
-                <strong>West-side daytime starters</strong>
-                <p>Use this when the route should start with beaches, gardens, or UBC culture before the day gets overbuilt.</p>
-              </AppLink>
-              <AppLink className="query-card query-card-link" to="/vancouver/false-creek-culture-starters">
-                <strong>False Creek culture starters</strong>
-                <p>Use this when the route should stay compact around markets, museums, Vanier Park, and one culture-afternoon shape.</p>
-              </AppLink>
-              <AppLink className="query-card query-card-link" to="/vancouver/ubc-discovery-starters">
-                <strong>UBC discovery starters</strong>
-                <p>Use this when the route should stay campus-side around museums, gardens, and one contained west-side discovery day.</p>
-              </AppLink>
-              <AppLink className="query-card query-card-link" to="/vancouver/missions">
-                <strong>Saveable missions</strong>
-                <p>Move here once the route type is clear and the next step is saving or reusing the plan.</p>
-              </AppLink>
-            </div>
-          </div>
-          <div className="source-panel">
-            <SectionHeader
-              label="Cluster health"
-              title="The guide system now covers the strongest Vancouver planning moments"
-              copy="These clusters give readers a clearer map of CityAtlas than one flat article library would."
-            />
-            <div className="guide-query-grid">
-              <article className="query-card">
-                <strong>{dateAndWeatherGuides.length} route-and-weather guides</strong>
-                <p>Date night, rainy day, and work-mode planning sit together because they answer compact city-moment questions.</p>
-              </article>
-              <article className="query-card">
-                <strong>{visitorGuides.length} visitor and host guides</strong>
-                <p>Visitor-intent pages now connect first arrival, second-look plans, guest hosting, and the starter-pack path.</p>
-              </article>
-              <article className="query-card">
-                <strong>{weekendAndResetGuides.length} weekend and reset guides</strong>
-                <p>Weekend-route, Sunday, and wellness pages keep calmer, lower-friction route questions in one crawlable area.</p>
-              </article>
-              <article className="query-card">
-                <strong>{neighborhoodGuides.length} neighborhood guides</strong>
-                <p>These pages now include a full neighborhood starter trio plus chooser pages so CityAtlas can explain place fit before named-venue browsing.</p>
-              </article>
-            </div>
-          </div>
+      <section className="guide-door-hero page-top" aria-labelledby="guide-door-title">
+        <p className="section-label">Guides</p>
+        <h1 id="guide-door-title">What do you need today?</h1>
+        <div className="guide-door-grid" aria-label="Choose your Vancouver guide door">
+          {guideDoorOptions.map((door) => (
+            <AppLink className="guide-door-card" key={door.id} to={door.path}>
+              <span className="guide-door-photo" aria-hidden="true">
+                <img alt="" decoding="async" loading="lazy" src={door.image} />
+              </span>
+              <strong>{door.label}</strong>
+              <span className="guide-door-go">Go</span>
+            </AppLink>
+          ))}
         </div>
-        <div className="guide-query-grid">
-          <article className="query-card">
-            <strong>Date night</strong>
-            <p>Confident plans that stay local, efficient, and easy to share.</p>
-          </article>
-          <article className="query-card">
-            <strong>Rainy day Vancouver</strong>
-            <p>Indoor-friendly routes with clear neighborhood logic and low friction.</p>
-          </article>
-          <article className="query-card">
-            <strong>Wellness reset</strong>
-            <p>Recovery, movement, and calm-hour planning without inflated claims.</p>
-          </article>
-          <article className="query-card">
-            <strong>Neighborhood chooser</strong>
-            <p>Help people pick the right part of Vancouver before they overbuild the night.</p>
-          </article>
-          <article className="query-card">
-            <strong>First evening in Vancouver</strong>
-            <p>Compact visitor loops that orient a new arrival without turning night one into a marathon.</p>
-          </article>
-          <article className="query-card">
-            <strong>Where should a first-time visitor start?</strong>
-            <p>Destination-choice guidance that helps a new arrival choose the right part of Vancouver first.</p>
-          </article>
-          <article className="query-card">
-            <strong>Returning Vancouver visitor ideas</strong>
-            <p>Local-discovery guidance for people who want a second-look city plan instead of repeating the obvious first trip.</p>
-          </article>
-          <article className="query-card">
-            <strong>Hosting out-of-town guests</strong>
-            <p>Low-pressure city introductions that help a host pick one easy Vancouver anchor instead of an all-day marathon.</p>
-          </article>
-          <article className="query-card">
-            <strong>Itinerary starter pack</strong>
-            <p>Use this when the first problem is choosing the right CityAtlas page before the day gets overbuilt.</p>
-          </article>
-          <article className="query-card">
-            <strong>Weekend route ideas</strong>
-            <p>One-anchor weekend planning that keeps the day compact instead of bouncing across the city.</p>
-          </article>
-          <article className="query-card">
-            <strong>Low-effort Vancouver Sunday plan</strong>
-            <p>Help someone choose one gentle Sunday anchor instead of overfilling the day with a cross-city weekend checklist.</p>
-          </article>
+        <div className="guide-door-underlink">
+          <span>Prefer to browse everything?</span>
+          <a href="#guide-library-index">Open the full guide list</a>
         </div>
-      </section>
-
-      <section className="section-block">
-        <SectionHeader
-          label="Situation router"
-          title="Choose the strongest next CityAtlas page by planning moment"
-          copy="This turns the guide library into a clearer route map for real readers: start with the situation, then open the guide or starter layer that already fits it."
-          action={<StatusPill tone="blue">Decision-first route links</StatusPill>}
-        />
-        <div className="guide-query-grid">
-          {guideRouterCards.map((card) => {
-            const secondaryIsAnchor = card.secondaryPath.startsWith("#");
-            const primaryIsAnchor = card.primaryPath.startsWith("#");
-
-            return (
-              <article className="query-card" key={card.title}>
-                <span className="query-card-kicker">{card.meta}</span>
-                <strong>{card.title}</strong>
-                <p>{card.copy}</p>
-                <div className="query-card-actions">
-                  {primaryIsAnchor ? (
-                    <a className="button secondary" href={card.primaryPath}>
-                      {card.primaryLabel}
-                    </a>
-                  ) : (
-                    <AppLink className="button secondary" to={card.primaryPath}>
-                      {card.primaryLabel}
-                    </AppLink>
-                  )}
-                  {secondaryIsAnchor ? (
-                    <a className="button secondary" href={card.secondaryPath}>
-                      {card.secondaryLabel}
-                    </a>
-                  ) : (
-                    <AppLink className="button secondary" to={card.secondaryPath}>
-                      {card.secondaryLabel}
-                    </AppLink>
-                  )}
-                </div>
-              </article>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="section-block">
-        <SectionHeader
-          label="Other city preview"
-          title="Toronto is the first narrower CityAtlas city preview"
-          copy="Use the Toronto preview when the strongest next move is one first-visit starting-area question or one compact weekend-route question, not the full Vancouver route library."
-          action={<StatusPill tone="blue">Second-city preview</StatusPill>}
-        />
-        <div className="guide-query-grid">
-          <AppLink className="query-card query-card-link" to="/toronto/guides">
-            <strong>Toronto guide hub</strong>
-            <p>Start with the Toronto guide hub when the plan needs one cleaner first-visit or weekend-route decision instead of a generic city roundup.</p>
-          </AppLink>
-          <AppLink className="query-card query-card-link" to="/toronto/first-time-visitor-starters">
-            <strong>Toronto starter page</strong>
-            <p>Open the official-source Toronto starter page for a narrower first-visit layer with visible claim limits and correction paths.</p>
-          </AppLink>
-          <AppLink
-            className="query-card query-card-link"
-            to="/toronto/guides/where-should-a-first-time-toronto-visitor-start"
-          >
-            <strong>Toronto destination guide</strong>
-            <p>Read the Toronto destination guide when the key decision is Distillery, St. Lawrence, Harbourfront, AGO, or ROM first.</p>
-          </AppLink>
-          <AppLink className="query-card query-card-link" to="/toronto/weekend-route-starters">
-            <strong>Toronto weekend starter page</strong>
-            <p>Open the official-source Toronto weekend page when the key decision is one flexible weekend anchor instead of a scattered cross-city plan.</p>
-          </AppLink>
-        </div>
-      </section>
-
-      {dateAndWeatherGuides.length > 0 ? (
-        <section className="section-block" id="route-weather-guide-cluster">
-          <SectionHeader
-            label="Route and weather cluster"
-            title="Guides for compact city moments"
-            copy="These pages answer the highest-frequency route questions first: date night, rainy days, first evening, and work-mode tradeoffs."
-            action={<StatusPill tone="green">{dateAndWeatherGuides.length} guides</StatusPill>}
-          />
-          <div className="card-grid two">
-            {dateAndWeatherGuides.map((guide) => (
-              <GuideCard guide={guide} key={guide.id} />
-            ))}
-          </div>
-        </section>
-      ) : null}
-
-      {visitorGuides.length > 0 ? (
-        <section className="section-block" id="visitor-guide-cluster">
-          <SectionHeader
-            label="Visitor and host cluster"
-            title="Guides for first arrivals, repeat visits, and guest plans"
-            copy="This cluster makes CityAtlas easier to classify for visitor-intent and host-intent questions without collapsing everything into generic tourism copy."
-            action={<StatusPill tone="green">{visitorGuides.length} guides</StatusPill>}
-          />
-          <div className="card-grid two">
-            {visitorGuides.map((guide) => (
-              <GuideCard guide={guide} key={guide.id} />
-            ))}
-          </div>
-        </section>
-      ) : null}
-
-      {weekendAndResetGuides.length > 0 ? (
-        <section className="section-block" id="weekend-guide-cluster">
-          <SectionHeader
-            label="Weekend and reset cluster"
-            title="Guides for calmer weekend shapes and recovery-led plans"
-            copy="These pages keep Sunday, wellness, and one-anchor weekend planning together so the route logic reads like a system instead of scattered articles."
-            action={<StatusPill tone="green">{weekendAndResetGuides.length} guides</StatusPill>}
-          />
-          <div className="card-grid two">
-            {weekendAndResetGuides.map((guide) => (
-              <GuideCard guide={guide} key={guide.id} />
-            ))}
-          </div>
-        </section>
-      ) : null}
-
-      {neighborhoodGuides.length > 0 ? (
-        <section className="section-block" id="neighborhood-guide-cluster">
-          <SectionHeader
-            label="Destination starters"
-            title="Neighborhood-intent pages for clearer Vancouver choices"
-            copy="These guides answer which part of Vancouver fits the plan before the reader gets dragged into venue-by-venue browsing, now with dedicated starter pages for Gastown, Mount Pleasant, and Kitsilano."
-            action={<StatusPill tone="green">{neighborhoodGuides.length} guides</StatusPill>}
-          />
-          <div className="card-grid three">
-            {(neighborhoodStarterGuides.length > 0
-              ? [...neighborhoodStarterGuides, ...neighborhoodGuides.filter((guide) => guide.category !== "Neighborhood Starter")]
-              : neighborhoodGuides
-            ).map((guide) => (
-              <GuideCard guide={guide} key={guide.id} />
-            ))}
-          </div>
-        </section>
-      ) : null}
-
-      {sourceBackedDateNightStarters.length > 0 ||
-      sourceBackedRainyDayStarters.length > 0 ||
-      sourceBackedFirstEveningStarters.length > 0 ||
-      sourceBackedFirstTimeVisitorStarters.length > 0 ||
-      sourceBackedGardenDayStarters.length > 0 ||
-      sourceBackedKitsilanoScenicStarters.length > 0 ||
-      sourceBackedWestSideDaytimeStarters.length > 0 ||
-      sourceBackedFalseCreekCultureStarters.length > 0 ||
-      sourceBackedUbcDiscoveryStarters.length > 0 ||
-      sourceBackedReturningVisitorStarters.length > 0 ||
-      sourceBackedOutOfTownGuestStarters.length > 0 ||
-      sourceBackedWeekendRouteStarters.length > 0 ||
-      sourceBackedSundayStarters.length > 0 ||
-      sourceBackedWellnessResetStarters.length > 0 ? (
-        <section className="split-section">
-          <div className="source-panel">
-            <SectionHeader
-              label="Source-backed now"
-              title="Need pages that name real Vancouver places more carefully?"
-              copy="CityAtlas now has narrow Vancouver date-night, rainy-day, Sunday, weekend-route, wellness-reset, guest-hosting, first-evening, first-time-visitor, returning-visitor, Kitsilano-scenic, False Creek culture, and UBC discovery pages built from official public sources, visible claim boundaries, and a public correction path."
-            />
-          </div>
-          <div className="source-panel">
-            <p>
-              This lets the guide system stay useful without pretending every real venue page is
-              already fully verified. Use it as the bridge between route logic and careful real-world coverage.
-            </p>
-            <div className="hero-actions">
-              <AppLink className="button primary" to="/vancouver/date-night-starters">
-                Open source-backed starters <ArrowRightIcon />
-              </AppLink>
-              <AppLink className="button secondary" to="/vancouver/rainy-day-starters">
-                Rainy-day starters
-              </AppLink>
-              <AppLink className="button secondary" to="/vancouver/first-evening-starters">
-                First-evening starters
-              </AppLink>
-              <AppLink className="button secondary" to="/vancouver/first-time-visitor-starters">
-                First-time visitor starters
-              </AppLink>
-              <AppLink className="button secondary" to="/vancouver/garden-day-starters">
-                Garden day starters
-              </AppLink>
-              <AppLink className="button secondary" to="/vancouver/kitsilano-scenic-starters">
-                Kitsilano scenic starters
-              </AppLink>
-              <AppLink className="button secondary" to="/vancouver/west-side-daytime-starters">
-                West-side daytime starters
-              </AppLink>
-              <AppLink className="button secondary" to="/vancouver/false-creek-culture-starters">
-                False Creek culture starters
-              </AppLink>
-              <AppLink className="button secondary" to="/vancouver/ubc-discovery-starters">
-                UBC discovery starters
-              </AppLink>
-              <AppLink className="button secondary" to="/vancouver/returning-visitor-starters">
-                Returning-visitor starters
-              </AppLink>
-              <AppLink className="button secondary" to="/vancouver/out-of-town-guest-starters">
-                Out-of-town guest starters
-              </AppLink>
-              <AppLink className="button secondary" to="/vancouver/weekend-route-starters">
-                Weekend route starters
-              </AppLink>
-              <AppLink className="button secondary" to="/vancouver/sunday-starters">
-                Sunday starters
-              </AppLink>
-              <AppLink className="button secondary" to="/vancouver/wellness-reset-starters">
-                Wellness reset starters
-              </AppLink>
-              <AppLink
-                className="button secondary"
-                to="/vancouver/guides/vancouver-itinerary-starter-pack-which-cityatlas-page-should-you-open-first"
-              >
-                Starter pack guide
-              </AppLink>
-              {routeRoundupGuide ? (
-                <AppLink
-                  className="button secondary"
-                  to={`/vancouver/guides/${routeRoundupGuide.slug}`}
-                >
-                  Guide roundup
-                </AppLink>
-              ) : null}
-              <AppLink className="button secondary" to="/editorial-standards">
-                Editorial standards
-              </AppLink>
-            </div>
-          </div>
-        </section>
-      ) : null}
-
-      <section className="section-block">
-        <SectionHeader
-          label="All guides"
-          title="Answer-first Vancouver guide library"
-          copy="CityAtlas should win with useful route logic, neighborhood fit, and planning help, not generic listicles."
-        />
-        <div className="card-grid two">
-          {cityGuides.map((guide) => (
-            <GuideCard guide={guide} key={guide.id} />
+        <div className="guide-door-more-ways" aria-label="More ways to start">
+          {guideSelectorOptions.slice(0, 4).map((option) => (
+            <AppLink key={option.id} to={option.primaryPath}>
+              {option.label}
+            </AppLink>
           ))}
         </div>
       </section>
 
-      <section className="cta-band">
-        <div>
-          <h2>Turn guide traffic into saved plans and stronger local discovery</h2>
-          <p>
-            Every guide should point readers toward a route, a planner action, a neighborhood
-            decision, or a business review path instead of ending as a dead article.
-          </p>
+      <section className="section-block" id="guide-library-index">
+        <SectionHeader
+          label="Optional"
+          title="Need more than one choice?"
+          copy="Open the full library only if you still want to browse everything or switch cities."
+        />
+        <div className="guide-library-disclosure-stack">
+          <details className="disclosure-card guide-library-disclosure" open>
+            <summary className="disclosure-summary">
+              <div className="guide-library-disclosure-copy">
+                <strong>Browse every Vancouver guide</strong>
+                <p>Use the full library only when you already know the shape of the day.</p>
+              </div>
+              <span className="disclosure-tag">Optional</span>
+            </summary>
+            <div className="disclosure-body guide-library-disclosure-body">
+              <div className="guide-index-groups">
+                {guideIndexGroups.map((group) => {
+                  const expanded = expandedGuideGroups.includes(group.title);
+
+                  return (
+                    <article className="guide-index-group" key={group.title}>
+                      <button
+                        aria-expanded={expanded}
+                        className="guide-index-group-heading"
+                        onClick={() => toggleGuideGroup(group.title)}
+                        type="button"
+                      >
+                        <div className="guide-index-group-heading-copy">
+                          <strong>{group.title}</strong>
+                          <span className="guide-index-group-summary">{group.summary}</span>
+                        </div>
+                        <div className="guide-index-group-heading-meta">
+                          <span>{group.links.length} guides</span>
+                          <span className="guide-index-group-toggle">{expanded ? "Hide" : "Open"}</span>
+                        </div>
+                      </button>
+                      {expanded ? (
+                        <div className="guide-index-link-list">
+                          {group.links.map((guide) => (
+                            <AppLink className="guide-index-text-link" key={guide.id} to={guide.path}>
+                              <strong>{guide.title}</strong>
+                              <span>{guide.detail}</span>
+                            </AppLink>
+                          ))}
+                        </div>
+                      ) : null}
+                    </article>
+                  );
+                })}
+              </div>
+              <AppLink className="text-link" to="/editorial-standards">
+                See editorial standards <ArrowRightIcon />
+              </AppLink>
+            </div>
+          </details>
+
+          <article className="source-panel guide-library-alt-city-card">
+            <div className="guide-library-side-pills">
+              <StatusPill tone="blue">Toronto guides</StatusPill>
+            </div>
+            <strong>Need Toronto instead?</strong>
+            <p>Toronto stays smaller on purpose for one first-visit or weekend decision at a time.</p>
+            <div className="guide-selector-support-links">
+              <AppLink className="city-search-secondary-link" to="/toronto/guides">
+                Toronto guides
+              </AppLink>
+              <AppLink className="city-search-secondary-link" to="/toronto/first-time-visitor-starters">
+                Toronto starting points
+              </AppLink>
+              <AppLink
+                className="city-search-secondary-link"
+                to="/toronto/guides/where-should-a-first-time-toronto-visitor-start"
+              >
+                Toronto destination guide
+              </AppLink>
+            </div>
+          </article>
         </div>
-        <AppLink className="button primary" to="/vancouver/missions">
-          Open missions <ArrowRightIcon />
-        </AppLink>
       </section>
     </>
   );
+}
+
+function trustedPlacePageLinks(
+  starterPackGuide: CityAtlasData["guides"][number] | undefined,
+  routeRoundupGuide: CityAtlasData["guides"][number] | undefined,
+) {
+  return [
+    { path: "/vancouver/date-night-starters", label: "Date night", primary: true },
+    { path: "/vancouver/rainy-day-starters", label: "Rainy day" },
+    { path: "/vancouver/first-evening-starters", label: "First evening" },
+    { path: "/vancouver/first-time-visitor-starters", label: "First visit" },
+    { path: "/vancouver/kitsilano-scenic-starters", label: "Kitsilano" },
+    { path: "/vancouver/weekend-route-starters", label: "Weekend plan" },
+    { path: "/vancouver/wellness-reset-starters", label: "Wellness reset" },
+    ...(starterPackGuide
+      ? [{ path: `/vancouver/guides/${starterPackGuide.slug}`, label: "Where to start" }]
+      : []),
+    ...(routeRoundupGuide
+      ? [{ path: `/vancouver/guides/${routeRoundupGuide.slug}`, label: "Browse by situation" }]
+      : []),
+    { path: "/editorial-standards", label: "Editorial standards" },
+  ];
+}
+
+function buildGuideIndexGroups(
+  data: CityAtlasData,
+  allGuides: CityAtlasData["guides"],
+  groups: Array<{ title: string; summary: string; guides: CityAtlasData["guides"] }>,
+) {
+  const seenGuideIds = new Set<string>();
+  const groupedLinks = groups
+    .map((group) => {
+      const uniqueGuides = group.guides.filter((guide) => {
+        if (seenGuideIds.has(guide.id)) return false;
+        seenGuideIds.add(guide.id);
+        return true;
+      });
+
+      return {
+        title: group.title,
+        summary: group.summary,
+        links: uniqueGuides.map((guide) => ({
+          id: guide.id,
+          title: simplifyGuideDisplayText(guide.title),
+          detail: formatGuideIndexDetail(data, guide),
+          path: getGuidePath(guide),
+        })),
+      };
+    })
+    .filter((group) => group.links.length > 0);
+
+  const uncategorizedGuides = allGuides
+    .filter((guide) => !seenGuideIds.has(guide.id))
+    .map((guide) => ({
+      id: guide.id,
+      title: simplifyGuideDisplayText(guide.title),
+      detail: formatGuideIndexDetail(data, guide),
+      path: getGuidePath(guide),
+    }));
+
+  if (uncategorizedGuides.length > 0) {
+    groupedLinks.push({
+      title: "Other Vancouver guides",
+      summary: "Extra pages that do not fit the main clusters above.",
+      links: uncategorizedGuides,
+    });
+  }
+
+  return groupedLinks;
+}
+
+function formatGuideIndexDetail(data: CityAtlasData, guide: CityAtlasData["guides"][number]) {
+  const surfaceState = getGuideSurfaceState(guide, data);
+  return `${surfaceState.stateLabel} - ${simplifyGuideCategoryLabel(guide.category)} - ${guide.neighborhood}`;
 }

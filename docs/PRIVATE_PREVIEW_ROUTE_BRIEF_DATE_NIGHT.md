@@ -39,7 +39,7 @@ Not allowed:
    - Message: the product creates intent signals before payment or public claims.
 
 4. Open `/for-businesses/pricing`.
-   - Message: packages are planned and payment acceptance is disabled.
+   - Message: CityAtlas keeps the review-first path clear and now also has a limited hosted-checkout option for paid partner packages when the fit is already obvious.
 
 5. Open `/admin`.
    - Message: the owner console keeps real-world actions gated.

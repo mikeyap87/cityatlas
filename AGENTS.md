@@ -17,7 +17,7 @@ Keep this lane separate from other Univenture apps unless the owner explicitly a
 ## Project Shape
 
 - App source lives in `src/`.
-- Public media and design references live in `public/`.
+- Runtime public media lives in `public/`. Design references and QA screenshots live in `docs/design/` and `docs/visual_references/`.
 - Operator docs live in `docs/`.
 - Brand assets live in `public/brand/`; brand rules live in `docs/brand/`.
 - Supabase planning lives in `supabase/schema.sql`.
